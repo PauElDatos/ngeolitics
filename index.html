@@ -6,463 +6,487 @@
   <title>N.Geolitics — Investigaciones económicas e históricas</title>
   <meta name="description" content="N.Geolitics: investigaciones económicas e históricas basadas en recopilación, tratamiento y visualización de datos." />
 
-  <!-- Open Graph -->
-  <meta property="og:title" content="N.Geolitics" />
-  <meta property="og:description" content="Investigaciones económicas e históricas basadas en datos." />
-  <meta property="og:type" content="website" />
+  <link rel="icon" href="assets/faviconNG.png" />
 
   <style>
     :root{
-      --bg: #0b0c0f;
-      --panel: rgba(255,255,255,.06);
-      --panel2: rgba(255,255,255,.08);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.68);
-      --border: rgba(255,255,255,.12);
-      --shadow: 0 18px 60px rgba(0,0,0,.55);
-      --radius: 18px;
-      --radius2: 26px;
-      --max: 1100px;
+      --uiScale: 1.35;
+
+      --bg:#252525;
+      --primary:#FEF702;
+      --text:#B0B0B0;
+      --stroke:#3a3a3a;
+
+      --radius:16px;
+      --shadow: 0 10px 30px rgba(0,0,0,.25);
+
+      --fontTitle: "Futura","Trebuchet MS",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      --fontText:  Arial,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+
+      --max: 1040px;
     }
 
-    *{ box-sizing: border-box; }
-    html, body{ height: 100%; }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background:
-        radial-gradient(1100px 700px at 20% 10%, rgba(255,255,255,.10), transparent 55%),
-        radial-gradient(900px 600px at 80% 20%, rgba(255,255,255,.07), transparent 55%),
-        radial-gradient(900px 900px at 50% 120%, rgba(255,255,255,.05), transparent 60%),
-        var(--bg);
+      min-height:100vh;
+      background: var(--bg);
       color: var(--text);
-    }
-
-    a{ color: inherit; text-decoration: none; }
-    a:focus-visible, button:focus-visible{ outline: 2px solid rgba(255,255,255,.65); outline-offset: 3px; border-radius: 12px; }
-
-    .wrap{ max-width: var(--max); margin: 0 auto; padding: 28px 18px 60px; }
-
-    /* Top bar */
-    .top{
-      display:flex; align-items:center; justify-content:space-between;
-      padding: 10px 4px 24px;
-    }
-    .brand{
-      display:flex; align-items:center; gap:12px;
-      min-width: 200px;
-    }
-    .logo{
-      width:42px; height:42px; border-radius: 12px;
-      display:grid; place-items:center;
-      background: rgba(255,255,255,.06);
-      border: 1px solid var(--border);
-      box-shadow: 0 10px 30px rgba(0,0,0,.35);
-      font-weight: 800;
-      letter-spacing: .5px;
-    }
-    .brand-title{
-      display:flex; flex-direction:column; line-height:1.05;
-    }
-    .brand-title strong{ font-size: 15px; letter-spacing:.3px; }
-    .brand-title span{ font-size: 12px; color: var(--muted); }
-
-    nav{
-      display:flex; align-items:center; gap: 16px;
-    }
-    nav a{
-      font-size: 13px; color: var(--muted);
-      padding: 8px 10px;
-      border-radius: 12px;
-      transition: background .2s, color .2s;
-    }
-    nav a:hover{ background: rgba(255,255,255,.06); color: var(--text); }
-
-    .cta{
-      display:flex; align-items:center; gap:10px;
-    }
-    .btn{
-      border: 1px solid var(--border);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-size: 13px;
-      cursor:pointer;
-      transition: transform .06s ease, background .2s, border-color .2s;
-      user-select:none;
-    }
-    .btn:hover{ background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.18); }
-    .btn:active{ transform: translateY(1px); }
-    .btn.primary{
-      background: rgba(255,255,255,.92);
-      color: #0a0b0e;
-      border-color: transparent;
-      font-weight: 700;
-    }
-    .btn.primary:hover{ background: rgba(255,255,255,.98); }
-
-    /* Hero */
-    .hero{
-      margin-top: 10px;
-      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
-      border: 1px solid var(--border);
-      border-radius: var(--radius2);
-      box-shadow: var(--shadow);
-      overflow:hidden;
-      position: relative;
-    }
-    .hero-inner{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 18px;
-      padding: 28px;
-    }
-    .hero h1{
-      margin:0 0 10px;
-      font-size: clamp(30px, 4.2vw, 52px);
-      letter-spacing: -0.8px;
-    }
-    .hero p{
-      margin:0 0 18px;
-      color: var(--muted);
-      font-size: 15px;
-      line-height: 1.55;
-      max-width: 62ch;
-    }
-    .hero-actions{
-      display:flex; gap:10px; flex-wrap:wrap;
-      margin-top: 8px;
-    }
-    .hero-badges{
-      display:flex; gap:8px; flex-wrap:wrap;
-      margin-top: 14px;
-    }
-    .badge{
-      font-size: 12px;
-      padding: 7px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(0,0,0,.22);
-      color: rgba(255,255,255,.78);
-    }
-
-    /* Hero card (right) */
-    .hero-card{
-      align-self: center;
-      background: rgba(0,0,0,.25);
-      border: 1px solid var(--border);
-      border-radius: 22px;
+      font-family: var(--fontText);
+      font-size: calc(14px * var(--uiScale));
       padding: 18px;
-      min-height: 170px;
-      display:flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .hero-card .bigmark{
-      width: 100%;
-      aspect-ratio: 1 / 1;
-      border-radius: 20px;
-      display:grid;
-      place-items:center;
-      background: rgba(255,255,255,.05);
-      border: 1px solid rgba(255,255,255,.10);
-      font-weight: 900;
-      font-size: 56px;
-      letter-spacing: 2px;
-    }
-    .hero-card .meta{
-      display:flex; justify-content:space-between; gap:12px;
-      color: var(--muted);
-      font-size: 12px;
     }
 
-    /* Section */
-    .section{
-      margin-top: 28px;
-    }
-    .section-head{
-      display:flex; align-items:end; justify-content:space-between; gap: 12px;
-      margin: 0 2px 14px;
-    }
-    .section-head h2{
-      margin:0;
-      font-size: 18px;
-      letter-spacing: -.2px;
-    }
-    .section-head p{
-      margin:0;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.35;
-      max-width: 70ch;
+    a{ color:inherit; text-decoration:none; }
+    a:focus-visible, button:focus-visible{
+      outline:2px solid rgba(254,247,2,.55);
+      outline-offset:3px;
+      border-radius: 12px;
     }
 
-    /* Cards */
-    .grid{
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+    .wrap{
+      width: min(var(--max), 100%);
+      margin: 0 auto;
+      display: grid;
       gap: 14px;
     }
-    .card{
-      background: rgba(255,255,255,.05);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      overflow:hidden;
-      transition: transform .12s ease, background .2s, border-color .2s;
-      box-shadow: 0 10px 40px rgba(0,0,0,.35);
-    }
-    .card:hover{
-      transform: translateY(-2px);
-      background: rgba(255,255,255,.07);
-      border-color: rgba(255,255,255,.18);
-    }
-    .cover{
-      height: 165px;
-      background: rgba(0,0,0,.35);
-      border-bottom: 1px solid rgba(255,255,255,.10);
+
+    /* Header/brand */
+    header.top{
+      padding:14px 16px;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
       display:flex;
       align-items:center;
-      justify-content:center;
-      position: relative;
+      justify-content:space-between;
+      gap: 14px;
     }
-    .cover img{
-      width:100%; height:100%;
-      object-fit: cover;
-      filter: saturate(0.95) contrast(1.05);
-      opacity: .92;
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 12px;
+      min-width: 0;
     }
-    .cover .fallback{
-      position:absolute;
-      inset:0;
+
+    .logo{
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
       display:grid;
       place-items:center;
-      color: rgba(255,255,255,.85);
-      font-weight: 800;
-      letter-spacing:.8px;
-      font-size: 22px;
-      padding: 18px;
-      text-align:center;
-      background: radial-gradient(500px 300px at 50% 0%, rgba(255,255,255,.10), transparent 60%);
+      overflow:hidden;
+      flex: 0 0 auto;
     }
-    .card-body{
-      padding: 14px 14px 16px;
-    }
-    .title-row{
-      display:flex; align-items:center; justify-content:space-between; gap: 10px;
-      margin-bottom: 6px;
-    }
-    .title-row h3{
-      margin:0;
-      font-size: 16px;
-      letter-spacing: -.2px;
-    }
-    .status{
-      font-size: 11px;
-      padding: 6px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      color: rgba(255,255,255,.72);
-      background: rgba(0,0,0,.25);
-      white-space: nowrap;
-    }
-    .desc{
-      margin:0 0 10px;
-      color: var(--muted);
-      font-size: 13px;
-      line-height: 1.45;
-    }
-    .tags{
-      display:flex; gap: 8px; flex-wrap:wrap;
-    }
-    .tag{
-      font-size: 11px;
-      padding: 6px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-      color: rgba(255,255,255,.72);
-    }
-    .card-link{
+    .logo img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
       display:block;
     }
 
-    /* Footer */
-    footer{
-      margin-top: 34px;
-      padding-top: 18px;
-      border-top: 1px solid rgba(255,255,255,.10);
-      color: var(--muted);
-      font-size: 12px;
+    .brandText{
+      min-width:0;
+      line-height:1.05;
+    }
+    .brandText .t{
+      margin:0;
+      font-family: var(--fontTitle);
+      color: var(--primary);
+      font-size: calc(20px * var(--uiScale));
+      letter-spacing:.3px;
+      white-space:nowrap;
+    }
+    .brandText .s{
+      margin:6px 0 0 0;
+      opacity:.9;
+      font-size: calc(12px * var(--uiScale));
+      max-width: 90ch;
+    }
+
+    .topActions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex: 0 0 auto;
+      flex-wrap: wrap;
+      justify-content:flex-end;
+    }
+
+    .btn{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.9);
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: calc(12px * var(--uiScale));
+      cursor:pointer;
+      user-select:none;
+      transition: transform .04s ease, border-color .12s ease, background .12s ease;
+      line-height:1;
+      white-space:nowrap;
+    }
+    .btn:hover{ border-color: rgba(254,247,2,.35); background: rgba(255,255,255,.06); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      background: rgba(254,247,2,.95);
+      border-color: rgba(254,247,2,.95);
+      color: rgba(0,0,0,.92);
+      font-weight: 800;
+    }
+
+    /* Hero */
+    .hero{
+      padding: 18px 16px;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background: linear-gradient(180deg, rgba(254,247,2,.06), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      display:grid;
+      grid-template-columns: 1fr 220px;
+      gap: 14px;
+      align-items: stretch;
+      overflow:hidden;
+    }
+
+    .hero h1{
+      margin:0;
+      font-family: var(--fontTitle);
+      color:#fff;
+      font-size: calc(26px * var(--uiScale));
+      letter-spacing: .2px;
+      line-height:1.05;
+    }
+    .hero p{
+      margin:10px 0 0 0;
+      opacity:.9;
+      font-size: calc(13px * var(--uiScale));
+      line-height:1.45;
+      max-width: 95ch;
+    }
+
+    .heroBox{
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 14px;
+      background: rgba(0,0,0,.16);
+      padding: 12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      justify-content:space-between;
+      min-height: 100%;
+    }
+    .heroBox .mark{
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+      display:grid;
+      place-items:center;
+      padding: 10px;
+      min-height: 120px;
+    }
+    .heroBox .mark img{
+      width: 100%;
+      height: 100%;
+      max-height: 140px;
+      object-fit: contain;
+      filter: saturate(0.9);
+    }
+    .heroBox .meta{
       display:flex;
       justify-content:space-between;
       gap: 12px;
-      flex-wrap:wrap;
+      font-size: calc(11px * var(--uiScale));
+      opacity:.85;
+      white-space:nowrap;
     }
 
-    /* Responsive */
+    /* Section head */
+    .sectionHead{
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap: 12px;
+      padding: 0 2px;
+      margin-top: 4px;
+    }
+    .sectionHead h2{
+      margin:0;
+      font-family: var(--fontTitle);
+      color: var(--primary);
+      font-size: calc(16px * var(--uiScale));
+      letter-spacing:.35px;
+      text-transform: uppercase;
+    }
+    .sectionHead p{
+      margin:0;
+      opacity:.85;
+      font-size: calc(12px * var(--uiScale));
+      max-width: 80ch;
+      line-height:1.35;
+      text-align:right;
+    }
+
+    /* Cards list (uno debajo de otro) */
+    .list{
+      display:grid;
+      gap: 14px;
+    }
+
+    .card{
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      padding: 16px;
+      display:flex;
+      gap: 14px;
+      align-items: stretch;
+      position: relative;
+      overflow:hidden;
+      transition: border-color .15s ease, background .15s ease, transform .10s ease;
+    }
+
+    .card:hover{
+      border-color: rgba(254,247,2,.35);
+      background: linear-gradient(180deg, rgba(254,247,2,.06), rgba(255,255,255,.02));
+      transform: translateY(-1px);
+    }
+
+    .thumb{
+      width: 120px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      overflow:hidden;
+      flex: 0 0 auto;
+      display:grid;
+      place-items:center;
+      padding: 10px;
+    }
+    .thumb img{
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      opacity: .95;
+    }
+
+    .cardBody{
+      flex: 1 1 auto;
+      min-width: 0;
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+    }
+
+    .kicker{
+      font-family: var(--fontTitle);
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: .35px;
+      font-size: calc(12px * var(--uiScale));
+      opacity: .95;
+    }
+
+    .title{
+      margin:0;
+      font-family: var(--fontTitle);
+      font-size: calc(22px * var(--uiScale));
+      color:#fff;
+      letter-spacing:.2px;
+      line-height:1.05;
+    }
+
+    .desc{
+      margin:0;
+      opacity:.9;
+      font-size: calc(13px * var(--uiScale));
+      line-height:1.45;
+      max-width: 95ch;
+    }
+
+    .metaRow{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 4px;
+      align-items:center;
+      opacity: .92;
+      font-size: calc(11px * var(--uiScale));
+    }
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+      white-space:nowrap;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:50%;
+      background: var(--primary);
+      box-shadow: 0 0 0 3px rgba(254,247,2,.12);
+      flex: 0 0 auto;
+    }
+
+    .arrow{
+      position:absolute;
+      right: 16px;
+      bottom: 16px;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 18px;
+      color: var(--primary);
+    }
+
+    footer{
+      margin-top: 4px;
+      opacity:.75;
+      font-size: calc(11px * var(--uiScale));
+      line-height:1.45;
+      padding: 0 2px;
+    }
+
     @media (max-width: 900px){
-      .hero-inner{ grid-template-columns: 1fr; }
-      .hero-card{ order: -1; }
-      .grid{ grid-template-columns: 1fr; }
-      nav{ display:none; }
+      body{ padding: 14px; }
+      .hero{ grid-template-columns: 1fr; }
+      .sectionHead{ flex-direction:column; align-items:flex-start; }
+      .sectionHead p{ text-align:left; }
+      .card{ flex-direction:column; }
+      .thumb{ width: 100%; }
+      .arrow{ right: 14px; bottom: 14px; }
     }
   </style>
 </head>
 
 <body>
   <div class="wrap">
-    <header class="top">
+
+    <header class="top" aria-label="Cabecera principal">
       <div class="brand">
-        <div class="logo">N·G</div>
-        <div class="brand-title">
-          <strong>N.Geolitics</strong>
-          <span>Investigación económica e histórica basada en datos</span>
+        <div class="logo" aria-hidden="true">
+          <img src="assets/logotipoN.Geolitics.png" alt="N.Geolitics" />
+        </div>
+        <div class="brandText">
+          <h1 class="t">N.Geolitics</h1>
+          <p class="s">Investigaciones económicas e históricas basadas en recopilación, tratamiento y visualización de datos.</p>
         </div>
       </div>
 
-      <nav>
-        <a href="#investigaciones">Investigaciones</a>
-        <a href="#metodo">Método</a>
-        <a href="#contacto">Contacto</a>
-      </nav>
-
-      <div class="cta">
-        <a class="btn" href="https://www.patreon.com/" target="_blank" rel="noopener">Patreon</a>
-        <a class="btn primary" href="#investigaciones">Explorar</a>
+      <div class="topActions">
+        <a class="btn" href="https://www.patreon.com/ngeolitics" target="_blank" rel="noopener">Patreon</a>
+        <a class="btn primary" href="#investigaciones">Ver investigaciones</a>
       </div>
     </header>
 
-    <section class="hero" id="inicio">
-      <div class="hero-inner">
-        <div>
-          <h1>N.Geolitics</h1>
-          <p>
-            Un espacio para publicar investigaciones económicas e históricas a partir de recopilación,
-            limpieza, modelado y visualización de datos. Aquí encontrarás simuladores, paneles y
-            análisis reproducibles orientados a explicar fenómenos macro, demográficos y políticos.
-          </p>
+    <section class="hero" aria-label="Presentación">
+      <div>
+        <h1>Investigación aplicada con datos</h1>
+        <p>
+          En este sitio publico proyectos interactivos donde combino <b>recopilación</b>, <b>limpieza</b> y
+          <b>modelado</b> de datos con visualización para extraer conclusiones claras.
+          <br><br>
+          La idea es que puedas entrar a cada módulo, ver las series, manipular parámetros y entender el “por qué”
+          detrás de cada resultado.
+        </p>
 
-          <div class="hero-actions">
-            <a class="btn primary" href="#investigaciones">Ver investigaciones</a>
-            <a class="btn" href="https://www.patreon.com/" target="_blank" rel="noopener">Suscripción / Comunidad</a>
-            <a class="btn" href="#metodo">Cómo trabajo</a>
-          </div>
-
-          <div class="hero-badges">
-            <span class="badge">📊 Datos → modelos → visualización</span>
-            <span class="badge">🧭 Economía · Historia · Geopolítica</span>
-            <span class="badge">🧩 Proyectos modulares</span>
-          </div>
-        </div>
-
-        <aside class="hero-card" aria-label="Identidad">
-          <div class="bigmark">N·G</div>
-          <div class="meta">
-            <span>Publicación continua</span>
-            <span>Versión web</span>
-          </div>
-        </aside>
-      </div>
-    </section>
-
-    <section class="section" id="investigaciones">
-      <div class="section-head">
-        <div>
-          <h2>Investigaciones</h2>
-          <p>Acceso directo a cada proyecto. Cada módulo tiene su propia web, datasets y visualizaciones.</p>
+        <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
+          <a class="btn" href="https://paueldatos.github.io/ngeolitics/" aria-label="URL GitHub Pages">GitHub Pages</a>
+          <a class="btn" href="#investigaciones">Explorar módulos</a>
         </div>
       </div>
 
-      <div class="grid">
-        <!-- Proyecto 1 -->
-        <a class="card card-link" href="./pensiones-simulador/" aria-label="Abrir investigación: Pensiones">
-          <div class="cover">
-            <!-- Si tienes portada, ponla en assets/covers/pensiones.png -->
-            <img src="./assets/covers/pensiones.png" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
-            <div class="fallback" style="display:none;">Pensiones</div>
-          </div>
-          <div class="card-body">
-            <div class="title-row">
-              <h3>Pensiones</h3>
-              <span class="status">Simulador</span>
-            </div>
-            <p class="desc">
-              Simulador demográfico y escenarios: pirámide poblacional, parámetros temporales y comparación OCDE.
-            </p>
-            <div class="tags">
-              <span class="tag">Demografía</span>
-              <span class="tag">OCDE</span>
-              <span class="tag">Escenarios</span>
-            </div>
-          </div>
-        </a>
-
-        <!-- Proyecto 2 -->
-        <a class="card card-link" href="./pge/" aria-label="Abrir investigación: Presupuestos (PGE)">
-          <div class="cover">
-            <!-- Si tienes portada, ponla en assets/covers/pge.png -->
-            <img src="./assets/covers/pge.png" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
-            <div class="fallback" style="display:none;">PGE</div>
-          </div>
-          <div class="card-body">
-            <div class="title-row">
-              <h3>PGE — Presupuestos</h3>
-              <span class="status">Panel</span>
-            </div>
-            <p class="desc">
-              Exploración y visualización de partidas, políticas y series históricas presupuestarias.
-            </p>
-            <div class="tags">
-              <span class="tag">Gasto público</span>
-              <span class="tag">Series históricas</span>
-              <span class="tag">Políticas</span>
-            </div>
-          </div>
-        </a>
-      </div>
-    </section>
-
-    <section class="section" id="metodo">
-      <div class="section-head">
-        <div>
-          <h2>Método</h2>
-          <p>
-            La idea es mantener cada investigación como un módulo independiente (HTML + datos), y que esta home sea el
-            “hub” de entrada. Esto facilita publicar nuevas investigaciones sin romper nada.
-          </p>
+      <div class="heroBox" aria-label="Bloque lateral">
+        <div class="mark">
+          <img src="assets/logotipoN.Geolitics.png" alt="N.Geolitics" />
+        </div>
+        <div class="meta">
+          <span>Actualizado</span>
+          <span id="today">—</span>
         </div>
       </div>
     </section>
 
-    <section class="section" id="contacto">
-      <div class="section-head">
-        <div>
-          <h2>Contacto</h2>
-          <p>
-            Puedes añadir aquí enlaces a correo, X/Twitter, GitHub, etc. (o dejarlo solo con Patreon).
+    <div class="sectionHead" id="investigaciones">
+      <h2>Investigaciones</h2>
+      <p>Una por una, en formato interactivo. (Puedes ir añadiendo más debajo con el mismo “card”.)</p>
+    </div>
+
+    <section class="list" aria-label="Lista de investigaciones">
+
+      <!-- Card 1 -->
+      <a class="card" href="pensiones-simulador/index.html" aria-label="Abrir investigación: Pensiones">
+        <div class="thumb" aria-hidden="true">
+          <img src="assets/logotipoN.Geolitics.png" alt="" />
+        </div>
+        <div class="cardBody">
+          <div class="kicker">Investigación 01</div>
+          <h3 class="title">Pensiones</h3>
+          <p class="desc">
+            Módulos interactivos para analizar sostenibilidad (OCDE) y simulación demográfica/normativa.
           </p>
+          <div class="metaRow">
+            <span class="tag"><span class="dot"></span>Interactividad</span>
+            <span class="tag"><span class="dot"></span>Demografía</span>
+            <span class="tag"><span class="dot"></span>Comparativa OCDE</span>
+          </div>
         </div>
-      </div>
-      <div class="hero" style="padding: 18px;">
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn" href="https://www.patreon.com/" target="_blank" rel="noopener">Patreon</a>
-          <!-- Cambia a tus enlaces reales -->
-          <a class="btn" href="#" onclick="alert('Añade aquí tu enlace de GitHub'); return false;">GitHub</a>
-          <a class="btn" href="#" onclick="alert('Añade aquí tu email o formulario'); return false;">Email</a>
+        <div class="arrow">→</div>
+      </a>
+
+      <!-- Card 2 -->
+      <a class="card" href="pge/index.html" aria-label="Abrir investigación: Entendiendo la economía de España (PGE)">
+        <div class="thumb" aria-hidden="true">
+          <img src="assets/logotipoN.Geolitics.png" alt="" />
         </div>
-      </div>
+        <div class="cardBody">
+          <div class="kicker">Investigación 02</div>
+          <h3 class="title">Entendiendo la economía de España</h3>
+          <p class="desc">
+            Visualizaciones y series para contextualizar indicadores y evolución macro (estructura tipo “panel + gráfico”).
+          </p>
+          <div class="metaRow">
+            <span class="tag"><span class="dot"></span>Indicadores</span>
+            <span class="tag"><span class="dot"></span>Series temporales</span>
+            <span class="tag"><span class="dot"></span>Análisis macro</span>
+          </div>
+        </div>
+        <div class="arrow">→</div>
+      </a>
+
     </section>
 
     <footer>
-      <div>© <span id="y"></span> N.Geolitics</div>
-      <div style="color: rgba(255,255,255,.55);">Investigación basada en datos · Web modular</div>
+      Consejo: si cambias nombres de carpetas/índices, actualiza los <code>href</code> de arriba.
+      <br>
+      Nota técnica: en GitHub Pages las rutas distinguen mayúsculas/minúsculas (mejor usar todo en minúsculas).
     </footer>
+
   </div>
 
   <script>
-    document.getElementById("y").textContent = new Date().getFullYear();
+    // fecha simple en el hero
+    (function(){
+      try{
+        const d = new Date();
+        const fmt = new Intl.DateTimeFormat("es-ES", { year:"numeric", month:"long", day:"2-digit" });
+        document.getElementById("today").textContent = fmt.format(d);
+      }catch(e){}
+    })();
   </script>
 </body>
 </html>
-<!-- redeploy -->
