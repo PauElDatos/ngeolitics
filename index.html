@@ -15,30 +15,35 @@
   <style>
     :root{
       --uiScale: 1.35;
+
+      /* Colores del ejemplo */
       --bg:#252525;
       --primary:#FEF702;
-      --text:#ffffff;
+      --text:#B0B0B0;
       --stroke:#3a3a3a;
+
       --radius:16px;
       --shadow: 0 10px 30px rgba(0,0,0,.25);
-      --max: 1040px;
 
-      /* Fuentes como el index de “entendiendo la economía de España” */
+      /* Fuentes del ejemplo (PGE-like) */
       --fontTitle: "Futura","Trebuchet MS",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       --fontText:  Arial,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
 
-      /* Afacad SOLO para el brand */
+      /* SOLO para el título */
       --fontBrand: "Afacad", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+      --max: 1040px;
     }
 
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
+
     body{
       margin:0;
       min-height:100vh;
       background: var(--bg);
       color: var(--text);
-      font-family: var(--fontText); /* <-- texto general como PGE */
+      font-family: var(--fontText);
       font-size: calc(14px * var(--uiScale));
       padding: 18px;
     }
@@ -57,10 +62,10 @@
       gap: 14px;
     }
 
-    /* CABECERA: fondo negro */
+    /* Header: estética del ejemplo, pero fondo negro */
     header.top{
       padding:14px 16px;
-      border:1px solid rgba(255,255,255,.10);
+      border:1px solid var(--stroke);
       border-radius:var(--radius);
       background: #000;
       box-shadow: var(--shadow);
@@ -70,26 +75,33 @@
       gap: 14px;
     }
 
-    .brand{ display:flex; align-items:center; gap: 12px; min-width: 0; }
-    .brandText{ min-width:0; line-height:1.05; }
+    .brand{
+      display:flex;
+      align-items:center;
+      min-width: 0;
+    }
 
-    /* TÍTULO: Afacad SOLO aquí */
+    /* Título sencillo: Afacad SOLO aquí */
     .brandText .t{
       margin:0;
       font-family: var(--fontBrand);
       color: #fff;
-      font-size: calc(40px * var(--uiScale));
+      font-size: calc(34px * var(--uiScale));
       letter-spacing:.2px;
       white-space:nowrap;
       font-weight: 400;
+      line-height: 1;
     }
 
     .topActions{
-      display:flex; align-items:center; gap:10px; flex: 0 0 auto;
-      flex-wrap: wrap; justify-content:flex-end;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap: wrap;
+      justify-content:flex-end;
     }
 
-    /* Botones de icono (redes) */
+    /* Icon buttons con estética del ejemplo */
     .iconBtn{
       width: 44px;
       height: 44px;
@@ -97,15 +109,15 @@
       align-items:center;
       justify-content:center;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
       transition: transform .04s ease, border-color .12s ease, background .12s ease;
-      cursor: pointer;
-      user-select: none;
+      cursor:pointer;
+      user-select:none;
     }
     .iconBtn:hover{
-      border-color: rgba(254,247,2,.45);
-      background: rgba(255,255,255,.10);
+      border-color: rgba(254,247,2,.35);
+      background: rgba(255,255,255,.06);
     }
     .iconBtn:active{ transform: translateY(1px); }
     .iconBtn svg{
@@ -115,31 +127,54 @@
       opacity: .95;
     }
 
+    .btn{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.9);
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: calc(12px * var(--uiScale));
+      cursor:pointer;
+      user-select:none;
+      transition: transform .04s ease, border-color .12s ease, background .12s ease;
+      line-height:1;
+      white-space:nowrap;
+      font-family: var(--fontText);
+    }
+    .btn:hover{ border-color: rgba(254,247,2,.35); background: rgba(255,255,255,.06); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      background: rgba(254,247,2,.95);
+      border-color: rgba(254,247,2,.95);
+      color: rgba(0,0,0,.92);
+      font-weight: 800;
+    }
+
+    /* Hero: estética ejemplo, sin bloque “Actualizado” */
     .hero{
       padding: 18px 16px;
       border:1px solid var(--stroke);
       border-radius:var(--radius);
       background: linear-gradient(180deg, rgba(254,247,2,.06), rgba(255,255,255,.02));
       box-shadow: var(--shadow);
-      display:block;
       overflow:hidden;
     }
     .hero h1{
       margin:0;
-      font-family: var(--fontTitle); /* <-- como PGE */
+      font-family: var(--fontTitle);
       color:#fff;
       font-size: calc(26px * var(--uiScale));
       letter-spacing: .2px;
       line-height:1.05;
-      font-weight: 700;
     }
     .hero p{
       margin:10px 0 0 0;
-      opacity:.92;
+      opacity:.9;
       font-size: calc(13px * var(--uiScale));
       line-height:1.45;
       max-width: 95ch;
-      font-family: var(--fontText); /* <-- como PGE */
+      font-family: var(--fontText);
     }
 
     .sectionHead{
@@ -152,16 +187,16 @@
     }
     .sectionHead h2{
       margin:0;
-      font-family: var(--fontTitle); /* <-- como PGE */
+      font-family: var(--fontTitle);
       color: var(--primary);
       font-size: calc(16px * var(--uiScale));
       letter-spacing:.35px;
       text-transform: uppercase;
-      font-weight: 700;
     }
 
     .list{ display:grid; gap: 14px; }
 
+    /* Cards: estética ejemplo, sin carátulas (thumb) ni tags */
     .card{
       border:1px solid var(--stroke);
       border-radius:var(--radius);
@@ -189,30 +224,28 @@
       padding-right: 54px;
     }
     .kicker{
-      font-family: var(--fontTitle); /* <-- como PGE */
+      font-family: var(--fontTitle);
       color: var(--primary);
       text-transform: uppercase;
       letter-spacing: .35px;
       font-size: calc(12px * var(--uiScale));
       opacity: .95;
-      font-weight: 700;
     }
     .title{
       margin:0;
-      font-family: var(--fontTitle); /* <-- como PGE */
+      font-family: var(--fontTitle);
       font-size: calc(22px * var(--uiScale));
       color:#fff;
       letter-spacing:.2px;
       line-height:1.05;
-      font-weight: 700;
     }
     .desc{
       margin:0;
-      opacity:.92;
+      opacity:.9;
       font-size: calc(13px * var(--uiScale));
       line-height:1.45;
       max-width: 95ch;
-      font-family: var(--fontText); /* <-- como PGE */
+      font-family: var(--fontText);
     }
     .arrow{
       position:absolute;
@@ -236,6 +269,7 @@
       .card{ flex-direction:column; }
       .cardBody{ padding-right: 0; }
       .arrow{ right: 14px; bottom: 14px; }
+      .brandText .t{ font-size: calc(28px * var(--uiScale)); }
     }
   </style>
 </head>
@@ -278,6 +312,9 @@
             <path d="M14.8 3.5c-3.6 0-6.6 2.9-6.6 6.6s2.9 6.6 6.6 6.6 6.6-2.9 6.6-6.6-2.9-6.6-6.6-6.6zM4 3.5h2.8v17H4z"/>
           </svg>
         </a>
+
+        <!-- CTA -->
+        <a class="btn primary" href="#analisis">Ver análisis</a>
       </div>
     </header>
 
@@ -299,7 +336,7 @@
     </div>
 
     <section class="list" aria-label="Lista de análisis">
-
+      <!-- Card 1 -->
       <a class="card" id="link-pensiones" href="pensiones-simulador/index.html" aria-label="Abrir análisis: Pensiones">
         <div class="cardBody">
           <div class="kicker">Análisis 01</div>
@@ -311,6 +348,7 @@
         <div class="arrow">→</div>
       </a>
 
+      <!-- Card 2 -->
       <a class="card" id="link-pge" href="PGE/index.html" aria-label="Abrir análisis: Entendiendo la economía de España">
         <div class="cardBody">
           <div class="kicker">Análisis 02</div>
@@ -321,7 +359,6 @@
         </div>
         <div class="arrow">→</div>
       </a>
-
     </section>
 
   </div>
