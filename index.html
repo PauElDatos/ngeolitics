@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>N.Geolitics — Investigaciones económicas e históricas</title>
+  <meta name="description" content="N.Geolitics: investigaciones económicas e históricas basadas en recopilación, tratamiento y visualización de datos." />
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="N.Geolitics" />
+  <meta property="og:description" content="Investigaciones económicas e históricas basadas en datos." />
+  <meta property="og:type" content="website" />
+
+  <style>
+    :root{
+      --bg: #0b0c0f;
+      --panel: rgba(255,255,255,.06);
+      --panel2: rgba(255,255,255,.08);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --border: rgba(255,255,255,.12);
+      --shadow: 0 18px 60px rgba(0,0,0,.55);
+      --radius: 18px;
+      --radius2: 26px;
+      --max: 1100px;
+    }
+
+    *{ box-sizing: border-box; }
+    html, body{ height: 100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1100px 700px at 20% 10%, rgba(255,255,255,.10), transparent 55%),
+        radial-gradient(900px 600px at 80% 20%, rgba(255,255,255,.07), transparent 55%),
+        radial-gradient(900px 900px at 50% 120%, rgba(255,255,255,.05), transparent 60%),
+        var(--bg);
+      color: var(--text);
+    }
+
+    a{ color: inherit; text-decoration: none; }
+    a:focus-visible, button:focus-visible{ outline: 2px solid rgba(255,255,255,.65); outline-offset: 3px; border-radius: 12px; }
+
+    .wrap{ max-width: var(--max); margin: 0 auto; padding: 28px 18px 60px; }
+
+    /* Top bar */
+    .top{
+      display:flex; align-items:center; justify-content:space-between;
+      padding: 10px 4px 24px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:12px;
+      min-width: 200px;
+    }
+    .logo{
+      width:42px; height:42px; border-radius: 12px;
+      display:grid; place-items:center;
+      background: rgba(255,255,255,.06);
+      border: 1px solid var(--border);
+      box-shadow: 0 10px 30px rgba(0,0,0,.35);
+      font-weight: 800;
+      letter-spacing: .5px;
+    }
+    .brand-title{
+      display:flex; flex-direction:column; line-height:1.05;
+    }
+    .brand-title strong{ font-size: 15px; letter-spacing:.3px; }
+    .brand-title span{ font-size: 12px; color: var(--muted); }
+
+    nav{
+      display:flex; align-items:center; gap: 16px;
+    }
+    nav a{
+      font-size: 13px; color: var(--muted);
+      padding: 8px 10px;
+      border-radius: 12px;
+      transition: background .2s, color .2s;
+    }
+    nav a:hover{ background: rgba(255,255,255,.06); color: var(--text); }
+
+    .cta{
+      display:flex; align-items:center; gap:10px;
+    }
+    .btn{
+      border: 1px solid var(--border);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 13px;
+      cursor:pointer;
+      transition: transform .06s ease, background .2s, border-color .2s;
+      user-select:none;
+    }
+    .btn:hover{ background: rgba(255,255,255,.10); border-color: rgba(255,255,255,.18); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      background: rgba(255,255,255,.92);
+      color: #0a0b0e;
+      border-color: transparent;
+      font-weight: 700;
+    }
+    .btn.primary:hover{ background: rgba(255,255,255,.98); }
+
+    /* Hero */
+    .hero{
+      margin-top: 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
+      border: 1px solid var(--border);
+      border-radius: var(--radius2);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      position: relative;
+    }
+    .hero-inner{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 18px;
+      padding: 28px;
+    }
+    .hero h1{
+      margin:0 0 10px;
+      font-size: clamp(30px, 4.2vw, 52px);
+      letter-spacing: -0.8px;
+    }
+    .hero p{
+      margin:0 0 18px;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+      max-width: 62ch;
+    }
+    .hero-actions{
+      display:flex; gap:10px; flex-wrap:wrap;
+      margin-top: 8px;
+    }
+    .hero-badges{
+      display:flex; gap:8px; flex-wrap:wrap;
+      margin-top: 14px;
+    }
+    .badge{
+      font-size: 12px;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.78);
+    }
+
+    /* Hero card (right) */
+    .hero-card{
+      align-self: center;
+      background: rgba(0,0,0,.25);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 18px;
+      min-height: 170px;
+      display:flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .hero-card .bigmark{
+      width: 100%;
+      aspect-ratio: 1 / 1;
+      border-radius: 20px;
+      display:grid;
+      place-items:center;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.10);
+      font-weight: 900;
+      font-size: 56px;
+      letter-spacing: 2px;
+    }
+    .hero-card .meta{
+      display:flex; justify-content:space-between; gap:12px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    /* Section */
+    .section{
+      margin-top: 28px;
+    }
+    .section-head{
+      display:flex; align-items:end; justify-content:space-between; gap: 12px;
+      margin: 0 2px 14px;
+    }
+    .section-head h2{
+      margin:0;
+      font-size: 18px;
+      letter-spacing: -.2px;
+    }
+    .section-head p{
+      margin:0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+      max-width: 70ch;
+    }
+
+    /* Cards */
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+    .card{
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow:hidden;
+      transition: transform .12s ease, background .2s, border-color .2s;
+      box-shadow: 0 10px 40px rgba(0,0,0,.35);
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      background: rgba(255,255,255,.07);
+      border-color: rgba(255,255,255,.18);
+    }
+    .cover{
+      height: 165px;
+      background: rgba(0,0,0,.35);
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position: relative;
+    }
+    .cover img{
+      width:100%; height:100%;
+      object-fit: cover;
+      filter: saturate(0.95) contrast(1.05);
+      opacity: .92;
+    }
+    .cover .fallback{
+      position:absolute;
+      inset:0;
+      display:grid;
+      place-items:center;
+      color: rgba(255,255,255,.85);
+      font-weight: 800;
+      letter-spacing:.8px;
+      font-size: 22px;
+      padding: 18px;
+      text-align:center;
+      background: radial-gradient(500px 300px at 50% 0%, rgba(255,255,255,.10), transparent 60%);
+    }
+    .card-body{
+      padding: 14px 14px 16px;
+    }
+    .title-row{
+      display:flex; align-items:center; justify-content:space-between; gap: 10px;
+      margin-bottom: 6px;
+    }
+    .title-row h3{
+      margin:0;
+      font-size: 16px;
+      letter-spacing: -.2px;
+    }
+    .status{
+      font-size: 11px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      color: rgba(255,255,255,.72);
+      background: rgba(0,0,0,.25);
+      white-space: nowrap;
+    }
+    .desc{
+      margin:0 0 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.45;
+    }
+    .tags{
+      display:flex; gap: 8px; flex-wrap:wrap;
+    }
+    .tag{
+      font-size: 11px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.72);
+    }
+    .card-link{
+      display:block;
+    }
+
+    /* Footer */
+    footer{
+      margin-top: 34px;
+      padding-top: 18px;
+      border-top: 1px solid rgba(255,255,255,.10);
+      color: var(--muted);
+      font-size: 12px;
+      display:flex;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+    }
+
+    /* Responsive */
+    @media (max-width: 900px){
+      .hero-inner{ grid-template-columns: 1fr; }
+      .hero-card{ order: -1; }
+      .grid{ grid-template-columns: 1fr; }
+      nav{ display:none; }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">
+        <div class="logo">N·G</div>
+        <div class="brand-title">
+          <strong>N.Geolitics</strong>
+          <span>Investigación económica e histórica basada en datos</span>
+        </div>
+      </div>
+
+      <nav>
+        <a href="#investigaciones">Investigaciones</a>
+        <a href="#metodo">Método</a>
+        <a href="#contacto">Contacto</a>
+      </nav>
+
+      <div class="cta">
+        <a class="btn" href="https://www.patreon.com/" target="_blank" rel="noopener">Patreon</a>
+        <a class="btn primary" href="#investigaciones">Explorar</a>
+      </div>
+    </header>
+
+    <section class="hero" id="inicio">
+      <div class="hero-inner">
+        <div>
+          <h1>N.Geolitics</h1>
+          <p>
+            Un espacio para publicar investigaciones económicas e históricas a partir de recopilación,
+            limpieza, modelado y visualización de datos. Aquí encontrarás simuladores, paneles y
+            análisis reproducibles orientados a explicar fenómenos macro, demográficos y políticos.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn primary" href="#investigaciones">Ver investigaciones</a>
+            <a class="btn" href="https://www.patreon.com/" target="_blank" rel="noopener">Suscripción / Comunidad</a>
+            <a class="btn" href="#metodo">Cómo trabajo</a>
+          </div>
+
+          <div class="hero-badges">
+            <span class="badge">📊 Datos → modelos → visualización</span>
+            <span class="badge">🧭 Economía · Historia · Geopolítica</span>
+            <span class="badge">🧩 Proyectos modulares</span>
+          </div>
+        </div>
+
+        <aside class="hero-card" aria-label="Identidad">
+          <div class="bigmark">N·G</div>
+          <div class="meta">
+            <span>Publicación continua</span>
+            <span>Versión web</span>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="investigaciones">
+      <div class="section-head">
+        <div>
+          <h2>Investigaciones</h2>
+          <p>Acceso directo a cada proyecto. Cada módulo tiene su propia web, datasets y visualizaciones.</p>
+        </div>
+      </div>
+
+      <div class="grid">
+        <!-- Proyecto 1 -->
+        <a class="card card-link" href="./pensiones-simulador/" aria-label="Abrir investigación: Pensiones">
+          <div class="cover">
+            <!-- Si tienes portada, ponla en assets/covers/pensiones.png -->
+            <img src="./assets/covers/pensiones.png" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+            <div class="fallback" style="display:none;">Pensiones</div>
+          </div>
+          <div class="card-body">
+            <div class="title-row">
+              <h3>Pensiones</h3>
+              <span class="status">Simulador</span>
+            </div>
+            <p class="desc">
+              Simulador demográfico y escenarios: pirámide poblacional, parámetros temporales y comparación OCDE.
+            </p>
+            <div class="tags">
+              <span class="tag">Demografía</span>
+              <span class="tag">OCDE</span>
+              <span class="tag">Escenarios</span>
+            </div>
+          </div>
+        </a>
+
+        <!-- Proyecto 2 -->
+        <a class="card card-link" href="./pge/" aria-label="Abrir investigación: Presupuestos (PGE)">
+          <div class="cover">
+            <!-- Si tienes portada, ponla en assets/covers/pge.png -->
+            <img src="./assets/covers/pge.png" alt="" onerror="this.style.display='none'; this.nextElementSibling.style.display='grid';">
+            <div class="fallback" style="display:none;">PGE</div>
+          </div>
+          <div class="card-body">
+            <div class="title-row">
+              <h3>PGE — Presupuestos</h3>
+              <span class="status">Panel</span>
+            </div>
+            <p class="desc">
+              Exploración y visualización de partidas, políticas y series históricas presupuestarias.
+            </p>
+            <div class="tags">
+              <span class="tag">Gasto público</span>
+              <span class="tag">Series históricas</span>
+              <span class="tag">Políticas</span>
+            </div>
+          </div>
+        </a>
+      </div>
+    </section>
+
+    <section class="section" id="metodo">
+      <div class="section-head">
+        <div>
+          <h2>Método</h2>
+          <p>
+            La idea es mantener cada investigación como un módulo independiente (HTML + datos), y que esta home sea el
+            “hub” de entrada. Esto facilita publicar nuevas investigaciones sin romper nada.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contacto">
+      <div class="section-head">
+        <div>
+          <h2>Contacto</h2>
+          <p>
+            Puedes añadir aquí enlaces a correo, X/Twitter, GitHub, etc. (o dejarlo solo con Patreon).
+          </p>
+        </div>
+      </div>
+      <div class="hero" style="padding: 18px;">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <a class="btn" href="https://www.patreon.com/" target="_blank" rel="noopener">Patreon</a>
+          <!-- Cambia a tus enlaces reales -->
+          <a class="btn" href="#" onclick="alert('Añade aquí tu enlace de GitHub'); return false;">GitHub</a>
+          <a class="btn" href="#" onclick="alert('Añade aquí tu email o formulario'); return false;">Email</a>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div>© <span id="y"></span> N.Geolitics</div>
+      <div style="color: rgba(255,255,255,.55);">Investigación basada en datos · Web modular</div>
+    </footer>
+  </div>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>

@@ -1,0 +1,1509 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Pensiones — Sostenibilidad OCDE (Móvil)</title>
+
+  <style>
+    :root{
+      /* Ajuste general para móvil: bajar escala para evitar solapes */
+      --uiScale: 1.05;
+
+      /* MODIFICACIÓN: distancia (offset) COMÚN de los labels descriptivos de ejes (X e Y) respecto a sus ejes */
+      --cpAxisLabelOffset: 70;
+
+      /* MODIFICACIÓN: SOLO EN MÓVIL (layout apilado), escala de fuente de los labels descriptivos de ejes */
+      --cpAxisLabelFontScaleMobile: 2.20;
+
+      --bg:#252525;
+      --primary:#FEF702;
+      --text:#B0B0B0;
+      --grid:#4A4A4A;
+      --workers:#36C3FF;
+      --retired:#FF6A00;
+      --panel:#2b2b2b;
+      --stroke:#3a3a3a;
+
+      --fontTitle: "Futura","Trebuchet MS",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      --fontText:  Arial,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+
+      --radius:14px;
+      --shadow: 0 10px 30px rgba(0,0,0,.25);
+    }
+
+    *{box-sizing:border-box}
+    html, body{ height:100%; }
+
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:var(--fontText);
+      font-size: calc(14px * var(--uiScale));
+      overflow-x:hidden; /* clave para evitar desbordes horizontales */
+      -webkit-text-size-adjust: 100%;
+    }
+
+    header{
+      padding:14px 14px 10px 14px;
+      display:flex;
+      flex-wrap:wrap;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .h-title{ line-height:1.05; flex:1 1 auto; min-width: 220px; }
+    .h-title h1{
+      margin:0;
+      font-family:var(--fontTitle);
+      color:var(--primary);
+      font-size: calc(18px * var(--uiScale));
+      letter-spacing:.3px;
+      overflow-wrap:anywhere;
+    }
+    .h-title p{ margin:6px 0 0 0; font-size: calc(12px * var(--uiScale)); opacity:.9; }
+
+    .h-meta{
+      font-size: calc(12px * var(--uiScale));
+      opacity:.9;
+      text-align:right;
+      flex:0 0 auto;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 10px;
+      border:1px solid var(--stroke);
+      border-radius:999px;
+      background:rgba(255,255,255,.03);
+      white-space:nowrap;
+    }
+    .dot{
+      width:8px; height:8px; border-radius:50%;
+      background:var(--primary);
+      box-shadow:0 0 0 3px rgba(254,247,2,.15);
+    }
+    a.back{
+      color:var(--text);
+      text-decoration:none;
+      border-bottom:1px solid rgba(255,255,255,.18);
+      padding-bottom:1px;
+    }
+    a.back:hover{ border-bottom-color: rgba(254,247,2,.35); color:#fff; }
+
+    main{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      padding:10px 10px 16px 10px;
+      min-height: calc(100svh - 64px);
+      height:auto;
+    }
+
+    .panel{
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      max-width:100%;
+    }
+
+    .ph{
+      padding:10px 10px 8px 10px;
+      border-bottom:1px solid var(--stroke);
+      background:rgba(255,255,255,.02);
+      display:flex;
+      flex-wrap:wrap;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:8px;
+      min-height:44px;
+    }
+    .ttl{
+      font-family:var(--fontTitle);
+      color:var(--primary);
+      font-size: calc(12px * var(--uiScale));
+      letter-spacing:.35px;
+      text-transform:uppercase;
+      white-space:normal;     /* móvil: permitir salto */
+      line-height:1.15;
+      flex:1 1 auto;
+      min-width: 180px;
+      overflow-wrap:anywhere;
+    }
+    .sub{
+      font-size: calc(12px * var(--uiScale));
+      opacity:.85;
+      text-align:left;        /* móvil: mejor lectura */
+      max-width:100%;
+      white-space:normal;     /* móvil: permitir salto */
+      line-height:1.25;
+      flex:1 1 100%;
+    }
+
+    .ph-actions{
+      flex:1 1 100%;
+      display:flex;
+      flex-direction:column;  /* móvil: botones apilados */
+      justify-content:stretch;
+      gap:8px;
+      min-width:0;
+      overflow:visible;
+    }
+    .ph-btn{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.14);
+      color:var(--text);
+      border-radius:12px;      /* en móvil mejor que píldora estrecha */
+      padding:11px 12px;
+      font-size: calc(12px * var(--uiScale));
+      line-height:1.15;
+      cursor:pointer;
+      white-space:normal;      /* permitir salto en texto */
+      text-align:left;
+      width:100%;
+    }
+    .ph-btn:hover{
+      border-color: rgba(254,247,2,.25);
+      background:rgba(255,255,255,.03);
+      color:#fff;
+    }
+    .ph-btn[aria-pressed="true"]{
+      border-color: rgba(254,247,2,.35);
+      background:rgba(254,247,2,.08);
+      color:#fff;
+    }
+
+    .nav-row{
+      display:flex;
+      gap:8px;
+      width:100%;
+    }
+    .nav-row .ph-btn{
+      width:auto;
+      flex:1 1 0;
+    }
+
+    .countries{ display:flex; flex-direction:column; }
+    .countries .body{
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      overflow:visible; /* móvil: evitar scroll interno */
+    }
+
+    .loader{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.14);
+      font-size: calc(12px * var(--uiScale));
+      opacity:.9;
+      width:100%;
+    }
+    .spinner{
+      width:14px; height:14px;
+      border-radius:999px;
+      border:2px solid rgba(255,255,255,.22);
+      border-top-color: var(--primary);
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin{ to{ transform:rotate(360deg);} }
+
+    /* En móvil: solo selector (no lista larga) */
+    .country-select-wrap{ display:flex; flex-direction:column; gap:10px; }
+    .country-list-wrap{ display:none; }
+
+    .country-select{
+      width:100%;
+      appearance:none;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.14);
+      color:var(--text);
+      border-radius:12px;
+      padding:12px 12px;
+      font-size: calc(13px * var(--uiScale));
+      outline:none;
+    }
+    .country-select:focus{
+      border-color: rgba(254,247,2,.35);
+      box-shadow: 0 0 0 3px rgba(254,247,2,.10);
+    }
+    .select-hint{
+      font-size: calc(11px * var(--uiScale));
+      opacity:.75;
+      line-height:1.35;
+    }
+
+    .viz{
+      display:grid;
+      grid-template-columns: 1fr; /* móvil: 1 columna */
+      gap:10px;
+      padding:10px;
+      align-items:stretch;
+    }
+
+    .chart-area{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-height:0;
+      max-width:100%;
+    }
+
+    .chart-legend{
+      display:flex;
+      flex-direction:column;   /* móvil: apilar leyenda */
+      gap:8px;
+      align-items:flex-start;
+      justify-content:flex-start;
+      font-size: calc(12px * var(--uiScale));
+      opacity:.92;
+    }
+    .legend-left{ display:flex; flex-direction:column; gap:8px; }
+    .legend-item{ display:flex; align-items:center; gap:8px; }
+    .swatch{ width:10px; height:10px; border-radius:2px; background:var(--primary); }
+    .swatch.workers{ background:var(--workers); }
+    .swatch.retired{ background:var(--retired); }
+    .swatch.primary{ background:var(--primary); }
+
+    .bigsvg{
+      width:100%;
+      max-width:100%;
+      height:auto;
+      min-height:260px;
+      aspect-ratio: 1000 / 700; /* clave para que reserve espacio */
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.05);
+      background:rgba(0,0,0,.08);
+      display:block;
+    }
+
+    .explain{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      max-width:100%;
+    }
+    .explain .body{
+      padding:10px;
+      overflow:visible; /* móvil: evitar scroll interno */
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .pyrwrap{
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:12px;
+      background:rgba(255,255,255,.02);
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+      max-width:100%;
+    }
+    .pyrtitle{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:8px;
+      font-size: calc(12px * var(--uiScale));
+      opacity:.92;
+    }
+    .pyrtitle .l{
+      font-family:var(--fontTitle);
+      letter-spacing:.35px;
+      text-transform:uppercase;
+      color:var(--primary);
+      font-size: calc(12px * var(--uiScale));
+    }
+    .pyrsvg{
+      width:100%;
+      max-width:100%;
+      height:auto;
+      min-height:240px;              /* bajar para móvil */
+      aspect-ratio: 520 / 520;
+      border-radius:10px;
+      border:1px solid rgba(255,255,255,.06);
+      background:rgba(0,0,0,.08);
+      display:block;
+    }
+    .pyrnote{
+      font-size: calc(11px * var(--uiScale));
+      opacity:.72;
+      line-height:1.35;
+    }
+
+    .blkwrap{
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:12px;
+      background:rgba(255,255,255,.02);
+      padding:10px;
+      display:flex;
+      flex-direction:column;
+      gap:8px;
+    }
+    .blktitle{
+      display:flex;
+      flex-wrap:wrap;
+      align-items:baseline;
+      justify-content:space-between;
+      gap:8px;
+      font-size: calc(12px * var(--uiScale));
+      opacity:.92;
+    }
+    .blktitle .l{
+      font-family:var(--fontTitle);
+      letter-spacing:.35px;
+      text-transform:uppercase;
+      color:var(--primary);
+      font-size: calc(12px * var(--uiScale));
+      white-space:normal;
+      line-height:1.15;
+      overflow-wrap:anywhere;
+    }
+
+    /* Clave móvil: no forzar 2 columnas; apilar para evitar superposición */
+    .kv{
+      display:grid;
+      grid-template-columns: 1fr;  /* antes: 1fr auto */
+      gap:6px;
+      align-items:start;
+      padding:10px;
+      border:1px solid rgba(255,255,255,.08);
+      border-radius:12px;
+      background:rgba(255,255,255,.02);
+    }
+    .k{ font-size: calc(12px * var(--uiScale)); opacity:.9; }
+    .v{
+      font-size: calc(12px * var(--uiScale));
+      color:#fff;
+      font-variant-numeric: tabular-nums;
+      margin: -2px 0 6px 0;
+    }
+
+    .badge{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      padding:10px 10px;
+      border-radius:12px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.14);
+      font-size: calc(12px * var(--uiScale));
+      line-height:1.25;
+      flex-wrap:wrap; /* por si el texto es largo */
+    }
+    .badge .dot2{
+      width:10px; height:10px; border-radius:999px;
+      background:var(--primary);
+      box-shadow:0 0 0 3px rgba(254,247,2,.12);
+      flex:0 0 auto;
+      margin-top:2px;
+    }
+    .badge.warn .dot2{ background:var(--retired); box-shadow:0 0 0 3px rgba(255,106,0,.14); }
+    .badge.ok .dot2{ background:var(--workers); box-shadow:0 0 0 3px rgba(54,195,255,.14); }
+
+    /* MODIFICACIÓN: fondo amarillo para el badge de resultado */
+    #resultBadge{
+      background: var(--primary);
+      color: #111;
+    }
+
+    .hr{ height:1px; background:rgba(255,255,255,.06); margin:2px 0; }
+
+    .mono{
+      font-variant-numeric: tabular-nums;
+      font-feature-settings: "tnum" 1, "ss01" 1;
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Redirect: si se abre en escritorio, vuelve a ocde.html -->
+<script>
+  (function(){
+    try{
+      if (window.innerWidth > 900) window.location.replace("ocde.html");
+    }catch(e){}
+  })();
+</script>
+
+<header>
+  <div class="h-title">
+    <h1>Sostenibilidad — países OCDE</h1>
+  </div>
+  <div class="h-meta">
+    <div class="pill"><span class="dot"></span><span><a class="back" href="index.html">Volver</a></span></div>
+  </div>
+</header>
+
+<main>
+
+  <!-- TOP: Selector país -->
+  <section class="panel countries" aria-label="Países OCDE">
+    <div class="ph">
+      <div class="ttl">Países OCDE</div>
+      <div class="sub" id="selectedCountryMeta">Cargando datos…</div>
+    </div>
+
+    <div class="body">
+      <div class="loader" id="loadBox"><span class="spinner"></span><span id="loadText">Leyendo datasets…</span></div>
+
+      <div class="country-select-wrap" id="countrySelectWrap" aria-label="Selector de países">
+        <select class="country-select" id="countrySelect" disabled>
+          <option>Cargando…</option>
+        </select>
+        <div class="select-hint" id="leftNoteMobile">Estado: esperando datos.</div>
+      </div>
+
+      <!-- Se mantiene el contenedor de lista por compatibilidad, pero oculto en móvil -->
+      <div class="country-list-wrap" id="countryListWrap">
+        <div class="country-grid" id="countryList"></div>
+        <div class="note" id="leftNote">Estado: esperando datos.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Visualización -->
+  <section class="panel" aria-label="Visualización y explicación">
+    <div class="ph">
+      <div class="ttl">Gráfica C–P</div>
+
+      <div class="ph-actions" aria-label="Clasificación de países">
+        <button class="ph-btn" id="btnSortProductivity" type="button" aria-pressed="false" title="Ordena por pendiente k=τ/ρ (mayor a menor)">
+          Productividad (k) ↓
+        </button>
+        <button class="ph-btn" id="btnSortMostProfitable" type="button" aria-pressed="false" title="Ordena por mayor margen: (k·C − P) relativo (mayor a menor)">
+          Más rentables ↓
+        </button>
+        <button class="ph-btn" id="btnSortLeastSustainable" type="button" aria-pressed="false" title="Ordena por mayor tensión: (P − k·C) relativo (mayor a menor)">
+          Menos sostenibles ↓
+        </button>
+        <div class="nav-row">
+          <button class="ph-btn" id="btnPrevCountry" type="button" title="Ir al país anterior">
+            ← País anterior
+          </button>
+          <button class="ph-btn" id="btnNextCountry" type="button" title="Ir al país siguiente">
+            País siguiente →
+          </button>
+        </div>
+      </div>
+
+      <div class="sub mono" id="cpReadout">C: — | P: —</div>
+    </div>
+
+    <div class="viz">
+
+      <!-- CHART -->
+      <div class="chart-area" aria-label="Gráfica Cotizantes vs Pensionistas">
+        <div class="chart-legend">
+          <div class="legend-left">
+            <div class="legend-item"><span class="swatch primary"></span><span>Línea de equilibrio (k = τ/ρ)</span></div>
+            <div class="legend-item"><span class="swatch retired"></span><span>País</span></div>
+          </div>
+          <div class="legend-item mono" id="kReadout">k: —</div>
+        </div>
+
+        <svg id="cpSvg" class="bigsvg" viewBox="0 0 1000 700" preserveAspectRatio="xMidYMid meet" aria-label="Gráfica C vs P"></svg>
+
+        <div class="badge ok" id="resultBadge">
+          <span class="dot2"></span>
+          <span id="resultBadgeText">Selecciona un país</span>
+        </div>
+      </div>
+
+      <!-- EXPLANATION -->
+      <aside class="panel explain" aria-label="Explicación del resultado">
+        <div class="ph">
+          <div class="ttl">Bloque país</div>
+          <div class="sub mono" id="resultMini">—</div>
+        </div>
+
+        <div class="body">
+
+          <div class="pyrwrap" aria-label="Pirámide poblacional">
+            <div class="pyrtitle">
+              <span class="l">Pirámide</span>
+              <span class="mono" id="pyrMeta">—</span>
+            </div>
+            <svg id="pyrSvg" class="pyrsvg" viewBox="0 0 520 520" preserveAspectRatio="xMidYMid meet" aria-label="Pirámide poblacional (total)"></svg>
+            <div class="pyrnote" id="pyrNote">
+              Fuente: OECD Population (HIST). Si el CSV solo tiene sexo total, se muestra una pirámide simétrica (total/2 a cada lado).
+            </div>
+          </div>
+
+          <div class="blkwrap" aria-label="Número de cotizantes por pensionista">
+            <div class="blktitle">
+              <span class="l">Número de cotizantes por pensionista</span>
+            </div>
+            <div class="kv">
+              <div class="k">Cotizantes (C)</div>
+              <div class="v mono" id="CVal">—</div>
+
+              <div class="k">Pensionistas (P)</div>
+              <div class="v mono" id="PVal">—</div>
+
+              <div class="k">Ratio P/C</div>
+              <div class="v mono" id="PCRatio">—</div>
+
+              <div class="k">Trabajadores por pensionista (C/P)</div>
+              <div class="v mono" id="CPRatio">—</div>
+            </div>
+          </div>
+
+          <div class="hr"></div>
+
+          <div class="blkwrap" aria-label="Equilibrio de ingreso y gasto en pensiones">
+            <div class="blktitle">
+              <span class="l">Equilibrio de ingreso y gasto en pensiones</span>
+            </div>
+            <div class="kv">
+              <div class="k">τ (cotización a pensiones)</div>
+              <div class="v mono" id="tauVal">—</div>
+
+              <div class="k">ρ (tasa de reemplazo)</div>
+              <div class="v mono" id="rhoVal">—</div>
+
+              <div class="k">k = τ/ρ (pendiente de equilibrio)</div>
+              <div class="v mono" id="kVal">—</div>
+
+              <div class="k">Equilibrio a C actual: P* = k·C</div>
+              <div class="v mono" id="PStar">—</div>
+            </div>
+          </div>
+
+        </div>
+      </aside>
+
+    </div>
+  </section>
+
+</main>
+
+<script>
+(() => {
+  /* MODIFICACIÓN: nuevo JSON */
+  const DATA_URL = "merged_countries.json";
+
+  /* MODIFICACIÓN: el archivo de pirámide ahora se llama así */
+  const POP_CSV_URL = "OECD_piramide.csv";
+
+  const CSS = (v) => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+  const COLORS = {
+    primary: CSS('--primary'),
+    text: CSS('--text'),
+    grid: CSS('--grid'),
+    workers: CSS('--workers'),
+    retired: CSS('--retired'),
+  };
+
+  const UI_SCALE = Number(getComputedStyle(document.documentElement).getPropertyValue('--uiScale')) || 1;
+
+  /* MODIFICACIÓN: offset COMÚN para labels descriptivos (X e Y) */
+  const CP_AXIS_LABEL_OFFSET = Number(getComputedStyle(document.documentElement).getPropertyValue('--cpAxisLabelOffset')) || 50;
+
+  /* MODIFICACIÓN: SOLO EN MÓVIL, escala de fuente para labels descriptivos */
+  const CP_AXIS_LABEL_FONT_SCALE_MOBILE = Number(getComputedStyle(document.documentElement).getPropertyValue('--cpAxisLabelFontScaleMobile')) || 1;
+
+  const NAME_TO_ISO3 = {
+    "Alemania":"DEU","Australia":"AUS","Austria":"AUT","Bélgica":"BEL","Canadá":"CAN","Chile":"CHL","Colombia":"COL",
+    "Corea del Sur":"KOR","Costa Rica":"CRI","Dinamarca":"DNK","Eslovaquia":"SVK","Eslovenia":"SVN","España":"ESP",
+    "Estados Unidos":"USA","Estonia":"EST","Finlandia":"FIN","Francia":"FRA","Grecia":"GRC","Hungría":"HUN","Islandia":"ISL",
+    "Irlanda":"IRL","Israel":"ISR","Italia":"ITA","Japón":"JPN","Letonia":"LVA","Lituania":"LTU","Luxemburgo":"LUX","México":"MEX",
+    "Noruega":"NOR","Nueva Zelanda":"NZL","Países Bajos":"NLD","Polonia":"POL","Portugal":"PRT","Reino Unido":"GBR",
+    "República Checa":"CZE","Suecia":"SWE","Suiza":"CHE","Turquía":"TUR"
+  };
+
+  /* MODIFICACIÓN: ISO2 -> ISO3 (pirámide) */
+  const ISO2_TO_ISO3 = {
+    "AT":"AUT","AU":"AUS","BE":"BEL","CA":"CAN","CH":"CHE","CL":"CHL","CO":"COL","CR":"CRI","CZ":"CZE",
+    "DE":"DEU","DK":"DNK","EE":"EST","ES":"ESP","FI":"FIN","FR":"FRA","GB":"GBR","UK":"GBR","GR":"GRC",
+    "HU":"HUN","IE":"IRL","IL":"ISR","IS":"ISL","IT":"ITA","JP":"JPN","KR":"KOR","LT":"LTU","LU":"LUX","LV":"LVA",
+    "MX":"MEX","NL":"NLD","NO":"NOR","NZ":"NZL","PL":"POL","PT":"PRT","SE":"SWE","SI":"SVN","SK":"SVK","TR":"TUR","US":"USA"
+  };
+
+  const PYR_AGE_ORDER = [
+    "Y_LE4","Y5T9","Y10T14","Y15T19","Y20T24","Y25T29","Y30T34","Y35T39","Y40T44","Y45T49",
+    "Y50T54","Y55T59","Y60T64","Y65T69","Y70T74","Y75T79","Y80T84","Y_GE85"
+  ];
+  const AGE_LABEL = (code) => ({
+    "Y_LE4":"0–4","Y5T9":"5–9","Y10T14":"10–14","Y15T19":"15–19","Y20T24":"20–24","Y25T29":"25–29",
+    "Y30T34":"30–34","Y35T39":"35–39","Y40T44":"40–44","Y45T49":"45–49","Y50T54":"50–54","Y55T59":"55–59",
+    "Y60T64":"60–64","Y65T69":"65–69","Y70T74":"70–74","Y75T79":"75–79","Y80T84":"80–84","Y_GE85":"85+"
+  }[code] || code);
+
+  const state = {
+    selectedCountry: null,
+    countriesByName: new Map(),
+    oecdNames: [],
+    popByIso3: new Map(),
+    popYears: new Set(),
+    popPreferredYear: null,
+    sortMode: "default"
+  };
+
+  const els = {
+    loadBox: document.getElementById('loadBox'),
+    loadText: document.getElementById('loadText'),
+    leftNote: document.getElementById('leftNote'),
+    leftNoteMobile: document.getElementById('leftNoteMobile'),
+    countryList: document.getElementById('countryList'),
+    countrySelect: document.getElementById('countrySelect'),
+    selectedCountryMeta: document.getElementById('selectedCountryMeta'),
+
+    cpSvg: document.getElementById('cpSvg'),
+    cpReadout: document.getElementById('cpReadout'),
+    kReadout: document.getElementById('kReadout'),
+
+    btnSortProductivity: document.getElementById('btnSortProductivity'),
+    btnSortMostProfitable: document.getElementById('btnSortMostProfitable'),
+    btnSortLeastSustainable: document.getElementById('btnSortLeastSustainable'),
+    btnPrevCountry: document.getElementById('btnPrevCountry'),
+    btnNextCountry: document.getElementById('btnNextCountry'),
+
+    resultMini: document.getElementById('resultMini'),
+    resultBadge: document.getElementById('resultBadge'),
+    resultBadgeText: document.getElementById('resultBadgeText'),
+    CVal: document.getElementById('CVal'),
+    PVal: document.getElementById('PVal'),
+    PCRatio: document.getElementById('PCRatio'),
+    CPRatio: document.getElementById('CPRatio'),
+    tauVal: document.getElementById('tauVal'),
+    rhoVal: document.getElementById('rhoVal'),
+    kVal: document.getElementById('kVal'),
+    PStar: document.getElementById('PStar'),
+
+    pyrSvg: document.getElementById('pyrSvg'),
+    pyrMeta: document.getElementById('pyrMeta'),
+    pyrNote: document.getElementById('pyrNote')
+  };
+
+  const safeNum = (x) => (typeof x === "number" && isFinite(x)) ? x : null;
+  const toMillions = (people) => {
+    const p = safeNum(people);
+    if (p === null) return null;
+    return p / 1e6;
+  };
+
+  function pickLatestObservation(observations, predicate){
+    const arr = observations.filter(o => predicate(o));
+    if (!arr.length) return null;
+    arr.sort((a,b) => (b?.period?.date || "").localeCompare(a?.period?.date || ""));
+    return arr[0];
+  }
+
+  function sumContributionRates(observations){
+    const rates = observations
+      .filter(o => typeof o?.metric === "string" && o.metric.startsWith("contribution_rate_"))
+      .map(o => safeNum(o.value))
+      .filter(v => v !== null);
+    if (!rates.length) return null;
+    return rates.reduce((a,b)=>a+b,0);
+  }
+
+  /* MODIFICACIÓN: métricas desde inputs (nuevo JSON) con fallback a observations */
+  function resolveCountryMetrics(countryEntry){
+    if (!countryEntry) return null;
+
+    const name = countryEntry.country?.name ?? "—";
+    const inp = (countryEntry && typeof countryEntry.inputs === "object") ? countryEntry.inputs : null;
+
+    let C_m = safeNum(inp?.C_m);
+    let P_m = safeNum(inp?.P_m);
+
+    const C_people_inp = safeNum(inp?.C_people);
+    const P_people_inp = safeNum(inp?.P_people);
+
+    if (C_m === null && C_people_inp !== null) C_m = toMillions(C_people_inp);
+    if (P_m === null && P_people_inp !== null) P_m = toMillions(P_people_inp);
+
+    let tau = safeNum(inp?.tau);
+    let rho = safeNum(inp?.rho);
+    let k   = safeNum(inp?.k);
+
+    const obs = Array.isArray(countryEntry.observations) ? countryEntry.observations : [];
+
+    if (P_m === null){
+      const pObs = pickLatestObservation(obs, o => o.metric === "pensioners_people");
+      const P_people = pObs ? safeNum(pObs.value) : null;
+      if (P_people !== null) P_m = toMillions(P_people);
+    }
+
+    if (C_m === null){
+      const cObs = pickLatestObservation(obs, o =>
+        o.metric === "contributors_employed_people" ||
+        o.metric === "contributors_affiliates_people" ||
+        o.metric === "contributors_affiliated_people"
+      );
+      const C_people = cObs ? safeNum(cObs.value) : null;
+      if (C_people !== null) C_m = toMillions(C_people);
+    }
+
+    if (rho === null){
+      const rhoObs = pickLatestObservation(obs, o => o.metric === "replacement_rate_gross_full_career");
+      rho = rhoObs ? safeNum(rhoObs.value) : null;
+    }
+
+    if (tau === null){
+      tau = sumContributionRates(obs);
+    }
+
+    if (k === null){
+      k = (tau !== null && rho !== null && rho > 0) ? (tau / rho) : null;
+    }
+
+    return { name, C_m, P_m, tau, rho, k };
+  }
+
+  function hasCoreData(m){
+    return (m && m.C_m !== null && m.P_m !== null && m.tau !== null && m.rho !== null && m.k !== null);
+  }
+
+  const svgEl = (name, attrs={}) => {
+    const el = document.createElementNS("http://www.w3.org/2000/svg", name);
+    for (const [k,v] of Object.entries(attrs)) el.setAttribute(k, String(v));
+    return el;
+  };
+  const clearSvg = (svg) => { while (svg.firstChild) svg.removeChild(svg.firstChild); };
+
+  function countryTag(name){
+    const entry = state.countriesByName.get(name);
+    if (!entry) return "—";
+    const m = resolveCountryMetrics(entry);
+    return hasCoreData(m) ? "datos" : "parcial";
+  }
+
+  function renderCountrySelect(){
+    if (!els.countrySelect) return;
+    els.countrySelect.innerHTML = "";
+    for (const name of state.oecdNames){
+      const opt = document.createElement('option');
+      opt.value = name;
+      opt.textContent = `${name} (${countryTag(name)})`;
+      if (name === state.selectedCountry) opt.selected = true;
+      els.countrySelect.appendChild(opt);
+    }
+    els.countrySelect.disabled = false;
+  }
+
+  function renderCountryList(){
+    if (!els.countryList) return;
+    els.countryList.innerHTML = "";
+    state.oecdNames.forEach(name => {
+      const btn = document.createElement('button');
+      btn.className = 'country-btn';
+      btn.type = 'button';
+      btn.setAttribute('aria-selected', name === state.selectedCountry ? "true":"false");
+      btn.innerHTML = `<span>${name}</span><span class="tag">${countryTag(name)}</span>`;
+      btn.addEventListener('click', () => selectCountry(name, {syncSelect:true}));
+      els.countryList.appendChild(btn);
+    });
+  }
+
+  function setSortButtons(mode){
+    els.btnSortProductivity.setAttribute("aria-pressed", mode === "productivity" ? "true" : "false");
+    els.btnSortMostProfitable.setAttribute("aria-pressed", mode === "profitable" ? "true" : "false");
+    els.btnSortLeastSustainable.setAttribute("aria-pressed", mode === "unsustainable" ? "true" : "false");
+  }
+
+  function sortCountries(mode){
+    state.sortMode = mode;
+    setSortButtons(mode);
+
+    const baseNames = [...state.oecdNames];
+    const decorated = baseNames.map(name => {
+      const entry = state.countriesByName.get(name) || null;
+      const m = entry ? resolveCountryMetrics(entry) : null;
+
+      let score = -Infinity;
+      if (m && m.C_m !== null && m.P_m !== null && m.k !== null && m.k > 0){
+        const pStar = m.k * m.C_m;
+        if (mode === "productivity"){
+          score = m.k;
+        } else if (mode === "profitable"){
+          score = (pStar > 0) ? ((pStar - m.P_m) / pStar) : -Infinity;
+        } else if (mode === "unsustainable"){
+          score = (pStar > 0) ? ((m.P_m - pStar) / pStar) : -Infinity;
+        }
+      }
+      return { name, score };
+    });
+
+    decorated.sort((a,b) => {
+      if (b.score !== a.score) return (b.score - a.score);
+      return a.name.localeCompare(b.name, "es");
+    });
+
+    state.oecdNames = decorated.map(d => d.name);
+    renderCountryList();
+    renderCountrySelect();
+
+    if (state.selectedCountry && state.countriesByName.has(state.selectedCountry)){
+      renderCPChart();
+    } else if (state.oecdNames.length){
+      selectCountry(state.oecdNames[0], {syncSelect:true});
+    }
+  }
+
+  function wireSortButtons(){
+    els.btnSortProductivity.addEventListener("click", () => sortCountries("productivity"));
+    els.btnSortMostProfitable.addEventListener("click", () => sortCountries("profitable"));
+    els.btnSortLeastSustainable.addEventListener("click", () => sortCountries("unsustainable"));
+    setSortButtons(state.sortMode);
+  }
+
+  function wireCountrySelect(){
+    if (!els.countrySelect) return;
+    els.countrySelect.addEventListener('change', (e) => {
+      const name = e.target.value;
+      if (name) selectCountry(name, {syncSelect:false});
+    });
+  }
+
+  function wireNavButtons(){
+    if (els.btnPrevCountry){
+      els.btnPrevCountry.addEventListener("click", () => {
+        if (!state.oecdNames.length) return;
+        const idx = state.selectedCountry ? state.oecdNames.indexOf(state.selectedCountry) : -1;
+        const newIdx = (idx <= 0) ? (state.oecdNames.length - 1) : (idx - 1);
+        const name = state.oecdNames[newIdx];
+        if (name) selectCountry(name, {syncSelect:true});
+      });
+    }
+    if (els.btnNextCountry){
+      els.btnNextCountry.addEventListener("click", () => {
+        if (!state.oecdNames.length) return;
+        const idx = state.selectedCountry ? state.oecdNames.indexOf(state.selectedCountry) : -1;
+        const newIdx = (idx < 0 || idx >= state.oecdNames.length - 1) ? 0 : (idx + 1);
+        const name = state.oecdNames[newIdx];
+        if (name) selectCountry(name, {syncSelect:true});
+      });
+    }
+  }
+
+  /* MODIFICACIÓN: ISO3 desde entry.country.iso2/iso3 (nuevo JSON) */
+  function getPyramidForCountry(countryName){
+    const entry = state.countriesByName.get(countryName) || null;
+
+    const iso2 = (entry?.country?.iso2 || "").trim() || null;
+    const iso3 =
+      (entry?.country?.iso3 || "").trim() ||
+      (iso2 && ISO2_TO_ISO3[iso2] ? ISO2_TO_ISO3[iso2] : null) ||
+      (NAME_TO_ISO3[countryName] || null);
+
+    if (!iso3) return null;
+
+    const byYear = state.popByIso3.get(iso3) || null;
+    if (!byYear) return null;
+
+    const year = state.popPreferredYear || [...state.popYears].sort().slice(-1)[0] || null;
+    if (!year) return null;
+
+    const bySex = byYear.get(year) || null;
+    if (!bySex) return null;
+
+    const mMap = bySex.get("_M") || null;
+    const fMap = bySex.get("_F") || null;
+    const tMap = bySex.get("_T") || null;
+
+    const mVals = PYR_AGE_ORDER.map(a => safeNum(mMap?.get(a)) ?? null);
+    const fVals = PYR_AGE_ORDER.map(a => safeNum(fMap?.get(a)) ?? null);
+
+    const hasMF = !(mVals.every(v => v === null) || fVals.every(v => v === null));
+
+    if (!hasMF){
+      const tVals = PYR_AGE_ORDER.map(a => safeNum(tMap?.get(a)) ?? null);
+      if (tVals.every(v => v === null)) return null;
+
+      const mHalf = tVals.map(v => (v === null ? null : v/2));
+      const fHalf = tVals.map(v => (v === null ? null : v/2));
+      return { iso3, year, mVals: mHalf, fVals: fHalf, ageCodes: PYR_AGE_ORDER, fromTotal: true };
+    }
+
+    return { iso3, year, mVals, fVals, ageCodes: PYR_AGE_ORDER, fromTotal: false };
+  }
+
+  function renderPyramid(countryName){
+    const svg = els.pyrSvg;
+    clearSvg(svg);
+
+    const pyr = getPyramidForCountry(countryName);
+    if (!pyr){
+      els.pyrMeta.textContent = "Sin datos";
+      els.pyrNote.textContent = "No hay datos de pirámide para este país (revisa mapeo ISO3 o el CSV en tu repo).";
+      const t = svgEl('text', {
+        x: 20, y: 60,
+        fill: COLORS.text,
+        "font-size": String(13 * UI_SCALE),
+        "font-family":"Arial, sans-serif",
+        "opacity":"0.85"
+      });
+      t.textContent = "Pirámide no disponible";
+      svg.appendChild(t);
+      return;
+    }
+
+    const W=520, H=520;
+    const pad = {l: 74, r: 24, t: 44, b: 24};
+    const innerW = W - pad.l - pad.r;
+    const innerH = H - pad.t - pad.b;
+    const cx = pad.l + innerW/2;
+
+    const mRaw = pyr.mVals.map(v => (v === null ? 0 : v));
+    const fRaw = pyr.fVals.map(v => (v === null ? 0 : v));
+    const maxV = Math.max(1, ...mRaw, ...fRaw);
+
+    const barH = innerH / pyr.ageCodes.length;
+    const maxPx = (innerW/2) * 0.90;
+
+    const gridLines = 6;
+    for (let kk=0;kk<=gridLines;kk++){
+      const x = pad.l + (innerW * kk/gridLines);
+      svg.appendChild(svgEl('line', {
+        x1:x, y1:pad.t, x2:x, y2:pad.t+innerH,
+        stroke: COLORS.grid, "stroke-width":1, "stroke-opacity":"0.25"
+      }));
+    }
+    svg.appendChild(svgEl('line',{
+      x1: cx, y1: pad.t, x2: cx, y2: pad.t+innerH,
+      stroke: COLORS.text, "stroke-width":1.2, "stroke-opacity":"0.55"
+    }));
+
+    const labL = svgEl('text',{
+      x: cx - 8, y: 30,
+      fill: COLORS.workers,
+      "font-size": String(12 * UI_SCALE),
+      "font-family":"Arial, sans-serif",
+      "text-anchor":"end", "opacity":"0.88"
+    });
+    labL.textContent = "Hombre";
+    svg.appendChild(labL);
+
+    const labR = svgEl('text',{
+      x: cx + 8, y: 30,
+      fill: COLORS.retired,
+      "font-size": String(12 * UI_SCALE),
+      "font-family":"Arial, sans-serif",
+      "text-anchor":"start", "opacity":"0.88"
+    });
+    labR.textContent = "Mujer";
+    svg.appendChild(labR);
+
+    for (let i=0;i<pyr.ageCodes.length;i++){
+      const code = pyr.ageCodes[i];
+      const m = mRaw[i];
+      const f = fRaw[i];
+
+      const y = pad.t + (pyr.ageCodes.length - 1 - i) * barH + 1;
+      const h = Math.max(1, barH - 2);
+
+      const wL = (m / maxV) * maxPx;
+      const wR = (f / maxV) * maxPx;
+
+      svg.appendChild(svgEl('rect',{ x: cx - wL, y, width: wL, height: h, fill: COLORS.workers, "fill-opacity":"0.70" }));
+      svg.appendChild(svgEl('rect',{ x: cx,      y, width: wR, height: h, fill: COLORS.retired, "fill-opacity":"0.70" }));
+
+      const t = svgEl('text',{
+        x: 10, y: y + h*0.72,
+        fill: COLORS.text,
+        "font-size": String(11 * UI_SCALE),
+        "font-family":"Arial, sans-serif",
+        "opacity":"0.88"
+      });
+      t.textContent = AGE_LABEL(code);
+      svg.appendChild(t);
+    }
+
+    const totalPop = mRaw.reduce((a,b)=>a+b,0) + fRaw.reduce((a,b)=>a+b,0);
+    els.pyrMeta.textContent = `${pyr.year} · ${(totalPop/1e6).toFixed(1)} M`;
+
+    els.pyrNote.textContent = pyr.fromTotal
+      ? `OECD POP, año ${pyr.year}. El CSV no trae M/F (solo Total), se dibuja simétrico (Total/2 a cada lado).`
+      : `OECD POP, año ${pyr.year}. Se dibuja Hombre (izq) y Mujer (der) con datos del CSV.`;
+  }
+
+  function setExplainPanel(metrics){
+    const name = state.selectedCountry || "—";
+    els.resultMini.textContent = `${name} (último dato)`;
+    renderPyramid(name);
+
+    if (!metrics || !hasCoreData(metrics)){
+      els.resultBadge.classList.remove('warn','ok');
+      els.resultBadge.classList.add('ok');
+      els.resultBadgeText.textContent = "Datos insuficientes para calcular (C,P,τ,ρ,k).";
+
+      els.CVal.textContent = metrics?.C_m !== null ? `${metrics.C_m.toFixed(2)} M` : "—";
+      els.PVal.textContent = metrics?.P_m !== null ? `${metrics.P_m.toFixed(2)} M` : "—";
+      els.PCRatio.textContent = "—";
+      els.CPRatio.textContent = "—";
+      els.tauVal.textContent = metrics?.tau !== null ? metrics.tau.toFixed(3) : "—";
+      els.rhoVal.textContent = metrics?.rho !== null ? metrics.rho.toFixed(2) : "—";
+      els.kVal.textContent = metrics?.k !== null ? metrics.k.toFixed(2) : "—";
+      els.PStar.textContent = "—";
+      return;
+    }
+
+    const C = metrics.C_m;
+    const P = metrics.P_m;
+    const k = metrics.k;
+
+    const ratioPC = (C > 0) ? (P / C) : NaN;
+    const ratioCP = (P > 0) ? (C / P) : NaN;
+    const pStar = k * C;
+    const above = (P > pStar + 1e-9);
+
+    els.CVal.textContent = `${C.toFixed(2)} M`;
+    els.PVal.textContent = `${P.toFixed(2)} M`;
+    els.PCRatio.textContent = isFinite(ratioPC) ? ratioPC.toFixed(2) : "—";
+    els.CPRatio.textContent = isFinite(ratioCP) ? ratioCP.toFixed(2) : "—";
+    els.tauVal.textContent = metrics.tau.toFixed(3);
+    els.rhoVal.textContent = metrics.rho.toFixed(2);
+    els.kVal.textContent = metrics.k.toFixed(2);
+    els.PStar.textContent = `${pStar.toFixed(2)} M`;
+
+    els.resultBadge.classList.remove('warn','ok');
+    els.resultBadge.classList.add(above ? 'warn' : 'ok');
+    els.resultBadgeText.textContent = above
+      ? "Por encima de la línea → tensión (impuestos/deuda)"
+      : "Por debajo de la línea → margen (sin tensión fiscal)";
+  }
+
+  function xMaxFromC(C){
+    if (C === null) return 30;
+    if (C < 1.5) return 2;
+    if (C < 3.5) return 5;
+    if (C < 10)  return 10;
+    return Math.ceil(C / 10) * 10;
+  }
+  function xStepFromXMax(xMax){
+    if (xMax <= 2)  return 0.5;
+    if (xMax <= 5)  return 1;
+    if (xMax <= 10) return 2;
+    if (xMax <= 50) return 5;
+    if (xMax <= 100) return 10;
+    return 10;
+  }
+  function yMaxFromP(P){
+    if (P === null) return 30;
+    if (P < 1.5) return 2;
+    if (P < 3.5) return 5;
+    if (P < 10)  return 10;
+    return Math.ceil(P / 10) * 10;
+  }
+  function yStepFromYMax(yMax){
+    if (yMax <= 2)  return 0.5;
+    if (yMax <= 5)  return 1;
+    if (yMax <= 10) return 2;
+    if (yMax <= 50) return 5;
+    if (yMax <= 100) return 10;
+    return 10;
+  }
+  function buildTicks(max, step){
+    const ticks = [];
+    const n = Math.round(max / step);
+    for (let i=0;i<=n;i++){
+      const v = i * step;
+      ticks.push(Math.abs(v) < 1e-12 ? 0 : v);
+    }
+    if (ticks[ticks.length-1] !== max) ticks.push(max);
+    return ticks;
+  }
+
+  function thinTicksForWidth(ticks, innerPx, minPxPerLabel){
+    if (!Array.isArray(ticks) || ticks.length <= 2) return ticks;
+    const maxLabels = Math.max(2, Math.floor(innerPx / minPxPerLabel) + 1);
+    if (ticks.length <= maxLabels) return ticks;
+
+    const step = Math.ceil((ticks.length - 1) / (maxLabels - 1));
+    return ticks.filter((_, i) => (i % step === 0) || (i === ticks.length - 1));
+  }
+
+  function renderCPChart(){
+    const svg = els.cpSvg;
+    clearSvg(svg);
+
+    const W = 1000, H = 700;
+    const pad = {
+      l: Math.round(90 * UI_SCALE),
+      r: Math.round(30 * UI_SCALE),
+      t: Math.round(26 * UI_SCALE),
+      b: Math.round(70 * UI_SCALE)
+    };
+    const innerW = W - pad.l - pad.r;
+    const innerH = H - pad.t - pad.b;
+
+    /* (móvil) ya estás en layout apilado; aun así mantenemos el switch por consistencia */
+    const isMobileStacked = window.matchMedia && window.matchMedia("(max-width: 1100px)").matches;
+    const axisLabelScale = isMobileStacked ? CP_AXIS_LABEL_FONT_SCALE_MOBILE : 1;
+
+    if (!state.selectedCountry){
+      els.cpReadout.textContent = `C: — | P: —`;
+      els.kReadout.textContent = `k: —`;
+      setExplainPanel(null);
+      return;
+    }
+
+    const entry = state.countriesByName.get(state.selectedCountry) || null;
+    const metrics = entry ? resolveCountryMetrics(entry) : null;
+
+    const C = metrics?.C_m ?? null;
+    const P = metrics?.P_m ?? null;
+    const k = metrics?.k ?? null;
+
+    const xMax = xMaxFromC(C);
+    const xStep = xStepFromXMax(xMax);
+    const xTicksAll = buildTicks(xMax, xStep);
+
+    const yMax = yMaxFromP(P);
+    const yStep = yStepFromYMax(yMax);
+    const yTicksAll = buildTicks(yMax, yStep);
+
+    const pxW = svg.clientWidth || 900;
+    const pxH = svg.clientHeight || 560;
+
+    const xTicks = thinTicksForWidth(xTicksAll, pxW * 0.78, 70 * UI_SCALE);
+    const yTicks = thinTicksForWidth(yTicksAll, pxH * 0.65, 54 * UI_SCALE);
+
+    const xMin=0, yMin=0;
+
+    const xToPx = (x) => pad.l + ((x-xMin)/(xMax-xMin))*innerW;
+    const yToPx = (y) => pad.t + innerH - ((y-yMin)/(yMax-yMin))*innerH;
+
+    const fTick  = 20 * UI_SCALE;
+    const fAxis  = 14 * UI_SCALE;
+    const fPoint = 14 * UI_SCALE;
+
+    /* MODIFICACIÓN: fuente SOLO para labels descriptivos de ejes */
+    const fAxisLabel = fAxis * axisLabelScale;
+
+    yTicks.forEach(v => {
+      svg.appendChild(svgEl('line',{
+        x1: pad.l, y1: yToPx(v), x2: pad.l+innerW, y2: yToPx(v),
+        stroke: COLORS.grid, "stroke-width":"1", "stroke-opacity":"0.45",
+        "stroke-dasharray":"6 6"
+      }));
+      const t = svgEl('text',{
+        x: pad.l - Math.round(10 * UI_SCALE),
+        y: yToPx(v) + 6,
+        fill: COLORS.text,
+        "font-size": String(fTick),
+        "font-family":"Arial, sans-serif",
+        "text-anchor":"end", "opacity":"0.90"
+      });
+      t.textContent = String(v);
+      svg.appendChild(t);
+    });
+
+    xTicks.forEach(v => {
+      svg.appendChild(svgEl('line',{
+        x1: xToPx(v), y1: pad.t, x2: xToPx(v), y2: pad.t+innerH,
+        stroke: COLORS.grid, "stroke-width":"1", "stroke-opacity":"0.35"
+      }));
+      const t = svgEl('text',{
+        x: xToPx(v),
+        y: pad.t + innerH + Math.round(22 * UI_SCALE),
+        fill: COLORS.text,
+        "font-size": String(fTick),
+        "font-family":"Arial, sans-serif",
+        "text-anchor":"middle", "opacity":"0.90"
+      });
+      t.textContent = String(v);
+      svg.appendChild(t);
+    });
+
+    svg.appendChild(svgEl('line',{
+      x1: pad.l, y1: pad.t+innerH, x2: pad.l+innerW, y2: pad.t+innerH,
+      stroke: COLORS.text, "stroke-width":"1.2", "stroke-opacity":"0.9"
+    }));
+    svg.appendChild(svgEl('line',{
+      x1: pad.l, y1: pad.t, x2: pad.l, y2: pad.t+innerH,
+      stroke: COLORS.text, "stroke-width":"1.2", "stroke-opacity":"0.9"
+    }));
+
+    /* MODIFICACIÓN: offset COMÚN para ambos labels descriptivos */
+    const axisOffsetPx = CP_AXIS_LABEL_OFFSET * UI_SCALE;
+
+    const xLabelY = Math.min(
+      H - Math.round(6 * UI_SCALE),
+      (pad.t + innerH + axisOffsetPx)
+    );
+    const xl = svgEl('text',{
+      x: pad.l + innerW/2, y: xLabelY,
+      fill: COLORS.text,
+      "font-size": String(fAxisLabel),
+      "font-family":"Arial, sans-serif",
+      "text-anchor":"middle", "opacity":"0.95"
+    });
+    xl.textContent = "Cotizantes (millones)";
+    svg.appendChild(xl);
+
+    const yLabelX = Math.max(
+      Math.round(18 * UI_SCALE),
+      (pad.l - axisOffsetPx)
+    );
+    const yLabelY = pad.t + innerH/2;
+    const yl = svgEl('text',{
+      x: yLabelX, y: yLabelY,
+      fill: COLORS.text,
+      "font-size": String(fAxisLabel),
+      "font-family":"Arial, sans-serif",
+      "text-anchor":"middle", "opacity":"0.95",
+      transform: `rotate(-90 ${yLabelX} ${yLabelY})`
+    });
+    yl.textContent = "Pensionistas (millones)";
+    svg.appendChild(yl);
+
+    if (!metrics || C === null || P === null){
+      els.cpReadout.textContent = `Datos C/P no disponibles para ${state.selectedCountry}`;
+      els.kReadout.textContent = `k: —`;
+      setExplainPanel(metrics);
+      return;
+    }
+
+    els.cpReadout.textContent = `C: ${C.toFixed(2)} M | P: ${P.toFixed(2)} M`;
+    els.kReadout.textContent = (k !== null) ? `k: ${k.toFixed(2)}` : `k: —`;
+
+    setExplainPanel(metrics);
+
+    if (k !== null){
+      const xAtTop = yMax / k;
+      let xEnd, yEnd;
+      if (xAtTop <= xMax){ xEnd = xAtTop; yEnd = yMax; }
+      else { xEnd = xMax; yEnd = k*xMax; }
+
+      svg.appendChild(svgEl('line',{
+        x1: xToPx(0), y1: yToPx(0),
+        x2: xToPx(xEnd), y2: yToPx(yEnd),
+        stroke: COLORS.primary, "stroke-width":"4", "stroke-opacity":"0.95"
+      }));
+    }
+
+    svg.appendChild(svgEl('line',{
+      x1: xToPx(0), y1: yToPx(P),
+      x2: xToPx(C), y2: yToPx(P),
+      stroke: COLORS.workers, "stroke-width":"2", "stroke-opacity":"0.85",
+      "stroke-dasharray":"6 6"
+    }));
+    svg.appendChild(svgEl('line',{
+      x1: xToPx(C), y1: yToPx(0),
+      x2: xToPx(C), y2: yToPx(P),
+      stroke: COLORS.workers, "stroke-width":"2", "stroke-opacity":"0.85",
+      "stroke-dasharray":"6 6"
+    }));
+
+    svg.appendChild(svgEl('circle',{
+      cx: xToPx(C), cy: yToPx(P), r: 7.5,
+      fill: COLORS.retired, "fill-opacity":"0.95"
+    }));
+
+    const pxX = xToPx(C);
+    const nearRight = (pxX > (pad.l + innerW - 140));
+    const labelX = nearRight ? (pxX - 10) : (pxX + 10);
+    const anchor = nearRight ? "end" : "start";
+
+    const lab = svgEl('text',{
+      x: labelX, y: yToPx(P) - 10,
+      fill: COLORS.retired,
+      "font-size": String(fPoint),
+      "font-family":"Arial, sans-serif",
+      "text-anchor": anchor,
+      "opacity":"0.95"
+    });
+    lab.textContent = state.selectedCountry;
+    svg.appendChild(lab);
+  }
+
+  function selectCountry(name, opts={syncSelect:true}){
+    state.selectedCountry = name;
+    els.selectedCountryMeta.textContent = `Seleccionado: ${name}`;
+    renderCountryList();
+    renderCPChart();
+
+    if (opts.syncSelect && els.countrySelect){
+      els.countrySelect.value = name;
+    }
+  }
+
+  function parseCSV(text){
+    const rows = [];
+    let row = [];
+    let cur = "";
+    let inQuotes = false;
+
+    for (let i=0;i<text.length;i++){
+      const ch = text[i];
+      const next = text[i+1];
+
+      if (ch === '"'){
+        if (inQuotes && next === '"'){ cur += '"'; i++; }
+        else { inQuotes = !inQuotes; }
+      } else if (ch === ',' && !inQuotes){
+        row.push(cur); cur = "";
+      } else if ((ch === '\n' || ch === '\r') && !inQuotes){
+        if (ch === '\r' && next === '\n') i++;
+        row.push(cur); cur = "";
+        if (row.length > 1 || (row.length === 1 && row[0].trim() !== "")) rows.push(row);
+        row = [];
+      } else {
+        cur += ch;
+      }
+    }
+    row.push(cur);
+    if (row.length > 1 || (row.length === 1 && row[0].trim() !== "")) rows.push(row);
+
+    if (!rows.length) return { header: [], data: [] };
+    return { header: rows[0].map(h => h.trim()), data: rows.slice(1) };
+  }
+
+  async function loadPopulationCSV(){
+    const res = await fetch(POP_CSV_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error(`CSV población: HTTP ${res.status}`);
+    const text = await res.text();
+    const { header, data } = parseCSV(text);
+
+    const idx = (name) => header.indexOf(name);
+    const iRef = idx("REF_AREA");
+    const iSex = idx("SEX");
+    const iAge = idx("AGE");
+    const iYear = idx("TIME_PERIOD");
+    const iVal = idx("OBS_VALUE");
+
+    if ([iRef,iSex,iAge,iYear,iVal].some(i => i < 0)){
+      throw new Error("CSV población: faltan columnas REF_AREA, SEX, AGE, TIME_PERIOD, OBS_VALUE.");
+    }
+
+    state.popByIso3.clear();
+    state.popYears.clear();
+
+    for (const r of data){
+      const ref = (r[iRef] || "").trim();
+      let sex = (r[iSex] || "").trim();
+      const age = (r[iAge] || "").trim();
+      const year = (r[iYear] || "").trim();
+      const val = Number((r[iVal] || "").trim());
+
+      if (!ref || !year || !isFinite(val)) continue;
+
+      if (sex === "M") sex = "_M";
+      if (sex === "F") sex = "_F";
+      if (sex === "T") sex = "_T";
+
+      if (!["_T","_M","_F"].includes(sex)) continue;
+      if (!PYR_AGE_ORDER.includes(age)) continue;
+
+      state.popYears.add(year);
+
+      if (!state.popByIso3.has(ref)) state.popByIso3.set(ref, new Map());
+      const byYear = state.popByIso3.get(ref);
+
+      if (!byYear.has(year)) byYear.set(year, new Map());
+      const bySex = byYear.get(year);
+
+      if (!bySex.has(sex)) bySex.set(sex, new Map());
+      bySex.get(sex).set(age, val);
+    }
+
+    const years = [...state.popYears].map(y => Number(y)).filter(n => isFinite(n)).sort((a,b)=>a-b);
+    state.popPreferredYear = years.length ? String(years[years.length-1]) : null;
+  }
+
+  /* MODIFICACIÓN: countries puede ser ARRAY (viejo) u OBJETO por ISO2 (nuevo) */
+  async function loadPensionsJSON(){
+    const res = await fetch(DATA_URL, { cache: "no-store" });
+    if (!res.ok) throw new Error(`JSON pensiones: HTTP ${res.status}`);
+    const json = await res.json();
+
+    const raw = json?.countries;
+    let countries = [];
+    if (Array.isArray(raw)) {
+      countries = raw;
+    } else if (raw && typeof raw === "object") {
+      countries = Object.values(raw);
+    } else {
+      countries = [];
+    }
+
+    state.countriesByName.clear();
+    state.oecdNames = [];
+
+    for (const c of countries){
+      const name = c?.country?.name;
+      if (!name) continue;
+      state.countriesByName.set(name, c);
+      state.oecdNames.push(name);
+    }
+    state.oecdNames.sort((a,b)=>a.localeCompare(b, "es"));
+  }
+
+  function debounce(fn, wait=120){
+    let t = null;
+    return (...args) => {
+      if (t) clearTimeout(t);
+      t = setTimeout(() => fn(...args), wait);
+    };
+  }
+
+  async function init(){
+    try{
+      els.loadText.textContent = "Leyendo JSON + CSV…";
+
+      await Promise.all([ loadPensionsJSON(), loadPopulationCSV() ]);
+      wireSortButtons();
+      wireCountrySelect();
+      wireNavButtons();
+
+      els.loadBox.style.display = "none";
+
+      const leftMsg =
+        `Datos pensiones: ${state.oecdNames.length} países. Pirámides: ${state.popByIso3.size} códigos (año ${state.popPreferredYear || "—"}).`;
+      if (els.leftNote) els.leftNote.textContent = leftMsg;
+      if (els.leftNoteMobile) els.leftNoteMobile.textContent = leftMsg;
+
+      const defaultCountry =
+        state.countriesByName.has("España") ? "España" :
+        state.countriesByName.has("Spain") ? "Spain" :
+        (state.oecdNames[0] || null);
+
+      state.selectedCountry = defaultCountry;
+
+      els.selectedCountryMeta.textContent = defaultCountry ? `Seleccionado: ${defaultCountry}` : `Sin países`;
+
+      renderCountryList();
+      renderCountrySelect();
+      if (defaultCountry && els.countrySelect) els.countrySelect.value = defaultCountry;
+
+      requestAnimationFrame(() => renderCPChart());
+      window.addEventListener("resize", debounce(renderCPChart, 120), { passive: true });
+    }catch(err){
+      els.loadText.textContent = "Error cargando datasets";
+
+      const msg =
+        `No se pudo cargar "${DATA_URL}" o "${POP_CSV_URL}". Revisa que ambos existan en tu repo y se sirvan en GitHub Pages.`;
+      if (els.leftNote) els.leftNote.textContent = msg;
+      if (els.leftNoteMobile) els.leftNoteMobile.textContent = msg;
+
+      els.selectedCountryMeta.textContent = "Error";
+      els.resultBadge.classList.remove('warn','ok');
+      els.resultBadge.classList.add('warn');
+      els.resultBadgeText.textContent = "No se pudo cargar el dataset.";
+      renderCPChart();
+      console.error(err);
+    }
+  }
+
+  init();
+})();
+</script>
+
+</body>
+</html>

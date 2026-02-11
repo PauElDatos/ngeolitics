@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Pensiones — Inicio</title>
+  <style>
+    :root{
+      --bg:#252525;
+      --primary:#FEF702;
+      --text:#B0B0B0;
+      --panel:#2b2b2b;
+      --stroke:#3a3a3a;
+      --shadow: 0 10px 30px rgba(0,0,0,.25);
+      --radius:16px;
+
+      --fontTitle: "Futura","Trebuchet MS",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      --fontText:  Arial,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      background:var(--bg);
+      color:var(--text);
+      font-family:var(--fontText);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+    .shell{
+      width:min(980px, 100%);
+      display:grid;
+      gap:14px;
+    }
+    header{
+      padding:14px 16px;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      box-shadow:var(--shadow);
+    }
+    h1{
+      margin:0;
+      font-family:var(--fontTitle);
+      color:var(--primary);
+      font-size:28px;
+      letter-spacing:.3px;
+      line-height:1.05;
+    }
+    p{
+      margin:8px 0 0 0;
+      opacity:.9;
+      font-size:14px;
+      line-height:1.35;
+      max-width:80ch;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:14px;
+    }
+    @media (max-width: 900px){
+      .grid{ grid-template-columns:1fr; }
+    }
+    a.card{
+      text-decoration:none;
+      color:inherit;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      box-shadow:var(--shadow);
+      padding:22px 18px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      min-height:180px;
+      position:relative;
+      overflow:hidden;
+    }
+    a.card:hover{
+      border-color: rgba(254,247,2,.35);
+      background:linear-gradient(180deg, rgba(254,247,2,.07), rgba(255,255,255,.02));
+    }
+    .kicker{
+      font-family:var(--fontTitle);
+      color:var(--primary);
+      text-transform:uppercase;
+      letter-spacing:.35px;
+      font-size:13px;
+    }
+    .title{
+      font-family:var(--fontTitle);
+      font-size:26px;
+      color:#fff;
+      letter-spacing:.2px;
+      margin:0;
+      line-height:1.05;
+    }
+    .desc{
+      margin:0;
+      opacity:.9;
+      font-size:14px;
+      line-height:1.35;
+      max-width:65ch;
+    }
+    .arrow{
+      position:absolute;
+      right:16px;
+      bottom:16px;
+      width:44px; height:44px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(0,0,0,.18);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:18px;
+      color:var(--primary);
+    }
+    footer{
+      opacity:.75;
+      font-size:12px;
+      line-height:1.35;
+      padding:0 2px;
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header>
+      <h1>Sostenibilidad de las Pensiones de la OCDE</h1>
+      <p>
+        Dos módulos: <br> (1) comparativa OCDE<br> (2) simulador normativo
+      </p>
+    </header>
+
+    <div class="grid">
+      <a class="card" href="piramidePoblacional.html">
+        <div class="kicker">Módulo 1</div>
+        <h2 class="title">Simulador</h2>
+        <p class="desc">
+          Ajusta la pirámide por quinquenios y parámetros demográficos. La gráfica de la izquierda queda preparada para
+          la siguiente iteración (por ahora, placeholder).
+        </p>
+        <div class="arrow">→</div>
+      </a>
+
+      <a class="card" href="ocde.html">
+        <div class="kicker">Módulo 2</div>
+        <h2 class="title">Sostenibilidad países OCDE</h2>
+        <p class="desc">
+          Selecciona un país OCDE y visualiza su punto (C,P) junto con la línea de equilibrio definida por su k = τ/ρ.
+          De momento, datos completos solo para España.
+        </p>
+        <div class="arrow">→</div>
+      </a>
+    </div>
+
+    <footer>
+      Nota: Se ha usado IA para buscar los datos de los paises de la OCDE, teneis las fuentes aqui: .
+    </footer>
+  </div>
+</body>
+</html>
