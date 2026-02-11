@@ -5,27 +5,21 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>N.Geolitics — Investigaciones económicas e históricas</title>
   <meta name="description" content="N.Geolitics: investigaciones económicas e históricas basadas en recopilación, tratamiento y visualización de datos." />
-
   <link rel="icon" href="assets/faviconNG.png" />
 
   <style>
     :root{
       --uiScale: 1.35;
-
       --bg:#252525;
       --primary:#FEF702;
       --text:#B0B0B0;
       --stroke:#3a3a3a;
-
       --radius:16px;
       --shadow: 0 10px 30px rgba(0,0,0,.25);
-
       --fontTitle: "Futura","Trebuchet MS",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       --fontText:  Arial,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-
       --max: 1040px;
     }
-
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
@@ -37,22 +31,18 @@
       font-size: calc(14px * var(--uiScale));
       padding: 18px;
     }
-
     a{ color:inherit; text-decoration:none; }
     a:focus-visible, button:focus-visible{
       outline:2px solid rgba(254,247,2,.55);
       outline-offset:3px;
       border-radius: 12px;
     }
-
     .wrap{
       width: min(var(--max), 100%);
       margin: 0 auto;
       display: grid;
       gap: 14px;
     }
-
-    /* Header/brand */
     header.top{
       padding:14px 16px;
       border:1px solid var(--stroke);
@@ -64,60 +54,28 @@
       justify-content:space-between;
       gap: 14px;
     }
-
-    .brand{
-      display:flex;
-      align-items:center;
-      gap: 12px;
-      min-width: 0;
-    }
-
+    .brand{ display:flex; align-items:center; gap: 12px; min-width: 0; }
     .logo{
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
+      width: 44px; height: 44px; border-radius: 12px;
       border: 1px solid rgba(255,255,255,.10);
       background: rgba(0,0,0,.18);
-      display:grid;
-      place-items:center;
-      overflow:hidden;
-      flex: 0 0 auto;
+      display:grid; place-items:center; overflow:hidden; flex: 0 0 auto;
     }
-    .logo img{
-      width:100%;
-      height:100%;
-      object-fit: cover;
-      display:block;
-    }
-
-    .brandText{
-      min-width:0;
-      line-height:1.05;
-    }
+    .logo img{ width:100%; height:100%; object-fit: cover; display:block; }
+    .brandText{ min-width:0; line-height:1.05; }
     .brandText .t{
-      margin:0;
-      font-family: var(--fontTitle);
-      color: var(--primary);
+      margin:0; font-family: var(--fontTitle); color: var(--primary);
       font-size: calc(20px * var(--uiScale));
-      letter-spacing:.3px;
-      white-space:nowrap;
+      letter-spacing:.3px; white-space:nowrap;
     }
     .brandText .s{
-      margin:6px 0 0 0;
-      opacity:.9;
-      font-size: calc(12px * var(--uiScale));
+      margin:6px 0 0 0; opacity:.9; font-size: calc(12px * var(--uiScale));
       max-width: 90ch;
     }
-
     .topActions{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      flex: 0 0 auto;
-      flex-wrap: wrap;
-      justify-content:flex-end;
+      display:flex; align-items:center; gap:10px; flex: 0 0 auto;
+      flex-wrap: wrap; justify-content:flex-end;
     }
-
     .btn{
       appearance:none;
       border:1px solid rgba(255,255,255,.12);
@@ -129,8 +87,7 @@
       cursor:pointer;
       user-select:none;
       transition: transform .04s ease, border-color .12s ease, background .12s ease;
-      line-height:1;
-      white-space:nowrap;
+      line-height:1; white-space:nowrap;
     }
     .btn:hover{ border-color: rgba(254,247,2,.35); background: rgba(255,255,255,.06); }
     .btn:active{ transform: translateY(1px); }
@@ -140,8 +97,6 @@
       color: rgba(0,0,0,.92);
       font-weight: 800;
     }
-
-    /* Hero */
     .hero{
       padding: 18px 16px;
       border:1px solid var(--stroke);
@@ -154,7 +109,6 @@
       align-items: stretch;
       overflow:hidden;
     }
-
     .hero h1{
       margin:0;
       font-family: var(--fontTitle);
@@ -170,7 +124,6 @@
       line-height:1.45;
       max-width: 95ch;
     }
-
     .heroBox{
       border: 1px solid rgba(255,255,255,.10);
       border-radius: 14px;
@@ -206,8 +159,6 @@
       opacity:.85;
       white-space:nowrap;
     }
-
-    /* Section head */
     .sectionHead{
       display:flex;
       align-items:flex-end;
@@ -232,12 +183,7 @@
       line-height:1.35;
       text-align:right;
     }
-
-    /* Cards list (uno debajo de otro) */
-    .list{
-      display:grid;
-      gap: 14px;
-    }
+    .list{ display:grid; gap: 14px; }
 
     .card{
       border:1px solid var(--stroke);
@@ -252,13 +198,11 @@
       overflow:hidden;
       transition: border-color .15s ease, background .15s ease, transform .10s ease;
     }
-
     .card:hover{
       border-color: rgba(254,247,2,.35);
       background: linear-gradient(180deg, rgba(254,247,2,.06), rgba(255,255,255,.02));
       transform: translateY(-1px);
     }
-
     .thumb{
       width: 120px;
       border-radius: 14px;
@@ -270,13 +214,7 @@
       place-items:center;
       padding: 10px;
     }
-    .thumb img{
-      width: 100%;
-      height: 100%;
-      object-fit: contain;
-      opacity: .95;
-    }
-
+    .thumb img{ width: 100%; height: 100%; object-fit: contain; opacity: .95; }
     .cardBody{
       flex: 1 1 auto;
       min-width: 0;
@@ -284,7 +222,6 @@
       flex-direction:column;
       gap: 8px;
     }
-
     .kicker{
       font-family: var(--fontTitle);
       color: var(--primary);
@@ -293,7 +230,6 @@
       font-size: calc(12px * var(--uiScale));
       opacity: .95;
     }
-
     .title{
       margin:0;
       font-family: var(--fontTitle);
@@ -302,7 +238,6 @@
       letter-spacing:.2px;
       line-height:1.05;
     }
-
     .desc{
       margin:0;
       opacity:.9;
@@ -310,7 +245,6 @@
       line-height:1.45;
       max-width: 95ch;
     }
-
     .metaRow{
       display:flex;
       gap:10px;
@@ -336,7 +270,6 @@
       box-shadow: 0 0 0 3px rgba(254,247,2,.12);
       flex: 0 0 auto;
     }
-
     .arrow{
       position:absolute;
       right: 16px;
@@ -352,7 +285,6 @@
       font-size: 18px;
       color: var(--primary);
     }
-
     footer{
       margin-top: 4px;
       opacity:.75;
@@ -360,7 +292,6 @@
       line-height:1.45;
       padding: 0 2px;
     }
-
     @media (max-width: 900px){
       body{ padding: 14px; }
       .hero{ grid-template-columns: 1fr; }
@@ -405,7 +336,6 @@
         </p>
 
         <div style="margin-top:12px; display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn" href="https://paueldatos.github.io/ngeolitics/" aria-label="URL GitHub Pages">GitHub Pages</a>
           <a class="btn" href="#investigaciones">Explorar módulos</a>
         </div>
       </div>
@@ -423,13 +353,13 @@
 
     <div class="sectionHead" id="investigaciones">
       <h2>Investigaciones</h2>
-      <p>Una por una, en formato interactivo. (Puedes ir añadiendo más debajo con el mismo “card”.)</p>
+      <p>Una por una, en formato interactivo.</p>
     </div>
 
     <section class="list" aria-label="Lista de investigaciones">
 
       <!-- Card 1 -->
-      <a class="card" href="pensiones-simulador/index.html" aria-label="Abrir investigación: Pensiones">
+      <a class="card" id="link-pensiones" href="pensiones-simulador/index.html" aria-label="Abrir investigación: Pensiones">
         <div class="thumb" aria-hidden="true">
           <img src="assets/logotipoN.Geolitics.png" alt="" />
         </div>
@@ -448,8 +378,8 @@
         <div class="arrow">→</div>
       </a>
 
-      <!-- Card 2 -->
-      <a class="card" href="pge/index.html" aria-label="Abrir investigación: Entendiendo la economía de España (PGE)">
+      <!-- Card 2 (PGE): la carpeta puede ser PGE/ o pge/ según tu repo; lo autodetectamos -->
+      <a class="card" id="link-pge" href="PGE/index.html" aria-label="Abrir investigación: Entendiendo la economía de España">
         <div class="thumb" aria-hidden="true">
           <img src="assets/logotipoN.Geolitics.png" alt="" />
         </div>
@@ -457,7 +387,7 @@
           <div class="kicker">Investigación 02</div>
           <h3 class="title">Entendiendo la economía de España</h3>
           <p class="desc">
-            Visualizaciones y series para contextualizar indicadores y evolución macro (estructura tipo “panel + gráfico”).
+            Visualizaciones y series para contextualizar indicadores y evolución macro.
           </p>
           <div class="metaRow">
             <span class="tag"><span class="dot"></span>Indicadores</span>
@@ -471,9 +401,7 @@
     </section>
 
     <footer>
-      Consejo: si cambias nombres de carpetas/índices, actualiza los <code>href</code> de arriba.
-      <br>
-      Nota técnica: en GitHub Pages las rutas distinguen mayúsculas/minúsculas (mejor usar todo en minúsculas).
+      Si un enlace devuelve 404, casi siempre es por <b>mayúsculas/minúsculas</b> en el nombre de carpeta (en GitHub Pages sí importa).
     </footer>
 
   </div>
@@ -486,6 +414,36 @@
         const fmt = new Intl.DateTimeFormat("es-ES", { year:"numeric", month:"long", day:"2-digit" });
         document.getElementById("today").textContent = fmt.format(d);
       }catch(e){}
+    })();
+
+    // Autodetección de ruta PGE: "PGE/" vs "pge/" (GitHub Pages distingue mayúsculas/minúsculas)
+    (async function(){
+      const link = document.getElementById("link-pge");
+      if(!link) return;
+
+      const candidates = [
+        "pge/index.html",
+        "PGE/index.html",
+        "pge/",
+        "PGE/"
+      ];
+
+      async function exists(path){
+        try{
+          const r = await fetch(path, { method: "GET", cache: "no-store" });
+          return r && r.ok;
+        }catch(e){
+          return false;
+        }
+      }
+
+      for(const c of candidates){
+        if(await exists(c)){
+          link.href = c;
+          return;
+        }
+      }
+      // Si ninguno existe, dejamos el default.
     })();
   </script>
 </body>
