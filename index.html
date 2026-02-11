@@ -7,17 +7,22 @@
   <meta name="description" content="N.Geolitics: análisis basados en datos." />
   <link rel="icon" href="assets/faviconNG.png" />
 
+  <!-- Afacad (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&display=swap" rel="stylesheet">
+
   <style>
     :root{
       --uiScale: 1.35;
       --bg:#252525;
       --primary:#FEF702;
-      --text:#B0B0B0;
+      --text:#ffffff;
       --stroke:#3a3a3a;
       --radius:16px;
       --shadow: 0 10px 30px rgba(0,0,0,.25);
-      --fontTitle: "Futura","Trebuchet MS",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      --fontText:  Arial,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      --fontTitle: "Afacad", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      --fontText:  "Afacad", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       --max: 1040px;
     }
     *{ box-sizing:border-box; }
@@ -43,11 +48,13 @@
       display: grid;
       gap: 14px;
     }
+
+    /* CABECERA: fondo negro y tipografía Afacad */
     header.top{
       padding:14px 16px;
-      border:1px solid var(--stroke);
+      border:1px solid rgba(255,255,255,.10);
       border-radius:var(--radius);
-      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      background: #000; /* negro */
       box-shadow: var(--shadow);
       display:flex;
       align-items:center;
@@ -55,44 +62,46 @@
       gap: 14px;
     }
     .brand{ display:flex; align-items:center; gap: 12px; min-width: 0; }
-    .logo{
-      width: 44px; height: 44px; border-radius: 12px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-      display:grid; place-items:center; overflow:hidden; flex: 0 0 auto;
-    }
-    .logo img{ width:100%; height:100%; object-fit: cover; display:block; }
     .brandText{ min-width:0; line-height:1.05; }
     .brandText .t{
-      margin:0; font-family: var(--fontTitle); color: var(--primary);
-      font-size: calc(20px * var(--uiScale));
-      letter-spacing:.3px; white-space:nowrap;
+      margin:0;
+      font-family: var(--fontTitle);
+      color: #fff; /* blanco */
+      font-size: calc(22px * var(--uiScale));
+      letter-spacing:.2px;
+      white-space:nowrap;
+      font-weight: 700;
     }
 
     .topActions{
       display:flex; align-items:center; gap:10px; flex: 0 0 auto;
       flex-wrap: wrap; justify-content:flex-end;
     }
-    .btn{
-      appearance:none;
-      border:1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.04);
-      color: rgba(255,255,255,.9);
-      padding: 9px 12px;
+
+    /* Botones de icono (redes) */
+    .iconBtn{
+      width: 44px;
+      height: 44px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
       border-radius: 999px;
-      font-size: calc(12px * var(--uiScale));
-      cursor:pointer;
-      user-select:none;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
       transition: transform .04s ease, border-color .12s ease, background .12s ease;
-      line-height:1; white-space:nowrap;
+      cursor: pointer;
+      user-select: none;
     }
-    .btn:hover{ border-color: rgba(254,247,2,.35); background: rgba(255,255,255,.06); }
-    .btn:active{ transform: translateY(1px); }
-    .btn.primary{
-      background: rgba(254,247,2,.95);
-      border-color: rgba(254,247,2,.95);
-      color: rgba(0,0,0,.92);
-      font-weight: 800;
+    .iconBtn:hover{
+      border-color: rgba(254,247,2,.45);
+      background: rgba(255,255,255,.10);
+    }
+    .iconBtn:active{ transform: translateY(1px); }
+    .iconBtn svg{
+      width: 22px;
+      height: 22px;
+      fill: #fff; /* iconos blancos */
+      opacity: .95;
     }
 
     .hero{
@@ -111,10 +120,11 @@
       font-size: calc(26px * var(--uiScale));
       letter-spacing: .2px;
       line-height:1.05;
+      font-weight: 700;
     }
     .hero p{
       margin:10px 0 0 0;
-      opacity:.9;
+      opacity:.92;
       font-size: calc(13px * var(--uiScale));
       line-height:1.45;
       max-width: 95ch;
@@ -135,6 +145,7 @@
       font-size: calc(16px * var(--uiScale));
       letter-spacing:.35px;
       text-transform: uppercase;
+      font-weight: 700;
     }
 
     .list{ display:grid; gap: 14px; }
@@ -163,7 +174,7 @@
       display:flex;
       flex-direction:column;
       gap: 8px;
-      padding-right: 54px; /* espacio para la flecha */
+      padding-right: 54px;
     }
     .kicker{
       font-family: var(--fontTitle);
@@ -172,6 +183,7 @@
       letter-spacing: .35px;
       font-size: calc(12px * var(--uiScale));
       opacity: .95;
+      font-weight: 700;
     }
     .title{
       margin:0;
@@ -180,10 +192,11 @@
       color:#fff;
       letter-spacing:.2px;
       line-height:1.05;
+      font-weight: 700;
     }
     .desc{
       margin:0;
-      opacity:.9;
+      opacity:.92;
       font-size: calc(13px * var(--uiScale));
       line-height:1.45;
       max-width: 95ch;
@@ -219,17 +232,44 @@
 
     <header class="top" aria-label="Cabecera principal">
       <div class="brand">
-        <div class="logo" aria-hidden="true">
-          <img src="assets/logotipoN.Geolitics.png" alt="N.Geolitics" />
-        </div>
         <div class="brandText">
           <h1 class="t">N.Geolitics</h1>
         </div>
       </div>
 
-      <div class="topActions">
-        <a class="btn" href="https://www.patreon.com/ngeolitics" target="_blank" rel="noopener">Patreon</a>
-        <a class="btn primary" href="#analisis">Ver análisis</a>
+      <div class="topActions" aria-label="Redes sociales">
+        <!-- TikTok -->
+        <a class="iconBtn" href="https://www.tiktok.com/@n.geolitics" target="_blank" rel="noopener"
+           aria-label="TikTok">
+          <!-- Icono TikTok (simplificado) -->
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M16.6 5.7c.9.9 2 1.4 3.3 1.5v3.1c-1.7-.1-3.2-.6-4.6-1.6v6.2c0 3.1-2.5 5.6-5.6 5.6S4.1 18.1 4.1 15s2.5-5.6 5.6-5.6c.5 0 1 .1 1.4.2v3.2c-.4-.2-.9-.3-1.4-.3-1.4 0-2.6 1.2-2.6 2.6 0 1.4 1.2 2.6 2.6 2.6 1.4 0 2.6-1.1 2.6-2.6V3.5h3.1c.1.8.5 1.6 1.2 2.2z"/>
+          </svg>
+        </a>
+
+        <!-- Instagram -->
+        <a class="iconBtn" href="https://www.instagram.com/n.geolitics/?hl=es" target="_blank" rel="noopener"
+           aria-label="Instagram">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-5 4.5A5.5 5.5 0 1 1 6.5 14 5.5 5.5 0 0 1 12 8.5zm0 2A3.5 3.5 0 1 0 15.5 14 3.5 3.5 0 0 0 12 10.5zM18 6.8a1.2 1.2 0 1 1-1.2-1.2A1.2 1.2 0 0 1 18 6.8z"/>
+          </svg>
+        </a>
+
+        <!-- YouTube -->
+        <a class="iconBtn" href="https://www.youtube.com/@N.geolitics" target="_blank" rel="noopener"
+           aria-label="YouTube">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21.7 7.2a3 3 0 0 0-2.1-2.1C17.8 4.6 12 4.6 12 4.6s-5.8 0-7.6.5A3 3 0 0 0 2.3 7.2 31.1 31.1 0 0 0 1.9 12a31.1 31.1 0 0 0 .4 4.8 3 3 0 0 0 2.1 2.1c1.8.5 7.6.5 7.6.5s5.8 0 7.6-.5a3 3 0 0 0 2.1-2.1 31.1 31.1 0 0 0 .4-4.8 31.1 31.1 0 0 0-.4-4.8zM10.3 15.2V8.8L15.7 12l-5.4 3.2z"/>
+          </svg>
+        </a>
+
+        <!-- Patreon -->
+        <a class="iconBtn" href="https://www.patreon.com/cw/NGeolitics" target="_blank" rel="noopener"
+           aria-label="Patreon">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14.8 3.5c-3.6 0-6.6 2.9-6.6 6.6s2.9 6.6 6.6 6.6 6.6-2.9 6.6-6.6-2.9-6.6-6.6-6.6zM4 3.5h2.8v17H4z"/>
+          </svg>
+        </a>
       </div>
     </header>
 
