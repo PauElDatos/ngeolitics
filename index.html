@@ -7,7 +7,7 @@
   <meta name="description" content="N.Geolitics: análisis basados en datos." />
   <link rel="icon" href="assets/faviconNG.png" />
 
-  <!-- Afacad (Google Fonts) -->
+  <!-- Afacad SOLO para el título N.Geolitics -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -21,10 +21,16 @@
       --stroke:#3a3a3a;
       --radius:16px;
       --shadow: 0 10px 30px rgba(0,0,0,.25);
-      --fontTitle: "Afacad", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      --fontText:  "Afacad", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
       --max: 1040px;
+
+      /* Fuentes como el index de “entendiendo la economía de España” */
+      --fontTitle: "Futura","Trebuchet MS",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      --fontText:  Arial,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+
+      /* Afacad SOLO para el brand */
+      --fontBrand: "Afacad", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
     }
+
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
@@ -32,16 +38,18 @@
       min-height:100vh;
       background: var(--bg);
       color: var(--text);
-      font-family: var(--fontText);
+      font-family: var(--fontText); /* <-- texto general como PGE */
       font-size: calc(14px * var(--uiScale));
       padding: 18px;
     }
+
     a{ color:inherit; text-decoration:none; }
     a:focus-visible, button:focus-visible{
       outline:2px solid rgba(254,247,2,.55);
       outline-offset:3px;
       border-radius: 12px;
     }
+
     .wrap{
       width: min(var(--max), 100%);
       margin: 0 auto;
@@ -49,24 +57,27 @@
       gap: 14px;
     }
 
-    /* CABECERA: fondo negro y tipografía Afacad */
+    /* CABECERA: fondo negro */
     header.top{
       padding:14px 16px;
       border:1px solid rgba(255,255,255,.10);
       border-radius:var(--radius);
-      background: #000; /* negro */
+      background: #000;
       box-shadow: var(--shadow);
       display:flex;
       align-items:center;
       justify-content:space-between;
       gap: 14px;
     }
+
     .brand{ display:flex; align-items:center; gap: 12px; min-width: 0; }
     .brandText{ min-width:0; line-height:1.05; }
+
+    /* TÍTULO: Afacad SOLO aquí */
     .brandText .t{
       margin:0;
-      font-family: var(--fontTitle);
-      color: #fff; /* blanco */
+      font-family: var(--fontBrand);
+      color: #fff;
       font-size: calc(40px * var(--uiScale));
       letter-spacing:.2px;
       white-space:nowrap;
@@ -100,7 +111,7 @@
     .iconBtn svg{
       width: 22px;
       height: 22px;
-      fill: #fff; /* iconos blancos */
+      fill: #fff;
       opacity: .95;
     }
 
@@ -115,7 +126,7 @@
     }
     .hero h1{
       margin:0;
-      font-family: var(--fontTitle);
+      font-family: var(--fontTitle); /* <-- como PGE */
       color:#fff;
       font-size: calc(26px * var(--uiScale));
       letter-spacing: .2px;
@@ -128,6 +139,7 @@
       font-size: calc(13px * var(--uiScale));
       line-height:1.45;
       max-width: 95ch;
+      font-family: var(--fontText); /* <-- como PGE */
     }
 
     .sectionHead{
@@ -140,7 +152,7 @@
     }
     .sectionHead h2{
       margin:0;
-      font-family: var(--fontTitle);
+      font-family: var(--fontTitle); /* <-- como PGE */
       color: var(--primary);
       font-size: calc(16px * var(--uiScale));
       letter-spacing:.35px;
@@ -177,7 +189,7 @@
       padding-right: 54px;
     }
     .kicker{
-      font-family: var(--fontTitle);
+      font-family: var(--fontTitle); /* <-- como PGE */
       color: var(--primary);
       text-transform: uppercase;
       letter-spacing: .35px;
@@ -187,7 +199,7 @@
     }
     .title{
       margin:0;
-      font-family: var(--fontTitle);
+      font-family: var(--fontTitle); /* <-- como PGE */
       font-size: calc(22px * var(--uiScale));
       color:#fff;
       letter-spacing:.2px;
@@ -200,6 +212,7 @@
       font-size: calc(13px * var(--uiScale));
       line-height:1.45;
       max-width: 95ch;
+      font-family: var(--fontText); /* <-- como PGE */
     }
     .arrow{
       position:absolute;
@@ -239,33 +252,28 @@
 
       <div class="topActions" aria-label="Redes sociales">
         <!-- TikTok -->
-        <a class="iconBtn" href="https://www.tiktok.com/@n.geolitics" target="_blank" rel="noopener"
-           aria-label="TikTok">
-          <!-- Icono TikTok (simplificado) -->
+        <a class="iconBtn" href="https://www.tiktok.com/@n.geolitics" target="_blank" rel="noopener" aria-label="TikTok">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M16.6 5.7c.9.9 2 1.4 3.3 1.5v3.1c-1.7-.1-3.2-.6-4.6-1.6v6.2c0 3.1-2.5 5.6-5.6 5.6S4.1 18.1 4.1 15s2.5-5.6 5.6-5.6c.5 0 1 .1 1.4.2v3.2c-.4-.2-.9-.3-1.4-.3-1.4 0-2.6 1.2-2.6 2.6 0 1.4 1.2 2.6 2.6 2.6 1.4 0 2.6-1.1 2.6-2.6V3.5h3.1c.1.8.5 1.6 1.2 2.2z"/>
           </svg>
         </a>
 
         <!-- Instagram -->
-        <a class="iconBtn" href="https://www.instagram.com/n.geolitics/?hl=es" target="_blank" rel="noopener"
-           aria-label="Instagram">
+        <a class="iconBtn" href="https://www.instagram.com/n.geolitics/?hl=es" target="_blank" rel="noopener" aria-label="Instagram">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-5 4.5A5.5 5.5 0 1 1 6.5 14 5.5 5.5 0 0 1 12 8.5zm0 2A3.5 3.5 0 1 0 15.5 14 3.5 3.5 0 0 0 12 10.5zM18 6.8a1.2 1.2 0 1 1-1.2-1.2A1.2 1.2 0 0 1 18 6.8z"/>
           </svg>
         </a>
 
         <!-- YouTube -->
-        <a class="iconBtn" href="https://www.youtube.com/@N.geolitics" target="_blank" rel="noopener"
-           aria-label="YouTube">
+        <a class="iconBtn" href="https://www.youtube.com/@N.geolitics" target="_blank" rel="noopener" aria-label="YouTube">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M21.7 7.2a3 3 0 0 0-2.1-2.1C17.8 4.6 12 4.6 12 4.6s-5.8 0-7.6.5A3 3 0 0 0 2.3 7.2 31.1 31.1 0 0 0 1.9 12a31.1 31.1 0 0 0 .4 4.8 3 3 0 0 0 2.1 2.1c1.8.5 7.6.5 7.6.5s5.8 0 7.6-.5a3 3 0 0 0 2.1-2.1 31.1 31.1 0 0 0 .4-4.8 31.1 31.1 0 0 0-.4-4.8zM10.3 15.2V8.8L15.7 12l-5.4 3.2z"/>
           </svg>
         </a>
 
         <!-- Patreon -->
-        <a class="iconBtn" href="https://www.patreon.com/cw/NGeolitics" target="_blank" rel="noopener"
-           aria-label="Patreon">
+        <a class="iconBtn" href="https://www.patreon.com/cw/NGeolitics" target="_blank" rel="noopener" aria-label="Patreon">
           <svg viewBox="0 0 24 24" aria-hidden="true">
             <path d="M14.8 3.5c-3.6 0-6.6 2.9-6.6 6.6s2.9 6.6 6.6 6.6 6.6-2.9 6.6-6.6-2.9-6.6-6.6-6.6zM4 3.5h2.8v17H4z"/>
           </svg>
@@ -292,7 +300,6 @@
 
     <section class="list" aria-label="Lista de análisis">
 
-      <!-- Card 1 -->
       <a class="card" id="link-pensiones" href="pensiones-simulador/index.html" aria-label="Abrir análisis: Pensiones">
         <div class="cardBody">
           <div class="kicker">Análisis 01</div>
@@ -304,7 +311,6 @@
         <div class="arrow">→</div>
       </a>
 
-      <!-- Card 2 (PGE): la carpeta puede ser PGE/ o pge/ según tu repo; lo autodetectamos -->
       <a class="card" id="link-pge" href="PGE/index.html" aria-label="Abrir análisis: Entendiendo la economía de España">
         <div class="cardBody">
           <div class="kicker">Análisis 02</div>
