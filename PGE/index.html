@@ -182,6 +182,21 @@
       padding: 10px 14px;
     }
 
+    /* Botón Inicio (esquina superior derecha) */
+    .homeTopRight{
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 2000;
+    }
+
+    @media (max-width: 900px){
+      .homeTopRight{
+        top: 10px;
+        right: 10px;
+      }
+    }
+
     /* Leyenda/lista */
     .legend{
       display:flex;
@@ -652,6 +667,9 @@
 </head>
 
 <body>
+
+  <a class="btn homeTopRight" href="../index.html" title="Volver al inicio">← Volver al inicio</a>
+
   <header>
     <div class="h-title">
       <h1>entendiendo la economía de España</h1>
