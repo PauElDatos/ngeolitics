@@ -709,7 +709,6 @@
         <button class="btn tab on" data-view="pge" role="tab" aria-selected="true">Presupuestos generales del Estado</button>
         <button class="btn tab" data-view="gb" role="tab" aria-selected="false">Gasto vs beneficio</button>
         <button class="btn tab" data-view="pa" role="tab" aria-selected="false">Presión fiscal</button>
-        <button class="btn tab" data-view="pg" role="tab" aria-selected="false">Presión de gasto público</button>
       </div>
     </div>
   </header>
@@ -866,7 +865,7 @@
 
         <div class="pc chartPc">
           <div class="svgWrap" id="svgWrapPA">
-            <svg id="chartSvgPA" class="chartSvg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gráfico de presión fiscal como porcentaje del PIB"></svg>
+            <svg id="chartSvgPA" class="chartSvg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gráfico de gasto público per cápita como porcentaje del PIB per cápita"></svg>
             <div class="tooltip" id="tooltipPA" style="display:none;"></div>
             <div class="errorBox" id="errorBoxPA" style="display:none;"></div>
           </div>
@@ -896,89 +895,29 @@
       </div>
       <div class="pc">
       <div class="explainBox" id="paExplain">
-                <div class="explainTitle">Qué mide la “presión fiscal” aquí</div>
+                <div class="explainTitle">Cómo se calcula la “presión fiscal” aquí</div>
                 <div class="explainText">
-                  <div>El CSV <code>indicadores_estado_a_1986.csv</code> ya trae la serie en porcentaje: <code>presion_fiscal_real_1986_pct</code>.</div>
+                  <div>El CSV <code>indicadores_estado_a_1986.csv</code> ya trae la serie en porcentaje (<code>gasto_publico_per_capita_pct_1986</code>), que coincide con <code>presion_gasto_real_1986_pct</code>.</div>
                   <div style="margin-top:8px;">
-                    La interpretación es:
-                    <div style="margin:6px 0 0 0;"><b>Presión fiscal (%)</b> = 100 × ( <b>Ingresos fiscales reales (1986)</b> ÷ <b>PIB real (1986)</b> )</div>
+                    El cálculo es:
+                    <div style="margin:6px 0 0 0;"><b>Presión (%)</b> = 100 × ( <b>Gasto público real (1986)</b> ÷ <b>PIB real (1986)</b> )</div>
                     <div style="opacity:.95; margin-top:6px;">
-                      Donde “ingresos fiscales” suelen recoger impuestos + cotizaciones sociales (según las fuentes del propio CSV).
+                      Equivalentemente (y da el mismo resultado): 100 × ( <b>Gasto per cápita real (1986)</b> ÷ <b>PIB per cápita real (1986)</b> ).
                     </div>
                   </div>
                   <div style="margin-top:8px;">
-                    Nota: aquí lo mostramos tal cual viene en el CSV para asegurar coherencia y evitar recalcular con supuestos distintos.
+                    Pasos (resumen):
+                    <ol style="margin:6px 0 0 18px;">
+                      <li>Partir de PIB y gasto en euros corrientes.</li>
+                      <li>Deflactar a euros reales de 1986 (columnas <code>pib_total_eur_a_1986</code> y <code>gasto_publico_eur_a_1986</code>).</li>
+                      <li>Dividir para obtener el ratio gasto/PIB y multiplicar por 100.</li>
+                    </ol>
                   </div>
                 </div>
               </div>
-</div>
       </div>
     </section>
   </main>
-
-
-  <!-- ===================== VISTA 4: Presión de gasto público ===================== -->
-  <main id="viewPG" class="view">
-    <div class="topGrid">
-      <section class="panel">
-        <div class="ph">
-          <div class="ttl">Serie</div>
-          <div class="sub">1986–2023</div>
-        </div>
-        <div class="pc">
-          <div class="legend" id="legendPG"></div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="ph">
-          <div class="ttl">Gráfico</div>
-          <div class="sub"></div>
-        </div>
-
-        <div class="pc chartPc">
-          <div class="svgWrap" id="svgWrapPG">
-            <svg id="chartSvgPG" class="chartSvg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gráfico de presión de gasto público como porcentaje del PIB per cápita"></svg>
-            <div class="tooltip" id="tooltipPG" style="display:none;"></div>
-            <div class="errorBox" id="errorBoxPG" style="display:none;"></div>
-          </div>
-
-          <div class="chartControls">
-            <button class="btn on" id="btnPolBandsPG" title="Mostrar/ocultar colores de presidencias">Políticos: ON</button>
-            <button class="btn" id="btnExplainPG" title="Ir a la explicación">Explicación</button>
-          </div>
-
-          <div class="footerSingle">
-            <span class="footerSource">Fuente: <span style="color:#fff">Banco Mundial</span>, <span style="color:#fff">INE</span>, <span style="color:#fff">BOE</span>, <span style="color:#fff">FRED</span>. · <span style="opacity:.9;">N.Geolitics</span></span>
-            <span class="footerPres">Felipe González (1986–1996) · José María Aznar (1996–2004) · José Luis Rodríguez Zapatero (2004–2011) · Mariano Rajoy (2011–2018) · Pedro Sánchez (2018–2023)</span>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <section class="panel">
-      <div class="ph">
-        <div class="ttl">Explicación</div>
-        <div class="sub"></div>
-      </div>
-      <div class="pc">
-        <div class="explainBox" id="pgExplain">
-          <div class="explainTitle">Qué mide la “presión de gasto público” aquí</div>
-          <div class="explainText">
-            <div>Usamos la serie del CSV <code>indicadores_estado_a_1986.csv</code>: <code>gasto_publico_per_capita_pct_1986</code>.</div>
-            <div style="margin-top:8px;">
-              La interpretación es:
-              <div style="margin:6px 0 0 0;"><b>Presión de gasto público (%)</b> = 100 × ( <b>Gasto público real per cápita (1986)</b> ÷ <b>PIB real per cápita (1986)</b> )</div>
-              <div style="opacity:.95; margin-top:6px;">
-                Es el mismo ratio que <code>presion_gasto_real_1986_pct</code>, pero en formato per cápita.
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
 
 <script>
 /* ===================== Tabs ===================== */
@@ -988,7 +927,6 @@
     pge: document.getElementById("viewPGE"),
     gb:  document.getElementById("viewGB"),
     pa:  document.getElementById("viewPA"),
-    pg:  document.getElementById("viewPG"),
   };
 
   function setView(k){
@@ -1008,7 +946,6 @@
     if (k === "pge") window.__pge?.onShow?.();
     if (k === "gb")  window.__gb?.onShow?.();
     if (k === "pa")  window.__pa?.onShow?.();
-    if (k === "pg")  window.__pg?.onShow?.();
   }
 
   btns.forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
@@ -3125,9 +3062,9 @@ try{
     const h = csv.headers;
 
     const cYear = pickCol(h, ["anio","año","year"]);
-    const cPct = pickCol(h, ["presion_fiscal_real_1986_pct"]);
+    const cPct = pickCol(h, ["gasto_publico_per_capita_pct_1986"]);
     if (!cYear || !cPct){
-      throw new Error("indicadores_estado_a_1986.csv: falta la columna presion_fiscal_real_1986_pct.");
+      throw new Error("indicadores_estado_a_1986.csv: falta la columna gasto_publico_per_capita_pct_1986.");
     }
 
     const mp = new Map();
@@ -3138,7 +3075,7 @@ try{
       if (!Number.isFinite(year) || !Number.isFinite(v)) continue;
       rows.push({year, v});
     }
-    if (!rows.length) throw new Error("No hay datos válidos para presión fiscal.");
+    if (!rows.length) throw new Error("No hay datos válidos para poder adquisitivo.");
 
     const minY = Math.max(1986, rows.reduce((m,r)=>Math.min(m,r.year), Infinity));
     const maxY = Math.min(2023, rows.reduce((m,r)=>Math.max(m,r.year), -Infinity));
@@ -3189,7 +3126,7 @@ try{
     formatValue: (k,v)=>formatPct(v),
     extraBackground: drawPresBands,
     alwaysTooltip: true,
-    yLabelLeft: "Porcentaje del PIB (%)",
+    yLabelLeft: "Porcentaje del PIB per cápita (%)",
     yLabelRight: null,
     defaultOrderTooltip: [KEY],
     topN: 0
@@ -3205,158 +3142,6 @@ try{
   }
   // Explicación: botón de pulso (sin estado) ya configurado arriba.
 window.__pa = { onShow: () => controller.onShow() };
-})();
-
-
-/* ===================== PG (Presión de gasto público) ===================== */
-(async function(){
-  const svg = document.getElementById("chartSvgPG");
-  const wrap = document.getElementById("svgWrapPG");
-  const tooltipEl = document.getElementById("tooltipPG");
-  const errorEl = document.getElementById("errorBoxPG");
-  const legendEl = document.getElementById("legendPG");
-  const btnPolBands = document.getElementById("btnPolBandsPG");
-  const btnExplain = document.getElementById("btnExplainPG");
-  const controls = Array.from(document.querySelectorAll("#viewPG .chartControls .btn"));
-
-  if (!svg || !wrap){
-    window.__pg = { onShow: ()=>{} };
-    return;
-  }
-
-  let showPresBands = true;
-
-  // Ir a explicación (scroll dentro del main)
-  if (btnExplain){
-    btnExplain.addEventListener("click", () => {
-      const el = document.getElementById("pgExplain");
-      if (el) el.scrollIntoView({ behavior:"smooth", block:"start" });
-    });
-  }
-
-  function drawPresBands(gBg, xScale, plotRect){
-    if (!showPresBands) return;
-    for (const p of PRES_BANDS){
-      const x0 = Math.max(app.xDomain.min, p.start);
-      const x1 = Math.min(app.xDomain.max, (p.end ?? app.xDomain.max));
-      if (x1 <= x0) continue;
-      const x = xScale(x0);
-      const w = xScale(x1) - xScale(x0);
-      gBg.appendChild(createSvgEl("rect", {
-        x, y: plotRect.y, width: w, height: plotRect.h,
-        fill: p.color, opacity: 0.18
-      }));
-    }
-  }
-
-  const app = {
-    xDomain: { min: 1986, max: 2023 },
-    series: new Map(),
-    yearVal: new Map(),
-  };
-
-  const KEY = "pct";
-  const COLOR = "#FF3D8D";
-  const LABEL = "Presión de gasto público";
-
-  function formatPct(v){
-    if (!Number.isFinite(v)) return "—";
-    return v.toFixed(1) + "%";
-  }
-  function getSeriesForPath(key){ return app.series.get(key) || null; }
-  function getValueAtYear(key, year){
-    const mp = app.yearVal.get(key);
-    if (!mp) return null;
-    const v = mp.get(year);
-    return Number.isFinite(v) ? v : null;
-  }
-
-  async function loadPG(){
-    const txt = await fetchText("indicadores_estado_a_1986.csv");
-    const csv = parseCSV(txt);
-    const h = csv.headers;
-
-    const cYear = pickCol(h, ["anio","año","year"]);
-    const cPct = pickCol(h, ["gasto_publico_per_capita_pct_1986"]);
-    if (!cYear || !cPct){
-      throw new Error("indicadores_estado_a_1986.csv: falta la columna gasto_publico_per_capita_pct_1986.");
-    }
-
-    const mp = new Map();
-    const rows = [];
-    for (const r of csv.rows){
-      const year = Math.round(toNum(r[cYear]));
-      const v = toNum(r[cPct]);
-      if (!Number.isFinite(year) || !Number.isFinite(v)) continue;
-      rows.push({year, v});
-    }
-    if (!rows.length) throw new Error("No hay datos válidos para presión de gasto público.");
-
-    const minY = Math.max(1986, rows.reduce((m,r)=>Math.min(m,r.year), Infinity));
-    const maxY = Math.min(2023, rows.reduce((m,r)=>Math.max(m,r.year), -Infinity));
-    app.xDomain = {min:minY, max:maxY};
-
-    for (const r of rows){
-      if (r.year < minY || r.year > maxY) continue;
-      mp.set(r.year, r.v);
-    }
-
-    app.yearVal.set(KEY, mp);
-
-    const xs = Array.from(mp.keys()).sort((a,b)=>a-b);
-    const ys = xs.map(x => mp.get(x));
-    app.series.set(KEY, { xs, ys });
-  }
-
-  try{
-    await loadPG();
-  } catch(e){
-    errorEl.style.display = "flex";
-    errorEl.textContent = e.message || String(e);
-    window.__pg = { onShow: ()=>{} };
-    return;
-  }
-
-  // legend
-  legendEl.innerHTML = "";
-  const it = document.createElement("div");
-  it.className = "item";
-  const sw = document.createElement("div"); sw.className="sw"; sw.style.background=COLOR;
-  const nm = document.createElement("div"); nm.className="nm"; nm.textContent = LABEL;
-  it.appendChild(sw); it.appendChild(nm);
-  legendEl.appendChild(it);
-
-  const ser = app.series.get(KEY);
-  const ymax = Math.max(1, ...ser.ys.filter(Number.isFinite)) * 1.05;
-
-  const controller = makeChartController({
-    svg, wrap, tooltipEl, errorEl,
-    legendEl,
-    controls,
-    seriesList: [{ key:KEY, label:LABEL, color:COLOR, axis:"left" }],
-    getValueAtYear,
-    getSeriesForPath,
-    xDomain: app.xDomain,
-    yDomain: { left: { min: 0, max: ymax } },
-    formatValue: (k,v)=>formatPct(v),
-    extraBackground: drawPresBands,
-    alwaysTooltip: true,
-    yLabelLeft: "Porcentaje del PIB per cápita (%)",
-    yLabelRight: null,
-    defaultOrderTooltip: [KEY],
-    topN: 0
-  });
-
-  if (btnPolBands){
-    btnPolBands.addEventListener("click", () => {
-      showPresBands = !showPresBands;
-      btnPolBands.classList.toggle("on", showPresBands);
-      btnPolBands.textContent = "Políticos: " + (showPresBands ? "ON" : "OFF");
-      controller.onShow();
-    });
-  }
-
-  window.__pg = { onShow: () => controller.onShow() };
 })();
 </script>
 </body>
