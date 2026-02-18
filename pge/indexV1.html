@@ -608,7 +608,8 @@
   
     /* ===== Vistas GB/PA: explicación debajo de Series + Gráfico (se ve con scroll) ===== */
     #viewGB.view.active,
-    #viewPA.view.active{
+    #viewPA.view.active,
+    #viewPG.view.active{
       display:flex !important;
       flex-direction:column;
       gap:12px;
@@ -620,11 +621,13 @@
        porque .topGrid ocupa height:100% y el segundo item (section.panel) tenía flex-shrink:1.
        Forzamos a que NO se encoja, para que quede debajo y se pueda ver haciendo scroll. */
     #viewGB.view.active > section.panel,
-    #viewPA.view.active > section.panel{
+    #viewPA.view.active > section.panel,
+    #viewPG.view.active > section.panel{
       flex: 0 0 auto;
     }
     #viewGB .topGrid,
-    #viewPA .topGrid{
+    #viewPA .topGrid,
+    #viewPG .topGrid{
       display:grid;
       grid-template-columns: 340px 1fr;
       grid-template-rows: 1fr;
@@ -635,26 +638,32 @@
       flex: 0 0 auto;
     }
     #viewGB .topGrid > .panel,
-    #viewPA .topGrid > .panel{
+    #viewPA .topGrid > .panel,
+    #viewPG .topGrid > .panel{
       height:100%;
     }
     /* sin scroll interno del panel de gráfico (el scroll es del main) */
     #viewGB .pc.chartPc,
-    #viewPA .pc.chartPc{
+    #viewPA .pc.chartPc,
+    #viewPG .pc.chartPc{
       overflow:hidden;
     }
     #viewGB .svgWrap,
-    #viewPA .svgWrap{
-      min-height:0;
+    #viewPA .svgWrap,
+    #viewPG .svgWrap{
+      flex: 1 1 auto;
+      min-height: 520px;
     }
 
     @media (max-width: 900px){
       #viewGB.view.active,
-      #viewPA.view.active{
+    #viewPA.view.active,
+    #viewPG.view.active{
         overflow:visible;
       }
       #viewGB .topGrid,
-      #viewPA .topGrid{
+    #viewPA .topGrid,
+    #viewPG .topGrid{
         grid-template-columns: 1fr;
         min-height:0;
       }
@@ -709,7 +718,7 @@
         <button class="btn tab on" data-view="pge" role="tab" aria-selected="true">Presupuestos generales del Estado</button>
         <button class="btn tab" data-view="gb" role="tab" aria-selected="false">Gasto vs beneficio</button>
         <button class="btn tab" data-view="pa" role="tab" aria-selected="false">Presión fiscal</button>
-      </div>
+</div>
     </div>
   </header>
 
@@ -865,7 +874,7 @@
 
         <div class="pc chartPc">
           <div class="svgWrap" id="svgWrapPA">
-            <svg id="chartSvgPA" class="chartSvg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gráfico de gasto público per cápita como porcentaje del PIB per cápita"></svg>
+            <svg id="chartSvgPA" class="chartSvg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gráfico de presión fiscal como porcentaje del PIB"></svg>
             <div class="tooltip" id="tooltipPA" style="display:none;"></div>
             <div class="errorBox" id="errorBoxPA" style="display:none;"></div>
           </div>
@@ -895,26 +904,28 @@
       </div>
       <div class="pc">
       <div class="explainBox" id="paExplain">
-                <div class="explainTitle">Cómo se calcula la “presión fiscal” aquí</div>
+                <div class="explainTitle">Qué mide la “presión fiscal” aquí</div>
                 <div class="explainText">
-                  <div>El CSV <code>indicadores_estado_a_1986.csv</code> ya trae la serie en porcentaje (<code>gasto_publico_per_capita_pct_1986</code>), que coincide con <code>presion_gasto_real_1986_pct</code>.</div>
+                  <div>El CSV <code>indicadores_estado_a_1986.csv</code> ya trae la serie en porcentaje: <code>presion_fiscal_real_1986_pct</code>.
+                  <div style="margin-top:8px;">En esta sección mostramos 3 series del CSV:</div>
+                  <ul style="margin:6px 0 0 18px; padding:0; line-height:1.45;">
+                    <li><code>presion_fiscal_real_1986_pct</code> (Presión fiscal, % del PIB real 1986)</li>
+                    <li><code>gasto_publico_per_capita_pct_1986</code> (Presión de gasto público, % del PIB real per cápita 1986)</li>
+                    <li><code>esfuerzo_fiscal_simple</code> (Esfuerzo fiscal simple, índice; se dibuja en el eje derecho)</li>
+                  </ul></div>
                   <div style="margin-top:8px;">
-                    El cálculo es:
-                    <div style="margin:6px 0 0 0;"><b>Presión (%)</b> = 100 × ( <b>Gasto público real (1986)</b> ÷ <b>PIB real (1986)</b> )</div>
+                    La interpretación es:
+                    <div style="margin:6px 0 0 0;"><b>Presión fiscal (%)</b> = 100 × ( <b>Ingresos fiscales reales (1986)</b> ÷ <b>PIB real (1986)</b> )</div>
                     <div style="opacity:.95; margin-top:6px;">
-                      Equivalentemente (y da el mismo resultado): 100 × ( <b>Gasto per cápita real (1986)</b> ÷ <b>PIB per cápita real (1986)</b> ).
+                      Donde “ingresos fiscales” suelen recoger impuestos + cotizaciones sociales (según las fuentes del propio CSV).
                     </div>
                   </div>
                   <div style="margin-top:8px;">
-                    Pasos (resumen):
-                    <ol style="margin:6px 0 0 18px;">
-                      <li>Partir de PIB y gasto en euros corrientes.</li>
-                      <li>Deflactar a euros reales de 1986 (columnas <code>pib_total_eur_a_1986</code> y <code>gasto_publico_eur_a_1986</code>).</li>
-                      <li>Dividir para obtener el ratio gasto/PIB y multiplicar por 100.</li>
-                    </ol>
+                    Nota: aquí lo mostramos tal cual viene en el CSV para asegurar coherencia y evitar recalcular con supuestos distintos.
                   </div>
                 </div>
               </div>
+</div>
       </div>
     </section>
   </main>
@@ -927,7 +938,7 @@
     pge: document.getElementById("viewPGE"),
     gb:  document.getElementById("viewGB"),
     pa:  document.getElementById("viewPA"),
-  };
+};
 
   function setView(k){
     for (const [key, el] of Object.entries(views)){
@@ -941,11 +952,15 @@
     // Al cambiar de sección, empieza arriba (la explicación queda más abajo y se ve con scroll)
     if (views[k]) views[k].scrollTop = 0;
 
+    // Guardar sección actual (sirve para dibujar cuando el controlador aún está cargando)
+    window.__activeViewKey = k;
 
-    // Recalcular geometría de gráficos visibles
-    if (k === "pge") window.__pge?.onShow?.();
-    if (k === "gb")  window.__gb?.onShow?.();
-    if (k === "pa")  window.__pa?.onShow?.();
+    // Recalcular geometría de gráficos visibles (tras aplicar display/layout)
+    requestAnimationFrame(() => {
+      if (k === "pge") window.__pge?.onShow?.();
+      if (k === "gb")  window.__gb?.onShow?.();
+      if (k === "pa")  window.__pa?.onShow?.();
+});
   }
 
   btns.forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
@@ -2985,9 +3000,6 @@ try{
     btnPolBands.textContent = "Políticos: " + (showPresBands ? "ON" : "OFF");
   }
 
-
-
-
   // Explicación (botón de pulso: hace scroll; no mantiene estado ON/OFF)
   const btnExplain = document.getElementById("btnExplainPA");
   const explainEl = document.getElementById("paExplain");
@@ -2995,7 +3007,6 @@ try{
   function pulseExplainPA(){
     if (!explainEl) return;
 
-    // Si algún día la explicación se marca como colapsable, la abrimos aquí.
     if (explainEl.classList.contains("explainCollapsible")){
       explainEl.classList.add("open");
     }
@@ -3019,6 +3030,18 @@ try{
     btnExplain.addEventListener("click", pulseExplainPA);
   }
 
+  const app = {
+    xDomain: { min: 1986, max: 2023 },
+    series: new Map(),
+    yearVal: new Map(),
+  };
+
+  const seriesDefs = [
+    { key:"pf", col:"presion_fiscal_real_1986_pct", label:"Presión fiscal", color:"#FF3D8D", axis:"left" },
+    { key:"gp", col:"gasto_publico_per_capita_pct_1986", label:"Presión de gasto público", color:"#34D399", axis:"left" },
+    { key:"ef", col:"esfuerzo_fiscal_simple", label:"Esfuerzo fiscal simple", color:"#3DA6FF", axis:"right" },
+  ];
+
   function drawPresBands(gBg, xScale, plotRect){
     if (!showPresBands) return;
     for (const p of PRES_BANDS){
@@ -3034,20 +3057,6 @@ try{
     }
   }
 
-  const app = {
-    xDomain: { min: 1986, max: 2023 },
-    series: new Map(),
-    yearVal: new Map(),
-  };
-
-  const KEY = "pct";
-  const COLOR = "#FF3D8D";
-  const LABEL = "Presión fiscal";
-
-  function formatPct(v){
-    if (!Number.isFinite(v)) return "—";
-    return v.toFixed(1) + "%";
-  }
   function getSeriesForPath(key){ return app.series.get(key) || null; }
   function getValueAtYear(key, year){
     const mp = app.yearVal.get(key);
@@ -3056,79 +3065,138 @@ try{
     return Number.isFinite(v) ? v : null;
   }
 
+  function formatValue(key, v){
+    if (!Number.isFinite(v)) return "—";
+    if (key === "ef") return v.toFixed(2); // índice
+    return v.toFixed(1) + "%";
+  }
+
+  function niceTicks(minV, maxV){
+    // ticks inclusivos (pueden empezar > 0)
+    const span = Math.max(1e-9, maxV - minV);
+    const step = niceStepY(span);
+    const a = Math.floor(minV/step)*step;
+    const b = Math.ceil(maxV/step)*step;
+    const out = [];
+    for (let x=a; x<=b+1e-9; x+=step){
+      out.push(Math.round(x*1000)/1000);
+    }
+    return out;
+  }
+
   async function loadPA(){
     const txt = await fetchText("indicadores_estado_a_1986.csv");
     const csv = parseCSV(txt);
     const h = csv.headers;
 
     const cYear = pickCol(h, ["anio","año","year"]);
-    const cPct = pickCol(h, ["gasto_publico_per_capita_pct_1986"]);
-    if (!cYear || !cPct){
-      throw new Error("indicadores_estado_a_1986.csv: falta la columna gasto_publico_per_capita_pct_1986.");
+    if (!cYear){
+      throw new Error("indicadores_estado_a_1986.csv: falta la columna de año (anio/año/year).");
     }
 
-    const mp = new Map();
-    const rows = [];
+    const cols = new Map();
+    for (const sd of seriesDefs){
+      const c = pickCol(h, [sd.col]);
+      if (!c){
+        throw new Error(`indicadores_estado_a_1986.csv: falta la columna ${sd.col}.`);
+      }
+      cols.set(sd.key, c);
+    }
+
+    const mpByKey = new Map(seriesDefs.map(sd => [sd.key, new Map()]));
+    const yearsOk = [];
+
     for (const r of csv.rows){
       const year = Math.round(toNum(r[cYear]));
-      const v = toNum(r[cPct]);
-      if (!Number.isFinite(year) || !Number.isFinite(v)) continue;
-      rows.push({year, v});
+      if (!Number.isFinite(year)) continue;
+      if (year < 1986 || year > 2023) continue;
+
+      let any = false;
+      for (const sd of seriesDefs){
+        const v = toNum(r[cols.get(sd.key)]);
+        if (Number.isFinite(v)){
+          mpByKey.get(sd.key).set(year, v);
+          any = true;
+        }
+      }
+      if (any) yearsOk.push(year);
     }
-    if (!rows.length) throw new Error("No hay datos válidos para poder adquisitivo.");
 
-    const minY = Math.max(1986, rows.reduce((m,r)=>Math.min(m,r.year), Infinity));
-    const maxY = Math.min(2023, rows.reduce((m,r)=>Math.max(m,r.year), -Infinity));
-    app.xDomain = {min:minY, max:maxY};
-
-    for (const r of rows){
-      if (r.year < minY || r.year > maxY) continue;
-      mp.set(r.year, r.v);
+    if (!yearsOk.length){
+      throw new Error("No hay datos válidos en el rango 1986–2023 para las series seleccionadas.");
     }
 
-    app.yearVal.set(KEY, mp);
+    // Dominio X (fijo 1986–2023, pero validamos que haya algo dentro)
+    app.xDomain = { min: 1986, max: 2023 };
 
-    const xs = Array.from(mp.keys()).sort((a,b)=>a-b);
-    const ys = xs.map(x => mp.get(x));
-    app.series.set(KEY, { xs, ys });
+    // Construir series (xs/ys) por clave
+    for (const sd of seriesDefs){
+      const mp = mpByKey.get(sd.key);
+      app.yearVal.set(sd.key, mp);
+
+      const xs = Array.from(mp.keys()).sort((a,b)=>a-b);
+      const ys = xs.map(x => mp.get(x));
+      app.series.set(sd.key, { xs, ys });
+    }
   }
 
   try{
     await loadPA();
   } catch(e){
-    errorEl.style.display = "flex";
-    errorEl.textContent = e.message || String(e);
+    if (errorEl){
+      errorEl.style.display = "flex";
+      errorEl.textContent = e.message || String(e);
+    }
     window.__pa = { onShow: ()=>{} };
     return;
   }
 
-  // legend
-  legendEl.innerHTML = "";
-  const it = document.createElement("div");
-  it.className = "item";
-  const sw = document.createElement("div"); sw.className="sw"; sw.style.background=COLOR;
-  const nm = document.createElement("div"); nm.className="nm"; nm.textContent = LABEL;
-  it.appendChild(sw); it.appendChild(nm);
-  legendEl.appendChild(it);
+  // Dominios Y
+  const leftKeys = seriesDefs.filter(s=>s.axis==="left").map(s=>s.key);
+  const rightKeys = seriesDefs.filter(s=>s.axis==="right").map(s=>s.key);
 
-  const ser = app.series.get(KEY);
-  const ymax = Math.max(1, ...ser.ys.filter(Number.isFinite)) * 1.05;
+  let leftMax = 0;
+  for (const k of leftKeys){
+    const ser = app.series.get(k);
+    if (!ser) continue;
+    for (const v of ser.ys){
+      if (Number.isFinite(v)) leftMax = Math.max(leftMax, v);
+    }
+  }
+  leftMax = Math.max(1, leftMax) * 1.05;
+
+  // right axis ticks (para esfuerzo fiscal)
+  let rightMin = Infinity, rightMax = -Infinity;
+  for (const k of rightKeys){
+    const ser = app.series.get(k);
+    if (!ser) continue;
+    for (const v of ser.ys){
+      if (Number.isFinite(v)){
+        rightMin = Math.min(rightMin, v);
+        rightMax = Math.max(rightMax, v);
+      }
+    }
+  }
+  const rightTicks = Number.isFinite(rightMin) && Number.isFinite(rightMax)
+    ? niceTicks(rightMin, rightMax)
+    : null;
 
   const controller = makeChartController({
     svg, wrap, tooltipEl, errorEl,
     legendEl,
     controls,
-    seriesList: [{ key:KEY, label:LABEL, color:COLOR, axis:"left" }],
+    seriesList: seriesDefs.map(s => ({ key:s.key, label:s.label, color:s.color, axis:s.axis })),
     getValueAtYear,
     getSeriesForPath,
     xDomain: app.xDomain,
-    yDomain: { left: { min: 0, max: ymax } },
-    formatValue: (k,v)=>formatPct(v),
+    yDomain: { left: { min: 0, max: leftMax } },
+    rightAxis: rightTicks ? { ticks: rightTicks, formatTick: (v)=>String(v) } : null,
+    formatValue,
     extraBackground: drawPresBands,
     alwaysTooltip: true,
-    yLabelLeft: "Porcentaje del PIB per cápita (%)",
-    yLabelRight: null,
-    defaultOrderTooltip: [KEY],
+    yLabelLeft: "Porcentaje (%)",
+    yLabelRight: rightTicks ? "Esfuerzo fiscal (índice)" : null,
+    defaultOrderTooltip: ["pf","gp","ef"],
     topN: 0
   });
 
@@ -3140,8 +3208,9 @@ try{
       controller.onShow();
     });
   }
-  // Explicación: botón de pulso (sin estado) ya configurado arriba.
-window.__pa = { onShow: () => controller.onShow() };
+
+  window.__pa = { onShow: () => controller.onShow() };
+  if (window.__activeViewKey === "pa") requestAnimationFrame(() => controller.onShow());
 })();
 </script>
 </body>
