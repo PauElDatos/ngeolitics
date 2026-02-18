@@ -608,7 +608,8 @@
   
     /* ===== Vistas GB/PA: explicación debajo de Series + Gráfico (se ve con scroll) ===== */
     #viewGB.view.active,
-    #viewPA.view.active{
+    #viewPA.view.active,
+    #viewPG.view.active{
       display:flex !important;
       flex-direction:column;
       gap:12px;
@@ -620,11 +621,13 @@
        porque .topGrid ocupa height:100% y el segundo item (section.panel) tenía flex-shrink:1.
        Forzamos a que NO se encoja, para que quede debajo y se pueda ver haciendo scroll. */
     #viewGB.view.active > section.panel,
-    #viewPA.view.active > section.panel{
+    #viewPA.view.active > section.panel,
+    #viewPG.view.active > section.panel{
       flex: 0 0 auto;
     }
     #viewGB .topGrid,
-    #viewPA .topGrid{
+    #viewPA .topGrid,
+    #viewPG .topGrid{
       display:grid;
       grid-template-columns: 340px 1fr;
       grid-template-rows: 1fr;
@@ -635,26 +638,32 @@
       flex: 0 0 auto;
     }
     #viewGB .topGrid > .panel,
-    #viewPA .topGrid > .panel{
+    #viewPA .topGrid > .panel,
+    #viewPG .topGrid > .panel{
       height:100%;
     }
     /* sin scroll interno del panel de gráfico (el scroll es del main) */
     #viewGB .pc.chartPc,
-    #viewPA .pc.chartPc{
+    #viewPA .pc.chartPc,
+    #viewPG .pc.chartPc{
       overflow:hidden;
     }
     #viewGB .svgWrap,
-    #viewPA .svgWrap{
-      min-height:0;
+    #viewPA .svgWrap,
+    #viewPG .svgWrap{
+      flex: 1 1 auto;
+      min-height: 520px;
     }
 
     @media (max-width: 900px){
       #viewGB.view.active,
-      #viewPA.view.active{
+    #viewPA.view.active,
+    #viewPG.view.active{
         overflow:visible;
       }
       #viewGB .topGrid,
-      #viewPA .topGrid{
+    #viewPA .topGrid,
+    #viewPG .topGrid{
         grid-template-columns: 1fr;
         min-height:0;
       }
@@ -1003,12 +1012,16 @@
     // Al cambiar de sección, empieza arriba (la explicación queda más abajo y se ve con scroll)
     if (views[k]) views[k].scrollTop = 0;
 
+    // Guardar sección actual (sirve para dibujar cuando el controlador aún está cargando)
+    window.__activeViewKey = k;
 
-    // Recalcular geometría de gráficos visibles
-    if (k === "pge") window.__pge?.onShow?.();
-    if (k === "gb")  window.__gb?.onShow?.();
-    if (k === "pa")  window.__pa?.onShow?.();
-    if (k === "pg")  window.__pg?.onShow?.();
+    // Recalcular geometría de gráficos visibles (tras aplicar display/layout)
+    requestAnimationFrame(() => {
+      if (k === "pge") window.__pge?.onShow?.();
+      if (k === "gb")  window.__gb?.onShow?.();
+      if (k === "pa")  window.__pa?.onShow?.();
+      if (k === "pg")  window.__pg?.onShow?.();
+    });
   }
 
   btns.forEach(b => b.addEventListener("click", () => setView(b.dataset.view)));
@@ -3205,6 +3218,7 @@ try{
   }
   // Explicación: botón de pulso (sin estado) ya configurado arriba.
 window.__pa = { onShow: () => controller.onShow() };
+  if (window.__activeViewKey === "pa") requestAnimationFrame(() => controller.onShow());
 })();
 
 
@@ -3357,6 +3371,7 @@ window.__pa = { onShow: () => controller.onShow() };
   }
 
   window.__pg = { onShow: () => controller.onShow() };
+  if (window.__activeViewKey === "pg") requestAnimationFrame(() => controller.onShow());
 })();
 </script>
 </body>
