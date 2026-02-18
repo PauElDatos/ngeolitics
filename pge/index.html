@@ -2196,6 +2196,7 @@ function makeChartController(opts){
 
   async function fetchFirstUsableRaw(){
     const candidates = [
+      "pge_politicas.csv",
       "pge_politicas_valores.csv",
       "pge_politicas_raw.csv",
       "pge_politicas_series.csv",
@@ -2439,11 +2440,11 @@ function makeChartController(opts){
 
   async function loadPGE(){
     // 1) CSV de correspondencias (moderno ↔ antiguo)
-    const mapTxt = await fetchText("pge_politicas.csv");
+    const mapTxt = await fetchText("pge_politicas_correspondencias.csv");
     const mapCsv = parseCSV(mapTxt);
     const mapInfo = buildMapping(mapCsv);
     if (!mapInfo || !mapInfo.rows || !mapInfo.rows.length){
-      throw new Error("No se pudo leer pge_politicas.csv (esperaba columnas tipo id_politica_moderno y politicas_antiguas_encontradas).");
+      throw new Error("No se pudo leer pge_politicas_correspondencias.csv (esperaba columnas tipo id_politica_moderno y politicas_antiguas_encontradas).");
     }
     app.mapInfo = mapInfo;
     renderMappingTable();
