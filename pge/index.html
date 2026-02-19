@@ -497,6 +497,7 @@
     }
     #viewGB .presStats{ flex: 0 0 auto; }
 
+    #viewPGE #btnExplainPGE,
     #viewGB #btnExplainGB,
     #viewPA #btnExplainPA{
       margin-left: auto;
@@ -605,11 +606,49 @@
     }
 
 
-  
+    /* Tabla de correspondencias (PGE) */
+    .mapTableScroll{
+      margin-top: 10px;
+      max-height: 420px;
+      overflow: auto;
+      border-radius: 10px;
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    table.mapTable{
+      width: 100%;
+      border-collapse: collapse;
+      font-size: calc(12px * var(--uiScale));
+    }
+    table.mapTable thead th{
+      position: sticky;
+      top: 0;
+      background: rgba(0,0,0,.35);
+      backdrop-filter: blur(4px);
+      text-align: left;
+      padding: 8px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.92);
+      z-index: 1;
+    }
+    table.mapTable tbody td{
+      padding: 7px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      color: rgba(255,255,255,.85);
+      vertical-align: top;
+    }
+    table.mapTable tbody tr:hover td{
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.95);
+    }
+    .mapOldItem{
+      display:block;
+      white-space: nowrap;
+    }
+
     /* ===== Vistas GB/PA: explicación debajo de Series + Gráfico (se ve con scroll) ===== */
     #viewGB.view.active,
     #viewPA.view.active,
-    #viewPG.view.active{
+    #viewPGE.view.active{
       display:flex !important;
       flex-direction:column;
       gap:12px;
@@ -622,12 +661,12 @@
        Forzamos a que NO se encoja, para que quede debajo y se pueda ver haciendo scroll. */
     #viewGB.view.active > section.panel,
     #viewPA.view.active > section.panel,
-    #viewPG.view.active > section.panel{
+    #viewPGE.view.active > section.panel{
       flex: 0 0 auto;
     }
     #viewGB .topGrid,
     #viewPA .topGrid,
-    #viewPG .topGrid{
+    #viewPGE .topGrid{
       display:grid;
       grid-template-columns: 340px 1fr;
       grid-template-rows: 1fr;
@@ -639,18 +678,18 @@
     }
     #viewGB .topGrid > .panel,
     #viewPA .topGrid > .panel,
-    #viewPG .topGrid > .panel{
+    #viewPGE .topGrid > .panel{
       height:100%;
     }
     /* sin scroll interno del panel de gráfico (el scroll es del main) */
     #viewGB .pc.chartPc,
     #viewPA .pc.chartPc,
-    #viewPG .pc.chartPc{
+    #viewPGE .pc.chartPc{
       overflow:hidden;
     }
     #viewGB .svgWrap,
     #viewPA .svgWrap,
-    #viewPG .svgWrap{
+    #viewPGE .svgWrap{
       flex: 1 1 auto;
       min-height: 520px;
     }
@@ -658,12 +697,12 @@
     @media (max-width: 900px){
       #viewGB.view.active,
     #viewPA.view.active,
-    #viewPG.view.active{
+    #viewPGE.view.active{
         overflow:visible;
       }
       #viewGB .topGrid,
     #viewPA .topGrid,
-    #viewPG .topGrid{
+    #viewPGE .topGrid{
         grid-template-columns: 1fr;
         min-height:0;
       }
@@ -722,68 +761,87 @@
     </div>
   </header>
 
-  <!-- ===================== VISTA 1: PGE ===================== -->
+    <!-- ===================== VISTA 1: PGE ===================== -->
   <main id="viewPGE" class="view active">
-    <section class="panel">
-      <div class="ph">
-        <div class="ttl">Políticas</div>
-        <div class="sub">
-          <button class="btn" id="btnPre2004" title="Incluir/excluir equivalencias anteriores a 2004 (las políticas antiguas se agregan a su política moderna)">Anteriores a 2004</button>
-        </div>
-      </div>
-      <div class="pc">
-        <div class="legend" id="legend"></div>
-      </div>
-    </section>
-
-    <section class="panel">
-      <div class="ph">
-        <div class="ttl">Gráfico</div>
-        <div class="sub"></div>
-      </div>
-
-      <div class="pc chartPc">
-        <div class="svgWrap" id="svgWrap">
-          <svg id="chartSvg" class="chartSvg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gráfico de porcentaje del presupuesto por política y año"></svg>
-          <div class="tooltip" id="tooltip" style="display:none;"></div>
-          <div class="errorBox" id="errorBox" style="display:none;"></div>
-        </div>
-
-        <div class="chartControls">
-          <button class="btn" id="btnScale">Escala: Exponencial</button>
-          <button class="btn" id="btnCrosshair">Línea vertical: OFF</button>
-          <button class="btn" id="btnHoverFocus">Resaltar al pasar: OFF</button>
-          <button class="btn on" id="btnPolBandsPGE" title="Mostrar/ocultar colores de presidencias">Políticos: ON</button>
-        </div>
-
-        <div class="footerSingle">
-          <span class="footerSource">Fuente: <span style="color:#fff">BOE</span> · <span style="opacity:.9;">N.Geolitics</span></span>
-          <span class="footerPres">Felipe González (1986–1996) · José María Aznar (1996–2004) · José Luis Rodríguez Zapatero (2004–2011) · Mariano Rajoy (2011–2018) · Pedro Sánchez (2018–2023)</span>
-        
-        <div class="explainBox" id="pgeExplain">
-          <div class="explainTitle">Correspondencias de políticas (pre-2004 → clasificación moderna)</div>
-          <div class="explainText">
-            <div>
-              Para hacer comparable toda la serie 1986–2023, las partidas anteriores a 2004 que aparecen con identificadores como <code>X999</code>
-              se agregan a su <b>política moderna</b> equivalente.
-              El botón <b>Anteriores a 2004</b> permite incluir/excluir esas equivalencias en las series.
-            </div>
-            <div style="margin-top:10px;">Tabla de correspondencias (moderna → antiguas agregadas):</div>
-            <div class="popTableScroll" style="margin-top:8px; max-height: 340px;">
-              <table class="popTable" aria-label="Tabla de correspondencias entre políticas modernas y antiguas">
-                <thead>
-                  <tr><th>Política moderna</th><th>Políticas antiguas agregadas</th></tr>
-                </thead>
-                <tbody id="pgeMapBody"></tbody>
-              </table>
-            </div>
-            <div style="margin-top:10px; opacity:.9;" id="pgeMapNote"></div>
+    <div class="topGrid">
+      <section class="panel">
+        <div class="ph">
+          <div class="ttl">Políticas</div>
+          <div class="sub">
+            <button class="btn" id="btnPre2004" title="Mostrar/ocultar partidas antiguas sin correspondencia (si existen)">Anteriores a 2004</button>
           </div>
         </div>
-</div>
+        <div class="pc">
+          <div class="legend" id="legend"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="ph">
+          <div class="ttl">Gráfico</div>
+          <div class="sub"></div>
+        </div>
+
+        <div class="pc chartPc">
+          <div class="svgWrap" id="svgWrap">
+            <svg id="chartSvg" class="chartSvg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gráfico de porcentaje del presupuesto por política y año"></svg>
+            <div class="tooltip" id="tooltip" style="display:none;"></div>
+            <div class="errorBox" id="errorBox" style="display:none;"></div>
+          </div>
+
+          <div class="chartControls">
+            <button class="btn" id="btnScale">Escala: Exponencial</button>
+            <button class="btn" id="btnCrosshair">Línea vertical: OFF</button>
+            <button class="btn" id="btnHoverFocus">Resaltar al pasar: OFF</button>
+            <button class="btn on" id="btnPolBandsPGE" title="Mostrar/ocultar colores de presidencias">Políticos: ON</button>
+            <button class="btn" id="btnExplainPGE" title="Ir a la explicación">Explicación</button>
+          </div>
+
+          <div class="footerSingle">
+            <span class="footerSource">Fuente: <span style="color:#fff">BOE</span> · <span style="opacity:.9;">N.Geolitics</span></span>
+            <span class="footerPres">Felipe González (1986–1996) · José María Aznar (1996–2004) · José Luis Rodríguez Zapatero (2004–2011) · Mariano Rajoy (2011–2018) · Pedro Sánchez (2018–2023)</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <section class="panel">
+      <div class="ph">
+        <div class="ttl">Explicación</div>
+        <div class="sub"></div>
+      </div>
+      <div class="pc">
+        <div class="explainBox" id="pgeExplain">
+          <div class="explainTitle">Cómo se agregan las políticas antiguas a las modernas</div>
+          <div class="explainText">
+            <div>
+              El BOE utiliza distintos esquemas de clasificación según el periodo. Para tener una serie consistente, aquí se muestran
+              <b>solo</b> las <b>políticas modernas</b> (<code>id_politica_moderno</code>), y para cada una se suman las partidas históricas
+              indicadas en <code>pge_politicas.csv</code>.
+            </div>
+            <div style="margin-top:8px;">
+              La tabla siguiente indica la correspondencia usada (columna <code>politicas_antiguas_encontradas</code> → serie moderna).
+            </div>
+          </div>
+
+          <div class="mapTableScroll" aria-label="Tabla de correspondencias PGE: políticas modernas y políticas antiguas agregadas">
+            <table class="mapTable">
+              <thead>
+                <tr>
+                  <th>Política moderna</th>
+                  <th>Políticas antiguas agregadas</th>
+                </tr>
+              </thead>
+              <tbody id="pgeMapBody"></tbody>
+            </table>
+          </div>
+
+          <div class="explainText" id="pgeUnmappedNote" style="margin-top:10px; opacity:.95;"></div>
+        </div>
       </div>
     </section>
   </main>
+
 
   <!-- ===================== VISTA 2: Gasto vs beneficio ===================== -->
   <main id="viewGB" class="view">
@@ -2015,7 +2073,7 @@ function makeChartController(opts){
   };
 }
 
-/* ===================== Vista 1: PGE (políticas modernas + equivalencias pre-2004) ===================== */
+/* ===================== Vista 1: PGE (políticas modernas + agregación histórica) ===================== */
 (async function(){
   const svg = document.getElementById("chartSvg");
   const wrap = document.getElementById("svgWrap");
@@ -2028,21 +2086,15 @@ function makeChartController(opts){
     btnCrosshair: document.getElementById("btnCrosshair"),
     btnHoverFocus: document.getElementById("btnHoverFocus"),
   };
+
   const btnPre2004 = document.getElementById("btnPre2004");
   const btnPolBands = document.getElementById("btnPolBandsPGE");
-  let showPresBands = true;
+  const btnExplain = document.getElementById("btnExplainPGE");
+  const explainEl = document.getElementById("pgeExplain");
+  const mapBodyEl = document.getElementById("pgeMapBody");
+  const unmappedNoteEl = document.getElementById("pgeUnmappedNote");
 
-  const app = {
-    includeAntiguas: true,     // incluir equivalencias pre-2004 (X999, etc.) agregadas al id moderno
-    rawRows: null,             // [{id_norm, year, pol, pol_norm, val}]
-    rawSource: "",
-    mapInfo: null,             // estructura de correspondencias
-    keys: [],                  // ids modernos en orden (p.ej. "01"..."27")
-    seriesByKey: new Map(),    // id_moderno -> {xs,ys}
-    yearValueByKey: new Map(), // id_moderno -> Map(year->pct)
-    keyInfo: new Map(),        // id_moderno -> {label,color}
-    xDomain: {min:1986, max:2023},
-  };
+  let showPresBands = true;
 
   function drawPresBands(gBg, xScale, plotRect){
     if (!showPresBands) return;
@@ -2070,6 +2122,65 @@ function makeChartController(opts){
     });
   }
 
+  // Explicación (botón de pulso: hace scroll; no mantiene estado ON/OFF)
+  function pulseExplainPGE(){
+    if (!explainEl) return;
+    requestAnimationFrame(() => {
+      const scroller = document.getElementById("viewPGE") || explainEl.closest(".view");
+      if (scroller && typeof scroller.scrollTo === "function"){
+        const sr = scroller.getBoundingClientRect();
+        const tr = explainEl.getBoundingClientRect();
+        const top = (tr.top - sr.top) + (scroller.scrollTop || 0) - 8;
+        scroller.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+      } else {
+        explainEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  }
+
+  if (btnExplain){
+    btnExplain.classList.remove("on");
+    btnExplain.textContent = "Explicación";
+    btnExplain.addEventListener("click", pulseExplainPGE);
+  }
+
+  // ---------- Helpers ----------
+  function normId(v){
+    const s = String(v ?? "").trim().toUpperCase();
+    if (!s) return "";
+    if (/^\d+$/.test(s)) return s.padStart(2, "0");
+    return s;
+  }
+
+  function parseOldItem(raw){
+    const item = String(raw ?? "").trim();
+    if (!item) return null;
+
+    let id = "";
+    let name = "";
+
+    // Preferimos em dash (—) pero aceptamos "-" si viene así
+    if (item.includes("—")){
+      const idx = item.indexOf("—");
+      id = item.slice(0, idx).trim();
+      name = item.slice(idx + 1).trim();
+    } else if (item.includes("-")){
+      const idx = item.indexOf("-");
+      id = item.slice(0, idx).trim();
+      name = item.slice(idx + 1).trim();
+    } else {
+      const m = item.match(/^(\S+)\s+(.*)$/);
+      if (m){ id = m[1]; name = m[2]; }
+      else { name = item; }
+    }
+
+    id = normId(id);
+    name = String(name).replace(/^["']|["']$/g, "").trim();
+    const nameNorm = stripAccentsLower(name);
+    const key = id + "||" + nameNorm;
+    return { id, name, key, pretty: (id ? (id + " — " + name) : name) };
+  }
+
   function hsvToRgb(h,s,v){
     let r=0,g=0,b=0;
     const i = Math.floor(h*6);
@@ -2090,316 +2201,11 @@ function makeChartController(opts){
   }
   function colorList(n, sat=0.9, val=1.0){
     const cols=[];
-    for (let i=0;i<n;i++) cols.push(hsvToRgb(i/Math.max(1,n), sat, val));
+    for (let i=0;i<n;i++) cols.push(hsvToRgb(i/n, sat, val));
     return cols;
   }
 
-  function normId(v){
-    const s = String(v ?? "").trim();
-    if (!s) return "";
-    if (/^\d+$/.test(s)) return String(Number(s)).padStart(2,"0");
-    const m = s.match(/^0*(\d+)$/);
-    if (m) return String(Number(m[1])).padStart(2,"0");
-    return s.toUpperCase();
-  }
-
-  function parsePolicyPart(part){
-    const s = String(part ?? "").trim();
-    if (!s) return null;
-    // "03 — Nombre" o "03 - Nombre"
-    const m = s.match(/^([^—\-]+?)\s*[—\-]\s*(.+)$/);
-    if (!m) return { id:"", name:s };
-    return { id: normId(m[1]), name: String(m[2] ?? "").trim() };
-  }
-
-  function splitParts(listStr){
-    return String(listStr ?? "")
-      .split("|")
-      .map(x => x.trim())
-      .filter(Boolean);
-  }
-
-  function buildMapping(mapCsv){
-    const cols = mapCsv.headers || [];
-    const rows = mapCsv.rows || [];
-
-    const c_id   = pickCol(cols, ["id_politica_moderno","id politica moderno","id_politica","id politica"]);
-    const c_mod  = pickCol(cols, ["politica_moderna","política_moderna","politica moderna","política moderna","politica","política"]);
-    const c_list = pickCol(cols, ["politicas_antiguas_encontradas","políticas_antiguas_encontradas","politicas antiguas encontradas","equivalencias","correspondencias"]);
-    if (!c_id || !c_list) return null;
-
-    const outRows = [];
-    const modernIds = new Set();
-    const labelByKey = new Map();
-    const modernLabelByKey = new Map();
-    const altIdToModern = new Map();     // ids no-X999 -> id_moderno
-    const altNameToModern = new Map();   // nombre_normalizado -> id_moderno
-
-    for (const r of rows){
-      const idModern = normId(r[c_id]);
-      if (!idModern) continue;
-
-      const modName = String(r[c_mod] ?? "").trim();
-      const listStr = String(r[c_list] ?? "").trim();
-      const label = listStr || (idModern + (modName ? (" — " + modName) : ""));
-
-      const parts = splitParts(label).map(parsePolicyPart).filter(Boolean);
-      const modernPart = parts.find(p => p.id === idModern);
-      const modernLabel = modernPart ? (idModern + " — " + modernPart.name) : (idModern + (modName ? (" — " + modName) : ""));
-
-      outRows.push({
-        id: idModern,
-        politica_moderna: modName,
-        label_display: label,
-        modern_label: modernLabel,
-        parts,
-      });
-
-      modernIds.add(idModern);
-      labelByKey.set(idModern, label);
-      modernLabelByKey.set(idModern, modernLabel);
-
-      for (const p of parts){
-        if (!p) continue;
-        const pid = normId(p.id);
-        const pn = stripAccentsLower(p.name || "");
-        if (pid && pid !== idModern && pid !== "X999" && pid !== "X" && !altIdToModern.has(pid)){
-          altIdToModern.set(pid, idModern);
-        }
-        // para X999 (y en general), la clave real es el nombre
-        if (pn && pid !== idModern && !altNameToModern.has(pn)){
-          altNameToModern.set(pn, idModern);
-        }
-      }
-    }
-
-    // orden por id numérico si procede
-    outRows.sort((a,b) => {
-      const ai = (/^\d+$/.test(a.id) ? Number(a.id) : 1e9);
-      const bi = (/^\d+$/.test(b.id) ? Number(b.id) : 1e9);
-      return ai - bi || a.id.localeCompare(b.id);
-    });
-
-    const keys = outRows.map(r => r.id);
-
-    return { rows: outRows, keys, modernIds, labelByKey, modernLabelByKey, altIdToModern, altNameToModern };
-  }
-
-  function isRawDataCSV(csvParsed){
-    const cols = csvParsed.headers || [];
-    const c_id   = pickCol(cols, ["id_politica","id politica"]);
-    const c_year = pickCol(cols, ["año","ano","anio","year"]);
-    const c_pol  = pickCol(cols, ["politica","política"]);
-    const c_val  = pickCol(cols, ["presupuesto","presupuesto gasto","valor","importe","amount"]);
-    return !!(c_id && c_year && c_pol && c_val);
-  }
-
-  async function fetchFirstUsableRaw(){
-    const candidates = [
-      "pge_politicas.csv",
-      "pge_politicas_valores.csv",
-      "pge_politicas_raw.csv",
-      "pge_politicas_series.csv",
-      "pge_politicas_data.csv",
-      "pge_politicas_detalle.csv",
-      "pge_politicas_pct.csv",
-    ];
-
-    for (const url of candidates){
-      try{
-        const txt = await fetchText(url);
-        const parsed = parseCSV(txt);
-        if (isRawDataCSV(parsed)) return { url, parsed };
-      }catch(e){}
-    }
-    return null;
-  }
-
-  function parseRawRows(csvParsed){
-    const cols = csvParsed.headers;
-    const rows = csvParsed.rows;
-
-    const c_id   = pickCol(cols, ["id_politica", "id politica"]);
-    const c_year = pickCol(cols, ["año","ano","anio","year"]);
-    const c_pol  = pickCol(cols, ["politica","política"]);
-    const c_val  = pickCol(cols, ["presupuesto","presupuesto gasto","valor","importe","amount"]);
-    if (!c_id || !c_year || !c_pol || !c_val) return [];
-
-    const base = [];
-    for (const r of rows){
-      const idRaw = String(r[c_id] ?? "").trim();
-      const id = normId(idRaw);
-      const year = Math.trunc(toNum(r[c_year]));
-      const polName = String(r[c_pol] ?? "").trim();
-      const val = toNum(r[c_val]);
-      if (!id || !Number.isFinite(year) || !polName || !Number.isFinite(val)) continue;
-      base.push({
-        id_norm: id,
-        year,
-        pol: polName,
-        pol_norm: stripAccentsLower(polName),
-        val,
-      });
-    }
-    return base;
-  }
-
-  function prepararSeriesPctModerno(rawRows, mapInfo, includeAntiguas){
-    const totMap = new Map();
-    for (const r of rawRows){
-      totMap.set(r.year, (totMap.get(r.year) || 0) + r.val);
-    }
-
-    const gMap = new Map(); // (id_moderno||year) -> sum(val)
-
-    const modernIds = mapInfo.modernIds;
-    const altIdToModern = mapInfo.altIdToModern;
-    const altNameToModern = mapInfo.altNameToModern;
-
-    let unmapped = 0;
-
-    for (const r of rawRows){
-      let mid = null;
-
-      if (modernIds.has(r.id_norm)){
-        mid = r.id_norm; // ya es política moderna
-      } else if (includeAntiguas){
-        // primero por id no-X999 (si aplica)
-        if (r.id_norm && r.id_norm !== "X999" && altIdToModern.has(r.id_norm)){
-          mid = altIdToModern.get(r.id_norm);
-        } else if (r.pol_norm && altNameToModern.has(r.pol_norm)){
-          mid = altNameToModern.get(r.pol_norm);
-        }
-      }
-
-      if (!mid){
-        unmapped++;
-        continue;
-      }
-
-      const k = mid + "||" + r.year;
-      gMap.set(k, (gMap.get(k) || 0) + r.val);
-    }
-
-    const byKey = new Map(); // id_moderno -> [[year,pct],...]
-    let allYears = new Set();
-
-    for (const [k, sumVal] of gMap.entries()){
-      const [mid, y] = k.split("||");
-      const year = Number(y);
-      const total = totMap.get(year) || NaN;
-      if (!Number.isFinite(total) || total === 0) continue;
-      const pct = (sumVal / total) * 100;
-      if (!byKey.has(mid)) byKey.set(mid, []);
-      byKey.get(mid).push([year, pct]);
-      allYears.add(year);
-    }
-
-    const seriesByKey = new Map();
-    for (const idModern of mapInfo.keys){
-      const pts = byKey.get(idModern) || [];
-      pts.sort((a,b)=>a[0]-b[0]);
-      if (pts.length < 2) continue;
-      seriesByKey.set(idModern, {
-        xs: pts.map(p=>p[0]),
-        ys: pts.map(p=>p[1]),
-      });
-    }
-
-    const years = Array.from(allYears).sort((a,b)=>a-b);
-    const minY = years.length ? years[0] : app.xDomain.min;
-    const maxY = years.length ? years[years.length-1] : app.xDomain.max;
-
-    return {
-      seriesByKey,
-      labelByKey: mapInfo.labelByKey,
-      keys: mapInfo.keys,
-      years,
-      xDomain: { min: minY, max: maxY },
-      unmappedCount: unmapped,
-    };
-  }
-
-  function applyPrepared(prep){
-    app.seriesByKey.clear();
-    app.yearValueByKey.clear();
-    app.keyInfo.clear();
-
-    app.keys = prep.keys.slice();
-    app.xDomain = prep.xDomain;
-
-    const cols = colorList(app.keys.length, 0.9, 1.0);
-
-    for (let i=0;i<app.keys.length;i++){
-      const k = app.keys[i];
-      const label = prep.labelByKey.get(k) || k;
-      app.keyInfo.set(k, { label, color: cols[i] });
-    }
-
-    for (const [k, ser] of prep.seriesByKey.entries()){
-      app.seriesByKey.set(k, ser);
-      const mp = new Map();
-      for (let i=0;i<ser.xs.length;i++) mp.set(ser.xs[i], ser.ys[i]);
-      app.yearValueByKey.set(k, mp);
-    }
-
-    const note = document.getElementById("pgeMapNote");
-    if (note){
-      const pieces = [];
-      if (app.rawSource) pieces.push(`Datos: <code>${app.rawSource}</code>`);
-      pieces.push(app.includeAntiguas
-        ? "Equivalencias pre-2004: <b>incluidas</b>."
-        : "Equivalencias pre-2004: <b>excluidas</b>.");
-      if (Number.isFinite(prep.unmappedCount) && prep.unmappedCount > 0){
-        pieces.push(`Filas sin correspondencia: ${prep.unmappedCount}.`);
-      }
-      note.innerHTML = pieces.join(" · ");
-    }
-  }
-
-  function renderMappingTable(){
-    const body = document.getElementById("pgeMapBody");
-    if (!body || !app.mapInfo) return;
-
-    body.innerHTML = "";
-
-    for (const row of app.mapInfo.rows){
-      const tr = document.createElement("tr");
-
-      const tdM = document.createElement("td");
-      tdM.textContent = row.modern_label || (row.id + (row.politica_moderna ? (" — " + row.politica_moderna) : ""));
-      tr.appendChild(tdM);
-
-      const oldParts = (row.parts || [])
-        .filter(p => p && p.id && p.id !== row.id)
-        .map(p => (p.id ? (p.id + " — " + (p.name || "")) : (p.name || "")))
-        .filter(Boolean);
-
-      const tdA = document.createElement("td");
-      tdA.textContent = oldParts.length ? oldParts.join(" | ") : "—";
-      tr.appendChild(tdA);
-
-      body.appendChild(tr);
-    }
-  }
-
   function formatPct(v){ return Number.isFinite(v) ? (v.toFixed(2) + "%") : "—"; }
-
-  function buildSeriesList(){
-    const out = [];
-    for (const k of app.keys){
-      if (!app.seriesByKey.has(k)) continue;
-      const info = app.keyInfo.get(k);
-      out.push({
-        key: k,
-        label: info?.label || k,
-        color: info?.color || "rgba(176,176,176,.7)",
-        badge: "",
-        axis: "left",
-      });
-    }
-    return out;
-  }
 
   function computeYMax(keys){
     let ymax = 1;
@@ -2422,6 +2228,251 @@ function makeChartController(opts){
     return [0,10,20,30,40,50,60,80,100];
   }
 
+  // ---------- Preparación de series ----------
+  function prepararSeriesPctModernas(mapCsv, dataCsv){
+    const colsMap = mapCsv.headers;
+    const rowsMap = mapCsv.rows;
+
+    const c_mod_id  = pickCol(colsMap, ["id_politica_moderno","id politica moderno","id_politica","id politica","id"]);
+    const c_mod_pol = pickCol(colsMap, ["politica_moderna","politica moderna","politica","política"]);
+    const c_old     = pickCol(colsMap, ["politicas_antiguas_encontradas","politicas antiguas encontradas","politicas_antiguas","politicas antiguas"]);
+
+    if (!c_mod_id || !c_mod_pol || !c_old){
+      throw new Error("pge_politicas.csv: faltan columnas esperadas (id_politica_moderno / politica_moderna / politicas_antiguas_encontradas).");
+    }
+
+    // 1) Mapping moderno -> lista de (id+nombre) antiguas
+    const mapping = [];
+    const usedOldKeys = new Set();
+    const oldKeyToModern = new Map();
+
+    for (const r of rowsMap){
+      const modId = normId(r[c_mod_id]);
+      const modLabel = String(r[c_mod_pol] ?? "").trim();
+      const oldRaw = String(r[c_old] ?? "").trim();
+      if (!modId || !modLabel) continue;
+
+      const pieces = oldRaw ? oldRaw.split("|").map(s => s.trim()).filter(Boolean) : [];
+      const olds = [];
+      for (const p of pieces){
+        const it = parseOldItem(p);
+        if (!it || !it.id || !it.name) continue;
+        olds.push(it);
+
+        usedOldKeys.add(it.key);
+        if (!oldKeyToModern.has(it.key)) oldKeyToModern.set(it.key, []);
+        oldKeyToModern.get(it.key).push(modId);
+      }
+
+      mapping.push({
+        id: modId,
+        label: modLabel,
+        olds,
+      });
+    }
+
+    mapping.sort((a,b) => {
+      const na = /^\d+$/.test(a.id) ? parseInt(a.id, 10) : 9999;
+      const nb = /^\d+$/.test(b.id) ? parseInt(b.id, 10) : 9999;
+      return na - nb || a.id.localeCompare(b.id);
+    });
+
+    // 2) Agrega datos anuales por (id+política)
+    const colsData = dataCsv.headers;
+    const rowsData = dataCsv.rows;
+
+    const c_id   = pickCol(colsData, ["id_politica","id politica","id"]);
+    const c_year = pickCol(colsData, ["año","ano","anio","year"]);
+    const c_pol  = pickCol(colsData, ["politica","política"]);
+    const c_val  = pickCol(colsData, ["presupuesto","valor","importe","amount"]);
+
+    if (!c_id || !c_year || !c_pol || !c_val){
+      throw new Error("pge_politicas_anio.csv: faltan columnas esperadas (id_politica / anio / politica / presupuesto).");
+    }
+
+    const sumByOldKeyYear = new Map(); // oldKey -> Map(year->sum)
+    const oldNameByKey = new Map();    // oldKey -> politica (tal cual)
+    const totalByYear = new Map();     // year -> total
+    const yearsSet = new Set();
+
+    for (const r of rowsData){
+      const id = normId(r[c_id]);
+      const year = Math.trunc(toNum(r[c_year]));
+      const polName = String(r[c_pol] ?? "").trim();
+      const val = toNum(r[c_val]);
+
+      if (!id || !Number.isFinite(year) || !polName || !Number.isFinite(val)) continue;
+
+      const polNorm = stripAccentsLower(polName);
+      const oldKey = id + "||" + polNorm;
+
+      if (!sumByOldKeyYear.has(oldKey)) sumByOldKeyYear.set(oldKey, new Map());
+      const mp = sumByOldKeyYear.get(oldKey);
+      mp.set(year, (mp.get(year) || 0) + val);
+
+      if (!oldNameByKey.has(oldKey)) oldNameByKey.set(oldKey, polName);
+
+      totalByYear.set(year, (totalByYear.get(year) || 0) + val);
+      yearsSet.add(year);
+    }
+
+    const years = Array.from(yearsSet).sort((a,b)=>a-b);
+
+    // 3) Construye series por política moderna (suma de sus antiguas)
+    const series = new Map();
+    const labels_main = [];
+    const labelKeySet = new Set();
+
+    for (const m of mapping){
+      const label = m.label;
+      labels_main.push(label);
+      labelKeySet.add(label);
+
+      const xs = [];
+      const ys = [];
+      for (const y of years){
+        const total = totalByYear.get(y);
+        if (!Number.isFinite(total) || total === 0) continue;
+
+        let sum = 0;
+        for (const it of m.olds){
+          const mp = sumByOldKeyYear.get(it.key);
+          if (!mp) continue;
+          const v = mp.get(y);
+          if (Number.isFinite(v)) sum += v;
+        }
+
+        xs.push(y);
+        ys.push((sum / total) * 100);
+      }
+
+      if (xs.length >= 2) series.set(label, { xs, ys });
+    }
+
+    // 4) (Opcional) X999 sin correspondencia (botón "Anteriores a 2004")
+    const x999_labels = [];
+    for (const [oldKey, mp] of sumByOldKeyYear.entries()){
+      const id = oldKey.split("||")[0];
+      if (id !== "X999") continue;
+      if (usedOldKeys.has(oldKey)) continue;
+
+      let label = oldNameByKey.get(oldKey) || oldKey;
+      if (labelKeySet.has(label)) label = "X999 · " + label;
+
+      const xs = [];
+      const ys = [];
+      for (const y of years){
+        const total = totalByYear.get(y);
+        if (!Number.isFinite(total) || total === 0) continue;
+
+        const v = mp.get(y) || 0;
+        xs.push(y);
+        ys.push((v / total) * 100);
+      }
+
+      if (xs.length >= 2){
+        series.set(label, { xs, ys });
+        x999_labels.push(label);
+      }
+    }
+    x999_labels.sort((a,b)=>a.localeCompare(b, "es"));
+
+    // 5) Duplicidades en el mapping (mismo oldKey asignado a múltiples modernas)
+    const dup = [];
+    for (const [k, arr] of oldKeyToModern.entries()){
+      const uniq = Array.from(new Set(arr));
+      if (uniq.length > 1){
+        dup.push({ oldKey: k, modernIds: uniq });
+      }
+    }
+
+    return { series, labels_main, x999_labels, years, mapping, dup };
+  }
+
+  function renderMappingTable(mapping, dataCsvParsed){
+    if (!mapBodyEl) return;
+    mapBodyEl.innerHTML = "";
+
+    // Para marcar si una "política antigua" existe o no en los datos anuales:
+    const colsData = dataCsvParsed.headers;
+    const rowsData = dataCsvParsed.rows;
+    const c_id   = pickCol(colsData, ["id_politica","id politica","id"], false);
+    const c_pol  = pickCol(colsData, ["politica","política"], false);
+
+    const exists = new Set();
+    if (c_id && c_pol){
+      for (const r of rowsData){
+        const id = normId(r[c_id]);
+        const polName = String(r[c_pol] ?? "").trim();
+        if (!id || !polName) continue;
+        exists.add(id + "||" + stripAccentsLower(polName));
+      }
+    }
+
+    for (const m of mapping){
+      const tr = document.createElement("tr");
+
+      const tdM = document.createElement("td");
+      tdM.textContent = `${m.id} — ${m.label}`;
+
+      const tdO = document.createElement("td");
+      if (!m.olds || !m.olds.length){
+        tdO.textContent = "—";
+      } else {
+        for (const it of m.olds){
+          const d = document.createElement("span");
+          d.className = "mapOldItem";
+          d.textContent = it.pretty + (exists.size ? (exists.has(it.key) ? "" : " (no encontrada)") : "");
+          tdO.appendChild(d);
+        }
+      }
+
+      tr.appendChild(tdM);
+      tr.appendChild(tdO);
+      mapBodyEl.appendChild(tr);
+    }
+  }
+
+  const app = {
+    showPre2004: false,     // X999 sin correspondencia
+    seriesByKey: new Map(), // label -> {xs,ys}
+    yearValueByKey: new Map(), // label -> Map(year->pct)
+    keyInfo: new Map(),     // label -> {label,color,type}
+    labelsMain: [],
+    x999Labels: [],
+    xDomain: {min:1986, max:2023},
+    mappingRows: [],
+  };
+
+  function buildSeriesList(){
+    const out = [];
+    for (const lab of app.labelsMain){
+      if (!app.seriesByKey.has(lab)) continue;
+      const info = app.keyInfo.get(lab);
+      out.push({
+        key: lab,
+        label: lab,
+        color: info?.color || "rgba(176,176,176,.7)",
+        badge: "",
+        axis: "left",
+      });
+    }
+    if (app.showPre2004){
+      for (const lab of app.x999Labels){
+        if (!app.seriesByKey.has(lab)) continue;
+        const info = app.keyInfo.get(lab);
+        out.push({
+          key: lab,
+          label: lab,
+          color: info?.color || "rgba(176,176,176,.55)",
+          badge: "sin correspondencia",
+          axis: "left",
+        });
+      }
+    }
+    return out;
+  }
+
   function getValueAtYear(key, year){
     const mp = app.yearValueByKey.get(key);
     if (!mp) return null;
@@ -2439,49 +2490,99 @@ function makeChartController(opts){
   }
 
   async function loadPGE(){
-    // 1) CSV de correspondencias (moderno ↔ antiguo)
-    const mapTxt = await fetchText("pge_politicas_correspondencias.csv");
+    const [mapTxt, dataTxt] = await Promise.all([
+      fetchText("pge_politicas.csv"),
+      fetchText("pge_politicas_anio.csv"),
+    ]);
+
     const mapCsv = parseCSV(mapTxt);
-    const mapInfo = buildMapping(mapCsv);
-    if (!mapInfo || !mapInfo.rows || !mapInfo.rows.length){
-      throw new Error("No se pudo leer pge_politicas_correspondencias.csv (esperaba columnas tipo id_politica_moderno y politicas_antiguas_encontradas).");
-    }
-    app.mapInfo = mapInfo;
-    renderMappingTable();
+    const dataCsv = parseCSV(dataTxt);
 
-    // 2) CSV de valores (series por política y año)
-    const rawRes = await fetchFirstUsableRaw();
-    if (!rawRes){
-      throw new Error("No se encontró el CSV de valores de PGE. Necesito un fichero con columnas id_politica, año, politica y presupuesto. Probé: pge_politicas_valores.csv, pge_politicas_raw.csv, pge_politicas_series.csv, pge_politicas_data.csv, pge_politicas_detalle.csv, pge_politicas_pct.csv.");
-    }
-    app.rawSource = rawRes.url;
-    app.rawRows = parseRawRows(rawRes.parsed);
-    if (!app.rawRows.length){
-      throw new Error(`El CSV de valores (${rawRes.url}) está vacío o no tiene filas válidas.`);
+    const prep = prepararSeriesPctModernas(mapCsv, dataCsv);
+    if (!prep || !prep.series || !prep.series.size){
+      throw new Error("No se pudieron preparar las series de PGE (revisa pge_politicas.csv / pge_politicas_anio.csv).");
     }
 
+    app.seriesByKey.clear();
+    app.yearValueByKey.clear();
+    app.keyInfo.clear();
+
+    app.labelsMain = prep.labels_main || [];
+    app.x999Labels = prep.x999_labels || [];
+    app.mappingRows = prep.mapping || [];
+
+    // Dominio X
+    const years = (prep.years && prep.years.length) ? prep.years : [];
+    app.xDomain = { min: years[0] ?? 1986, max: years[years.length-1] ?? 2023 };
+
+    // Colores: modernas brillantes, X999 sin correspondencia más apagadas
+    const mainCols = colorList(app.labelsMain.length, 0.9, 1.0);
+    const xCols = colorList(app.x999Labels.length, 0.35, 0.95);
+    const colorMap = new Map();
+    app.labelsMain.forEach((lab,i)=> colorMap.set(lab, mainCols[i] || "rgb(176,176,176)"));
+    app.x999Labels.forEach((lab,i)=> colorMap.set(lab, xCols[i] || "rgba(176,176,176,.55)"));
+
+    for (const [lab, ser] of prep.series.entries()){
+      app.seriesByKey.set(lab, ser);
+      const mp = new Map();
+      for (let i=0;i<ser.xs.length;i++) mp.set(ser.xs[i], ser.ys[i]);
+      app.yearValueByKey.set(lab, mp);
+
+      const tp = app.x999Labels.includes(lab) ? "x999" : "main";
+      app.keyInfo.set(lab, { label: lab, color: colorMap.get(lab), type: tp });
+    }
+
+    // UI: botón "Anteriores a 2004" solo si hay algo que mostrar
     if (btnPre2004){
-      btnPre2004.classList.toggle("on", app.includeAntiguas);
+      if (!app.x999Labels.length){
+        btnPre2004.classList.remove("on");
+        btnPre2004.style.opacity = "0.45";
+        btnPre2004.style.pointerEvents = "none";
+        btnPre2004.title = "No hay partidas X999 sin correspondencia en el CSV actual.";
+      } else {
+        btnPre2004.style.opacity = "";
+        btnPre2004.style.pointerEvents = "";
+        btnPre2004.title = "Mostrar/ocultar partidas antiguas sin correspondencia (si existen)";
+      }
     }
 
-    const prep = prepararSeriesPctModerno(app.rawRows, app.mapInfo, app.includeAntiguas);
-    if (!prep || !prep.seriesByKey || !prep.seriesByKey.size){
-      throw new Error("No se pudieron preparar las series de PGE (revisa el CSV de valores y las correspondencias).");
+    // Render tabla de correspondencias
+    renderMappingTable(app.mappingRows, dataCsv);
+
+    if (unmappedNoteEl){
+      const parts = [];
+      if (app.x999Labels.length){
+        parts.push(`Hay <b>${app.x999Labels.length}</b> partidas <b>X999</b> en <code>pge_politicas_anio.csv</code> que no aparecen en la tabla de correspondencias.`);
+        parts.push(`Puedes verlas como series adicionales con el botón <b>“Anteriores a 2004”</b>.`);
+      } else {
+        parts.push("Todas las partidas X999 encontradas en <code>pge_politicas_anio.csv</code> están asignadas a alguna política moderna según <code>pge_politicas.csv</code>.");
+      }
+
+      // Duplicidades (si existen)
+      if (prep.dup && prep.dup.length){
+        parts.push(`<span style="opacity:.95;">Nota técnica: se detectaron <b>${prep.dup.length}</b> duplicidades en el mapping (una misma política antigua asignada a varias modernas). Si no era intencional, revisa <code>pge_politicas.csv</code>.</span>`);
+      }
+
+      unmappedNoteEl.innerHTML = parts.join(" ");
     }
-    applyPrepared(prep);
+  }
+
+  try{
+    await loadPGE();
+  } catch(e){
+    if (errorEl){
+      errorEl.style.display = "flex";
+      errorEl.textContent = e.message || String(e);
+    }
+    window.__pge = { onShow: ()=>{} };
+    return;
   }
 
   let controller = null;
 
   function rebuild(){
-    if (app.rawRows && app.mapInfo){
-      const prep = prepararSeriesPctModerno(app.rawRows, app.mapInfo, app.includeAntiguas);
-      applyPrepared(prep);
-    }
-
     const series = buildSeriesList();
     const yMax = computeYMax(series.map(s=>s.key));
-
     if (controller) controller.destroy();
     controller = makeChartController({
       svg, wrap, tooltipEl, errorEl,
@@ -2505,27 +2606,18 @@ function makeChartController(opts){
   }
 
   if (btnPre2004){
-    btnPre2004.classList.toggle("on", app.includeAntiguas);
     btnPre2004.addEventListener("click", () => {
-      app.includeAntiguas = !app.includeAntiguas;
-      btnPre2004.classList.toggle("on", app.includeAntiguas);
+      if (!app.x999Labels.length) return;
+      app.showPre2004 = !app.showPre2004;
+      btnPre2004.classList.toggle("on", app.showPre2004);
       rebuild();
     });
   }
 
-  try{
-    await loadPGE();
-  } catch(e){
-    if (errorEl){
-      errorEl.style.display = "flex";
-      errorEl.textContent = e.message || String(e);
-    }
-    window.__pge = { onShow: ()=>{} };
-    return;
-  }
-
   rebuild();
 })();
+
+
 /* ===================== Vista 2: Gasto vs beneficio (PIB & Gasto) ===================== */
 (async function(){
   const svg = document.getElementById("chartSvgGB");
