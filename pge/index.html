@@ -1318,22 +1318,6 @@ function makeChartController(opts){
     seriesList,
     getValueAtYear,
     getSeriesForPath,
-      // Reglas de segmentación (solo aplica a PGE)
-      // - Vista completa (raw): permite continuidad si el/los años intermedios no existen en el dataset (años sin PGE).
-      //   Corta si el año intermedio sí existe (hubo PGE) pero esa política no tiene presupuesto.
-      segmentBreakRule: (app.mode === "raw") ? ((key, prevYear, nextYear, gap, ser) => {
-        const globalYears = app.pgeYearsByMode?.raw;
-        if (!globalYears || !ser || !ser.xs) return true;
-        const yearSet = ser.__yearSet || (ser.__yearSet = new Set(ser.xs));
-        for (let y = prevYear + 1; y <= nextYear - 1; y++){
-          if (globalYears.has(y) && !yearSet.has(y)) return true;
-        }
-        return false; // continuidad (los años intermedios no tienen PGE)
-      }) : null,
-
-      // - Vista compacta: separa “antes de 2004” vs “después de 2004” (corte 2004→2005)
-      forceBreakAfterYears: (app.mode === "compact") ? new Set([2004]) : null,
-
     xDomain,
     yDomain,
     formatValue,
@@ -2780,7 +2764,23 @@ function renderMappingTable(mapping, dataCsvParsed){
       yLabelRight: null,
       defaultOrderTooltip: null,
       topN: 15,
-      valueSorter: (a,b)=>tooltipSorter(a,b)
+      valueSorter: (a,b)=>tooltipSorter(a,b),
+
+      // Segmentación de líneas (PGE):
+      // - Si un año no existe en el dataset (años sin PGE), NO cortamos: continuidad.
+      // - Si el año sí existe (hubo PGE) pero una política no tiene registro, SÍ cortamos.
+      segmentBreakRule: (key, prevYear, nextYear, gap, ser) => {
+        const globalYears = app.pgeYearsByMode && app.pgeYearsByMode[app.mode];
+        if (!globalYears || !ser || !ser.xs) return true;
+        const yearSet = ser.__yearSet || (ser.__yearSet = new Set(ser.xs));
+        for (let y = prevYear + 1; y <= nextYear - 1; y++){
+          if (globalYears.has(y) && !yearSet.has(y)) return true;
+        }
+        return false;
+      },
+
+      // Vista compacta: separa “antes de 2004” vs “después de 2004” (corte 2004→2005)
+      forceBreakAfterYears: (app.mode === "compact") ? new Set([2004]) : null
     });
     window.__pge = { onShow: () => controller.onShow() };
   }
