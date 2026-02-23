@@ -2779,8 +2779,8 @@ function renderMappingTable(mapping, dataCsvParsed){
         return false;
       },
 
-      // Vista compacta: separa “antes de 2004” vs “después de 2004” (corte 2004→2005)
-      forceBreakAfterYears: (app.mode === "compact") ? new Set([2004]) : null
+      // Sin corte artificial por 2004
+      forceBreakAfterYears: null
     });
     window.__pge = { onShow: () => controller.onShow() };
   }
