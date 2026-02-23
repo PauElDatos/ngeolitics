@@ -1318,22 +1318,6 @@ function makeChartController(opts){
     seriesList,
     getValueAtYear,
     getSeriesForPath,
-      // Reglas de segmentación (solo aplica a PGE)
-      // - Vista completa (raw): permite continuidad si el/los años intermedios no existen en el dataset (años sin PGE).
-      //   Corta si el año intermedio sí existe (hubo PGE) pero esa política no tiene presupuesto.
-      segmentBreakRule: (app.mode === "raw") ? ((key, prevYear, nextYear, gap, ser) => {
-        const globalYears = app.pgeYearsByMode?.raw;
-        if (!globalYears || !ser || !ser.xs) return true;
-        const yearSet = ser.__yearSet || (ser.__yearSet = new Set(ser.xs));
-        for (let y = prevYear + 1; y <= nextYear - 1; y++){
-          if (globalYears.has(y) && !yearSet.has(y)) return true;
-        }
-        return false; // continuidad (los años intermedios no tienen PGE)
-      }) : null,
-
-      // - Vista compacta: separa “antes de 2004” vs “después de 2004” (corte 2004→2005)
-      forceBreakAfterYears: (app.mode === "compact") ? new Set([2004]) : null,
-
     xDomain,
     yDomain,
     formatValue,
@@ -1349,8 +1333,6 @@ function makeChartController(opts){
     topN,
     valueSorter,
     alwaysTooltip,
-    segmentBreakRule,
-    forceBreakAfterYears,
   } = opts;
 
   const state = {
@@ -1666,25 +1648,9 @@ function makeChartController(opts){
           continue;
         }
 
-        // Segmentación: por defecto cortamos cuando falta algún año intermedio.
-        // Opcionalmente:
-        //  - segmentBreakRule(key, prevYear, nextYear, gap, series) puede permitir continuidad (p.ej. años sin PGE)
-        //  - forceBreakAfterYears fuerza cortes incluso entre años consecutivos (p.ej. 2004→2005)
-        if (prevYear !== null){
-          const gap = year - prevYear;
-          let mustBreak = false;
-
-          if (gap > 1){
-            if (typeof segmentBreakRule === "function"){
-              mustBreak = !!segmentBreakRule(s.key, prevYear, year, gap, ser);
-            } else {
-              mustBreak = true;
-            }
-          } else if (gap === 1 && forceBreakAfterYears && forceBreakAfterYears.has(prevYear)){
-            mustBreak = true;
-          }
-
-          if (mustBreak) flushSeg();
+        // Si hay hueco (p.ej. falta un año intermedio), corta la línea
+        if (prevYear !== null && (year - prevYear) > 1){
+          flushSeg();
         }
 
         const x = xScale(year);
@@ -2658,13 +2624,6 @@ function renderMappingTable(mapping, dataCsvParsed){
     // Dominio X (unificado)
     const years = (prepCompact.years && prepCompact.years.length) ? prepCompact.years : (prepRaw.years || []);
     app.xDomain = { min: years[0] ?? 1986, max: years[years.length-1] ?? 2023 };
-
-    // Años con PGE disponible por modo (sirve para decidir continuidad de líneas)
-    app.pgeYearsByMode = {
-      compact: new Set(prepCompact.years || []),
-      raw: new Set(prepRaw.years || []),
-    };
-
 
     // Guardar mapping (tabla explicación, siempre visible)
     app.mappingRows = prepCompact.mapping || [];
