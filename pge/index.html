@@ -1299,10 +1299,6 @@ function interpAtYear(series, year){
   const i0 = i-1;
   if (i0 < 0 || i1 >= xs.length) return null;
   const x0 = xs[i0], x1 = xs[i1];
-
-  // No interpolar a través de huecos de años sin datos (evita “líneas completas” en vista completa)
-  if ((x1 - x0) > 1) return null;
-
   const y0 = ys[i0], y1 = ys[i1];
   if (!Number.isFinite(y0) || !Number.isFinite(y1)) return null;
   const t = (year - x0) / (x1 - x0);
@@ -1626,10 +1622,7 @@ function makeChartController(opts){
       const ser = getSeriesForPath(s.key);
       if (!ser || !ser.xs || ser.xs.length < 2) continue;
 
-      const segments = [];
-      let cur = [];
-      let prevYear = null;
-
+      const pts = [];
       for (let i=0;i<ser.xs.length;i++){
         const year = ser.xs[i];
         const v = ser.ys[i];
@@ -1647,22 +1640,11 @@ function makeChartController(opts){
         }
 
         if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
-
-        // Si hay hueco de años sin datos, empezamos un nuevo segmento (evita unir puntos lejanos)
-        if (cur.length && prevYear !== null && (year - prevYear) > 1){
-          segments.push(cur);
-          cur = [];
-        }
-        cur.push({x,y});
-        prevYear = year;
+        pts.push({x,y});
       }
-      if (cur.length) segments.push(cur);
+      if (pts.length < 2) continue;
 
-      const d = segments
-        .filter(seg => seg.length >= 2)
-        .map(seg => buildSmoothPathFromPoints(seg))
-        .filter(Boolean)
-        .join(" ");
+      const d = buildSmoothPathFromPoints(pts);
       if (!d) continue;
 
       const path = createSvgEl("path", {
@@ -2383,11 +2365,7 @@ function makeChartController(opts){
         const total = totalByYear.get(y);
         if (!Number.isFinite(total) || total === 0) continue;
 
-        // En vista completa: si una política no tiene dato en un año, NO dibujamos ese punto
-        if (!mp.has(y)) continue;
-        const v = mp.get(y);
-        if (!Number.isFinite(v) || v === 0) continue;
-
+        const v = mp.get(y) || 0;
         xs.push(y);
         ys.push((v / total) * 100);
       }
