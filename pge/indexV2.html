@@ -768,7 +768,7 @@
         <div class="ph">
           <div class="ttl">Políticas</div>
           <div class="sub">
-            <button class="btn" id="btnPre2004" title="Alternar entre vista compactada y vista completa">Vista completa</button>
+            <button class="btn" id="btnPre2004" title="Mostrar/ocultar partidas antiguas sin correspondencia (si existen)">Anteriores a 2004</button>
           </div>
         </div>
         <div class="pc">
@@ -2389,87 +2389,7 @@ function makeChartController(opts){
     return { series, labels_main, x999_labels, years, mapping, dup };
   }
 
-  
-  // ---------- Preparación de series (vista completa / bruto) ----------
-  function prepararSeriesPctBrutas(dataCsv){
-    const colsData = dataCsv.headers;
-    const rowsData = dataCsv.rows;
-
-    const c_id   = pickCol(colsData, ["id_politica","id politica","id"]);
-    const c_year = pickCol(colsData, ["año","ano","anio","year"]);
-    const c_pol  = pickCol(colsData, ["politica","política"]);
-    const c_val  = pickCol(colsData, ["presupuesto","valor","importe","amount"]);
-
-    if (!c_id || !c_year || !c_pol || !c_val){
-      throw new Error("pge_politicas_anio.csv: faltan columnas esperadas (id_politica / anio / politica / presupuesto).");
-    }
-
-    const sumByKeyYear = new Map(); // key -> Map(year->sum)
-    const nameByKey = new Map();    // key -> politica (tal cual)
-    const totalByYear = new Map();  // year -> total
-    const yearsSet = new Set();
-
-    for (const r of rowsData){
-      const id = normId(r[c_id]);
-      const year = Math.trunc(toNum(r[c_year]));
-      const polName = String(r[c_pol] ?? "").trim();
-      const val = toNum(r[c_val]);
-      if (!id || !Number.isFinite(year) || !polName || !Number.isFinite(val)) continue;
-
-      const polNorm = stripAccentsLower(polName);
-      const key = id + "||" + polNorm;
-
-      if (!sumByKeyYear.has(key)) sumByKeyYear.set(key, new Map());
-      const mp = sumByKeyYear.get(key);
-      mp.set(year, (mp.get(year) || 0) + val);
-
-      if (!nameByKey.has(key)) nameByKey.set(key, polName);
-
-      totalByYear.set(year, (totalByYear.get(year) || 0) + val);
-      yearsSet.add(year);
-    }
-
-    const years = Array.from(yearsSet).sort((a,b)=>a-b);
-
-    // Detecta colisiones de nombre (por si una misma "política" aparece con distintos IDs)
-    const nameCounts = new Map();
-    for (const [k, name] of nameByKey.entries()){
-      const nm = String(name || "").trim();
-      if (!nm) continue;
-      nameCounts.set(nm, (nameCounts.get(nm) || 0) + 1);
-    }
-
-    const series = new Map();
-    const labels = [];
-
-    for (const [key, mp] of sumByKeyYear.entries()){
-      const id = key.split("||")[0];
-      const baseName = nameByKey.get(key) || key;
-
-      // Si el nombre no es único, desambiguamos con el ID (solo en ese caso)
-      const label = (nameCounts.get(baseName) > 1) ? (`${id} · ${baseName}`) : baseName;
-
-      const xs = [];
-      const ys = [];
-      for (const y of years){
-        const total = totalByYear.get(y);
-        if (!Number.isFinite(total) || total === 0) continue;
-        const v = mp.get(y) || 0;
-        xs.push(y);
-        ys.push((v / total) * 100);
-      }
-
-      if (xs.length >= 2){
-        series.set(label, { xs, ys });
-        labels.push(label);
-      }
-    }
-
-    labels.sort((a,b)=>String(a).localeCompare(String(b), "es"));
-    return { series, labels, years };
-  }
-
-function renderMappingTable(mapping, dataCsvParsed){
+  function renderMappingTable(mapping, dataCsvParsed){
     if (!mapBodyEl) return;
     mapBodyEl.innerHTML = "";
 
@@ -2493,7 +2413,7 @@ function renderMappingTable(mapping, dataCsvParsed){
       const tr = document.createElement("tr");
 
       const tdM = document.createElement("td");
-      tdM.textContent = `${m.label}`;
+      tdM.textContent = `${m.id} — ${m.label}`;
 
       const tdO = document.createElement("td");
       if (!m.olds || !m.olds.length){
@@ -2502,7 +2422,7 @@ function renderMappingTable(mapping, dataCsvParsed){
         for (const it of m.olds){
           const d = document.createElement("span");
           d.className = "mapOldItem";
-          d.textContent = (it.name || it.pretty || "") + (exists.size ? (exists.has(it.key) ? "" : " (no encontrada)") : "");
+          d.textContent = it.pretty + (exists.size ? (exists.has(it.key) ? "" : " (no encontrada)") : "");
           tdO.appendChild(d);
         }
       }
@@ -2514,31 +2434,41 @@ function renderMappingTable(mapping, dataCsvParsed){
   }
 
   const app = {
-    mode: "compact",        // "compact" (agregado) | "raw" (bruto)
-    datasets: { compact: null, raw: null },
-
-    // Dataset activo (se rellena vía applyMode)
-    labels: [],
-    seriesByKey: new Map(),      // label -> {xs,ys}
-    yearValueByKey: new Map(),   // label -> Map(year->pct)
-    keyInfo: new Map(),          // label -> {label,color}
-
+    showPre2004: false,     // X999 sin correspondencia
+    seriesByKey: new Map(), // label -> {xs,ys}
+    yearValueByKey: new Map(), // label -> Map(year->pct)
+    keyInfo: new Map(),     // label -> {label,color,type}
+    labelsMain: [],
+    x999Labels: [],
     xDomain: {min:1986, max:2023},
-    mappingRows: [],             // mapping (solo vista compactada; tabla explicación)
-    dup: [],
+    mappingRows: [],
   };
+
   function buildSeriesList(){
     const out = [];
-    for (const lab of app.labels){
+    for (const lab of app.labelsMain){
       if (!app.seriesByKey.has(lab)) continue;
       const info = app.keyInfo.get(lab);
       out.push({
         key: lab,
         label: lab,
         color: info?.color || "rgba(176,176,176,.7)",
-        badge: (app.mode === "raw") ? "bruto" : "",
+        badge: "",
         axis: "left",
       });
+    }
+    if (app.showPre2004){
+      for (const lab of app.x999Labels){
+        if (!app.seriesByKey.has(lab)) continue;
+        const info = app.keyInfo.get(lab);
+        out.push({
+          key: lab,
+          label: lab,
+          color: info?.color || "rgba(176,176,176,.55)",
+          badge: "sin correspondencia",
+          axis: "left",
+        });
+      }
     }
     return out;
   }
@@ -2568,101 +2498,73 @@ function renderMappingTable(mapping, dataCsvParsed){
     const mapCsv = parseCSV(mapTxt);
     const dataCsv = parseCSV(dataTxt);
 
-    // A) Vista compactada (agregación por políticas modernas)
-    const prepCompact = prepararSeriesPctModernas(mapCsv, dataCsv);
-    if (!prepCompact || !prepCompact.series || !prepCompact.series.size){
+    const prep = prepararSeriesPctModernas(mapCsv, dataCsv);
+    if (!prep || !prep.series || !prep.series.size){
       throw new Error("No se pudieron preparar las series de PGE (revisa pge_politicas.csv / pge_politicas_anio.csv).");
     }
 
-    // B) Vista completa (bruto: todas las políticas de pge_politicas_anio.csv)
-    const prepRaw = prepararSeriesPctBrutas(dataCsv);
-    if (!prepRaw || !prepRaw.series || !prepRaw.series.size){
-      throw new Error("No se pudieron preparar las series brutas de PGE (revisa pge_politicas_anio.csv).");
-    }
+    app.seriesByKey.clear();
+    app.yearValueByKey.clear();
+    app.keyInfo.clear();
 
-    // Dominio X (unificado)
-    const years = (prepCompact.years && prepCompact.years.length) ? prepCompact.years : (prepRaw.years || []);
+    app.labelsMain = prep.labels_main || [];
+    app.x999Labels = prep.x999_labels || [];
+    app.mappingRows = prep.mapping || [];
+
+    // Dominio X
+    const years = (prep.years && prep.years.length) ? prep.years : [];
     app.xDomain = { min: years[0] ?? 1986, max: years[years.length-1] ?? 2023 };
 
-    // Guardar mapping (tabla explicación, siempre visible)
-    app.mappingRows = prepCompact.mapping || [];
-    app.dup = prepCompact.dup || [];
+    // Colores: modernas brillantes, X999 sin correspondencia más apagadas
+    const mainCols = colorList(app.labelsMain.length, 0.9, 1.0);
+    const xCols = colorList(app.x999Labels.length, 0.35, 0.95);
+    const colorMap = new Map();
+    app.labelsMain.forEach((lab,i)=> colorMap.set(lab, mainCols[i] || "rgb(176,176,176)"));
+    app.x999Labels.forEach((lab,i)=> colorMap.set(lab, xCols[i] || "rgba(176,176,176,.55)"));
 
-    // Helper: construir dataset (maps + colores) a partir de labels y series
-    function buildDataset(labels, seriesMap, sat, val){
-      const seriesByKey = new Map();
-      const yearValueByKey = new Map();
-      const keyInfo = new Map();
+    for (const [lab, ser] of prep.series.entries()){
+      app.seriesByKey.set(lab, ser);
+      const mp = new Map();
+      for (let i=0;i<ser.xs.length;i++) mp.set(ser.xs[i], ser.ys[i]);
+      app.yearValueByKey.set(lab, mp);
 
-      const cols = colorList(labels.length, sat, val);
-      const colorMap = new Map();
-      labels.forEach((lab,i)=> colorMap.set(lab, cols[i] || "rgb(176,176,176)"));
+      const tp = app.x999Labels.includes(lab) ? "x999" : "main";
+      app.keyInfo.set(lab, { label: lab, color: colorMap.get(lab), type: tp });
+    }
 
-      for (const lab of labels){
-        const ser = seriesMap.get(lab);
-        if (!ser) continue;
-
-        seriesByKey.set(lab, ser);
-
-        const mp = new Map();
-        for (let i=0;i<ser.xs.length;i++) mp.set(ser.xs[i], ser.ys[i]);
-        yearValueByKey.set(lab, mp);
-
-        keyInfo.set(lab, { label: lab, color: colorMap.get(lab) });
+    // UI: botón "Anteriores a 2004" solo si hay algo que mostrar
+    if (btnPre2004){
+      if (!app.x999Labels.length){
+        btnPre2004.classList.remove("on");
+        btnPre2004.style.opacity = "0.45";
+        btnPre2004.style.pointerEvents = "none";
+        btnPre2004.title = "No hay partidas X999 sin correspondencia en el CSV actual.";
+      } else {
+        btnPre2004.style.opacity = "";
+        btnPre2004.style.pointerEvents = "";
+        btnPre2004.title = "Mostrar/ocultar partidas antiguas sin correspondencia (si existen)";
       }
-
-      return { labels, seriesByKey, yearValueByKey, keyInfo };
     }
 
-    const dsCompact = buildDataset(prepCompact.labels_main || [], prepCompact.series, 0.9, 1.0);
-    const dsRaw = buildDataset(prepRaw.labels || [], prepRaw.series, 0.55, 0.95);
-
-    app.datasets.compact = dsCompact;
-    app.datasets.raw = dsRaw;
-
-    function updateModeButton(){
-      if (!btnPre2004) return;
-      const willGoRaw = (app.mode === "compact");
-      btnPre2004.classList.toggle("on", app.mode === "raw");
-      btnPre2004.textContent = willGoRaw ? "Vista completa" : "Vista compacta";
-      btnPre2004.title = willGoRaw
-        ? "Cambiar a vista completa: todas las políticas sin agregación (pge_politicas_anio.csv)"
-        : "Cambiar a vista compactada: políticas modernas agregadas (pge_politicas.csv + pge_politicas_anio.csv)";
-    }
-
-    function applyMode(mode){
-      const ds = app.datasets[mode];
-      if (!ds) return;
-
-      app.mode = mode;
-      app.labels = ds.labels || [];
-      app.seriesByKey = ds.seriesByKey;
-      app.yearValueByKey = ds.yearValueByKey;
-      app.keyInfo = ds.keyInfo;
-
-      updateModeButton();
-    }
-
-    // Activa el modo por defecto (compact)
-    applyMode(app.mode);
-
-    // Render tabla de correspondencias (sin IDs visibles)
+    // Render tabla de correspondencias
     renderMappingTable(app.mappingRows, dataCsv);
 
     if (unmappedNoteEl){
       const parts = [];
-      parts.push(`Vista compactada: <b>${dsCompact.labels.length}</b> políticas modernas. Vista completa: <b>${dsRaw.labels.length}</b> políticas (sin agregación).`);
-      parts.push(`Usa el botón <b>“${(app.mode === "compact") ? "Vista completa" : "Vista compacta"}”</b> para alternar.`);
+      if (app.x999Labels.length){
+        parts.push(`Hay <b>${app.x999Labels.length}</b> partidas <b>X999</b> en <code>pge_politicas_anio.csv</code> que no aparecen en la tabla de correspondencias.`);
+        parts.push(`Puedes verlas como series adicionales con el botón <b>“Anteriores a 2004”</b>.`);
+      } else {
+        parts.push("Todas las partidas X999 encontradas en <code>pge_politicas_anio.csv</code> están asignadas a alguna política moderna según <code>pge_politicas.csv</code>.");
+      }
 
-      if (app.dup && app.dup.length){
-        parts.push(`<span style="opacity:.95;">Nota técnica: se detectaron <b>${app.dup.length}</b> duplicidades en el mapping (una misma política antigua asignada a varias modernas). Si no era intencional, revisa <code>pge_politicas.csv</code>.</span>`);
+      // Duplicidades (si existen)
+      if (prep.dup && prep.dup.length){
+        parts.push(`<span style="opacity:.95;">Nota técnica: se detectaron <b>${prep.dup.length}</b> duplicidades en el mapping (una misma política antigua asignada a varias modernas). Si no era intencional, revisa <code>pge_politicas.csv</code>.</span>`);
       }
 
       unmappedNoteEl.innerHTML = parts.join(" ");
     }
-
-    // Exponer applyMode / update UI para el handler del botón
-    app.__applyMode = applyMode;
   }
 
   try{
@@ -2705,8 +2607,9 @@ function renderMappingTable(mapping, dataCsvParsed){
 
   if (btnPre2004){
     btnPre2004.addEventListener("click", () => {
-      const next = (app.mode === "compact") ? "raw" : "compact";
-      if (typeof app.__applyMode === "function") app.__applyMode(next);
+      if (!app.x999Labels.length) return;
+      app.showPre2004 = !app.showPre2004;
+      btnPre2004.classList.toggle("on", app.showPre2004);
       rebuild();
     });
   }
@@ -3440,10 +3343,6 @@ try{
     ? niceTicks(rightMin, rightMax)
     : null;
 
-  const yLabelLeftMarkers = seriesDefs.filter(s=>s.axis==="left").map(s=>s.color);
-  const yLabelRightMarkers = seriesDefs.filter(s=>s.axis==="right").map(s=>s.color);
-
-
   const controller = makeChartController({
     svg, wrap, tooltipEl, errorEl,
     legendEl,
@@ -3459,8 +3358,6 @@ try{
     alwaysTooltip: true,
     yLabelLeft: "Porcentaje (%)",
     yLabelRight: rightTicks ? "Esfuerzo fiscal (índice)" : null,
-    yLabelLeftMarkers,
-    yLabelRightMarkers,
     defaultOrderTooltip: ["pf","gp","ef"],
     topN: 0
   });
