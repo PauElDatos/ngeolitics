@@ -3375,7 +3375,6 @@ try{
     xDomain: { min: 1986, max: 2023 },
     series: new Map(),
     yearVal: new Map(),
-    yearsPresent: new Set(), // años que existen en el dataset (aunque alguna serie no tenga valor)
   };
 
   const seriesDefs = [
@@ -3447,15 +3446,12 @@ try{
 
     const mpByKey = new Map(seriesDefs.map(sd => [sd.key, new Map()]));
     const yearsOk = [];
-    const yearsAll = new Set();
 
     for (const r of csv.rows){
       const year = Math.round(toNum(r[cYear]));
       if (!Number.isFinite(year)) continue;
       if (year < 1986 || year > 2023) continue;
 
-      // Año presente en el dataset (sirve para decidir continuidad vs corte)
-      yearsAll.add(year);
       let any = false;
       for (const sd of seriesDefs){
         const v = toNum(r[cols.get(sd.key)]);
@@ -3466,9 +3462,6 @@ try{
       }
       if (any) yearsOk.push(year);
     }
-
-    app.yearsPresent = yearsAll;
-
 
     if (!yearsOk.length){
       throw new Error("No hay datos válidos en el rango 1986–2023 para las series seleccionadas.");
@@ -3551,20 +3544,7 @@ try{
     yLabelLeftMarkers,
     yLabelRightMarkers,
     defaultOrderTooltip: ["pf","gp","ef"],
-    topN: 0,
-
-    // Segmentación de líneas (misma lógica que PGE):
-    // - Si un año intermedio NO existe en el dataset, permitimos continuidad (no cortamos).
-    // - Si el año SÍ existe en el dataset pero esta serie no tiene valor, cortamos.
-    segmentBreakRule: (key, prevYear, nextYear, gap, ser) => {
-      const globalYears = app.yearsPresent;
-      if (!globalYears || !ser || !ser.xs) return true;
-      const yearSet = ser.__yearSet || (ser.__yearSet = new Set(ser.xs));
-      for (let y = prevYear + 1; y <= nextYear - 1; y++){
-        if (globalYears.has(y) && !yearSet.has(y)) return true;
-      }
-      return false;
-    }
+    topN: 0
   });
 
   if (btnPolBands){
