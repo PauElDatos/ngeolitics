@@ -3402,30 +3402,9 @@ try{
   function getSeriesForPath(key){ return app.series.get(key) || null; }
   function getValueAtYear(key, year){
     const mp = app.yearVal.get(key);
-    const ser = app.series.get(key);
-    if (!mp || !ser || !ser.xs || !ser.xs.length) return null;
-
-    // Valor directo (si existe)
-    const v0 = mp.get(year);
-    if (Number.isFinite(v0)) return v0;
-
-    // Interpolación lineal para años sin dato (mantiene continuidad visual y en tooltip)
-    const xs = ser.xs;
-    const ys = ser.ys;
-
-    // year fuera de rango
-    if (year < xs[0] || year > xs[xs.length - 1]) return null;
-
-    const i1 = lowerBound(xs, year);
-    const i0 = i1 - 1;
-    if (i0 < 0 || i1 >= xs.length) return null;
-
-    const x0 = xs[i0], x1 = xs[i1];
-    const y0 = ys[i0], y1 = ys[i1];
-    if (!Number.isFinite(y0) || !Number.isFinite(y1) || !Number.isFinite(x0) || !Number.isFinite(x1) || x1 === x0) return null;
-
-    const t = (year - x0) / (x1 - x0);
-    return y0 + t * (y1 - y0);
+    if (!mp) return null;
+    const v = mp.get(year);
+    return Number.isFinite(v) ? v : null;
   }
 
   function formatValue(key, v){
@@ -3574,9 +3553,18 @@ try{
     defaultOrderTooltip: ["pf","gp","ef"],
     topN: 0,
 
-    // Continuidad de líneas (sin cortes):
-    // - Conectamos el último año con dato con el siguiente, aunque haya años intermedios sin dato.
-    segmentBreakRule: () => false
+    // Segmentación de líneas (misma lógica que PGE):
+    // - Si un año intermedio NO existe en el dataset, permitimos continuidad (no cortamos).
+    // - Si el año SÍ existe en el dataset pero esta serie no tiene valor, cortamos.
+    segmentBreakRule: (key, prevYear, nextYear, gap, ser) => {
+      const globalYears = app.yearsPresent;
+      if (!globalYears || !ser || !ser.xs) return true;
+      const yearSet = ser.__yearSet || (ser.__yearSet = new Set(ser.xs));
+      for (let y = prevYear + 1; y <= nextYear - 1; y++){
+        if (globalYears.has(y) && !yearSet.has(y)) return true;
+      }
+      return false;
+    }
   });
 
   if (btnPolBands){
