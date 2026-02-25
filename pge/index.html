@@ -2295,7 +2295,7 @@ function makeChartController(opts){
     const mapping = [];
     const usedOldKeys = new Set();
     const oldKeyToModern = new Map();
-
+    const allowDupOldKeys = new Set(); // oldKeys duplicados de forma intencional (no avisar)
     for (const r of rowsMap){
       const modId = normId(r[c_mod_id]);
       const modLabel = String(r[c_mod_pol] ?? "").trim();
@@ -2326,6 +2326,34 @@ function makeChartController(opts){
       const nb = /^\d+$/.test(b.id) ? parseInt(b.id, 10) : 9999;
       return na - nb || a.id.localeCompare(b.id);
     });
+
+    // --- PATCH (2026-02-25): integrar 'Pensiones' (05) también dentro de la política moderna 12
+    //     'Gestión y administración de la inclusión, de la Seguridad Social y de la migración',
+    //     para visualizar una serie continua (pensiones históricas + pensiones futuras) en esa política.
+    (function(){
+      try{
+        const m05 = mapping.find(x => x.id === "05");
+        const m12 = mapping.find(x => x.id === "12");
+        if (!m05 || !m12) return;
+
+        const existing = new Set((m12.olds || []).map(o => o.key));
+        for (const it of (m05.olds || [])){
+          if (!it || !it.key) continue;
+          if (existing.has(it.key)) continue;
+
+          // Añadimos la partida antigua de pensiones a la política 12
+          m12.olds.push(it);
+          existing.add(it.key);
+
+          // Marcamos como duplicidad intencional para no mostrar aviso técnico
+          allowDupOldKeys.add(it.key);
+
+          // Actualizamos el tracking interno (por si se usa para diagnósticos)
+          if (!oldKeyToModern.has(it.key)) oldKeyToModern.set(it.key, []);
+          oldKeyToModern.get(it.key).push("12");
+        }
+      }catch(e){}
+    })();
 
     // 2) Agrega datos anuales por (id+política)
     const colsData = dataCsv.headers;
@@ -2439,7 +2467,7 @@ function makeChartController(opts){
     const dup = [];
     for (const [k, arr] of oldKeyToModern.entries()){
       const uniq = Array.from(new Set(arr));
-      if (uniq.length > 1){
+      if (uniq.length > 1 && !allowDupOldKeys.has(k)){
         dup.push({ oldKey: k, modernIds: uniq });
       }
     }
@@ -2576,7 +2604,6 @@ function renderMappingTable(mapping, dataCsvParsed){
     mode: "compact",        // "compact" (agregado) | "raw" (bruto)
     datasets: { compact: null, raw: null },
 
-    hasPensionesFuturo: false,
     // Dataset activo (se rellena vía applyMode)
     labels: [],
     seriesByKey: new Map(),      // label -> {xs,ys}
@@ -2633,66 +2660,6 @@ function renderMappingTable(mapping, dataCsvParsed){
     if (!prepCompact || !prepCompact.series || !prepCompact.series.size){
       throw new Error("No se pudieron preparar las series de PGE (revisa pge_politicas.csv / pge_politicas_anio.csv).");
     }
-
-    // (Opcional) Extender la serie "Pensiones" con datos adicionales (p.ej. “pensiones del futuro”).
-    // Si existe un archivo local "pensiones_futuro.csv", se sumará (por año) a la serie compactada "Pensiones".
-    // Formato esperado (flexible): columnas año (anio/año/year) + valor (valor/pct/porcentaje/presupuesto_pct/pensiones_pct).
-    let hasPensionesFuturo = false;
-    try{
-      const futTxt = await fetchText("pensiones_futuro.csv");
-      const futCsv = parseCSV(futTxt);
-      const fh = futCsv.headers || [];
-      const cY = pickCol(fh, ["año","ano","anio","year"]);
-      const cV = pickCol(fh, ["valor","pct","porcentaje","presupuesto_pct","presupuesto_pct_pge","pensiones_pct","pensiones"]);
-      if (cY && cV){
-        const futByYear = new Map();
-        for (const r of (futCsv.rows || [])){
-          const y = Math.round(toNum(r[cY]));
-          const v = toNum(r[cV]);
-          if (!Number.isFinite(y) || !Number.isFinite(v)) continue;
-          futByYear.set(y, (futByYear.get(y) ?? 0) + v);
-        }
-
-        if (futByYear.size){
-          const targetLabel = Array.from(prepCompact.series.keys()).find(k => stripAccentsLower(k) === "pensiones");
-          if (targetLabel){
-            const ser = prepCompact.series.get(targetLabel);
-            if (ser && Array.isArray(ser.xs) && Array.isArray(ser.ys)){
-              const idxByYear = new Map();
-              for (let i=0;i<ser.xs.length;i++) idxByYear.set(ser.xs[i], i);
-
-              for (const [y,v] of futByYear.entries()){
-                if (idxByYear.has(y)){
-                  const i = idxByYear.get(y);
-                  const base = ser.ys[i];
-                  ser.ys[i] = (Number.isFinite(base) ? base : 0) + v;
-                } else {
-                  ser.xs.push(y);
-                  ser.ys.push(v);
-                }
-              }
-
-              // Ordenar por año
-              const zipped = ser.xs.map((x,i)=>({x, y: ser.ys[i]})).sort((a,b)=>a.x-b.x);
-              ser.xs = zipped.map(o=>o.x);
-              ser.ys = zipped.map(o=>o.y);
-
-              // Actualizar lista de años del modo compactado
-              const yearSet = new Set(prepCompact.years || []);
-              for (const y of ser.xs) yearSet.add(y);
-              prepCompact.years = Array.from(yearSet).sort((a,b)=>a-b);
-
-              hasPensionesFuturo = true;
-            }
-          }
-        }
-      }
-    } catch(e){
-      // Si no existe el archivo o falla su parseo, simplemente seguimos sin extensión.
-      hasPensionesFuturo = false;
-    }
-    app.hasPensionesFuturo = hasPensionesFuturo;
-
 
     // B) Vista completa (bruto: todas las políticas de pge_politicas_anio.csv)
     const prepRaw = prepararSeriesPctBrutas(dataCsv);
@@ -2783,11 +2750,6 @@ function renderMappingTable(mapping, dataCsvParsed){
 
       if (app.dup && app.dup.length){
         parts.push(`<span style="opacity:.95;">Nota técnica: se detectaron <b>${app.dup.length}</b> duplicidades en el mapping (una misma política antigua asignada a varias modernas). Si no era intencional, revisa <code>pge_politicas.csv</code>.</span>`);
-      }
-
-      
-      if (app.hasPensionesFuturo){
-        parts.push(`<span style="opacity:.95;">La serie <b>Pensiones</b> se ha extendido con datos de <code>pensiones_futuro.csv</code> (útil para añadir “pensiones del futuro”; por ejemplo, a partir de <a href="https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Tax_revenue_statistics" target="_blank" rel="noopener">Eurostat</a>).</span>`);
       }
 
       unmappedNoteEl.innerHTML = parts.join(" ");
