@@ -2576,7 +2576,6 @@ function renderMappingTable(mapping, dataCsvParsed){
     mode: "compact",        // "compact" (agregado) | "raw" (bruto)
     datasets: { compact: null, raw: null },
 
-    hasPensionesFuturo: false,
     // Dataset activo (se rellena vía applyMode)
     labels: [],
     seriesByKey: new Map(),      // label -> {xs,ys}
@@ -2633,66 +2632,6 @@ function renderMappingTable(mapping, dataCsvParsed){
     if (!prepCompact || !prepCompact.series || !prepCompact.series.size){
       throw new Error("No se pudieron preparar las series de PGE (revisa pge_politicas.csv / pge_politicas_anio.csv).");
     }
-
-    // (Opcional) Extender la serie "Pensiones" con datos adicionales (p.ej. “pensiones del futuro”).
-    // Si existe un archivo local "pensiones_futuro.csv", se sumará (por año) a la serie compactada "Pensiones".
-    // Formato esperado (flexible): columnas año (anio/año/year) + valor (valor/pct/porcentaje/presupuesto_pct/pensiones_pct).
-    let hasPensionesFuturo = false;
-    try{
-      const futTxt = await fetchText("pensiones_futuro.csv");
-      const futCsv = parseCSV(futTxt);
-      const fh = futCsv.headers || [];
-      const cY = pickCol(fh, ["año","ano","anio","year"]);
-      const cV = pickCol(fh, ["valor","pct","porcentaje","presupuesto_pct","presupuesto_pct_pge","pensiones_pct","pensiones"]);
-      if (cY && cV){
-        const futByYear = new Map();
-        for (const r of (futCsv.rows || [])){
-          const y = Math.round(toNum(r[cY]));
-          const v = toNum(r[cV]);
-          if (!Number.isFinite(y) || !Number.isFinite(v)) continue;
-          futByYear.set(y, (futByYear.get(y) ?? 0) + v);
-        }
-
-        if (futByYear.size){
-          const targetLabel = Array.from(prepCompact.series.keys()).find(k => stripAccentsLower(k) === "pensiones");
-          if (targetLabel){
-            const ser = prepCompact.series.get(targetLabel);
-            if (ser && Array.isArray(ser.xs) && Array.isArray(ser.ys)){
-              const idxByYear = new Map();
-              for (let i=0;i<ser.xs.length;i++) idxByYear.set(ser.xs[i], i);
-
-              for (const [y,v] of futByYear.entries()){
-                if (idxByYear.has(y)){
-                  const i = idxByYear.get(y);
-                  const base = ser.ys[i];
-                  ser.ys[i] = (Number.isFinite(base) ? base : 0) + v;
-                } else {
-                  ser.xs.push(y);
-                  ser.ys.push(v);
-                }
-              }
-
-              // Ordenar por año
-              const zipped = ser.xs.map((x,i)=>({x, y: ser.ys[i]})).sort((a,b)=>a.x-b.x);
-              ser.xs = zipped.map(o=>o.x);
-              ser.ys = zipped.map(o=>o.y);
-
-              // Actualizar lista de años del modo compactado
-              const yearSet = new Set(prepCompact.years || []);
-              for (const y of ser.xs) yearSet.add(y);
-              prepCompact.years = Array.from(yearSet).sort((a,b)=>a-b);
-
-              hasPensionesFuturo = true;
-            }
-          }
-        }
-      }
-    } catch(e){
-      // Si no existe el archivo o falla su parseo, simplemente seguimos sin extensión.
-      hasPensionesFuturo = false;
-    }
-    app.hasPensionesFuturo = hasPensionesFuturo;
-
 
     // B) Vista completa (bruto: todas las políticas de pge_politicas_anio.csv)
     const prepRaw = prepararSeriesPctBrutas(dataCsv);
@@ -2783,11 +2722,6 @@ function renderMappingTable(mapping, dataCsvParsed){
 
       if (app.dup && app.dup.length){
         parts.push(`<span style="opacity:.95;">Nota técnica: se detectaron <b>${app.dup.length}</b> duplicidades en el mapping (una misma política antigua asignada a varias modernas). Si no era intencional, revisa <code>pge_politicas.csv</code>.</span>`);
-      }
-
-      
-      if (app.hasPensionesFuturo){
-        parts.push(`<span style="opacity:.95;">La serie <b>Pensiones</b> se ha extendido con datos de <code>pensiones_futuro.csv</code> (útil para añadir “pensiones del futuro”; por ejemplo, a partir de <a href="https://ec.europa.eu/eurostat/statistics-explained/index.php?title=Tax_revenue_statistics" target="_blank" rel="noopener">Eurostat</a>).</span>`);
       }
 
       unmappedNoteEl.innerHTML = parts.join(" ");
