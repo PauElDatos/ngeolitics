@@ -2528,86 +2528,6 @@ function makeChartController(opts){
     return { series, labels, years };
   }
 
-
-
-  // ---------- Serie analítica: Presión SS (amplia) ----------
-  // Construye una serie sintética (% del total) sumando:
-  //  - 1986–2004: Seguridad Social/Protección Social + Promoción Social
-  //  - 2005–2023: Pensiones + Otras prestaciones + Servicios sociales + Desempleo + Gestión/Administración SS (y variantes)
-  function normPolicyName(s){
-    return stripAccentsLower(s).replace(/[^\p{L}\p{N} ]/gu, " ").replace(/\s+/g, " ").trim();
-  }
-
-  function prepararSeriePresionSS(dataCsv, label = SS_ANALYTIC_LABEL){
-    const colsData = dataCsv.headers;
-    const rowsData = dataCsv.rows;
-
-    const c_year = pickCol(colsData, ["año","ano","anio","year"]);
-    const c_pol  = pickCol(colsData, ["politica","política"]);
-    const c_val  = pickCol(colsData, ["presupuesto","valor","importe","amount"]);
-
-    if (!c_year || !c_pol || !c_val){
-      throw new Error("pge_politicas_anio.csv: faltan columnas requeridas para calcular Presión SS (anio, politica, presupuesto).");
-    }
-
-    const SS_EXACT = new Set([
-      "seguridad social y proteccion social",
-      "seguridad y proteccion social",
-      "promocion social",
-      "pensiones",
-      "otras prestaciones economicas",
-      "servicios sociales y promocion social",
-      "desempleo",
-      "gestion y administracion de la seguridad social",
-      "gestion y administracion de la inclusion de la seguridad social y de la migracion",
-    ]);
-
-    function isSS(polName){
-      const n = normPolicyName(polName);
-      if (!n) return false;
-      if (SS_EXACT.has(n)) return true;
-      // fallback: cubre pequeñas variaciones de texto mientras mantenga el núcleo "gestión + seguridad social"
-      if (n.startsWith("gestion y administracion") && n.includes("seguridad social")) return true;
-      return false;
-    }
-
-    const totalByYear = new Map(); // year -> total presupuesto
-    const ssByYear = new Map();    // year -> suma SS (amplia)
-    const yearsSet = new Set();
-
-    for (const r of rowsData){
-      const year = Math.trunc(toNum(r[c_year]));
-      const polName = String(r[c_pol] ?? "").trim();
-      const val = toNum(r[c_val]);
-
-      if (!Number.isFinite(year) || !polName || !Number.isFinite(val)) continue;
-
-      totalByYear.set(year, (totalByYear.get(year) || 0) + val);
-      yearsSet.add(year);
-
-      if (isSS(polName)){
-        ssByYear.set(year, (ssByYear.get(year) || 0) + val);
-      }
-    }
-
-    const years = Array.from(yearsSet).sort((a,b)=>a-b);
-    const xs = [];
-    const ys = [];
-
-    for (const y of years){
-      const total = totalByYear.get(y);
-      const ss = ssByYear.get(y);
-      if (!Number.isFinite(total) || total <= 0) continue;
-      if (!Number.isFinite(ss)) continue;
-      xs.push(y);
-      ys.push((ss / total) * 100);
-    }
-
-    const ser = (xs.length >= 2) ? { xs, ys } : null;
-    return { label, ser, years };
-  }
-
-
 function renderMappingTable(mapping, dataCsvParsed){
     if (!mapBodyEl) return;
     mapBodyEl.innerHTML = "";
@@ -2666,11 +2586,6 @@ function renderMappingTable(mapping, dataCsvParsed){
     mappingRows: [],             // mapping (solo vista compactada; tabla explicación)
     dup: [],
   };
-
-  // Serie analítica (capa): presión de Seguridad Social (amplia)
-  const SS_ANALYTIC_LABEL = "Presión SS (amplia)";
-  const SS_ANALYTIC_COLOR = "#FF3D8D";
-
   function buildSeriesList(){
     const out = [];
     for (const lab of app.labels){
@@ -2680,7 +2595,7 @@ function renderMappingTable(mapping, dataCsvParsed){
         key: lab,
         label: lab,
         color: info?.color || "rgba(176,176,176,.7)",
-        badge: (lab === SS_ANALYTIC_LABEL) ? "analítica" : ((app.mode === "raw") ? "bruto" : ""),
+        badge: (app.mode === "raw") ? "bruto" : "",
         axis: "left",
       });
     }
@@ -2723,22 +2638,6 @@ function renderMappingTable(mapping, dataCsvParsed){
     if (!prepRaw || !prepRaw.series || !prepRaw.series.size){
       throw new Error("No se pudieron preparar las series brutas de PGE (revisa pge_politicas_anio.csv).");
     }
-
-    // C) Serie analítica: Presión SS (amplia) (capa propia, calculada desde el bruto)
-    const ssAnalitica = prepararSeriePresionSS(dataCsv, SS_ANALYTIC_LABEL);
-    if (ssAnalitica && ssAnalitica.ser && ssAnalitica.ser.xs && ssAnalitica.ser.xs.length >= 2){
-      // Añadimos la serie a ambos modos (compacto y bruto) para poder compararla con cualquier vista
-      prepRaw.series.set(ssAnalitica.label, ssAnalitica.ser);
-      if (Array.isArray(prepRaw.labels) && !prepRaw.labels.includes(ssAnalitica.label)){
-        prepRaw.labels.unshift(ssAnalitica.label);
-      }
-
-      prepCompact.series.set(ssAnalitica.label, ssAnalitica.ser);
-      if (Array.isArray(prepCompact.labels_main) && !prepCompact.labels_main.includes(ssAnalitica.label)){
-        prepCompact.labels_main.unshift(ssAnalitica.label);
-      }
-    }
-
 
     // Dominio X (unificado)
     const years = (prepCompact.years && prepCompact.years.length) ? prepCompact.years : (prepRaw.years || []);
@@ -2783,15 +2682,6 @@ function renderMappingTable(mapping, dataCsvParsed){
 
     const dsCompact = buildDataset(prepCompact.labels_main || [], prepCompact.series, 0.9, 1.0);
     const dsRaw = buildDataset(prepRaw.labels || [], prepRaw.series, 0.55, 0.95);
-
-    // Fuerza un color estable para la serie analítica SS (así se reconoce siempre)
-    if (dsCompact && dsCompact.keyInfo && dsCompact.keyInfo.has(SS_ANALYTIC_LABEL)){
-      dsCompact.keyInfo.set(SS_ANALYTIC_LABEL, { label: SS_ANALYTIC_LABEL, color: SS_ANALYTIC_COLOR });
-    }
-    if (dsRaw && dsRaw.keyInfo && dsRaw.keyInfo.has(SS_ANALYTIC_LABEL)){
-      dsRaw.keyInfo.set(SS_ANALYTIC_LABEL, { label: SS_ANALYTIC_LABEL, color: SS_ANALYTIC_COLOR });
-    }
-
 
     app.datasets.compact = dsCompact;
     app.datasets.raw = dsRaw;
