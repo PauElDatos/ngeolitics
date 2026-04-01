@@ -833,17 +833,10 @@
               indicadas en <code>pge_politicas.csv</code>.
             </div>
             <div style="margin-top:8px;">
-              Además, la serie <b>Presión SS (amplia)</b> es una serie analítica creada para ver mejor el <b>agregado real del gasto ligado a pensiones y protección social</b> a lo largo del tiempo, aunque el BOE haya ido cambiando nombres y agrupaciones.
-            </div>
-            <div style="margin-top:8px;">
-              Esta serie agrupa estas políticas:
-              <ul>
-                <li><b>1986–2004:</b> Seguridad Social / Protección Social + Promoción Social.</li>
-                <li><b>2005–2023:</b> Pensiones + Otras prestaciones económicas + Servicios sociales y promoción social + Desempleo + Gestión y administración de la Seguridad Social + Gestión y administración de la inclusión, de la Seguridad Social y de la migración.</li>
-              </ul>
-            </div>
-            <div style="margin-top:8px;">
               La tabla siguiente indica la correspondencia usada (columna <code>politicas_antiguas_encontradas</code> → serie moderna).
+            </div>
+            <div style="margin-top:8px;">
+              Todos estos datos también podrás encontrarlos en Patreon.
             </div>
           </div>
 
@@ -897,7 +890,7 @@
           <div class="chartControls">
             <button class="btn" id="btnCrosshairGB">Línea vertical: OFF</button>
             <button class="btn on" id="btnPolBandsGB" title="Mostrar/ocultar colores de presidencias">Políticos: ON</button>
-            <button class="btn on" id="btnPopGB" title="Mostrar/ocultar flechas de variación de población">Población: ON</button>
+            <button class="btn" id="btnPopGB" title="Mostrar/ocultar flechas de variación de población">Población: OFF</button>
               <button class="btn" id="btnExplainGB" title="Ir a la explicación">Explicación</button>
 </div>
 
@@ -1007,9 +1000,27 @@
       </div>
       <div class="pc">
       <div class="explainBox" id="paExplain">
-                <div class="explainTitle">Definiciones</div>
+                <div class="explainTitle">Qué mide la “presión fiscal” aquí</div>
                 <div class="explainText">
-                  <div><b>Presión fiscal</b><br>Mide cuánto recauda el Estado sobre la economía.</div>
+                  <div>El CSV <code>indicadores_estado_a_1986.csv</code> ya trae la serie en porcentaje: <code>presion_fiscal_real_1986_pct</code>.</div>
+                  <div style="margin-top:8px;">En esta sección mostramos 3 series del CSV:</div>
+                  <ul style="margin:6px 0 0 18px; padding:0; line-height:1.45;">
+                    <li><code>presion_fiscal_real_1986_pct</code> (Presión fiscal, % del PIB real 1986)</li>
+                    <li><code>gasto_publico_per_capita_pct_1986</code> (Presión de gasto público, % del PIB real per cápita 1986)</li>
+                    <li><code>esfuerzo_fiscal_simple</code> (Esfuerzo fiscal simple, índice; se dibuja en el eje derecho)</li>
+                  </ul>
+                  <div style="margin-top:8px;">
+                    La interpretación es:
+                    <div style="margin:6px 0 0 0;"><b>Presión fiscal (%)</b> = 100 × ( <b>Ingresos fiscales reales (1986)</b> ÷ <b>PIB real (1986)</b> )</div>
+                    <div style="opacity:.95; margin-top:6px;">
+                      Donde “ingresos fiscales” suelen recoger impuestos + cotizaciones sociales (según las fuentes del propio CSV).
+                    </div>
+                  </div>
+                  <div style="margin-top:8px;">
+                    Nota: aquí lo mostramos tal cual viene en el CSV para asegurar coherencia y evitar recalcular con supuestos distintos.
+                  </div>
+                  <div style="margin-top:12px;"><b>Diferencia rápida</b></div>
+                  <div style="margin-top:6px;"><b>Presión fiscal</b><br>Mide cuánto recauda el Estado sobre la economía.</div>
                   <div style="margin-top:8px;"><b>Presión de gasto público</b><br>Mide cuánto gasta el Estado sobre la economía.</div>
                   <div style="margin-top:8px;"><b>Esfuerzo fiscal simple</b><br>Mide cómo de pesada resulta esa carga fiscal según la renta de la población.</div>
                   <div class="explainText" id="patreonNotePA" style="margin-top:12px; padding:0;"></div>
@@ -2951,7 +2962,7 @@ function renderMappingTable(mapping, dataCsvParsed){
   const btnPolBands = document.getElementById("btnPolBandsGB");
   const btnPop = document.getElementById("btnPopGB");
   let showPresBands = true;
-  let showPop = true;
+  let showPop = false;
   let popTableData = [];
 
   // Explicación (botón de pulso: hace scroll; no mantiene estado ON/OFF)
