@@ -28,11 +28,6 @@
   </script>
 <title>Entendiendo la economía de España</title>
 
-  <script>
-    // Cambia aquí el enlace cuando tengas tu página definitiva
-    const PATREON_URL = "https://www.patreon.com/c/NGeolitics?vanity=user";
-  </script>
-
   <style>
 
     :root{
@@ -539,14 +534,6 @@
       font-size: calc(11px * var(--uiScale));
       color: rgba(255,255,255,.9);
     }
-    .explainText a{
-      color: var(--primary);
-      text-decoration: none;
-      border-bottom: 1px solid rgba(254,247,2,.35);
-    }
-    .explainText a:hover{
-      border-bottom-color: rgba(254,247,2,.8);
-    }
 
 
     /* --- Explicación desplegable (GB/PA) --- */
@@ -835,9 +822,6 @@
             <div style="margin-top:8px;">
               La tabla siguiente indica la correspondencia usada (columna <code>politicas_antiguas_encontradas</code> → serie moderna).
             </div>
-            <div style="margin-top:8px;">
-              Todos estos datos también podrás encontrarlos en Patreon.
-            </div>
           </div>
 
           <div class="mapTableScroll" aria-label="Tabla de correspondencias PGE: políticas modernas y políticas antiguas agregadas">
@@ -853,7 +837,6 @@
           </div>
 
           <div class="explainText" id="pgeUnmappedNote" style="margin-top:10px; opacity:.95;"></div>
-          <div class="explainText" id="patreonNotePGE" style="margin-top:12px;"></div>
         </div>
       </div>
     </section>
@@ -931,18 +914,18 @@
                 <div class="explainTitle">Cómo leer estas series</div>
                 <div class="explainText">
                   <div><b>PIB total</b> y <b>Gasto público total</b> están en euros reales de 1986 (miles de millones).</div>
+                  <div><b>Per cápita</b> significa “por persona”: se divide entre la <b>población total</b> del año.</div>
                   <div style="margin-top:8px;">
                     Reglas rápidas:
                     <ul>
-                      <li>Si el <b>Gasto público total</b> crece igual que la <b>población</b> → <b>Gasto público per cápita</b> se mantiene plano.</li>
-                      <li>Si la <b>población</b> crece más rápido que el <b>Gasto público total</b> → <b>Gasto público per cápita</b> baja.</li>
-                      <li>Si el <b>Gasto público total</b> crece más rápido que la <b>población</b> → <b>Gasto público per cápita</b> sube.</li>
+                      <li>Si el <b>gasto total</b> crece igual que la <b>población</b> → <b>gasto per cápita</b> se mantiene plano.</li>
+                      <li>Si la <b>población</b> crece más rápido que el <b>gasto</b> → <b>gasto per cápita</b> baja.</li>
+                      <li>Si el <b>gasto</b> crece más rápido que la <b>población</b> → <b>gasto per cápita</b> sube.</li>
                     </ul>
                   </div>
                   <div style="margin-top:6px; opacity:.95;">
-                    Tip: pasa el cursor por los porcentajes de cada mandato (<b>PIB total</b> / <b>PIB per cápita</b> / <b>Gasto público total</b> / <b>Gasto público per cápita</b>) para resaltar en el gráfico <b>solo ese tramo temporal</b>.
+                    Tip: pasa el cursor por los porcentajes de cada mandato (PIB / PIB pc / Gto / Gto pc) para resaltar en el gráfico <b>solo ese tramo temporal</b>.
                   </div>
-                  <div class="explainText" id="patreonNoteGB" style="margin-top:12px; padding:0;"></div>
                 </div>
               </div>
       </div>
@@ -1002,13 +985,13 @@
       <div class="explainBox" id="paExplain">
                 <div class="explainTitle">Qué mide la “presión fiscal” aquí</div>
                 <div class="explainText">
-                  <div>El CSV <code>indicadores_estado_a_1986.csv</code> ya trae la serie en porcentaje: <code>presion_fiscal_real_1986_pct</code>.</div>
+                  <div>El CSV <code>indicadores_estado_a_1986.csv</code> ya trae la serie en porcentaje: <code>presion_fiscal_real_1986_pct</code>.
                   <div style="margin-top:8px;">En esta sección mostramos 3 series del CSV:</div>
                   <ul style="margin:6px 0 0 18px; padding:0; line-height:1.45;">
                     <li><code>presion_fiscal_real_1986_pct</code> (Presión fiscal, % del PIB real 1986)</li>
                     <li><code>gasto_publico_per_capita_pct_1986</code> (Presión de gasto público, % del PIB real per cápita 1986)</li>
                     <li><code>esfuerzo_fiscal_simple</code> (Esfuerzo fiscal simple, índice; se dibuja en el eje derecho)</li>
-                  </ul>
+                  </ul></div>
                   <div style="margin-top:8px;">
                     La interpretación es:
                     <div style="margin:6px 0 0 0;"><b>Presión fiscal (%)</b> = 100 × ( <b>Ingresos fiscales reales (1986)</b> ÷ <b>PIB real (1986)</b> )</div>
@@ -1019,31 +1002,12 @@
                   <div style="margin-top:8px;">
                     Nota: aquí lo mostramos tal cual viene en el CSV para asegurar coherencia y evitar recalcular con supuestos distintos.
                   </div>
-                  <div style="margin-top:12px;"><b>Diferencia rápida</b></div>
-                  <div style="margin-top:6px;"><b>Presión fiscal</b><br>Mide cuánto recauda el Estado sobre la economía.</div>
-                  <div style="margin-top:8px;"><b>Presión de gasto público</b><br>Mide cuánto gasta el Estado sobre la economía.</div>
-                  <div style="margin-top:8px;"><b>Esfuerzo fiscal simple</b><br>Mide cómo de pesada resulta esa carga fiscal según la renta de la población.</div>
-                  <div class="explainText" id="patreonNotePA" style="margin-top:12px; padding:0;"></div>
                 </div>
               </div>
 </div>
       </div>
     </section>
   </main>
-
-<script>
-function renderPatreonNote(targetId){
-  const el = document.getElementById(targetId);
-  if (!el) return;
-  const url = String(PATREON_URL || "").trim();
-  if (!url) return;
-  el.innerHTML = `Todos estos datos también podrás encontrarlos en Patreon: <a href="${url}" target="_blank" rel="noopener noreferrer">${url}</a>`;
-}
-
-renderPatreonNote("patreonNotePGE");
-renderPatreonNote("patreonNoteGB");
-renderPatreonNote("patreonNotePA");
-</script>
 
 <script>
 /* ===================== Tabs ===================== */
