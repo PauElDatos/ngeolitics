@@ -207,7 +207,7 @@
     }
     .item{
       display:flex;
-      align-items:flex-start;
+      align-items:center;
       gap:10px;
       padding:10px 10px;
       border:1px solid rgba(255,255,255,.08);
@@ -223,13 +223,11 @@
     .nm{
       flex:1 1 auto;
       font-size: calc(12px * var(--uiScale));
-      line-height:1.25;
+      line-height:1.15;
       min-width:0;
-      overflow:visible;
-      text-overflow:clip;
-      white-space:normal;
-      overflow-wrap:anywhere;
-      word-break:break-word;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      white-space:nowrap;
     }
     .badge{
       font-size: calc(10px * var(--uiScale));
@@ -238,8 +236,6 @@
       border:1px solid rgba(255,255,255,.10);
       opacity:.85;
       flex:0 0 auto;
-      align-self:flex-start;
-      margin-top:1px;
     }
     .muted{ opacity:.35; }
 
@@ -272,8 +268,8 @@
       position:absolute;
       z-index:3;
       min-width: 240px;
-      max-width: 520px;
-      max-height: 70vh;
+      max-width: 420px;
+      max-height: 420px;
       overflow:hidden;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(0,0,0,.82);
@@ -294,7 +290,7 @@
     }
     .ttRow{
       display:flex;
-      align-items:flex-start;
+      align-items:center;
       gap:8px;
       padding: 3px 0;
       border-bottom: 1px dashed rgba(255,255,255,.08);
@@ -305,14 +301,11 @@
     }
     .ttName{
       flex: 1 1 auto;
-      overflow:visible;
-      text-overflow:clip;
-      white-space: normal;
+      overflow:hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
       color: rgba(255,255,255,.90);
       min-width:0;
-      overflow-wrap:anywhere;
-      word-break:break-word;
-      line-height:1.25;
     }
     .ttVal{
       flex:0 0 auto;
