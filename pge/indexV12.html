@@ -771,104 +771,6 @@
       text-decoration:none !important;
       outline:none !important;
     }
-  
-    /* ===== Vista 4: Pérdida de poder adquisitivo ===== */
-    #viewPPA > section.panel:first-child .pc{
-      overflow-y:auto;
-      padding-right: 4px;
-    }
-    #viewPPA.view.active{
-      display:flex !important;
-      flex-direction:column;
-      gap:12px;
-      overflow-y:auto;
-      overflow-x:hidden;
-    }
-    #viewPPA.view.active > section.panel{
-      flex: 0 0 auto;
-    }
-    #viewPPA .topGrid{
-      display:grid;
-      grid-template-columns: 340px 1fr;
-      grid-template-rows: 1fr;
-      gap:12px;
-      height:100%;
-      min-height:100%;
-      flex: 0 0 auto;
-    }
-    #viewPPA .topGrid > .panel{
-      height:100%;
-    }
-    #viewPPA .pc.chartPc{
-      overflow:hidden;
-    }
-    #viewPPA .svgWrap{
-      flex: 1 1 auto;
-      min-height: 520px;
-    }
-    #viewPPA #btnExplainPPA{
-      margin-left:auto;
-    }
-
-    .ppaStats{
-      margin-top: 12px;
-      padding: 12px;
-      border: 1px solid rgba(255,255,255,.06);
-      border-radius: 12px;
-      background: rgba(0,0,0,.10);
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-    }
-    .ppaBase{
-      font-size: calc(12px * var(--uiScale));
-      line-height:1.3;
-      opacity:.9;
-      padding-bottom:8px;
-      border-bottom:1px solid rgba(255,255,255,.06);
-    }
-    .ppaStatRow{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-size: calc(12px * var(--uiScale));
-      line-height:1.25;
-    }
-    .ppaStatSw{
-      width:10px; height:10px;
-      border-radius:3px;
-      flex:0 0 auto;
-      background:#fff;
-    }
-    .ppaStatK{
-      flex:1 1 auto;
-      min-width:0;
-      overflow-wrap:anywhere;
-      word-break:break-word;
-    }
-    .ppaStatV{
-      flex:0 0 auto;
-      font-variant-numeric: tabular-nums;
-      white-space:nowrap;
-      color: rgba(255,255,255,.95);
-    }
-    .ppaStatNote{
-      margin-top:2px;
-      font-size: calc(11px * var(--uiScale));
-      line-height:1.35;
-      opacity:.82;
-    }
-
-    @media (max-width: 900px){
-      #viewPPA.view.active{
-        overflow:visible;
-      }
-      #viewPPA .topGrid{
-        grid-template-columns: 1fr;
-        min-height:0;
-      }
-    }
-
   </style>
 </head>
 
@@ -883,7 +785,6 @@
         <button class="btn tab on" data-view="pge" role="tab" aria-selected="true">Presupuestos generales del Estado</button>
         <button class="btn tab" data-view="gb" role="tab" aria-selected="false">Gasto vs beneficio</button>
         <button class="btn tab" data-view="pa" role="tab" aria-selected="false">Presión fiscal</button>
-        <button class="btn tab" data-view="ppa" role="tab" aria-selected="false">Pérdida de poder adquisitivo</button>
 </div>
     </div>
   </header>
@@ -1138,76 +1039,6 @@
     </section>
   </main>
 
-
-<!-- ===================== VISTA 4: Pérdida de poder adquisitivo ===================== -->
-  <main id="viewPPA" class="view">
-    <div class="topGrid">
-      <section class="panel">
-        <div class="ph">
-          <div class="ttl">Series</div>
-          <div class="sub">1995–2024</div>
-        </div>
-        <div class="pc">
-          <div class="legend" id="legendPPA"></div>
-          <div class="ppaStats" id="ppaStats"></div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="ph">
-          <div class="ttl">Gráfico</div>
-          <div class="sub chartMeta">Ambas series están deflactadas a precios de 1986 y rebasadas a 1995 = 0%, para comparar la subida acumulada en la misma escala.</div>
-        </div>
-
-        <div class="pc chartPc">
-          <div class="svgWrap" id="svgWrapPPA">
-            <svg id="chartSvgPPA" class="chartSvg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gráfico de pérdida de poder adquisitivo: PIB per cápita real frente a vivienda real"></svg>
-            <div class="tooltip" id="tooltipPPA" style="display:none;"></div>
-            <div class="errorBox" id="errorBoxPPA" style="display:none;"></div>
-          </div>
-
-          <div class="chartControls">
-            <button class="btn" id="btnCrosshairPPA">Línea vertical: OFF</button>
-            <button class="btn on" id="btnPolBandsPPA" title="Mostrar/ocultar colores de presidencias">Políticos: ON</button>
-            <button class="btn" id="btnExplainPPA" title="Ir a la explicación">Explicación</button>
-          </div>
-
-          <div class="footerSingle">
-            <span class="footerSource">Fuente: <span style="color:#fff">indicadores_estado_a_1986.csv</span> + <span style="color:#fff">35101000.XLS</span> (Total Nacional, media anual de trimestres). Precios de 1986. · <span style="opacity:.9;">N.Geolitics</span></span>
-            <span class="footerPres">Felipe González · José María Aznar · José Luis Rodríguez Zapatero · Mariano Rajoy · Pedro Sánchez</span>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <section class="panel">
-      <div class="ph">
-        <div class="ttl">Explicación</div>
-        <div class="sub"></div>
-      </div>
-      <div class="pc">
-        <div class="explainBox" id="ppaExplain">
-          <div class="explainTitle">Cómo se construye esta comparación</div>
-          <div class="explainText">
-            <div>Esta vista aproxima la evolución del <b>poder adquisitivo frente a la vivienda</b> comparando dos series en la <b>misma unidad temporal y monetaria</b>: el <b>PIB per cápita real</b> ya usado en <b>Gasto vs beneficio</b> y el <b>precio medio tasado de la vivienda libre por metro cuadrado</b>.</div>
-            <div style="margin-top:8px;">
-              Proceso aplicado:
-              <ul>
-                <li>Del Excel de vivienda se toma <b>solo la fila TOTAL NACIONAL</b>.</li>
-                <li>Para cada año se calcula la <b>media de los 4 trimestres</b>.</li>
-                <li>Al precio anual del metro cuadrado se le aplica el campo <code>deflactor_hasta_1986</code> del CSV, igual que al PIB per cápita, para expresar ambas series en <b>euros constantes de 1986</b>.</li>
-                <li>Después ambas series se rebasan a una base común: <b>1995 = 0%</b>, que es el primer año disponible en el Excel.</li>
-              </ul>
-            </div>
-            <div style="margin-top:8px;">Si la línea de la <b>vivienda real</b> sube más que la del <b>PIB per cápita real</b>, el acceso relativo a la vivienda empeora; si sube menos, mejora o se estabiliza.</div>
-            <div style="margin-top:8px;">La serie termina en <b>2024</b> porque es el último año en el que este cruce tiene a la vez precio de vivienda y PIB per cápita real disponibles.</div>
-            <div class="explainText" id="patreonNotePPA" style="margin-top:12px; padding:0;"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
 <script>
 function renderPatreonNote(targetId){
   const el = document.getElementById(targetId);
@@ -1220,7 +1051,6 @@ function renderPatreonNote(targetId){
 renderPatreonNote("patreonNotePGE");
 renderPatreonNote("patreonNoteGB");
 renderPatreonNote("patreonNotePA");
-renderPatreonNote("patreonNotePPA");
 </script>
 
 <script>
@@ -1231,7 +1061,6 @@ renderPatreonNote("patreonNotePPA");
     pge: document.getElementById("viewPGE"),
     gb:  document.getElementById("viewGB"),
     pa:  document.getElementById("viewPA"),
-    ppa: document.getElementById("viewPPA"),
 };
 
   function setView(k){
@@ -1254,7 +1083,6 @@ renderPatreonNote("patreonNotePPA");
       if (k === "pge") window.__pge?.onShow?.();
       if (k === "gb")  window.__gb?.onShow?.();
       if (k === "pa")  window.__pa?.onShow?.();
-      if (k === "ppa") window.__ppa?.onShow?.();
 });
   }
 
@@ -1642,18 +1470,12 @@ function makeChartController(opts){
     return v;
   }
 
-  function computeYTicksLeft(ymin, ymax){
-    const minV = Number.isFinite(ymin) ? ymin : 0;
-    const maxV = Number.isFinite(ymax) ? ymax : 1;
-    if (yTickBuilder) return yTickBuilder("left", minV, maxV);
-    const span = Math.max(1e-9, maxV - minV);
-    const step = niceStepY(span);
-    const yStart = Math.floor(minV/step)*step;
-    const yTop = Math.ceil(maxV/step)*step;
+  function computeYTicksLeft(ymax){
+    if (yTickBuilder) return yTickBuilder("left", ymax);
+    const step = niceStepY(ymax);
+    const yTop = Math.ceil(ymax/step)*step;
     const out = [];
-    for (let v=yStart; v<=yTop+1e-9; v+=step){
-      out.push(Number(v.toFixed(10)));
-    }
+    for (let v=0; v<=yTop+1e-9; v+=step) out.push(v);
     return out;
   }
 
@@ -1724,7 +1546,7 @@ function makeChartController(opts){
       return margin.l + t * plotW;
     };
 
-    const yTicksLeft = computeYTicksLeft((yDomain.left && yDomain.left.min) ?? 0, yDomain.left.max);
+    const yTicksLeft = computeYTicksLeft(yDomain.left.max);
     const yValsT = yTicksLeft.map(v => yTransform(v));
     const yMinT = Math.min(...yValsT.filter(Number.isFinite));
     const yMaxT = Math.max(...yValsT.filter(Number.isFinite));
@@ -3923,283 +3745,6 @@ try{
   window.__pa = { onShow: () => controller.onShow() };
   if (window.__activeViewKey === "pa") requestAnimationFrame(() => controller.onShow());
 })();
-
-/* ===================== Vista 4: Pérdida de poder adquisitivo ===================== */
-(async function(){
-  const svg = document.getElementById("chartSvgPPA");
-  const wrap = document.getElementById("svgWrapPPA");
-  const tooltipEl = document.getElementById("tooltipPPA");
-  const errorEl = document.getElementById("errorBoxPPA");
-  const legendEl = document.getElementById("legendPPA");
-  const statsEl = document.getElementById("ppaStats");
-
-  const controls = {
-    btnCrosshair: document.getElementById("btnCrosshairPPA"),
-  };
-
-  const btnPolBands = document.getElementById("btnPolBandsPPA");
-  let showPresBands = true;
-
-  const btnExplain = document.getElementById("btnExplainPPA");
-  const explainEl = document.getElementById("ppaExplain");
-
-  function pulseExplainPPA(){
-    if (!explainEl) return;
-
-    if (explainEl.classList.contains("explainCollapsible")){
-      explainEl.classList.add("open");
-    }
-
-    requestAnimationFrame(() => {
-      const scroller = document.getElementById("viewPPA") || explainEl.closest(".view");
-      if (scroller && typeof scroller.scrollTo === "function"){
-        const sr = scroller.getBoundingClientRect();
-        const tr = explainEl.getBoundingClientRect();
-        const top = (tr.top - sr.top) + (scroller.scrollTop || 0) - 8;
-        scroller.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-      } else {
-        explainEl.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    });
-  }
-
-  if (btnExplain){
-    btnExplain.classList.remove("on");
-    btnExplain.textContent = "Explicación";
-    btnExplain.addEventListener("click", pulseExplainPPA);
-  }
-
-  const seriesDefs = [
-    { key:"pib_pct", label:"PIB per cápita real", color:"#79FF6B", axis:"left" },
-    { key:"viv_pct", label:"Precio real vivienda (m²)", color:"#FF6A00", axis:"left" },
-  ];
-
-  const app = {
-    xDomain: { min: 1995, max: 2024 },
-    series: new Map(),
-    yearVal: new Map(),
-    meta: { baseYear: 1995, lastYear: 2024, pibLast: null, vivLast: null, gapLast: null },
-  };
-
-  function drawPresBands(gBg, xScale, plotRect){
-    if (!showPresBands) return;
-    for (const p of PRES_BANDS){
-      const x0 = Math.max(app.xDomain.min, p.start);
-      const x1 = Math.min(app.xDomain.max, (p.end ?? app.xDomain.max));
-      if (x1 <= x0) continue;
-      const x = xScale(x0);
-      const w = xScale(x1) - xScale(x0);
-      gBg.appendChild(createSvgEl("rect", {
-        x, y: plotRect.y, width: w, height: plotRect.h,
-        fill: p.color, opacity: 0.18
-      }));
-    }
-  }
-
-  function getSeriesForPath(key){ return app.series.get(key) || null; }
-
-  function getValueAtYear(key, year){
-    const mp = app.yearVal.get(key);
-    const ser = app.series.get(key);
-    if (!mp || !ser || !ser.xs || !ser.xs.length) return null;
-
-    const direct = mp.get(year);
-    if (Number.isFinite(direct)) return direct;
-
-    if (year < ser.xs[0] || year > ser.xs[ser.xs.length - 1]) return null;
-
-    const i1 = lowerBound(ser.xs, year);
-    const i0 = i1 - 1;
-    if (i0 < 0 || i1 >= ser.xs.length) return null;
-
-    const x0 = ser.xs[i0], x1 = ser.xs[i1];
-    const y0 = ser.ys[i0], y1 = ser.ys[i1];
-    if (!Number.isFinite(y0) || !Number.isFinite(y1) || x1 === x0) return null;
-
-    const t = (year - x0) / (x1 - x0);
-    return y0 + t * (y1 - y0);
-  }
-
-  function fmtPct(v){
-    if (!Number.isFinite(v)) return "—";
-    const s = v > 0 ? "+" : "";
-    return s + v.toFixed(1) + "%";
-  }
-
-  function renderStats(){
-    if (!statsEl) return;
-
-    statsEl.innerHTML = "";
-
-    const base = document.createElement("div");
-    base.className = "ppaBase";
-    base.textContent = `Base común: ${app.meta.baseYear} = 0% · ambas series en euros constantes de 1986`;
-    statsEl.appendChild(base);
-
-    const rows = [
-      { label:`PIB per cápita real (${app.meta.lastYear})`, value: app.meta.pibLast, color:"#79FF6B" },
-      { label:`Vivienda real por m² (${app.meta.lastYear})`, value: app.meta.vivLast, color:"#FF6A00" },
-      { label:`Brecha vivienda - PIB (${app.meta.lastYear})`, value: app.meta.gapLast, color:"#FFD166" },
-    ];
-
-    for (const r of rows){
-      const row = document.createElement("div");
-      row.className = "ppaStatRow";
-
-      const sw = document.createElement("div");
-      sw.className = "ppaStatSw";
-      sw.style.background = r.color;
-
-      const k = document.createElement("div");
-      k.className = "ppaStatK";
-      k.textContent = r.label;
-
-      const v = document.createElement("div");
-      v.className = "ppaStatV";
-      v.textContent = fmtPct(r.value);
-
-      row.appendChild(sw);
-      row.appendChild(k);
-      row.appendChild(v);
-      statsEl.appendChild(row);
-    }
-
-    const note = document.createElement("div");
-    note.className = "ppaStatNote";
-    note.textContent = "La brecha mide cuántos puntos porcentuales sube la vivienda por encima o por debajo del PIB per cápita real.";
-    statsEl.appendChild(note);
-  }
-
-  async function loadPPA(){
-    const txt = await fetchText("poder_adquisitivo_vivienda.csv");
-    const csv = parseCSV(txt);
-    const h = csv.headers;
-
-    const cYear = pickCol(h, ["anio", "año", "year"]);
-    const cBase = pickCol(h, ["anio_base"]);
-    const cVivPct = pickCol(h, ["vivienda_m2_pct_desde_base"]);
-    const cPibPct = pickCol(h, ["pib_per_capita_pct_desde_base"]);
-    const cGap = pickCol(h, ["brecha_vivienda_vs_pib_pct_puntos"]);
-
-    if (!cYear || !cBase || !cVivPct || !cPibPct || !cGap){
-      throw new Error("poder_adquisitivo_vivienda.csv: faltan columnas requeridas.");
-    }
-
-    const vivMap = new Map();
-    const pibMap = new Map();
-    const rows = [];
-
-    for (const r of csv.rows){
-      const year = Math.round(toNum(r[cYear]));
-      const viv = toNum(r[cVivPct]);
-      const pib = toNum(r[cPibPct]);
-      const gap = toNum(r[cGap]);
-      const baseYear = Math.round(toNum(r[cBase]));
-
-      if (!Number.isFinite(year) || !Number.isFinite(viv) || !Number.isFinite(pib)) continue;
-
-      rows.push({ year, viv, pib, gap, baseYear });
-      vivMap.set(year, viv);
-      pibMap.set(year, pib);
-    }
-
-    if (!rows.length){
-      throw new Error("poder_adquisitivo_vivienda.csv no tiene filas válidas.");
-    }
-
-    rows.sort((a,b)=>a.year-b.year);
-
-    app.xDomain = { min: rows[0].year, max: rows[rows.length - 1].year };
-    app.meta.baseYear = rows[0].baseYear || rows[0].year;
-    app.meta.lastYear = rows[rows.length - 1].year;
-    app.meta.pibLast = rows[rows.length - 1].pib;
-    app.meta.vivLast = rows[rows.length - 1].viv;
-    app.meta.gapLast = rows[rows.length - 1].gap;
-
-    app.yearVal.clear();
-    app.series.clear();
-
-    app.yearVal.set("pib_pct", pibMap);
-    app.yearVal.set("viv_pct", vivMap);
-
-    app.series.set("pib_pct", {
-      xs: rows.map(r => r.year),
-      ys: rows.map(r => r.pib),
-    });
-    app.series.set("viv_pct", {
-      xs: rows.map(r => r.year),
-      ys: rows.map(r => r.viv),
-    });
-  }
-
-  try{
-    await loadPPA();
-  } catch(e){
-    if (errorEl){
-      errorEl.style.display = "flex";
-      errorEl.textContent = e.message || String(e);
-    }
-    window.__ppa = { onShow: ()=>{} };
-    return;
-  }
-
-  renderStats();
-
-  let yMin = Infinity;
-  let yMax = -Infinity;
-  for (const s of seriesDefs){
-    const ser = app.series.get(s.key);
-    if (!ser) continue;
-    for (const v of ser.ys){
-      if (Number.isFinite(v)){
-        yMin = Math.min(yMin, v);
-        yMax = Math.max(yMax, v);
-      }
-    }
-  }
-  if (!Number.isFinite(yMin) || !Number.isFinite(yMax)){
-    yMin = 0;
-    yMax = 1;
-  }
-  yMin = Math.min(yMin, 0);
-  const span = Math.max(1, yMax - yMin);
-  const pad = Math.max(2, span * 0.08);
-  yMin -= pad;
-  yMax += pad;
-
-  const controller = makeChartController({
-    svg, wrap, tooltipEl, errorEl,
-    legendEl,
-    controls,
-    seriesList: seriesDefs.map(s => ({ key:s.key, label:s.label, color:s.color, axis:s.axis })),
-    getValueAtYear,
-    getSeriesForPath,
-    xDomain: app.xDomain,
-    yDomain: { left: { min: yMin, max: yMax } },
-    formatValue: (key, v) => fmtPct(v),
-    extraBackground: drawPresBands,
-    alwaysTooltip: true,
-    yLabelLeft: `Variación acumulada desde ${app.meta.baseYear} (%)`,
-    defaultOrderTooltip: ["pib_pct", "viv_pct"],
-    topN: 0,
-    segmentBreakRule: () => false
-  });
-
-  if (btnPolBands){
-    btnPolBands.classList.toggle("on", showPresBands);
-    btnPolBands.textContent = "Políticos: " + (showPresBands ? "ON" : "OFF");
-    btnPolBands.addEventListener("click", () => {
-      showPresBands = !showPresBands;
-      btnPolBands.classList.toggle("on", showPresBands);
-      btnPolBands.textContent = "Políticos: " + (showPresBands ? "ON" : "OFF");
-      controller.onShow();
-    });
-  }
-
-  window.__ppa = { onShow: () => controller.onShow() };
-  if (window.__activeViewKey === "ppa") requestAnimationFrame(() => controller.onShow());
-})();
-
 </script>
 </body>
 </html>
