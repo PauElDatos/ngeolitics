@@ -1145,12 +1145,7 @@
       <section class="panel">
         <div class="ph">
           <div class="ttl">Series</div>
-          <div class="sub" style="flex-wrap:wrap; gap:8px;">
-            <span id="ppaSeriesRange">1995–2024</span>
-            <button class="btn on" id="btnPPADataTop5" title="Cargar PIB + Total nacional + 5 comunidades">Top 5</button>
-            <button class="btn" id="btnPPADataNational" title="Cargar solo PIB + Total nacional">Solo nacional</button>
-            <button class="btn" id="btnPPADataAll" title="Cargar PIB + todas las comunidades disponibles">Todas</button>
-          </div>
+          <div class="sub">1995–2024</div>
         </div>
         <div class="pc">
           <div class="legend" id="legendPPA"></div>
@@ -1161,7 +1156,7 @@
       <section class="panel">
         <div class="ph">
           <div class="ttl">Gráfico</div>
-          <div class="sub chartMeta" id="ppaChartMeta">Series deflactadas a precios de 1986 y rebasadas a 1995 = 0%, para comparar la subida acumulada en la misma escala.</div>
+          <div class="sub chartMeta">Ambas series están deflactadas a precios de 1986 y rebasadas a 1995 = 0%, para comparar la subida acumulada en la misma escala.</div>
         </div>
 
         <div class="pc chartPc">
@@ -1178,7 +1173,7 @@
           </div>
 
           <div class="footerSingle">
-            <span class="footerSource" id="ppaFooterSource">Fuente: <span style="color:#fff">poder_adquisitivo_vivienda.csv</span>. Precios de 1986. · <span style="opacity:.9;">N.Geolitics</span></span>
+            <span class="footerSource">Fuente: <span style="color:#fff">indicadores_estado_a_1986.csv</span> + <span style="color:#fff">35101000.XLS</span> (Total Nacional, media anual de trimestres). Precios de 1986. · <span style="opacity:.9;">N.Geolitics</span></span>
             <span class="footerPres">Felipe González · José María Aznar · José Luis Rodríguez Zapatero · Mariano Rajoy · Pedro Sánchez</span>
           </div>
         </div>
@@ -1194,25 +1189,18 @@
         <div class="explainBox" id="ppaExplain">
           <div class="explainTitle">Cómo se construye esta comparación</div>
           <div class="explainText">
-            <div>Esta vista compara el <b>PIB per cápita real</b> con el <b>precio real de la vivienda por m²</b>, y ahora puede leer <b>varios CSV</b> para mostrar tanto la serie <b>nacional</b> como las <b>comunidades autónomas</b>.</div>
-            <div style="margin-top:8px;">
-              Archivos usados por esta vista:
-              <ul>
-                <li><code>poder_adquisitivo_vivienda.csv</code>: serie nacional compacta.</li>
-                <li><code>vivienda_ccaa_real_1986_top5_long.csv</code>: PIB real + Total nacional + top 5 CCAA.</li>
-                <li><code>vivienda_ccaa_real_1986_todas_long.csv</code>: PIB real + todas las CCAA disponibles.</li>
-              </ul>
-            </div>
+            <div>Esta vista aproxima la evolución del <b>poder adquisitivo frente a la vivienda</b> comparando dos series en la <b>misma unidad temporal y monetaria</b>: el <b>PIB per cápita real</b> ya usado en <b>Gasto vs beneficio</b> y el <b>precio medio tasado de la vivienda libre por metro cuadrado</b>.</div>
             <div style="margin-top:8px;">
               Proceso aplicado:
               <ul>
-                <li>Del Excel de vivienda se toma la <b>media anual de los 4 trimestres</b> para cada territorio.</li>
-                <li>Al precio anual del metro cuadrado se le aplica el campo <code>deflactor_hasta_1986</code> para expresarlo en <b>euros constantes de 1986</b>.</li>
-                <li>Después las series se rebasan a una base común: <b>1995 = 0%</b>.</li>
-                <li>En la leyenda puedes <b>hacer clic</b> sobre una serie para aislarla y comparar mejor una comunidad frente al PIB.</li>
+                <li>Del Excel de vivienda se toma <b>solo la fila TOTAL NACIONAL</b>.</li>
+                <li>Para cada año se calcula la <b>media de los 4 trimestres</b>.</li>
+                <li>Al precio anual del metro cuadrado se le aplica el campo <code>deflactor_hasta_1986</code> del CSV, igual que al PIB per cápita, para expresar ambas series en <b>euros constantes de 1986</b>.</li>
+                <li>Después ambas series se rebasan a una base común: <b>1995 = 0%</b>, que es el primer año disponible en el Excel.</li>
               </ul>
             </div>
-            <div style="margin-top:8px;">Si una línea de <b>vivienda real</b> sube más que la del <b>PIB per cápita real</b>, el acceso relativo a la vivienda empeora en ese territorio.</div>
+            <div style="margin-top:8px;">Si la línea de la <b>vivienda real</b> sube más que la del <b>PIB per cápita real</b>, el acceso relativo a la vivienda empeora; si sube menos, mejora o se estabiliza.</div>
+            <div style="margin-top:8px;">La serie termina en <b>2024</b> porque es el último año en el que este cruce tiene a la vez precio de vivienda y PIB per cápita real disponibles.</div>
             <div class="explainText" id="patreonNotePPA" style="margin-top:12px; padding:0;"></div>
           </div>
         </div>
@@ -3944,125 +3932,54 @@ try{
   const errorEl = document.getElementById("errorBoxPPA");
   const legendEl = document.getElementById("legendPPA");
   const statsEl = document.getElementById("ppaStats");
-  const rangeEl = document.getElementById("ppaSeriesRange");
-  const footerSourceEl = document.getElementById("ppaFooterSource");
-  const chartMetaEl = document.getElementById("ppaChartMeta");
 
   const controls = {
     btnCrosshair: document.getElementById("btnCrosshairPPA"),
   };
 
   const btnPolBands = document.getElementById("btnPolBandsPPA");
+  let showPresBands = true;
+
   const btnExplain = document.getElementById("btnExplainPPA");
   const explainEl = document.getElementById("ppaExplain");
 
-  const btnModeTop5 = document.getElementById("btnPPADataTop5");
-  const btnModeNational = document.getElementById("btnPPADataNational");
-  const btnModeAll = document.getElementById("btnPPADataAll");
+  function pulseExplainPPA(){
+    if (!explainEl) return;
 
-  let showPresBands = true;
-  let controller = null;
-  let currentMode = "top5";
+    if (explainEl.classList.contains("explainCollapsible")){
+      explainEl.classList.add("open");
+    }
 
-  const REGION_ORDER_TOP5 = [
-    "TOTAL NACIONAL",
-    "Andalucía",
-    "Cataluña",
-    "Madrid (Comunidad de)",
-    "Comunidad Valenciana",
-    "País Vasco",
+    requestAnimationFrame(() => {
+      const scroller = document.getElementById("viewPPA") || explainEl.closest(".view");
+      if (scroller && typeof scroller.scrollTo === "function"){
+        const sr = scroller.getBoundingClientRect();
+        const tr = explainEl.getBoundingClientRect();
+        const top = (tr.top - sr.top) + (scroller.scrollTop || 0) - 8;
+        scroller.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+      } else {
+        explainEl.scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    });
+  }
+
+  if (btnExplain){
+    btnExplain.classList.remove("on");
+    btnExplain.textContent = "Explicación";
+    btnExplain.addEventListener("click", pulseExplainPPA);
+  }
+
+  const seriesDefs = [
+    { key:"pib_pct", label:"PIB per cápita real", color:"#79FF6B", axis:"left" },
+    { key:"viv_pct", label:"Precio real vivienda (m²)", color:"#FF6A00", axis:"left" },
   ];
-
-  const PRETTY_REGION = new Map([
-    ["TOTAL NACIONAL", "Total nacional"],
-    ["Madrid (Comunidad de)", "Comunidad de Madrid"],
-    ["Comunidad Valenciana", "Comunidad Valenciana"],
-    ["País Vasco", "País Vasco"],
-    ["Andalucía", "Andalucía"],
-    ["Cataluña", "Cataluña"],
-    ["Asturias (Principado de )", "Asturias"],
-    ["Balears (Illes)", "Illes Balears"],
-    ["Ceuta y Melilla", "Ceuta y Melilla"],
-    ["Madrid", "Comunidad de Madrid"],
-  ]);
-
-  const COLOR_BY_SLUG = {
-    pib_pct: "#79FF6B",
-    total_nacional: "#FF6A00",
-    andalucia: "#B084F5",
-    cataluna: "#46C7F2",
-    madrid: "#FF5D73",
-    comunidad_valenciana: "#FFD166",
-    pais_vasco: "#00D1B2",
-    aragon: "#8BC34A",
-    asturias_principado_de: "#7E57C2",
-    balears_illes: "#F06292",
-    canarias: "#FFB74D",
-    cantabria: "#4DB6AC",
-    castilla_la_mancha: "#BA68C8",
-    castilla_y_leon: "#90A4AE",
-    ceuta_y_melilla: "#A1887F",
-    extremadura: "#26A69A",
-    galicia: "#64B5F6",
-    murcia_region_de: "#FF8A65",
-    navarra_comunidad_foral_de: "#9575CD",
-    rioja_la: "#AED581",
-  };
-
-  const DATASET_META = {
-    national: {
-      label: "Solo nacional",
-      preferredFile: "poder_adquisitivo_vivienda.csv",
-      footer: 'Fuente: <span style="color:#fff">poder_adquisitivo_vivienda.csv</span>. Precios de 1986. · <span style="opacity:.9;">N.Geolitics</span>',
-    },
-    top5: {
-      label: "Top 5 + nacional",
-      preferredFile: "vivienda_ccaa_real_1986_top5_long.csv",
-      footer: 'Fuente: <span style="color:#fff">vivienda_ccaa_real_1986_top5_long.csv</span> + <span style="color:#fff">poder_adquisitivo_vivienda.csv</span>. Precios de 1986. · <span style="opacity:.9;">N.Geolitics</span>',
-    },
-    all: {
-      label: "Todas las CCAA",
-      preferredFile: "vivienda_ccaa_real_1986_todas_long.csv",
-      footer: 'Fuente: <span style="color:#fff">vivienda_ccaa_real_1986_todas_long.csv</span> + <span style="color:#fff">poder_adquisitivo_vivienda.csv</span>. Precios de 1986. · <span style="opacity:.9;">N.Geolitics</span>',
-    },
-  };
-
-  const datasets = {
-    national: null,
-    top5: null,
-    all: null,
-  };
 
   const app = {
     xDomain: { min: 1995, max: 2024 },
     series: new Map(),
     yearVal: new Map(),
-    seriesDefs: [],
-    meta: {
-      baseYear: 1995,
-      lastYear: 2024,
-      datasetLabel: "",
-      regionOrder: [],
-      regionLabels: new Map(),
-      pibLast: null,
-      preferredFile: "",
-    },
+    meta: { baseYear: 1995, lastYear: 2024, pibLast: null, vivLast: null, gapLast: null },
   };
-
-  function slugifyRegion(v){
-    return stripAccentsLower(String(v ?? ""))
-      .replace(/[^a-z0-9]+/g, "_")
-      .replace(/^_+|_+$/g, "");
-  }
-
-  function prettyRegion(v){
-    const s = String(v ?? "").trim();
-    return PRETTY_REGION.get(s) || s;
-  }
-
-  function getColorForSlug(slug, idx){
-    return COLOR_BY_SLUG[slug] || makeHSVColor((idx + 2) % 24, 24);
-  }
 
   function drawPresBands(gBg, xScale, plotRect){
     if (!showPresBands) return;
@@ -4098,7 +4015,6 @@ try{
     const x0 = ser.xs[i0], x1 = ser.xs[i1];
     const y0 = ser.ys[i0], y1 = ser.ys[i1];
     if (!Number.isFinite(y0) || !Number.isFinite(y1) || x1 === x0) return null;
-    if ((x1 - x0) > 1) return null;
 
     const t = (year - x0) / (x1 - x0);
     return y0 + t * (y1 - y0);
@@ -4110,57 +4026,21 @@ try{
     return s + v.toFixed(1) + "%";
   }
 
-  function setModeButtons(mode){
-    const map = {
-      top5: btnModeTop5,
-      national: btnModeNational,
-      all: btnModeAll,
-    };
-    for (const [k, btn] of Object.entries(map)){
-      if (!btn) continue;
-      btn.classList.toggle("on", k === mode);
-    }
-  }
-
-  function updateTextMeta(){
-    if (rangeEl){
-      rangeEl.textContent = `${app.xDomain.min}–${app.xDomain.max}`;
-    }
-    if (footerSourceEl){
-      footerSourceEl.innerHTML = DATASET_META[currentMode].footer;
-    }
-    if (chartMetaEl){
-      const nRegions = app.meta.regionOrder.length;
-      const label = app.meta.datasetLabel || DATASET_META[currentMode].label;
-      chartMetaEl.textContent = `Vista: ${label}. Series deflactadas a precios de 1986 y rebasadas a ${app.meta.baseYear} = 0%. Territorios con vivienda mostrados: ${nRegions}.`;
-    }
-  }
-
   function renderStats(){
     if (!statsEl) return;
+
     statsEl.innerHTML = "";
 
     const base = document.createElement("div");
     base.className = "ppaBase";
-    base.innerHTML = `Vista cargada: <b>${app.meta.datasetLabel || DATASET_META[currentMode].label}</b><br>Base común: <b>${app.meta.baseYear} = 0%</b> · precios constantes de 1986`;
+    base.textContent = `Base común: ${app.meta.baseYear} = 0% · ambas series en euros constantes de 1986`;
     statsEl.appendChild(base);
 
-    const rows = [];
-    rows.push({ label:`PIB per cápita real (${app.meta.lastYear})`, value: app.meta.pibLast, color: COLOR_BY_SLUG.pib_pct });
-
-    for (const regionKey of app.meta.regionOrder){
-      const pretty = app.meta.regionLabels.get(regionKey) || regionKey;
-      const serKey = `house_${regionKey}`;
-      const mp = app.yearVal.get(serKey);
-      const value = mp ? mp.get(app.meta.lastYear) : NaN;
-      const gap = Number.isFinite(value) && Number.isFinite(app.meta.pibLast) ? value - app.meta.pibLast : NaN;
-      const gapTxt = Number.isFinite(gap) ? ` · brecha vs PIB: ${fmtPct(gap)}` : "";
-      rows.push({
-        label: `Vivienda real por m² · ${pretty} (${app.meta.lastYear})${gapTxt}`,
-        value,
-        color: app.seriesDefs.find(s => s.key === serKey)?.color || "#FF6A00"
-      });
-    }
+    const rows = [
+      { label:`PIB per cápita real (${app.meta.lastYear})`, value: app.meta.pibLast, color:"#79FF6B" },
+      { label:`Vivienda real por m² (${app.meta.lastYear})`, value: app.meta.vivLast, color:"#FF6A00" },
+      { label:`Brecha vivienda - PIB (${app.meta.lastYear})`, value: app.meta.gapLast, color:"#FFD166" },
+    ];
 
     for (const r of rows){
       const row = document.createElement("div");
@@ -4186,311 +4066,74 @@ try{
 
     const note = document.createElement("div");
     note.className = "ppaStatNote";
-    note.textContent = "Haz clic en una serie de la leyenda para aislarla. Shift + clic permite comparar varias a la vez.";
+    note.textContent = "La brecha mide cuántos puntos porcentuales sube la vivienda por encima o por debajo del PIB per cápita real.";
     statsEl.appendChild(note);
   }
 
-  function parseNationalCompact(csv){
+  async function loadPPA(){
+    const txt = await fetchText("poder_adquisitivo_vivienda.csv");
+    const csv = parseCSV(txt);
     const h = csv.headers;
+
     const cYear = pickCol(h, ["anio", "año", "year"]);
     const cBase = pickCol(h, ["anio_base"]);
     const cVivPct = pickCol(h, ["vivienda_m2_pct_desde_base"]);
     const cPibPct = pickCol(h, ["pib_per_capita_pct_desde_base"]);
+    const cGap = pickCol(h, ["brecha_vivienda_vs_pib_pct_puntos"]);
 
-    if (!cYear || !cBase || !cVivPct || !cPibPct){
+    if (!cYear || !cBase || !cVivPct || !cPibPct || !cGap){
       throw new Error("poder_adquisitivo_vivienda.csv: faltan columnas requeridas.");
     }
 
+    const vivMap = new Map();
+    const pibMap = new Map();
     const rows = [];
+
     for (const r of csv.rows){
       const year = Math.round(toNum(r[cYear]));
       const viv = toNum(r[cVivPct]);
       const pib = toNum(r[cPibPct]);
+      const gap = toNum(r[cGap]);
       const baseYear = Math.round(toNum(r[cBase]));
+
       if (!Number.isFinite(year) || !Number.isFinite(viv) || !Number.isFinite(pib)) continue;
-      rows.push({ year, pib, baseYear, regions: new Map([["total_nacional", viv]]) });
+
+      rows.push({ year, viv, pib, gap, baseYear });
+      vivMap.set(year, viv);
+      pibMap.set(year, pib);
     }
 
-    if (!rows.length) throw new Error("poder_adquisitivo_vivienda.csv no tiene filas válidas.");
+    if (!rows.length){
+      throw new Error("poder_adquisitivo_vivienda.csv no tiene filas válidas.");
+    }
 
     rows.sort((a,b)=>a.year-b.year);
-    return {
-      modeLabel: DATASET_META.national.label,
-      preferredFile: DATASET_META.national.preferredFile,
-      baseYear: rows[0].baseYear || rows[0].year,
-      rows,
-      regionOrder: ["total_nacional"],
-      regionLabels: new Map([["total_nacional", "Total nacional"]]),
-    };
-  }
 
-  function parseRegionalLong(csv, modeLabel, preferredFile, limitToTop5=false){
-    const h = csv.headers;
-    const cYear = pickCol(h, ["anio", "año", "year"]);
-    const cRegion = pickCol(h, ["region_label", "region", "ccaa"]);
-    const cSlug = pickCol(h, ["region_slug"]);
-    const cBase = pickCol(h, ["anio_base"]);
-    const cVivPct = pickCol(h, ["vivienda_m2_pct_desde_base"]);
-    const cPibPct = pickCol(h, ["pib_per_capita_pct_desde_1995", "pib_per_capita_pct_desde_base"]);
+    app.xDomain = { min: rows[0].year, max: rows[rows.length - 1].year };
+    app.meta.baseYear = rows[0].baseYear || rows[0].year;
+    app.meta.lastYear = rows[rows.length - 1].year;
+    app.meta.pibLast = rows[rows.length - 1].pib;
+    app.meta.vivLast = rows[rows.length - 1].viv;
+    app.meta.gapLast = rows[rows.length - 1].gap;
 
-    if (!cYear || !cRegion || !cVivPct || !cPibPct){
-      throw new Error(`${preferredFile}: faltan columnas requeridas.`);
-    }
-
-    const byYear = new Map();
-    const regionLabels = new Map();
-    const seenOrder = [];
-    let baseYearFound = null;
-
-    for (const r of csv.rows){
-      const year = Math.round(toNum(r[cYear]));
-      const regionRaw = String(r[cRegion] ?? "").trim();
-      const viv = toNum(r[cVivPct]);
-      const pib = toNum(r[cPibPct]);
-      const baseYear = Math.round(toNum(cBase ? r[cBase] : 1995));
-      if (!Number.isFinite(year) || !regionRaw || !Number.isFinite(viv) || !Number.isFinite(pib)) continue;
-
-      const slug = String(cSlug ? r[cSlug] : slugifyRegion(regionRaw)).trim() || slugifyRegion(regionRaw);
-      if (baseYearFound === null && Number.isFinite(baseYear)) baseYearFound = baseYear;
-      regionLabels.set(slug, prettyRegion(regionRaw));
-      if (!seenOrder.includes(slug)) seenOrder.push(slug);
-
-      let yrow = byYear.get(year);
-      if (!yrow){
-        yrow = { year, pib, baseYear: Number.isFinite(baseYear) ? baseYear : 1995, regions: new Map() };
-        byYear.set(year, yrow);
-      }
-      if (!Number.isFinite(yrow.pib)) yrow.pib = pib;
-      yrow.regions.set(slug, viv);
-    }
-
-    let regionOrder = seenOrder.slice();
-    if (limitToTop5){
-      const topSlugs = REGION_ORDER_TOP5.map(x => (x === "TOTAL NACIONAL" ? "total_nacional" : slugifyRegion(x)));
-      regionOrder = topSlugs.filter(s => seenOrder.includes(s));
-    } else {
-      const totalFirst = regionOrder.includes("total_nacional") ? ["total_nacional"] : [];
-      const rest = regionOrder.filter(s => s !== "total_nacional").sort((a,b)=>{
-        const la = regionLabels.get(a) || a;
-        const lb = regionLabels.get(b) || b;
-        return la.localeCompare(lb, 'es');
-      });
-      regionOrder = totalFirst.concat(rest);
-    }
-
-    const rows = Array.from(byYear.values()).sort((a,b)=>a.year-b.year);
-    if (!rows.length) throw new Error(`${preferredFile} no tiene filas válidas.`);
-
-    return {
-      modeLabel,
-      preferredFile,
-      baseYear: baseYearFound || rows[0].baseYear || rows[0].year,
-      rows,
-      regionOrder,
-      regionLabels,
-    };
-  }
-
-  async function loadDataset(mode){
-    if (datasets[mode]) return datasets[mode];
-
-    if (mode === "national"){
-      const txt = await fetchText("poder_adquisitivo_vivienda.csv");
-      const parsed = parseNationalCompact(parseCSV(txt));
-      datasets[mode] = parsed;
-      return parsed;
-    }
-
-    if (mode === "top5"){
-      const txt = await fetchText("vivienda_ccaa_real_1986_top5_long.csv");
-      const parsed = parseRegionalLong(parseCSV(txt), DATASET_META.top5.label, DATASET_META.top5.preferredFile, true);
-      datasets[mode] = parsed;
-      return parsed;
-    }
-
-    if (mode === "all"){
-      try{
-        const txt = await fetchText("vivienda_ccaa_real_1986_todas_long.csv");
-        const parsed = parseRegionalLong(parseCSV(txt), DATASET_META.all.label, DATASET_META.all.preferredFile, false);
-        datasets[mode] = parsed;
-        return parsed;
-      } catch(err){
-        const txt = await fetchText("vivienda_ccaa_real_1986_top5_long.csv");
-        const parsed = parseRegionalLong(parseCSV(txt), "Top 5 + nacional (fallback)", "vivienda_ccaa_real_1986_top5_long.csv", true);
-        datasets[mode] = parsed;
-        return parsed;
-      }
-    }
-
-    throw new Error(`Modo PPA desconocido: ${mode}`);
-  }
-
-  function applyDataset(ds){
-    app.series.clear();
     app.yearVal.clear();
+    app.series.clear();
 
-    const pibMap = new Map();
-    const pibXs = [];
-    const pibYs = [];
-
-    for (const row of ds.rows){
-      if (Number.isFinite(row.pib)){
-        pibMap.set(row.year, row.pib);
-        pibXs.push(row.year);
-        pibYs.push(row.pib);
-      }
-    }
     app.yearVal.set("pib_pct", pibMap);
-    app.series.set("pib_pct", { xs: pibXs, ys: pibYs });
+    app.yearVal.set("viv_pct", vivMap);
 
-    const seriesDefs = [
-      { key:"pib_pct", label:"PIB per cápita real", color: COLOR_BY_SLUG.pib_pct, axis:"left" },
-    ];
-
-    ds.regionOrder.forEach((slug, idx) => {
-      const mp = new Map();
-      const xs = [];
-      const ys = [];
-      for (const row of ds.rows){
-        const v = row.regions.get(slug);
-        if (!Number.isFinite(v)) continue;
-        mp.set(row.year, v);
-        xs.push(row.year);
-        ys.push(v);
-      }
-      const key = `house_${slug}`;
-      app.yearVal.set(key, mp);
-      app.series.set(key, { xs, ys });
-      seriesDefs.push({
-        key,
-        label: `Vivienda real por m² · ${ds.regionLabels.get(slug) || slug}`,
-        color: getColorForSlug(slug, idx),
-        axis:"left"
-      });
+    app.series.set("pib_pct", {
+      xs: rows.map(r => r.year),
+      ys: rows.map(r => r.pib),
     });
-
-    app.seriesDefs = seriesDefs;
-    app.xDomain = { min: ds.rows[0].year, max: ds.rows[ds.rows.length - 1].year };
-    app.meta.baseYear = ds.baseYear || ds.rows[0].baseYear || ds.rows[0].year;
-    app.meta.lastYear = ds.rows[ds.rows.length - 1].year;
-    app.meta.datasetLabel = ds.modeLabel;
-    app.meta.regionOrder = ds.regionOrder.slice();
-    app.meta.regionLabels = ds.regionLabels;
-    app.meta.pibLast = pibMap.get(app.meta.lastYear);
-    app.meta.preferredFile = ds.preferredFile;
-  }
-
-  function computeYDomain(){
-    let yMin = Infinity;
-    let yMax = -Infinity;
-    for (const s of app.seriesDefs){
-      const ser = app.series.get(s.key);
-      if (!ser) continue;
-      for (const v of ser.ys){
-        if (Number.isFinite(v)){
-          yMin = Math.min(yMin, v);
-          yMax = Math.max(yMax, v);
-        }
-      }
-    }
-    if (!Number.isFinite(yMin) || !Number.isFinite(yMax)){
-      yMin = 0;
-      yMax = 1;
-    }
-    yMin = Math.min(yMin, 0);
-    const span = Math.max(1, yMax - yMin);
-    const pad = Math.max(2, span * 0.08);
-    return { left: { min: yMin - pad, max: yMax + pad } };
-  }
-
-  function rebuildChart(){
-    if (controller && typeof controller.destroy === "function"){
-      controller.destroy();
-      controller = null;
-    }
-
-    controller = makeChartController({
-      svg, wrap, tooltipEl, errorEl,
-      legendEl,
-      controls,
-      seriesList: app.seriesDefs,
-      getValueAtYear,
-      getSeriesForPath,
-      xDomain: app.xDomain,
-      yDomain: computeYDomain(),
-      formatValue: (key, v) => fmtPct(v),
-      extraBackground: drawPresBands,
-      alwaysTooltip: true,
-      yLabelLeft: `Variación acumulada desde ${app.meta.baseYear} (%)`,
-      defaultOrderTooltip: app.seriesDefs.map(s => s.key),
-      topN: 0,
-      segmentBreakRule: () => false
+    app.series.set("viv_pct", {
+      xs: rows.map(r => r.year),
+      ys: rows.map(r => r.viv),
     });
   }
-
-  async function setMode(mode){
-    try{
-      if (errorEl){
-        errorEl.style.display = "none";
-        errorEl.textContent = "";
-      }
-      currentMode = mode;
-      setModeButtons(mode);
-      const ds = await loadDataset(mode);
-      applyDataset(ds);
-      updateTextMeta();
-      renderStats();
-      rebuildChart();
-      if (window.__activeViewKey === "ppa" && controller) requestAnimationFrame(() => controller.onShow());
-    } catch(e){
-      if (errorEl){
-        errorEl.style.display = "flex";
-        errorEl.textContent = e.message || String(e);
-      }
-    }
-  }
-
-  function pulseExplainPPA(){
-    if (!explainEl) return;
-    if (explainEl.classList.contains("explainCollapsible")){
-      explainEl.classList.add("open");
-    }
-    requestAnimationFrame(() => {
-      const scroller = document.getElementById("viewPPA") || explainEl.closest(".view");
-      if (scroller && typeof scroller.scrollTo === "function"){
-        const sr = scroller.getBoundingClientRect();
-        const tr = explainEl.getBoundingClientRect();
-        const top = (tr.top - sr.top) + (scroller.scrollTop || 0) - 8;
-        scroller.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-      } else {
-        explainEl.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    });
-  }
-
-  if (btnExplain){
-    btnExplain.classList.remove("on");
-    btnExplain.textContent = "Explicación";
-    btnExplain.addEventListener("click", pulseExplainPPA);
-  }
-
-  if (btnPolBands){
-    btnPolBands.classList.toggle("on", showPresBands);
-    btnPolBands.textContent = "Políticos: " + (showPresBands ? "ON" : "OFF");
-    btnPolBands.addEventListener("click", () => {
-      showPresBands = !showPresBands;
-      btnPolBands.classList.toggle("on", showPresBands);
-      btnPolBands.textContent = "Políticos: " + (showPresBands ? "ON" : "OFF");
-      if (controller) controller.onShow();
-    });
-  }
-
-  if (btnModeTop5) btnModeTop5.addEventListener("click", () => setMode("top5"));
-  if (btnModeNational) btnModeNational.addEventListener("click", () => setMode("national"));
-  if (btnModeAll) btnModeAll.addEventListener("click", () => setMode("all"));
 
   try{
-    await setMode("top5");
+    await loadPPA();
   } catch(e){
     if (errorEl){
       errorEl.style.display = "flex";
@@ -4500,7 +4143,61 @@ try{
     return;
   }
 
-  window.__ppa = { onShow: () => { if (controller) controller.onShow(); } };
+  renderStats();
+
+  let yMin = Infinity;
+  let yMax = -Infinity;
+  for (const s of seriesDefs){
+    const ser = app.series.get(s.key);
+    if (!ser) continue;
+    for (const v of ser.ys){
+      if (Number.isFinite(v)){
+        yMin = Math.min(yMin, v);
+        yMax = Math.max(yMax, v);
+      }
+    }
+  }
+  if (!Number.isFinite(yMin) || !Number.isFinite(yMax)){
+    yMin = 0;
+    yMax = 1;
+  }
+  yMin = Math.min(yMin, 0);
+  const span = Math.max(1, yMax - yMin);
+  const pad = Math.max(2, span * 0.08);
+  yMin -= pad;
+  yMax += pad;
+
+  const controller = makeChartController({
+    svg, wrap, tooltipEl, errorEl,
+    legendEl,
+    controls,
+    seriesList: seriesDefs.map(s => ({ key:s.key, label:s.label, color:s.color, axis:s.axis })),
+    getValueAtYear,
+    getSeriesForPath,
+    xDomain: app.xDomain,
+    yDomain: { left: { min: yMin, max: yMax } },
+    formatValue: (key, v) => fmtPct(v),
+    extraBackground: drawPresBands,
+    alwaysTooltip: true,
+    yLabelLeft: `Variación acumulada desde ${app.meta.baseYear} (%)`,
+    defaultOrderTooltip: ["pib_pct", "viv_pct"],
+    topN: 0,
+    segmentBreakRule: () => false
+  });
+
+  if (btnPolBands){
+    btnPolBands.classList.toggle("on", showPresBands);
+    btnPolBands.textContent = "Políticos: " + (showPresBands ? "ON" : "OFF");
+    btnPolBands.addEventListener("click", () => {
+      showPresBands = !showPresBands;
+      btnPolBands.classList.toggle("on", showPresBands);
+      btnPolBands.textContent = "Políticos: " + (showPresBands ? "ON" : "OFF");
+      controller.onShow();
+    });
+  }
+
+  window.__ppa = { onShow: () => controller.onShow() };
+  if (window.__activeViewKey === "ppa") requestAnimationFrame(() => controller.onShow());
 })();
 
 </script>
