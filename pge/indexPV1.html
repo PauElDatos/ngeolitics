@@ -843,7 +843,7 @@
     }
 
     header{
-      padding: 18px 22px 16px 22px;
+      padding: 22px 24px 18px 24px;
       margin-top: 2px;
       margin-bottom: 12px;
       background: linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
@@ -851,50 +851,31 @@
       border: 1px solid var(--stroke);
       border-radius: 30px;
       box-shadow: var(--shadow), inset 0 0 0 1px rgba(255,255,255,.02);
-      align-items: stretch;
-    }
-
-    .headerTop{
-      display:flex;
-      align-items:flex-start;
-      justify-content:space-between;
-      gap:18px;
-      width:100%;
-    }
-
-    .headerMain{
-      min-width:0;
-      flex:1 1 auto;
-      display:flex;
-      flex-direction:column;
-      gap:14px;
+      align-items: flex-start;
     }
 
     .h-title{
-      line-height:1;
-      width:auto;
-      min-width:0;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      width: 100%;
     }
     .h-title h1{
       color: #fff;
       font-family: var(--fontBrand);
-      font-size: clamp(26px, 3.4vw, 50px);
+      font-size: clamp(32px, 4vw, 58px);
       font-weight: 400;
-      line-height: 1;
+      line-height: .96;
       letter-spacing: -.02em;
       text-transform:none;
-      max-width:none;
+      max-width: 12ch;
       margin: 0;
-      white-space: nowrap;
-      text-wrap: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      text-wrap: balance;
     }
 
     .tabs{
-      gap: 10px;
+      gap: 12px;
       margin-top: 0;
-      flex-wrap: wrap;
     }
 
     .btn{
@@ -917,9 +898,9 @@
       font-weight: 700;
     }
     .btn.tab{
-      padding: 10px 16px;
+      padding: 12px 16px;
       border-radius: 999px;
-      font-size: calc(11.5px * var(--uiScale));
+      font-size: calc(12px * var(--uiScale));
     }
     .btn.tab[aria-selected="true"],
     .btn.tab.on{
@@ -1043,20 +1024,13 @@
       border-bottom-color: rgba(255,255,255,.68);
     }
 
-    .homeTopRight{
-      position: static;
-      z-index: auto;
-      flex: 0 0 auto;
-      align-self: flex-start;
-      margin-left: 12px;
-      white-space: nowrap;
-    }
-
     a.btn.homeTopRight{
+      top: 20px;
+      right: 20px;
       border:1px solid rgba(255,255,255,.14) !important;
       background: rgba(255,255,255,.045) !important;
       color:#fff !important;
-      padding: 10px 16px !important;
+      padding: 12px 16px !important;
       border-radius: 999px !important;
       font-family: var(--fontText) !important;
       font-weight: 600;
@@ -1078,16 +1052,6 @@
       background: rgba(0,0,0,.55);
     }
 
-    @media (max-width: 1100px){
-      .h-title h1{
-        font-size: clamp(24px, 3vw, 42px);
-      }
-      .btn.tab{
-        font-size: calc(11px * var(--uiScale));
-        padding: 10px 14px;
-      }
-    }
-
     @media (max-width: 900px){
       body{ padding: 14px; }
       header,
@@ -1101,23 +1065,15 @@
         padding: 18px 18px 16px 18px;
         border-radius: 24px;
       }
-      .headerTop{
-        flex-direction: column;
-        align-items: stretch;
-        gap: 14px;
-      }
-      .headerMain{
-        gap: 12px;
-      }
       .h-title h1{
-        font-size: clamp(24px, 5.6vw, 34px);
-        white-space: nowrap;
+        font-size: clamp(28px, 9vw, 44px);
+        max-width: 14ch;
       }
       .tabs{
         gap: 10px;
       }
       .btn.tab{
-        padding: 10px 14px;
+        padding: 11px 14px;
       }
       .panel{
         border-radius: 22px;
@@ -1127,11 +1083,9 @@
         padding-left: 14px;
         padding-right: 14px;
       }
-      .homeTopRight{
-        margin-left: 0;
-      }
       a.btn.homeTopRight{
-        align-self: flex-start;
+        top: 14px;
+        right: 14px;
         padding: 10px 14px !important;
       }
     }
@@ -1141,21 +1095,16 @@
 
 <body>
 
+  <a class="btn homeTopRight" href="../index.html" title="Volver al inicio">← Volver al inicio</a>
+
   <header>
-    <div class="headerTop">
-      <div class="headerMain">
-        <div class="h-title">
-          <h1>Entendiendo la economía de España</h1>
-        </div>
-
-        <div class="tabs" role="tablist" aria-label="Secciones">
-          <button class="btn tab on" data-view="pge" role="tab" aria-selected="true">Presupuestos generales del Estado</button>
-          <button class="btn tab" data-view="gb" role="tab" aria-selected="false">Gasto vs beneficio</button>
-          <button class="btn tab" data-view="pa" role="tab" aria-selected="false">Presión fiscal</button>
-        </div>
-      </div>
-
-      <a class="btn homeTopRight" href="../index.html" title="Volver al inicio">← Volver al inicio</a>
+    <div class="h-title">
+      <h1>entendiendo la economía de España</h1>
+      <div class="tabs" role="tablist" aria-label="Secciones">
+        <button class="btn tab on" data-view="pge" role="tab" aria-selected="true">Presupuestos generales del Estado</button>
+        <button class="btn tab" data-view="gb" role="tab" aria-selected="false">Gasto vs beneficio</button>
+        <button class="btn tab" data-view="pa" role="tab" aria-selected="false">Presión fiscal</button>
+</div>
     </div>
   </header>
 
