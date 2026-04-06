@@ -7,440 +7,277 @@
   <meta name="description" content="N.Geolitics: análisis basados en datos." />
   <link rel="icon" href="assets/faviconNG.png" />
 
+  <!-- Afacad SOLO para el título N.Geolitics -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&display=swap" rel="stylesheet">
 
   <style>
     :root{
-      --bg:#242424;
-      --bg-2:#1d1d1d;
-      --surface:#050505;
-      --surface-2:#0a0a0a;
-      --surface-3:#101010;
-      --text:#f6f6f6;
-      --muted:#b5b5b5;
-      --line:rgba(255,255,255,.10);
-      --line-strong:rgba(255,255,255,.16);
-      --chip:rgba(255,255,255,.03);
-      --chip-hover:rgba(255,255,255,.06);
-      --radius-xl:30px;
-      --radius-lg:24px;
-      --radius-md:18px;
-      --shadow:0 24px 60px rgba(0,0,0,.30);
-      --inner-highlight: inset 0 1px 0 rgba(255,255,255,.06);
-      --font-brand: "Afacad", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      --font-ui: Inter, ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      --max: 1400px;
+      --uiScale: 1.35;
+
+      /* Colores del ejemplo */
+      --bg:#252525;
+      --primary:#FEF702;
+      --text:#B0B0B0;
+      --stroke:#3a3a3a;
+
+      --radius:16px;
+      --shadow: 0 10px 30px rgba(0,0,0,.25);
+
+      /* Fuentes del ejemplo (PGE-like) */
+      --fontTitle: "Futura","Trebuchet MS",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      --fontText:  Arial,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+
+      /* SOLO para el título */
+      --fontBrand: "Afacad", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+
+      --max: 1040px;
     }
 
     *{ box-sizing:border-box; }
-    html, body{ min-height:100%; }
+    html,body{ height:100%; }
 
     body{
       margin:0;
-      color:var(--text);
-      font-family:var(--font-ui);
-      background:
-        radial-gradient(circle at top center, #3a3a3a 0%, #2e2e2e 22%, var(--bg) 52%, var(--bg-2) 100%);
-      padding:20px;
+      min-height:100vh;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--fontText);
+      font-size: calc(14px * var(--uiScale));
+      padding: 18px;
     }
 
     a{ color:inherit; text-decoration:none; }
     a:focus-visible, button:focus-visible{
-      outline:2px solid rgba(255,255,255,.55);
+      outline:2px solid rgba(254,247,2,.55);
       outline-offset:3px;
+      border-radius: 12px;
     }
 
     .wrap{
-      width:min(var(--max), 100%);
-      margin:0 auto;
-      display:grid;
-      gap:22px;
+      width: min(var(--max), 100%);
+      margin: 0 auto;
+      display: grid;
+      gap: 14px;
     }
 
-    .panel{
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,0) 22%),
-        linear-gradient(180deg, var(--surface-2), var(--surface));
-      border:1px solid var(--line);
-      border-radius:var(--radius-xl);
-      box-shadow:var(--shadow), var(--inner-highlight);
-    }
-
+    /* Header: estética del ejemplo, pero fondo negro */
     header.top{
-      min-height:138px;
-      padding:26px 34px;
+      padding:14px 16px;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background: #000;
+      box-shadow: var(--shadow);
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:24px;
+      gap: 14px;
     }
 
     .brand{
-      min-width:0;
       display:flex;
       align-items:center;
+      min-width: 0;
     }
 
+    /* Título sencillo: Afacad SOLO aquí */
     .brandText .t{
       margin:0;
-      font-family:var(--font-brand);
-      font-size:76px;
-      line-height:.92;
-      font-weight:400;
+      font-family: var(--fontBrand);
+      color: #fff;
+      font-size: calc(34px * var(--uiScale));
       letter-spacing:.2px;
-      color:#fff;
       white-space:nowrap;
+      font-weight: 400;
+      line-height: 1;
     }
 
     .topActions{
       display:flex;
       align-items:center;
-      gap:18px;
-      flex-wrap:wrap;
+      gap:10px;
+      flex-wrap: wrap;
       justify-content:flex-end;
     }
 
+    /* Icon buttons con estética del ejemplo */
     .iconBtn{
-      width:82px;
-      height:82px;
-      border-radius:999px;
+      width: 44px;
+      height: 44px;
       display:flex;
       align-items:center;
       justify-content:center;
-      border:1px solid var(--line-strong);
-      background:linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.01));
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
-      transition:transform .12s ease, background .18s ease, border-color .18s ease;
+      border-radius: 999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      transition: transform .04s ease, border-color .12s ease, background .12s ease;
+      cursor:pointer;
+      user-select:none;
     }
-
     .iconBtn:hover{
-      transform:translateY(-1px);
-      background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border-color:rgba(255,255,255,.24);
+      border-color: rgba(254,247,2,.35);
+      background: rgba(255,255,255,.06);
     }
-
+    .iconBtn:active{ transform: translateY(1px); }
     .iconBtn svg{
-      width:34px;
-      height:34px;
-      fill:#fff;
-      opacity:.96;
+      width: 22px;
+      height: 22px;
+      fill: #fff;
+      opacity: .95;
     }
 
-    .hero{
-      padding:34px 36px;
-      display:grid;
-      grid-template-columns: 1.3fr .9fr;
-      gap:28px;
-      align-items:stretch;
-    }
-
-    .heroCopy{
-      display:flex;
-      flex-direction:column;
-      justify-content:center;
-      gap:18px;
-      min-width:0;
-    }
-
-    .eyebrow{
-      display:inline-flex;
-      width:max-content;
-      padding:10px 16px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:var(--chip);
-      color:var(--muted);
-      font-size:13px;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-    }
-
-    .hero h2{
-      margin:0;
-      font-family:var(--font-brand);
-      font-size:58px;
-      line-height:.96;
-      font-weight:500;
-      color:#fff;
-      max-width:12ch;
-    }
-
-    .hero p{
-      margin:0;
-      color:#d8d8d8;
-      font-size:20px;
-      line-height:1.6;
-      max-width:62ch;
-    }
-
-    .heroAside{
-      border:1px solid var(--line);
-      border-radius:26px;
-      background:linear-gradient(180deg, rgba(255,255,255,.02), rgba(255,255,255,.01));
-      padding:24px;
-      display:grid;
-      gap:18px;
-      align-content:start;
-      min-width:0;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
-    }
-
-    .heroAsideTitle{
-      font-size:13px;
-      letter-spacing:.14em;
-      text-transform:uppercase;
-      color:var(--muted);
-    }
-
-    .heroAside p{
-      margin:0;
-      color:#e6e6e6;
-      font-size:17px;
-      line-height:1.55;
-    }
-
-    .statGrid{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0, 1fr));
-      gap:12px;
-    }
-
-    .stat{
-      border:1px solid var(--line);
-      border-radius:18px;
-      padding:14px 16px;
-      background:rgba(255,255,255,.02);
-    }
-
-    .stat .n{
-      display:block;
-      font-size:26px;
-      color:#fff;
-      font-weight:600;
+    .btn{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.9);
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: calc(12px * var(--uiScale));
+      cursor:pointer;
+      user-select:none;
+      transition: transform .04s ease, border-color .12s ease, background .12s ease;
       line-height:1;
-      margin-bottom:6px;
+      white-space:nowrap;
+      font-family: var(--fontText);
+    }
+    .btn:hover{ border-color: rgba(254,247,2,.35); background: rgba(255,255,255,.06); }
+    .btn:active{ transform: translateY(1px); }
+    .btn.primary{
+      background: rgba(254,247,2,.95);
+      border-color: rgba(254,247,2,.95);
+      color: rgba(0,0,0,.92);
+      font-weight: 800;
     }
 
-    .stat .l{
-      display:block;
-      font-size:13px;
-      color:var(--muted);
-      line-height:1.3;
+    /* Hero: estética ejemplo, sin bloque “Actualizado” */
+    .hero{
+      padding: 18px 16px;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background: linear-gradient(180deg, rgba(254,247,2,.06), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      overflow:hidden;
     }
-
-    .sectionBlock{
-      display:grid;
-      gap:16px;
+    .hero h1{
+      margin:0;
+      font-family: var(--fontTitle);
+      color:#fff;
+      font-size: calc(26px * var(--uiScale));
+      letter-spacing: .2px;
+      line-height:1.05;
+    }
+    .hero p{
+      margin:10px 0 0 0;
+      opacity:.9;
+      font-size: calc(13px * var(--uiScale));
+      line-height:1.45;
+      max-width: 95ch;
+      font-family: var(--fontText);
     }
 
     .sectionHead{
       display:flex;
-      align-items:center;
+      align-items:flex-end;
       justify-content:space-between;
-      gap:16px;
-      padding:0 10px;
+      gap: 12px;
+      padding: 0 2px;
+      margin-top: 4px;
     }
-
-    .sectionHead h3{
+    .sectionHead h2{
       margin:0;
-      font-family:var(--font-brand);
-      font-size:40px;
-      font-weight:500;
-      color:#fff;
-      letter-spacing:.2px;
+      font-family: var(--fontTitle);
+      color: var(--primary);
+      font-size: calc(16px * var(--uiScale));
+      letter-spacing:.35px;
+      text-transform: uppercase;
     }
 
-    .sectionHead p{
-      margin:0;
-      color:var(--muted);
-      font-size:16px;
-    }
+    .list{ display:grid; gap: 14px; }
 
-    .list{
-      display:grid;
-      grid-template-columns:repeat(2, minmax(0, 1fr));
-      gap:18px;
-    }
-
+    /* Cards: estética ejemplo, sin carátulas (thumb) ni tags */
     .card{
-      position:relative;
-      min-height:260px;
-      padding:28px;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      box-shadow: var(--shadow);
+      padding: 16px;
+      display:flex;
+      gap: 14px;
+      align-items: stretch;
+      position: relative;
+      overflow:hidden;
+      transition: border-color .15s ease, background .15s ease, transform .10s ease;
+    }
+    .card:hover{
+      border-color: rgba(254,247,2,.35);
+      background: linear-gradient(180deg, rgba(254,247,2,.06), rgba(255,255,255,.02));
+      transform: translateY(-1px);
+    }
+    .cardBody{
+      flex: 1 1 auto;
+      min-width: 0;
       display:flex;
       flex-direction:column;
-      justify-content:space-between;
-      gap:18px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.035), rgba(255,255,255,0) 26%),
-        linear-gradient(180deg, var(--surface-2), var(--surface));
-      border:1px solid var(--line);
-      border-radius:var(--radius-xl);
-      box-shadow:var(--shadow), var(--inner-highlight);
-      overflow:hidden;
-      transition:transform .14s ease, border-color .18s ease, background .18s ease;
+      gap: 8px;
+      padding-right: 54px;
     }
-
-    .card::before{
-      content:"";
-      position:absolute;
-      inset:0;
-      background:radial-gradient(circle at top right, rgba(255,255,255,.07), transparent 36%);
-      pointer-events:none;
-    }
-
-    .card:hover{
-      transform:translateY(-2px);
-      border-color:rgba(255,255,255,.22);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,0) 28%),
-        linear-gradient(180deg, #0c0c0c, #050505);
-    }
-
-    .cardTop{
-      display:grid;
-      gap:14px;
-      position:relative;
-      z-index:1;
-    }
-
     .kicker{
-      display:inline-flex;
-      align-items:center;
-      width:max-content;
-      min-width:48px;
-      padding:8px 14px;
-      border-radius:999px;
-      border:1px solid var(--line);
-      background:var(--chip);
-      color:var(--muted);
-      font-size:13px;
-      font-weight:600;
-      letter-spacing:.08em;
+      font-family: var(--fontTitle);
+      color: var(--primary);
+      text-transform: uppercase;
+      letter-spacing: .35px;
+      font-size: calc(12px * var(--uiScale));
+      opacity: .95;
     }
-
     .title{
       margin:0;
-      font-family:var(--font-brand);
-      font-size:42px;
-      line-height:.98;
+      font-family: var(--fontTitle);
+      font-size: calc(22px * var(--uiScale));
       color:#fff;
-      font-weight:500;
-      max-width:12ch;
+      letter-spacing:.2px;
+      line-height:1.05;
     }
-
     .desc{
       margin:0;
-      color:#d4d4d4;
-      font-size:18px;
-      line-height:1.58;
-      max-width:44ch;
+      opacity:.9;
+      font-size: calc(13px * var(--uiScale));
+      line-height:1.45;
+      max-width: 95ch;
+      font-family: var(--fontText);
     }
-
-    .cardFoot{
-      position:relative;
-      z-index:1;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-    }
-
-    .miniMeta{
-      color:var(--muted);
-      font-size:14px;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-
     .arrow{
-      width:58px;
-      height:58px;
-      border-radius:999px;
-      border:1px solid var(--line-strong);
-      background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.015));
+      position:absolute;
+      right: 16px;
+      bottom: 16px;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
       display:flex;
       align-items:center;
       justify-content:center;
-      color:#fff;
-      font-size:25px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+      font-size: 18px;
+      color: var(--primary);
     }
 
-    .footerNote{
-      padding:0 10px 12px;
-      color:#9a9a9a;
-      font-size:14px;
-      line-height:1.5;
-    }
-
-    @media (max-width: 1200px){
-      .brandText .t{ font-size:62px; }
-      .hero{ grid-template-columns:1fr; }
-      .hero h2{ max-width:none; }
-      .list{ grid-template-columns:1fr; }
-      .iconBtn{ width:72px; height:72px; }
-    }
-
-    @media (max-width: 760px){
-      body{ padding:14px; }
-      .wrap{ gap:16px; }
-      header.top{
-        min-height:auto;
-        padding:22px 20px;
-        flex-direction:column;
-        align-items:flex-start;
-      }
-      .brandText .t{
-        font-size:42px;
-        white-space:normal;
-      }
-      .topActions{
-        width:100%;
-        justify-content:space-between;
-        gap:12px;
-      }
-      .iconBtn{
-        width:60px;
-        height:60px;
-      }
-      .iconBtn svg{
-        width:28px;
-        height:28px;
-      }
-      .hero{
-        padding:24px 20px;
-        gap:20px;
-      }
-      .eyebrow{ font-size:12px; }
-      .hero h2{
-        font-size:42px;
-      }
-      .hero p,
-      .heroAside p,
-      .desc{
-        font-size:16px;
-      }
-      .sectionHead{
-        flex-direction:column;
-        align-items:flex-start;
-        padding:0 4px;
-      }
-      .sectionHead h3{ font-size:32px; }
-      .card{
-        min-height:auto;
-        padding:22px 20px;
-      }
-      .title{ font-size:34px; }
-      .statGrid{ grid-template-columns:1fr; }
-      .arrow{ width:52px; height:52px; }
+    @media (max-width: 900px){
+      body{ padding: 14px; }
+      .sectionHead{ flex-direction:column; align-items:flex-start; }
+      .card{ flex-direction:column; }
+      .cardBody{ padding-right: 0; }
+      .arrow{ right: 14px; bottom: 14px; }
+      .brandText .t{ font-size: calc(28px * var(--uiScale)); }
     }
   </style>
 </head>
+
 <body>
   <div class="wrap">
-    <header class="top panel" aria-label="Cabecera principal">
+
+    <header class="top" aria-label="Cabecera principal">
       <div class="brand">
         <div class="brandText">
           <h1 class="t">N.Geolitics</h1>
@@ -448,96 +285,91 @@
       </div>
 
       <div class="topActions" aria-label="Redes sociales">
+        <!-- TikTok -->
         <a class="iconBtn" href="https://www.tiktok.com/@n.geolitics" target="_blank" rel="noopener" aria-label="TikTok">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.6 5.7c.9.9 2 1.4 3.3 1.5v3.1c-1.7-.1-3.2-.6-4.6-1.6v6.2c0 3.1-2.5 5.6-5.6 5.6S4.1 18.1 4.1 15s2.5-5.6 5.6-5.6c.5 0 1 .1 1.4.2v3.2c-.4-.2-.9-.3-1.4-.3-1.4 0-2.6 1.2-2.6 2.6 0 1.4 1.2 2.6 2.6 2.6 1.4 0 2.6-1.1 2.6-2.6V3.5h3.1c.1.8.5 1.6 1.2 2.2z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M16.6 5.7c.9.9 2 1.4 3.3 1.5v3.1c-1.7-.1-3.2-.6-4.6-1.6v6.2c0 3.1-2.5 5.6-5.6 5.6S4.1 18.1 4.1 15s2.5-5.6 5.6-5.6c.5 0 1 .1 1.4.2v3.2c-.4-.2-.9-.3-1.4-.3-1.4 0-2.6 1.2-2.6 2.6 0 1.4 1.2 2.6 2.6 2.6 1.4 0 2.6-1.1 2.6-2.6V3.5h3.1c.1.8.5 1.6 1.2 2.2z"/>
+          </svg>
         </a>
+
+        <!-- Instagram -->
         <a class="iconBtn" href="https://www.instagram.com/n.geolitics/?hl=es" target="_blank" rel="noopener" aria-label="Instagram">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-5 4.5A5.5 5.5 0 1 1 6.5 14 5.5 5.5 0 0 1 12 8.5zm0 2A3.5 3.5 0 1 0 15.5 14 3.5 3.5 0 0 0 12 10.5zM18 6.8a1.2 1.2 0 1 1-1.2-1.2A1.2 1.2 0 0 1 18 6.8z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5zm10 2H7a3 3 0 0 0-3 3v10a3 3 0 0 0 3 3h10a3 3 0 0 0 3-3V7a3 3 0 0 0-3-3zm-5 4.5A5.5 5.5 0 1 1 6.5 14 5.5 5.5 0 0 1 12 8.5zm0 2A3.5 3.5 0 1 0 15.5 14 3.5 3.5 0 0 0 12 10.5zM18 6.8a1.2 1.2 0 1 1-1.2-1.2A1.2 1.2 0 0 1 18 6.8z"/>
+          </svg>
         </a>
+
+        <!-- YouTube -->
         <a class="iconBtn" href="https://www.youtube.com/@N.geolitics" target="_blank" rel="noopener" aria-label="YouTube">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21.7 7.2a3 3 0 0 0-2.1-2.1C17.8 4.6 12 4.6 12 4.6s-5.8 0-7.6.5A3 3 0 0 0 2.3 7.2 31.1 31.1 0 0 0 1.9 12a31.1 31.1 0 0 0 .4 4.8 3 3 0 0 0 2.1 2.1c1.8.5 7.6.5 7.6.5s5.8 0 7.6-.5a3 3 0 0 0 2.1-2.1 31.1 31.1 0 0 0 .4-4.8 31.1 31.1 0 0 0-.4-4.8zM10.3 15.2V8.8L15.7 12l-5.4 3.2z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21.7 7.2a3 3 0 0 0-2.1-2.1C17.8 4.6 12 4.6 12 4.6s-5.8 0-7.6.5A3 3 0 0 0 2.3 7.2 31.1 31.1 0 0 0 1.9 12a31.1 31.1 0 0 0 .4 4.8 3 3 0 0 0 2.1 2.1c1.8.5 7.6.5 7.6.5s5.8 0 7.6-.5a3 3 0 0 0 2.1-2.1 31.1 31.1 0 0 0 .4-4.8 31.1 31.1 0 0 0-.4-4.8zM10.3 15.2V8.8L15.7 12l-5.4 3.2z"/>
+          </svg>
         </a>
+
+        <!-- Patreon -->
         <a class="iconBtn" href="https://www.patreon.com/cw/NGeolitics" target="_blank" rel="noopener" aria-label="Patreon">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M14.8 3.5c-3.6 0-6.6 2.9-6.6 6.6s2.9 6.6 6.6 6.6 6.6-2.9 6.6-6.6-2.9-6.6-6.6-6.6zM4 3.5h2.8v17H4z"/></svg>
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M14.8 3.5c-3.6 0-6.6 2.9-6.6 6.6s2.9 6.6 6.6 6.6 6.6-2.9 6.6-6.6-2.9-6.6-6.6-6.6zM4 3.5h2.8v17H4z"/>
+          </svg>
         </a>
       </div>
     </header>
 
-    <section class="hero panel" aria-label="Presentación principal">
-      <div class="heroCopy">
-        <span class="eyebrow">Análisis basados en datos</span>
-        <h2>La información es poder</h2>
+    <section class="hero" aria-label="Presentación">
+    <div>
+        <h1>La información es poder</h1>
         <p>
-          Aquí encontrarás estudios económicos sin ideología política, diseñados para entender con claridad la evolución,
-          la estructura y el estado del sistema. La idea es que todo mantenga la misma estética sobria y negra de tu cabecera:
-          más limpio, más serio y más coherente visualmente.
+        Aquí encontrarás diferentes <b>estudios económicos</b> sin ideología política, para entender el funcionamiento, la evolución y el estado
+        del sistema, con una fácil <b>visualización y explicación</b> de los datos.
+        <br><br>
+        En cada módulo podrás ver las series, manipular parámetros y consultar las fuentes.
         </p>
-      </div>
-
-      <aside class="heroAside" aria-label="Resumen del proyecto">
-        <div class="heroAsideTitle">Enfoque</div>
-        <p>
-          Visualización, contexto y lectura directa. Menos color, menos ruido y más sensación de producto premium.
-        </p>
-        <div class="statGrid">
-          <div class="stat">
-            <span class="n">02</span>
-            <span class="l">Módulos publicados</span>
-          </div>
-          <div class="stat">
-            <span class="n">100%</span>
-            <span class="l">Estética unificada</span>
-          </div>
-        </div>
-      </aside>
-    </section>
-
-    <section class="sectionBlock" aria-labelledby="analisis-title">
-      <div class="sectionHead">
-        <div>
-          <h3 id="analisis-title">Análisis</h3>
-          <p>La misma línea visual de la cabecera aplicada al resto de la home.</p>
-        </div>
-      </div>
-
-      <div class="list" aria-label="Lista de análisis">
-        <a class="card" id="link-pensiones" href="pensiones-simulador/index.html" aria-label="Abrir análisis: Pensiones">
-          <div class="cardTop">
-            <span class="kicker">A1</span>
-            <h4 class="title">Pensiones</h4>
-            <p class="desc">Insostenibilidad del sistema de pensiones de reparto, con una presentación más sobria, negra y consistente con la marca.</p>
-          </div>
-          <div class="cardFoot">
-            <span class="miniMeta">Abrir análisis</span>
-            <span class="arrow">→</span>
-          </div>
-        </a>
-
-        <a class="card" id="link-pge" href="pge/index.html" aria-label="Abrir análisis: Entendiendo la economía de España">
-          <div class="cardTop">
-            <span class="kicker">A2</span>
-            <h4 class="title">Entendiendo la economía de España</h4>
-            <p class="desc">Visualización de las políticas de los Presupuestos Generales del Estado y de la presión fiscal con una interfaz más cercana al bloque superior que has señalado.</p>
-          </div>
-          <div class="cardFoot">
-            <span class="miniMeta">Abrir análisis</span>
-            <span class="arrow">→</span>
-          </div>
-        </a>
-      </div>
-    </section>
-
-    <div class="footerNote">
-      Versión de prueba: base monocroma, alto contraste y superficies oscuras para mantener legibilidad y comodidad visual tanto de día como de noche.
     </div>
+    </section>
+
+    <div class="sectionHead" id="analisis">
+    <h2>Análisis</h2>
+    </div>
+
+    <section class="list" aria-label="Lista de análisis">
+    <!-- Card 1 -->
+    <a class="card" id="link-pensiones" href="pensiones-simulador/index.html" aria-label="Abrir análisis: Pensiones">
+        <div class="cardBody">
+        <div class="kicker">A1</div>
+        <h3 class="title">Pensiones</h3>
+        <p class="desc">
+            Insostenibilidad del sistema de pensiones de reparto.
+        </p>
+        </div>
+        <div class="arrow">→</div>
+    </a>
+
+    <!-- Card 2 -->
+    <a class="card" id="link-pge" href="pge/index.html" aria-label="Abrir análisis: Entendiendo la economía de España">
+        <div class="cardBody">
+        <div class="kicker">A2</div>
+        <h3 class="title">Entendiendo la economía de España</h3>
+        <p class="desc">
+            Visualización de las políticas de los Presupuestos Generales del Estado y la presión fiscal.
+        </p>
+        </div>
+        <div class="arrow">→</div>
+    </a>
+    </section>
+
+
   </div>
 
   <script>
+    // Autodetección de ruta PGE: "PGE/" vs "pge/" (GitHub Pages distingue mayúsculas/minúsculas)
     (async function(){
       const link = document.getElementById("link-pge");
       if(!link) return;
 
-      const candidates = ["pge/index.html", "pge/"];
+      const candidates = [
+        "pge/index.html",
+        "pge/"
+      ];
 
       async function exists(path){
         try{
