@@ -1,0 +1,679 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tramos del IRPF nacional en el tiempo</title>
+  <style>
+    :root {
+      --bg: #252525;
+      --panel: rgba(255,255,255,.03);
+      --panel-2: rgba(255,255,255,.05);
+      --stroke: #3a3a3a;
+      --grid: #4A4A4A;
+      --text: #d8d8d8;
+      --muted: #b0b0b0;
+      --accent: #FEF702;
+      --shadow: 0 14px 34px rgba(0,0,0,.26);
+      --radius: 16px;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      line-height: 1.4;
+    }
+    a { color: var(--accent); }
+    .wrap {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .hero {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 3vw, 40px);
+      color: var(--accent);
+      letter-spacing: .2px;
+    }
+    .lead {
+      max-width: 1100px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 14px;
+      min-height: calc(100vh - 150px);
+    }
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      min-height: 0;
+    }
+    .panelHead {
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--stroke);
+      background: rgba(255,255,255,.02);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .panelHead h2 {
+      margin: 0;
+      font-size: 13px;
+      letter-spacing: .45px;
+      text-transform: uppercase;
+      color: var(--accent);
+    }
+    .panelBody { padding: 14px; }
+    .controls { display: grid; gap: 12px; }
+    .field { display: grid; gap: 8px; }
+    .label { font-size: 12px; letter-spacing: .3px; text-transform: uppercase; color: var(--muted); }
+    .segmented { display: flex; flex-wrap: wrap; gap: 8px; }
+    .btn {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.92);
+      padding: 9px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: .15s ease;
+    }
+    .btn:hover { border-color: rgba(254,247,2,.35); background: rgba(255,255,255,.06); }
+    .btn.active { background: rgba(254,247,2,.92); border-color: rgba(254,247,2,.98); color: #161616; font-weight: 700; }
+    select {
+      width: 100%;
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-size: 14px;
+    }
+    .legend { display: grid; gap: 8px; max-height: 42vh; overflow: auto; padding-right: 4px; }
+    .legendItem {
+      display: grid;
+      grid-template-columns: 14px 1fr auto;
+      align-items: start;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      border-radius: 12px;
+      padding: 10px;
+      cursor: pointer;
+    }
+    .legendItem:hover { border-color: rgba(254,247,2,.26); }
+    .legendItem.is-muted { opacity: .45; }
+    .legendItem.is-focused { border-color: rgba(254,247,2,.75); background: rgba(254,247,2,.08); }
+    .swatch { width: 12px; height: 12px; border-radius: 4px; margin-top: 3px; }
+    .legendMain { min-width: 0; }
+    .legendName { font-size: 13px; font-weight: 700; }
+    .legendSub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .legendValue { font-size: 12px; color: var(--text); white-space: nowrap; margin-top: 2px; }
+    .smallNote { font-size: 12px; color: var(--muted); }
+    .rightCol { display: grid; grid-template-rows: minmax(470px, 1fr) auto; gap: 14px; min-height: 0; }
+    .chartPanel { display: grid; grid-template-rows: auto 1fr auto; min-height: 0; }
+    .chartMeta { font-size: 12px; color: var(--muted); text-align: right; max-width: 720px; }
+    .chartWrap { position: relative; min-height: 0; padding: 14px; }
+    .chartBox {
+      position: relative;
+      height: 100%;
+      min-height: 460px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.12);
+      border: 1px solid rgba(255,255,255,.06);
+      overflow: hidden;
+    }
+    svg { display: block; width: 100%; height: 100%; }
+    .tooltip {
+      position: absolute;
+      z-index: 3;
+      min-width: 260px;
+      max-width: min(380px, calc(100vw - 48px));
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.84);
+      border-radius: 12px;
+      padding: 10px 12px;
+      box-shadow: 0 16px 34px rgba(0,0,0,.36);
+      pointer-events: none;
+      display: none;
+    }
+    .ttYear { color: var(--accent); font-weight: 700; margin-bottom: 6px; }
+    .ttRow { display: grid; grid-template-columns: 10px 1fr auto; gap: 8px; align-items: center; padding: 3px 0; border-bottom: 1px dashed rgba(255,255,255,.08); }
+    .ttRow:last-child { border-bottom: 0; }
+    .ttDot { width: 10px; height: 10px; border-radius: 50%; }
+    .ttName { font-size: 12px; color: rgba(255,255,255,.9); }
+    .ttVal { font-size: 12px; color: rgba(255,255,255,.95); white-space: nowrap; }
+    .chartFoot { padding: 0 14px 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+    .detailsGrid { display: grid; grid-template-columns: 1.25fr .95fr; gap: 14px; }
+    .cards { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+    .card { border: 1px solid rgba(255,255,255,.08); border-radius: 12px; background: rgba(255,255,255,.02); padding: 12px; }
+    .cardLabel { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .25px; }
+    .cardValue { font-size: 22px; font-weight: 700; margin-top: 6px; }
+    .cardSub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .tableWrap { overflow: auto; max-height: 430px; border: 1px solid rgba(255,255,255,.07); border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; min-width: 620px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.06); text-align: left; font-size: 13px; }
+    th { position: sticky; top: 0; background: #2b2b2b; color: var(--accent); z-index: 1; font-size: 12px; text-transform: uppercase; letter-spacing: .35px; }
+    tr:hover td { background: rgba(255,255,255,.03); }
+    .explain { display: grid; gap: 10px; font-size: 14px; color: var(--muted); }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid rgba(255,255,255,.08); border-radius: 999px; background: rgba(255,255,255,.03); font-size: 12px; color: var(--text); }
+    .pillRow { display: flex; flex-wrap: wrap; gap: 8px; }
+    .yearTitle { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+    .yearTitle h3 { margin:0; color:var(--accent); font-size:20px; }
+    .muted { color: var(--muted); }
+    .sourceLink { font-size: 12px; }
+    @media (max-width: 1150px) {
+      .layout { grid-template-columns: 1fr; }
+      .rightCol { grid-template-rows: auto auto; }
+      .detailsGrid { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .legend { max-height: none; }
+    }
+    @media (max-width: 720px) {
+      .wrap { padding: 14px; }
+      .panelHead { align-items: start; flex-direction: column; }
+      .cards { grid-template-columns: 1fr; }
+      .chartBox { min-height: 420px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Tramos del IRPF nacional en el tiempo</h1>
+      <div class="lead">
+        Esta página toma la <b>escala estatal/general</b> del IRPF de cada año presente en tu JSON y representa la evolución de los <b>límites superiores de cada tramo</b>. Para los años en pesetas, se convierten primero a euros; además puedes ver la serie en <b>euros corrientes</b> o en <b>euros constantes de 1986</b> aplicando el deflactor del CSV. Así se puede comparar mejor el tamaño real de los tramos a lo largo del tiempo.
+      </div>
+    </section>
+
+    <section class="layout">
+      <aside class="panel">
+        <div class="panelHead">
+          <h2>Controles y tramos</h2>
+          <div class="smallNote">Años disponibles: 1990–2023</div>
+        </div>
+        <div class="panelBody controls">
+          <div class="field">
+            <div class="label">Modo de importes</div>
+            <div class="segmented" id="modeButtons"></div>
+          </div>
+
+          <div class="field">
+            <div class="label">Tramos visibles</div>
+            <div class="segmented" id="countButtons"></div>
+            <div class="smallNote">Cada línea representa el <b>límite superior</b> del tramo n.º correspondiente. Cuando un año tiene menos tramos, las líneas altas desaparecen.</div>
+          </div>
+
+          <div class="field">
+            <div class="label">Año seleccionado</div>
+            <select id="yearSelect" aria-label="Seleccionar año"></select>
+          </div>
+
+          <div class="field">
+            <div class="label">Leyenda interactiva</div>
+            <div id="legend" class="legend"></div>
+            <div class="smallNote">Haz clic en un tramo para aislarlo visualmente; vuelve a pulsar para restaurar la vista completa.</div>
+          </div>
+        </div>
+      </aside>
+
+      <div class="rightCol">
+        <section class="panel chartPanel">
+          <div class="panelHead">
+            <h2>Gráfica</h2>
+            <div class="chartMeta" id="chartMeta"></div>
+          </div>
+          <div class="chartWrap">
+            <div class="chartBox" id="chartBox">
+              <svg id="chartSvg" viewBox="0 0 1200 620" preserveAspectRatio="none" aria-label="Gráfica de tramos del IRPF"></svg>
+              <div class="tooltip" id="tooltip"></div>
+            </div>
+          </div>
+          <div class="chartFoot">
+            <div>Consejo: mueve el cursor por la gráfica para ver un año concreto y haz clic para fijarlo en la tabla.</div>
+            <div id="lineSummary"></div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panelHead">
+            <h2>Detalle del año</h2>
+            <div class="smallNote" id="detailModeNote"></div>
+          </div>
+          <div class="panelBody detailsGrid">
+            <div>
+              <div class="yearTitle">
+                <h3 id="yearHeading"></h3>
+                <div class="sourceLink"><a id="yearSource" href="#" target="_blank" rel="noopener noreferrer">Fuente normativa</a></div>
+              </div>
+              <div class="cards" id="cards"></div>
+              <div style="height:12px"></div>
+              <div class="tableWrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tramo</th>
+                      <th>Desde</th>
+                      <th>Hasta</th>
+                      <th>Tipo marginal</th>
+                      <th>Moneda original</th>
+                    </tr>
+                  </thead>
+                  <tbody id="detailBody"></tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="explain">
+              <div class="pillRow">
+                <span class="pill">Serie base: <b>escala estatal/general</b></span>
+                <span class="pill">Máximo histórico cargado: <b>17 tramos finitos</b></span>
+                <span class="pill">Años del JSON: <b>26</b></span>
+              </div>
+              <div>
+                <b>Cómo se ha resuelto el problema de los muchos tramos en los 90:</b> en vez de intentar dibujar “bandas” incompatibles entre años, cada color representa el <b>tope del tramo n.º 1, n.º 2, n.º 3...</b> de cada ejercicio. Esto permite comparar cómo cambian los cortes del impuesto aunque el número total de tramos suba o baje.
+              </div>
+              <div>
+                <b>Modo euros corrientes:</b> los años en pesetas se convierten a euros con la equivalencia legal 1 € = 166,386 ptas. Los años ya expresados en euros se mantienen tal como aparecen en la tabla.
+              </div>
+              <div>
+                <b>Modo euros constantes de 1986:</b> después de pasar a euros, cada importe se multiplica por el <b>deflactor_hasta_1986</b> del CSV. Así la comparación temporal es mucho más homogénea.
+              </div>
+              <div>
+                <b>Importante:</b> el JSON no contiene todos los ejercicios intermedios; solo los años presentes en tu fichero. Por eso verás saltos entre algunos puntos.
+              </div>
+              <div class="muted" id="deflatorExplain"></div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const DATA = [{"year":1990,"regime":"1990_1996_general_only","deflator_hasta_1986":0.8,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1989-30591","row_count":16,"finite_bracket_count":15,"brackets":[{"index":1,"rate":25.0,"lower_original":648900.0,"upper_original":1081500.0,"lower_nominal_eur":3899.967545,"upper_nominal_eur":6499.945909,"lower_real_eur_1986":3119.974036,"upper_real_eur_1986":5199.956727,"is_open":false},{"index":2,"rate":26.0,"lower_original":1081500.0,"upper_original":1622250.0,"lower_nominal_eur":6499.945909,"upper_nominal_eur":9749.918863,"lower_real_eur_1986":5199.956727,"upper_real_eur_1986":7799.935091,"is_open":false},{"index":3,"rate":27.0,"lower_original":1622250.0,"upper_original":2163000.0,"lower_nominal_eur":9749.918863,"upper_nominal_eur":12999.891818,"lower_real_eur_1986":7799.935091,"upper_real_eur_1986":10399.913454,"is_open":false},{"index":4,"rate":28.0,"lower_original":2163000.0,"upper_original":2703750.0,"lower_nominal_eur":12999.891818,"upper_nominal_eur":16249.864772,"lower_real_eur_1986":10399.913454,"upper_real_eur_1986":12999.891818,"is_open":false},{"index":5,"rate":30.0,"lower_original":2703750.0,"upper_original":3244500.0,"lower_nominal_eur":16249.864772,"upper_nominal_eur":19499.837727,"lower_real_eur_1986":12999.891818,"upper_real_eur_1986":15599.870181,"is_open":false},{"index":6,"rate":32.0,"lower_original":3244500.0,"upper_original":3785250.0,"lower_nominal_eur":19499.837727,"upper_nominal_eur":22749.810681,"lower_real_eur_1986":15599.870181,"upper_real_eur_1986":18199.848545,"is_open":false},{"index":7,"rate":34.0,"lower_original":3785250.0,"upper_original":4326000.0,"lower_nominal_eur":22749.810681,"upper_nominal_eur":25999.783636,"lower_real_eur_1986":18199.848545,"upper_real_eur_1986":20799.826909,"is_open":false},{"index":8,"rate":36.0,"lower_original":4326000.0,"upper_original":4866750.0,"lower_nominal_eur":25999.783636,"upper_nominal_eur":29249.75659,"lower_real_eur_1986":20799.826909,"upper_real_eur_1986":23399.805272,"is_open":false},{"index":9,"rate":38.5,"lower_original":4866750.0,"upper_original":5407500.0,"lower_nominal_eur":29249.75659,"upper_nominal_eur":32499.729545,"lower_real_eur_1986":23399.805272,"upper_real_eur_1986":25999.783636,"is_open":false},{"index":10,"rate":41.0,"lower_original":5407500.0,"upper_original":5948250.0,"lower_nominal_eur":32499.729545,"upper_nominal_eur":35749.702499,"lower_real_eur_1986":25999.783636,"upper_real_eur_1986":28599.761999,"is_open":false},{"index":11,"rate":43.5,"lower_original":5948250.0,"upper_original":6489000.0,"lower_nominal_eur":35749.702499,"upper_nominal_eur":38999.675453,"lower_real_eur_1986":28599.761999,"upper_real_eur_1986":31199.740363,"is_open":false},{"index":12,"rate":46.0,"lower_original":6489000.0,"upper_original":7029750.0,"lower_nominal_eur":38999.675453,"upper_nominal_eur":42249.648408,"lower_real_eur_1986":31199.740363,"upper_real_eur_1986":33799.718726,"is_open":false},{"index":13,"rate":48.5,"lower_original":7029750.0,"upper_original":7570500.0,"lower_nominal_eur":42249.648408,"upper_nominal_eur":45499.621362,"lower_real_eur_1986":33799.718726,"upper_real_eur_1986":36399.69709,"is_open":false},{"index":14,"rate":51.0,"lower_original":7570500.0,"upper_original":8111250.0,"lower_nominal_eur":45499.621362,"upper_nominal_eur":48749.594317,"lower_real_eur_1986":36399.69709,"upper_real_eur_1986":38999.675453,"is_open":false},{"index":15,"rate":53.5,"lower_original":8111250.0,"upper_original":8652000.0,"lower_nominal_eur":48749.594317,"upper_nominal_eur":51999.567271,"lower_real_eur_1986":38999.675453,"upper_real_eur_1986":41599.653817,"is_open":false},{"index":16,"rate":56.0,"lower_original":8652000.0,"upper_original":null,"lower_nominal_eur":51999.567271,"upper_nominal_eur":null,"lower_real_eur_1986":41599.653817,"upper_real_eur_1986":null,"is_open":true}]},{"year":1992,"regime":"1990_1996_general_only","deflator_hasta_1986":0.71,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1991-14391","row_count":17,"finite_bracket_count":16,"brackets":[{"index":1,"rate":20.0,"lower_original":400000.0,"upper_original":1000000.0,"lower_nominal_eur":2404.048418,"upper_nominal_eur":6010.121044,"lower_real_eur_1986":1706.874376,"upper_real_eur_1986":4267.185941,"is_open":false},{"index":2,"rate":22.0,"lower_original":1000000.0,"upper_original":1570000.0,"lower_nominal_eur":6010.121044,"upper_nominal_eur":9435.890039,"lower_real_eur_1986":4267.185941,"upper_real_eur_1986":6699.481928,"is_open":false},{"index":3,"rate":24.0,"lower_original":1570000.0,"upper_original":2140000.0,"lower_nominal_eur":9435.890039,"upper_nominal_eur":12861.659034,"lower_real_eur_1986":6699.481928,"upper_real_eur_1986":9131.777914,"is_open":false},{"index":4,"rate":26.0,"lower_original":2140000.0,"upper_original":2710000.0,"lower_nominal_eur":12861.659034,"upper_nominal_eur":16287.428029,"lower_real_eur_1986":9131.777914,"upper_real_eur_1986":11564.0739,"is_open":false},{"index":5,"rate":28.0,"lower_original":2710000.0,"upper_original":3280000.0,"lower_nominal_eur":16287.428029,"upper_nominal_eur":19713.197024,"lower_real_eur_1986":11564.0739,"upper_real_eur_1986":13996.369887,"is_open":false},{"index":6,"rate":30.0,"lower_original":3280000.0,"upper_original":3850000.0,"lower_nominal_eur":19713.197024,"upper_nominal_eur":23138.966019,"lower_real_eur_1986":13996.369887,"upper_real_eur_1986":16428.665873,"is_open":false},{"index":7,"rate":32.0,"lower_original":3850000.0,"upper_original":4420000.0,"lower_nominal_eur":23138.966019,"upper_nominal_eur":26564.735014,"lower_real_eur_1986":16428.665873,"upper_real_eur_1986":18860.96186,"is_open":false},{"index":8,"rate":34.0,"lower_original":4420000.0,"upper_original":4990000.0,"lower_nominal_eur":26564.735014,"upper_nominal_eur":29990.504009,"lower_real_eur_1986":18860.96186,"upper_real_eur_1986":21293.257846,"is_open":false},{"index":9,"rate":36.0,"lower_original":4990000.0,"upper_original":5560000.0,"lower_nominal_eur":29990.504009,"upper_nominal_eur":33416.273004,"lower_real_eur_1986":21293.257846,"upper_real_eur_1986":23725.553833,"is_open":false},{"index":10,"rate":38.0,"lower_original":5560000.0,"upper_original":6130000.0,"lower_nominal_eur":33416.273004,"upper_nominal_eur":36842.041999,"lower_real_eur_1986":23725.553833,"upper_real_eur_1986":26157.849819,"is_open":false},{"index":11,"rate":40.0,"lower_original":6130000.0,"upper_original":6700000.0,"lower_nominal_eur":36842.041999,"upper_nominal_eur":40267.810994,"lower_real_eur_1986":26157.849819,"upper_real_eur_1986":28590.145806,"is_open":false},{"index":12,"rate":42.0,"lower_original":6700000.0,"upper_original":7270000.0,"lower_nominal_eur":40267.810994,"upper_nominal_eur":43693.579989,"lower_real_eur_1986":28590.145806,"upper_real_eur_1986":31022.441792,"is_open":false},{"index":13,"rate":44.0,"lower_original":7270000.0,"upper_original":7840000.0,"lower_nominal_eur":43693.579989,"upper_nominal_eur":47119.348984,"lower_real_eur_1986":31022.441792,"upper_real_eur_1986":33454.737778,"is_open":false},{"index":14,"rate":46.0,"lower_original":7840000.0,"upper_original":8410000.0,"lower_nominal_eur":47119.348984,"upper_nominal_eur":50545.117979,"lower_real_eur_1986":33454.737778,"upper_real_eur_1986":35887.033765,"is_open":false},{"index":15,"rate":48.0,"lower_original":8410000.0,"upper_original":8980000.0,"lower_nominal_eur":50545.117979,"upper_nominal_eur":53970.886974,"lower_real_eur_1986":35887.033765,"upper_real_eur_1986":38319.329751,"is_open":false},{"index":16,"rate":50.5,"lower_original":8980000.0,"upper_original":9550000.0,"lower_nominal_eur":53970.886974,"upper_nominal_eur":57396.655969,"lower_real_eur_1986":38319.329751,"upper_real_eur_1986":40751.625738,"is_open":false},{"index":17,"rate":53.0,"lower_original":9550000.0,"upper_original":null,"lower_nominal_eur":57396.655969,"upper_nominal_eur":null,"lower_real_eur_1986":40751.625738,"upper_real_eur_1986":null,"is_open":true}]},{"year":1994,"regime":"1990_1996_general_only","deflator_hasta_1986":0.65,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1993-31087","row_count":17,"finite_bracket_count":16,"brackets":[{"index":1,"rate":20.0,"lower_original":400000.0,"upper_original":1000000.0,"lower_nominal_eur":2404.048418,"upper_nominal_eur":6010.121044,"lower_real_eur_1986":1562.631471,"upper_real_eur_1986":3906.578678,"is_open":false},{"index":2,"rate":22.0,"lower_original":1000000.0,"upper_original":1570000.0,"lower_nominal_eur":6010.121044,"upper_nominal_eur":9435.890039,"lower_real_eur_1986":3906.578678,"upper_real_eur_1986":6133.328525,"is_open":false},{"index":3,"rate":24.5,"lower_original":1570000.0,"upper_original":2140000.0,"lower_nominal_eur":9435.890039,"upper_nominal_eur":12861.659034,"lower_real_eur_1986":6133.328525,"upper_real_eur_1986":8360.078372,"is_open":false},{"index":4,"rate":27.0,"lower_original":2140000.0,"upper_original":2710000.0,"lower_nominal_eur":12861.659034,"upper_nominal_eur":16287.428029,"lower_real_eur_1986":8360.078372,"upper_real_eur_1986":10586.828219,"is_open":false},{"index":5,"rate":30.0,"lower_original":2710000.0,"upper_original":3280000.0,"lower_nominal_eur":16287.428029,"upper_nominal_eur":19713.197024,"lower_real_eur_1986":10586.828219,"upper_real_eur_1986":12813.578065,"is_open":false},{"index":6,"rate":32.0,"lower_original":3280000.0,"upper_original":3850000.0,"lower_nominal_eur":19713.197024,"upper_nominal_eur":23138.966019,"lower_real_eur_1986":12813.578065,"upper_real_eur_1986":15040.327912,"is_open":false},{"index":7,"rate":34.0,"lower_original":3850000.0,"upper_original":4420000.0,"lower_nominal_eur":23138.966019,"upper_nominal_eur":26564.735014,"lower_real_eur_1986":15040.327912,"upper_real_eur_1986":17267.077759,"is_open":false},{"index":8,"rate":36.0,"lower_original":4420000.0,"upper_original":4990000.0,"lower_nominal_eur":26564.735014,"upper_nominal_eur":29990.504009,"lower_real_eur_1986":17267.077759,"upper_real_eur_1986":19493.827606,"is_open":false},{"index":9,"rate":38.0,"lower_original":4990000.0,"upper_original":5560000.0,"lower_nominal_eur":29990.504009,"upper_nominal_eur":33416.273004,"lower_real_eur_1986":19493.827606,"upper_real_eur_1986":21720.577452,"is_open":false},{"index":10,"rate":40.0,"lower_original":5560000.0,"upper_original":6130000.0,"lower_nominal_eur":33416.273004,"upper_nominal_eur":36842.041999,"lower_real_eur_1986":21720.577452,"upper_real_eur_1986":23947.327299,"is_open":false},{"index":11,"rate":42.5,"lower_original":6130000.0,"upper_original":6700000.0,"lower_nominal_eur":36842.041999,"upper_nominal_eur":40267.810994,"lower_real_eur_1986":23947.327299,"upper_real_eur_1986":26174.077146,"is_open":false},{"index":12,"rate":45.0,"lower_original":6700000.0,"upper_original":7270000.0,"lower_nominal_eur":40267.810994,"upper_nominal_eur":43693.579989,"lower_real_eur_1986":26174.077146,"upper_real_eur_1986":28400.826993,"is_open":false},{"index":13,"rate":47.0,"lower_original":7270000.0,"upper_original":7840000.0,"lower_nominal_eur":43693.579989,"upper_nominal_eur":47119.348984,"lower_real_eur_1986":28400.826993,"upper_real_eur_1986":30627.576839,"is_open":false},{"index":14,"rate":49.0,"lower_original":7840000.0,"upper_original":8410000.0,"lower_nominal_eur":47119.348984,"upper_nominal_eur":50545.117979,"lower_real_eur_1986":30627.576839,"upper_real_eur_1986":32854.326686,"is_open":false},{"index":15,"rate":51.0,"lower_original":8410000.0,"upper_original":8980000.0,"lower_nominal_eur":50545.117979,"upper_nominal_eur":53970.886974,"lower_real_eur_1986":32854.326686,"upper_real_eur_1986":35081.076533,"is_open":false},{"index":16,"rate":53.5,"lower_original":8980000.0,"upper_original":9550000.0,"lower_nominal_eur":53970.886974,"upper_nominal_eur":57396.655969,"lower_real_eur_1986":35081.076533,"upper_real_eur_1986":37307.82638,"is_open":false},{"index":17,"rate":56.0,"lower_original":9550000.0,"upper_original":null,"lower_nominal_eur":57396.655969,"upper_nominal_eur":null,"lower_real_eur_1986":37307.82638,"upper_real_eur_1986":null,"is_open":true}]},{"year":1995,"regime":"1990_1996_general_only","deflator_hasta_1986":0.62,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1994-28967","row_count":18,"finite_bracket_count":17,"brackets":[{"index":1,"rate":0.0,"lower_original":0.0,"upper_original":415000.0,"lower_nominal_eur":0.0,"upper_nominal_eur":2494.200233,"lower_real_eur_1986":0.0,"upper_real_eur_1986":1546.404145,"is_open":false},{"index":2,"rate":20.0,"lower_original":415000.0,"upper_original":1035000.0,"lower_nominal_eur":2494.200233,"upper_nominal_eur":6220.47528,"lower_real_eur_1986":1546.404145,"upper_real_eur_1986":3856.694674,"is_open":false},{"index":3,"rate":22.0,"lower_original":1035000.0,"upper_original":1625000.0,"lower_nominal_eur":6220.47528,"upper_nominal_eur":9766.446696,"lower_real_eur_1986":3856.694674,"upper_real_eur_1986":6055.196952,"is_open":false},{"index":4,"rate":24.5,"lower_original":1625000.0,"upper_original":2215000.0,"lower_nominal_eur":9766.446696,"upper_nominal_eur":13312.418112,"lower_real_eur_1986":6055.196952,"upper_real_eur_1986":8253.69923,"is_open":false},{"index":5,"rate":27.0,"lower_original":2215000.0,"upper_original":2805000.0,"lower_nominal_eur":13312.418112,"upper_nominal_eur":16858.389528,"lower_real_eur_1986":8253.69923,"upper_real_eur_1986":10452.201507,"is_open":false},{"index":6,"rate":30.0,"lower_original":2805000.0,"upper_original":3395000.0,"lower_nominal_eur":16858.389528,"upper_nominal_eur":20404.360944,"lower_real_eur_1986":10452.201507,"upper_real_eur_1986":12650.703785,"is_open":false},{"index":7,"rate":32.0,"lower_original":3395000.0,"upper_original":3985000.0,"lower_nominal_eur":20404.360944,"upper_nominal_eur":23950.33236,"lower_real_eur_1986":12650.703785,"upper_real_eur_1986":14849.206063,"is_open":false},{"index":8,"rate":34.0,"lower_original":3985000.0,"upper_original":4575000.0,"lower_nominal_eur":23950.33236,"upper_nominal_eur":27496.303776,"lower_real_eur_1986":14849.206063,"upper_real_eur_1986":17047.708341,"is_open":false},{"index":9,"rate":36.0,"lower_original":4575000.0,"upper_original":5165000.0,"lower_nominal_eur":27496.303776,"upper_nominal_eur":31042.275191,"lower_real_eur_1986":17047.708341,"upper_real_eur_1986":19246.210619,"is_open":false},{"index":10,"rate":38.0,"lower_original":5165000.0,"upper_original":5755000.0,"lower_nominal_eur":31042.275191,"upper_nominal_eur":34588.246607,"lower_real_eur_1986":19246.210619,"upper_real_eur_1986":21444.712897,"is_open":false},{"index":11,"rate":40.0,"lower_original":5755000.0,"upper_original":6345000.0,"lower_nominal_eur":34588.246607,"upper_nominal_eur":38134.218023,"lower_real_eur_1986":21444.712897,"upper_real_eur_1986":23643.215174,"is_open":false},{"index":12,"rate":42.5,"lower_original":6345000.0,"upper_original":6935000.0,"lower_nominal_eur":38134.218023,"upper_nominal_eur":41680.189439,"lower_real_eur_1986":23643.215174,"upper_real_eur_1986":25841.717452,"is_open":false},{"index":13,"rate":45.0,"lower_original":6935000.0,"upper_original":7525000.0,"lower_nominal_eur":41680.189439,"upper_nominal_eur":45226.160855,"lower_real_eur_1986":25841.717452,"upper_real_eur_1986":28040.21973,"is_open":false},{"index":14,"rate":47.0,"lower_original":7525000.0,"upper_original":8115000.0,"lower_nominal_eur":45226.160855,"upper_nominal_eur":48772.132271,"lower_real_eur_1986":28040.21973,"upper_real_eur_1986":30238.722008,"is_open":false},{"index":15,"rate":49.0,"lower_original":8115000.0,"upper_original":8705000.0,"lower_nominal_eur":48772.132271,"upper_nominal_eur":52318.103687,"lower_real_eur_1986":30238.722008,"upper_real_eur_1986":32437.224286,"is_open":false},{"index":16,"rate":51.0,"lower_original":8705000.0,"upper_original":9295000.0,"lower_nominal_eur":52318.103687,"upper_nominal_eur":55864.075102,"lower_real_eur_1986":32437.224286,"upper_real_eur_1986":34635.726564,"is_open":false},{"index":17,"rate":53.5,"lower_original":9295000.0,"upper_original":9885000.0,"lower_nominal_eur":55864.075102,"upper_nominal_eur":59410.046518,"lower_real_eur_1986":34635.726564,"upper_real_eur_1986":36834.228841,"is_open":false},{"index":18,"rate":56.0,"lower_original":9885000.0,"upper_original":null,"lower_nominal_eur":59410.046518,"upper_nominal_eur":null,"lower_real_eur_1986":36834.228841,"upper_real_eur_1986":null,"is_open":true}]},{"year":1996,"regime":"1990_1996_general_only","deflator_hasta_1986":0.6,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1995-27964","row_count":18,"finite_bracket_count":17,"brackets":[{"index":1,"rate":0.0,"lower_original":0.0,"upper_original":430000.0,"lower_nominal_eur":0.0,"upper_nominal_eur":2584.352049,"lower_real_eur_1986":0.0,"upper_real_eur_1986":1550.611229,"is_open":false},{"index":2,"rate":20.0,"lower_original":430000.0,"upper_original":1072000.0,"lower_nominal_eur":2584.352049,"upper_nominal_eur":6442.849759,"lower_real_eur_1986":1550.611229,"upper_real_eur_1986":3865.709855,"is_open":false},{"index":3,"rate":22.0,"lower_original":1072000.0,"upper_original":1682000.0,"lower_nominal_eur":6442.849759,"upper_nominal_eur":10109.023596,"lower_real_eur_1986":3865.709855,"upper_real_eur_1986":6065.414157,"is_open":false},{"index":4,"rate":24.5,"lower_original":1682000.0,"upper_original":2292000.0,"lower_nominal_eur":10109.023596,"upper_nominal_eur":13775.197432,"lower_real_eur_1986":6065.414157,"upper_real_eur_1986":8265.118459,"is_open":false},{"index":5,"rate":27.0,"lower_original":2292000.0,"upper_original":2902000.0,"lower_nominal_eur":13775.197432,"upper_nominal_eur":17441.371269,"lower_real_eur_1986":8265.118459,"upper_real_eur_1986":10464.822762,"is_open":false},{"index":6,"rate":30.0,"lower_original":2902000.0,"upper_original":3512000.0,"lower_nominal_eur":17441.371269,"upper_nominal_eur":21107.545106,"lower_real_eur_1986":10464.822762,"upper_real_eur_1986":12664.527064,"is_open":false},{"index":7,"rate":32.0,"lower_original":3512000.0,"upper_original":4122000.0,"lower_nominal_eur":21107.545106,"upper_nominal_eur":24773.718943,"lower_real_eur_1986":12664.527064,"upper_real_eur_1986":14864.231366,"is_open":false},{"index":8,"rate":34.0,"lower_original":4122000.0,"upper_original":4732000.0,"lower_nominal_eur":24773.718943,"upper_nominal_eur":28439.892779,"lower_real_eur_1986":14864.231366,"upper_real_eur_1986":17063.935668,"is_open":false},{"index":9,"rate":36.0,"lower_original":4732000.0,"upper_original":5342000.0,"lower_nominal_eur":28439.892779,"upper_nominal_eur":32106.066616,"lower_real_eur_1986":17063.935668,"upper_real_eur_1986":19263.63997,"is_open":false},{"index":10,"rate":38.0,"lower_original":5342000.0,"upper_original":5952000.0,"lower_nominal_eur":32106.066616,"upper_nominal_eur":35772.240453,"lower_real_eur_1986":19263.63997,"upper_real_eur_1986":21463.344272,"is_open":false},{"index":11,"rate":40.0,"lower_original":5952000.0,"upper_original":6562000.0,"lower_nominal_eur":35772.240453,"upper_nominal_eur":39438.41429,"lower_real_eur_1986":21463.344272,"upper_real_eur_1986":23663.048574,"is_open":false},{"index":12,"rate":42.5,"lower_original":6562000.0,"upper_original":7172000.0,"lower_nominal_eur":39438.41429,"upper_nominal_eur":43104.588126,"lower_real_eur_1986":23663.048574,"upper_real_eur_1986":25862.752876,"is_open":false},{"index":13,"rate":45.0,"lower_original":7172000.0,"upper_original":7782000.0,"lower_nominal_eur":43104.588126,"upper_nominal_eur":46770.761963,"lower_real_eur_1986":25862.752876,"upper_real_eur_1986":28062.457178,"is_open":false},{"index":14,"rate":47.0,"lower_original":7782000.0,"upper_original":8392000.0,"lower_nominal_eur":46770.761963,"upper_nominal_eur":50436.9358,"lower_real_eur_1986":28062.457178,"upper_real_eur_1986":30262.16148,"is_open":false},{"index":15,"rate":49.0,"lower_original":8392000.0,"upper_original":9002000.0,"lower_nominal_eur":50436.9358,"upper_nominal_eur":54103.109637,"lower_real_eur_1986":30262.16148,"upper_real_eur_1986":32461.865782,"is_open":false},{"index":16,"rate":51.0,"lower_original":9002000.0,"upper_original":9612000.0,"lower_nominal_eur":54103.109637,"upper_nominal_eur":57769.283473,"lower_real_eur_1986":32461.865782,"upper_real_eur_1986":34661.570084,"is_open":false},{"index":17,"rate":53.5,"lower_original":9612000.0,"upper_original":10222000.0,"lower_nominal_eur":57769.283473,"upper_nominal_eur":61435.45731,"lower_real_eur_1986":34661.570084,"upper_real_eur_1986":36861.274386,"is_open":false},{"index":18,"rate":56.0,"lower_original":10222000.0,"upper_original":null,"lower_nominal_eur":61435.45731,"upper_nominal_eur":null,"lower_real_eur_1986":36861.274386,"upper_real_eur_1986":null,"is_open":true}]},{"year":1997,"regime":"1997_1999_state_plus_autonomous_reference","deflator_hasta_1986":0.59,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1996-29118","row_count":10,"finite_bracket_count":9,"brackets":[{"index":1,"rate":17.0,"lower_original":442000.0,"upper_original":1136000.0,"lower_nominal_eur":2656.473501,"upper_nominal_eur":6827.497506,"lower_real_eur_1986":1567.319366,"upper_real_eur_1986":4028.223528,"is_open":false},{"index":2,"rate":19.55,"lower_original":1136000.0,"upper_original":2305000.0,"lower_nominal_eur":6827.497506,"upper_nominal_eur":13853.329006,"lower_real_eur_1986":4028.223528,"upper_real_eur_1986":8173.464114,"is_open":false},{"index":3,"rate":23.8,"lower_original":2305000.0,"upper_original":3474000.0,"lower_nominal_eur":13853.329006,"upper_nominal_eur":20879.160506,"lower_real_eur_1986":8173.464114,"upper_real_eur_1986":12318.704699,"is_open":false},{"index":4,"rate":27.2,"lower_original":3474000.0,"upper_original":4643000.0,"lower_nominal_eur":20879.160506,"upper_nominal_eur":27904.992007,"lower_real_eur_1986":12318.704699,"upper_real_eur_1986":16463.945284,"is_open":false},{"index":5,"rate":30.6,"lower_original":4643000.0,"upper_original":5812000.0,"lower_nominal_eur":27904.992007,"upper_nominal_eur":34930.823507,"lower_real_eur_1986":16463.945284,"upper_real_eur_1986":20609.185869,"is_open":false},{"index":6,"rate":34.0,"lower_original":5812000.0,"upper_original":6981000.0,"lower_nominal_eur":34930.823507,"upper_nominal_eur":41956.655007,"lower_real_eur_1986":20609.185869,"upper_real_eur_1986":24754.426454,"is_open":false},{"index":7,"rate":38.25,"lower_original":6981000.0,"upper_original":8150000.0,"lower_nominal_eur":41956.655007,"upper_nominal_eur":48982.486507,"lower_real_eur_1986":24754.426454,"upper_real_eur_1986":28899.667039,"is_open":false},{"index":8,"rate":41.65,"lower_original":8150000.0,"upper_original":9319000.0,"lower_nominal_eur":48982.486507,"upper_nominal_eur":56008.318008,"lower_real_eur_1986":28899.667039,"upper_real_eur_1986":33044.907624,"is_open":false},{"index":9,"rate":45.05,"lower_original":9319000.0,"upper_original":10488000.0,"lower_nominal_eur":56008.318008,"upper_nominal_eur":63034.149508,"lower_real_eur_1986":33044.907624,"upper_real_eur_1986":37190.14821,"is_open":false},{"index":10,"rate":47.6,"lower_original":10488000.0,"upper_original":null,"lower_nominal_eur":63034.149508,"upper_nominal_eur":null,"lower_real_eur_1986":37190.14821,"upper_real_eur_1986":null,"is_open":true}]},{"year":1998,"regime":"1997_1999_state_plus_autonomous_reference","deflator_hasta_1986":0.57,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1997-28052","row_count":8,"finite_bracket_count":7,"brackets":[{"index":1,"rate":17.0,"lower_original":467000.0,"upper_original":1161000.0,"lower_nominal_eur":2806.726527,"upper_nominal_eur":6977.750532,"lower_real_eur_1986":1599.834121,"upper_real_eur_1986":3977.317803,"is_open":false},{"index":2,"rate":19.55,"lower_original":1161000.0,"upper_original":2295000.0,"lower_nominal_eur":6977.750532,"upper_nominal_eur":13793.227796,"lower_real_eur_1986":3977.317803,"upper_real_eur_1986":7862.139843,"is_open":false},{"index":3,"rate":23.8,"lower_original":2295000.0,"upper_original":3495000.0,"lower_nominal_eur":13793.227796,"upper_nominal_eur":21005.373048,"lower_real_eur_1986":7862.139843,"upper_real_eur_1986":11973.062637,"is_open":false},{"index":4,"rate":27.2,"lower_original":3495000.0,"upper_original":5095000.0,"lower_nominal_eur":21005.373048,"upper_nominal_eur":30621.566718,"lower_real_eur_1986":11973.062637,"upper_real_eur_1986":17454.293029,"is_open":false},{"index":5,"rate":33.15,"lower_original":5095000.0,"upper_original":6795000.0,"lower_nominal_eur":30621.566718,"upper_nominal_eur":40838.772493,"lower_real_eur_1986":17454.293029,"upper_real_eur_1986":23278.100321,"is_open":false},{"index":6,"rate":38.25,"lower_original":6795000.0,"upper_original":8625000.0,"lower_nominal_eur":40838.772493,"upper_nominal_eur":51837.294003,"lower_real_eur_1986":23278.100321,"upper_real_eur_1986":29547.257582,"is_open":false},{"index":7,"rate":44.2,"lower_original":8625000.0,"upper_original":10500000.0,"lower_nominal_eur":51837.294003,"upper_nominal_eur":63106.27096,"lower_real_eur_1986":29547.257582,"upper_real_eur_1986":35970.574447,"is_open":false},{"index":8,"rate":47.6,"lower_original":10500000.0,"upper_original":null,"lower_nominal_eur":63106.27096,"upper_nominal_eur":null,"lower_real_eur_1986":35970.574447,"upper_real_eur_1986":null,"is_open":true}]},{"year":1999,"regime":"1997_1999_state_plus_autonomous_reference","deflator_hasta_1986":0.56,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1998-28472","row_count":6,"finite_bracket_count":5,"brackets":[{"index":1,"rate":15.0,"lower_original":0.0,"upper_original":600000.0,"lower_nominal_eur":0.0,"upper_nominal_eur":3606.072626,"lower_real_eur_1986":0.0,"upper_real_eur_1986":2019.400671,"is_open":false},{"index":2,"rate":20.17,"lower_original":600000.0,"upper_original":2100000.0,"lower_nominal_eur":3606.072626,"upper_nominal_eur":12621.254192,"lower_real_eur_1986":2019.400671,"upper_real_eur_1986":7067.902348,"is_open":false},{"index":3,"rate":23.57,"lower_original":2100000.0,"upper_original":4100000.0,"lower_nominal_eur":12621.254192,"upper_nominal_eur":24641.49628,"lower_real_eur_1986":7067.902348,"upper_real_eur_1986":13799.237917,"is_open":false},{"index":4,"rate":31.48,"lower_original":4100000.0,"upper_original":6600000.0,"lower_nominal_eur":24641.49628,"upper_nominal_eur":39666.798889,"lower_real_eur_1986":13799.237917,"upper_real_eur_1986":22213.407378,"is_open":false},{"index":5,"rate":38.07,"lower_original":6600000.0,"upper_original":11000000.0,"lower_nominal_eur":39666.798889,"upper_nominal_eur":66111.331482,"lower_real_eur_1986":22213.407378,"upper_real_eur_1986":37022.34563,"is_open":false},{"index":6,"rate":39.6,"lower_original":11000000.0,"upper_original":null,"lower_nominal_eur":66111.331482,"upper_nominal_eur":null,"lower_real_eur_1986":37022.34563,"upper_real_eur_1986":null,"is_open":true}]},{"year":2000,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.54,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/act.php?id=BOE-A-1999-24785","row_count":6,"finite_bracket_count":5,"brackets":[{"index":1,"rate":15.0,"lower_original":0.0,"upper_original":612000.0,"lower_nominal_eur":0.0,"upper_nominal_eur":3678.194079,"lower_real_eur_1986":0.0,"upper_real_eur_1986":1986.224803,"is_open":false},{"index":2,"rate":20.17,"lower_original":612000.0,"upper_original":2142000.0,"lower_nominal_eur":3678.194079,"upper_nominal_eur":12873.679276,"lower_real_eur_1986":1986.224803,"upper_real_eur_1986":6951.786809,"is_open":false},{"index":3,"rate":23.57,"lower_original":2142000.0,"upper_original":4182000.0,"lower_nominal_eur":12873.679276,"upper_nominal_eur":25134.326205,"lower_real_eur_1986":6951.786809,"upper_real_eur_1986":13572.536151,"is_open":false},{"index":4,"rate":31.48,"lower_original":4182000.0,"upper_original":6732000.0,"lower_nominal_eur":25134.326205,"upper_nominal_eur":40460.134867,"lower_real_eur_1986":13572.536151,"upper_real_eur_1986":21848.472828,"is_open":false},{"index":5,"rate":38.07,"lower_original":6732000.0,"upper_original":11220000.0,"lower_nominal_eur":40460.134867,"upper_nominal_eur":67433.558112,"lower_real_eur_1986":21848.472828,"upper_real_eur_1986":36414.12138,"is_open":false},{"index":6,"rate":39.6,"lower_original":11220000.0,"upper_original":null,"lower_nominal_eur":67433.558112,"upper_nominal_eur":null,"lower_real_eur_1986":36414.12138,"upper_real_eur_1986":null,"is_open":true}]},{"year":2002,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.51,"original_currency":"euros","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-2001-24962","row_count":6,"finite_bracket_count":5,"brackets":[{"index":1,"rate":12.06,"lower_original":0.0,"upper_original":3678.19,"lower_nominal_eur":0.0,"upper_nominal_eur":3678.19,"lower_real_eur_1986":0.0,"upper_real_eur_1986":1875.8769,"is_open":false},{"index":2,"rate":16.08,"lower_original":3678.19,"upper_original":12873.68,"lower_nominal_eur":3678.19,"upper_nominal_eur":12873.68,"lower_real_eur_1986":1875.8769,"upper_real_eur_1986":6565.5768,"is_open":false},{"index":3,"rate":18.961,"lower_original":12873.68,"upper_original":25134.33,"lower_nominal_eur":12873.68,"upper_nominal_eur":25134.33,"lower_real_eur_1986":6565.5768,"upper_real_eur_1986":12818.5083,"is_open":false},{"index":4,"rate":24.924,"lower_original":25134.33,"upper_original":40460.130000000005,"lower_nominal_eur":25134.33,"upper_nominal_eur":40460.13,"lower_real_eur_1986":12818.5083,"upper_real_eur_1986":20634.6663,"is_open":false},{"index":5,"rate":30.15,"lower_original":40460.13,"upper_original":67433.56,"lower_nominal_eur":40460.13,"upper_nominal_eur":67433.56,"lower_real_eur_1986":20634.6663,"upper_real_eur_1986":34391.1156,"is_open":false},{"index":6,"rate":32.16,"lower_original":67433.56,"upper_original":null,"lower_nominal_eur":67433.56,"upper_nominal_eur":null,"lower_real_eur_1986":34391.1156,"upper_real_eur_1986":null,"is_open":true}]},{"year":2003,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.49,"original_currency":"euros","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-2002-24711","row_count":5,"finite_bracket_count":4,"brackets":[{"index":1,"rate":9.06,"lower_original":0.0,"upper_original":4000.0,"lower_nominal_eur":0.0,"upper_nominal_eur":4000.0,"lower_real_eur_1986":0.0,"upper_real_eur_1986":1960.0,"is_open":false},{"index":2,"rate":15.84,"lower_original":4000.0,"upper_original":13800.0,"lower_nominal_eur":4000.0,"upper_nominal_eur":13800.0,"lower_real_eur_1986":1960.0,"upper_real_eur_1986":6762.0,"is_open":false},{"index":3,"rate":18.68,"lower_original":13800.0,"upper_original":25800.0,"lower_nominal_eur":13800.0,"upper_nominal_eur":25800.0,"lower_real_eur_1986":6762.0,"upper_real_eur_1986":12642.0,"is_open":false},{"index":4,"rate":24.71,"lower_original":25800.0,"upper_original":45000.0,"lower_nominal_eur":25800.0,"upper_nominal_eur":45000.0,"lower_real_eur_1986":12642.0,"upper_real_eur_1986":22050.0,"is_open":false},{"index":5,"rate":29.16,"lower_original":45000.0,"upper_original":null,"lower_nominal_eur":45000.0,"upper_nominal_eur":null,"lower_real_eur_1986":22050.0,"upper_real_eur_1986":null,"is_open":true}]},{"year":2005,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.46,"original_currency":"euros","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-2004-4347","row_count":5,"finite_bracket_count":4,"brackets":[{"index":1,"rate":9.06,"lower_original":0.0,"upper_original":4000.0,"lower_nominal_eur":0.0,"upper_nominal_eur":4000.0,"lower_real_eur_1986":0.0,"upper_real_eur_1986":1840.0,"is_open":false},{"index":2,"rate":15.84,"lower_original":4000.0,"upper_original":13800.0,"lower_nominal_eur":4000.0,"upper_nominal_eur":13800.0,"lower_real_eur_1986":1840.0,"upper_real_eur_1986":6348.0,"is_open":false},{"index":3,"rate":18.68,"lower_original":13800.0,"upper_original":25800.0,"lower_nominal_eur":13800.0,"upper_nominal_eur":25800.0,"lower_real_eur_1986":6348.0,"upper_real_eur_1986":11868.0,"is_open":false},{"index":4,"rate":24.71,"lower_original":25800.0,"upper_original":45000.0,"lower_nominal_eur":25800.0,"upper_nominal_eur":45000.0,"lower_real_eur_1986":11868.0,"upper_real_eur_1986":20700.0,"is_open":false},{"index":5,"rate":29.16,"lower_original":45000.0,"upper_original":null,"lower_nominal_eur":45000.0,"upper_nominal_eur":null,"lower_real_eur_1986":20700.0,"upper_real_eur_1986":null,"is_open":true}]},{"year":2006,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.45,"original_currency":"euros","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-2005-21525","row_count":5,"finite_bracket_count":4,"brackets":[{"index":1,"rate":9.06,"lower_original":0.0,"upper_original":4161.6,"lower_nominal_eur":0.0,"upper_nominal_eur":4161.6,"lower_real_eur_1986":0.0,"upper_real_eur_1986":1872.72,"is_open":false},{"index":2,"rate":15.84,"lower_original":4161.6,"upper_original":14357.52,"lower_nominal_eur":4161.6,"upper_nominal_eur":14357.52,"lower_real_eur_1986":1872.72,"upper_real_eur_1986":6460.884,"is_open":false},{"index":3,"rate":18.68,"lower_original":14357.52,"upper_original":26842.32,"lower_nominal_eur":14357.52,"upper_nominal_eur":26842.32,"lower_real_eur_1986":6460.884,"upper_real_eur_1986":12079.044,"is_open":false},{"index":4,"rate":24.71,"lower_original":26842.32,"upper_original":46818.0,"lower_nominal_eur":26842.32,"upper_nominal_eur":46818.0,"lower_real_eur_1986":12079.044,"upper_real_eur_1986":21068.1,"is_open":false},{"index":5,"rate":29.16,"lower_original":46818.0,"upper_original":null,"lower_nominal_eur":46818.0,"upper_nominal_eur":null,"lower_real_eur_1986":21068.1,"upper_real_eur_1986":null,"is_open":true}]},{"year":2007,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.44,"original_currency":"euros","source_url":"https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764","row_count":6,"finite_bracket_count":5,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1986":0.0,"upper_real_eur_1986":5478.0,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1986":5478.0,"upper_real_eur_1986":8888.0,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":35200.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":35200.0,"lower_real_eur_1986":8888.0,"upper_real_eur_1986":15488.0,"is_open":false},{"index":4,"rate":18.5,"lower_original":35200.0,"upper_original":60000.0,"lower_nominal_eur":35200.0,"upper_nominal_eur":60000.0,"lower_real_eur_1986":15488.0,"upper_real_eur_1986":26400.0,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":300000.0,"lower_nominal_eur":60000.0,"upper_nominal_eur":300000.0,"lower_real_eur_1986":26400.0,"upper_real_eur_1986":132000.0,"is_open":false},{"index":6,"rate":24.5,"lower_original":300000.0,"upper_original":null,"lower_nominal_eur":300000.0,"upper_nominal_eur":null,"lower_real_eur_1986":132000.0,"upper_real_eur_1986":null,"is_open":true}]},{"year":2008,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.42,"original_currency":"euros","source_url":"https://www.boe.es/buscar/act.php?id=BOE-A-2007-22295","row_count":4,"finite_bracket_count":3,"brackets":[{"index":1,"rate":15.66,"lower_original":0.0,"upper_original":17707.2,"lower_nominal_eur":0.0,"upper_nominal_eur":17707.2,"lower_real_eur_1986":0.0,"upper_real_eur_1986":7437.024,"is_open":false},{"index":2,"rate":18.27,"lower_original":17707.2,"upper_original":33007.2,"lower_nominal_eur":17707.2,"upper_nominal_eur":33007.2,"lower_real_eur_1986":7437.024,"upper_real_eur_1986":13863.024,"is_open":false},{"index":3,"rate":24.14,"lower_original":33007.2,"upper_original":53407.2,"lower_nominal_eur":33007.2,"upper_nominal_eur":53407.2,"lower_real_eur_1986":13863.024,"upper_real_eur_1986":22431.024,"is_open":false},{"index":4,"rate":27.13,"lower_original":53407.2,"upper_original":null,"lower_nominal_eur":53407.2,"upper_nominal_eur":null,"lower_real_eur_1986":22431.024,"upper_real_eur_1986":null,"is_open":true}]},{"year":2009,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.42,"original_currency":"euros","source_url":"https://www.boe.es/buscar/act.php?id=BOE-A-2008-20744","row_count":4,"finite_bracket_count":3,"brackets":[{"index":1,"rate":15.66,"lower_original":0.0,"upper_original":17707.2,"lower_nominal_eur":0.0,"upper_nominal_eur":17707.2,"lower_real_eur_1986":0.0,"upper_real_eur_1986":7437.024,"is_open":false},{"index":2,"rate":18.27,"lower_original":17707.2,"upper_original":33007.2,"lower_nominal_eur":17707.2,"upper_nominal_eur":33007.2,"lower_real_eur_1986":7437.024,"upper_real_eur_1986":13863.024,"is_open":false},{"index":3,"rate":24.14,"lower_original":33007.2,"upper_original":53407.2,"lower_nominal_eur":33007.2,"upper_nominal_eur":53407.2,"lower_real_eur_1986":13863.024,"upper_real_eur_1986":22431.024,"is_open":false},{"index":4,"rate":27.13,"lower_original":53407.2,"upper_original":null,"lower_nominal_eur":53407.2,"upper_nominal_eur":null,"lower_real_eur_1986":22431.024,"upper_real_eur_1986":null,"is_open":true}]},{"year":2010,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.41,"original_currency":"euros","source_url":"https://www.boe.es/buscar/act.php?id=BOE-A-2009-20765","row_count":4,"finite_bracket_count":3,"brackets":[{"index":1,"rate":15.66,"lower_original":0.0,"upper_original":17707.2,"lower_nominal_eur":0.0,"upper_nominal_eur":17707.2,"lower_real_eur_1986":0.0,"upper_real_eur_1986":7259.952,"is_open":false},{"index":2,"rate":18.27,"lower_original":17707.2,"upper_original":33007.2,"lower_nominal_eur":17707.2,"upper_nominal_eur":33007.2,"lower_real_eur_1986":7259.952,"upper_real_eur_1986":13532.952,"is_open":false},{"index":3,"rate":24.14,"lower_original":33007.2,"upper_original":53407.2,"lower_nominal_eur":33007.2,"upper_nominal_eur":53407.2,"lower_real_eur_1986":13532.952,"upper_real_eur_1986":21896.952,"is_open":false},{"index":4,"rate":27.13,"lower_original":53407.2,"upper_original":null,"lower_nominal_eur":53407.2,"upper_nominal_eur":null,"lower_real_eur_1986":21896.952,"upper_real_eur_1986":null,"is_open":true}]},{"year":2011,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.4,"original_currency":"euros","source_url":"https://www.boe.es/buscar/act.php?id=BOE-A-2010-19703","row_count":6,"finite_bracket_count":5,"brackets":[{"index":1,"rate":12.14,"lower_original":0.17,"upper_original":17707.37,"lower_nominal_eur":0.17,"upper_nominal_eur":17707.37,"lower_real_eur_1986":0.068,"upper_real_eur_1986":7082.948,"is_open":false},{"index":2,"rate":18.0,"lower_original":707.2,"upper_original":16007.2,"lower_nominal_eur":707.2,"upper_nominal_eur":16007.2,"lower_real_eur_1986":282.88,"upper_real_eur_1986":6402.88,"is_open":false},{"index":3,"rate":5.21,"lower_original":33007.2,"upper_original":53407.2,"lower_nominal_eur":33007.2,"upper_nominal_eur":53407.2,"lower_real_eur_1986":13202.88,"upper_real_eur_1986":21362.88,"is_open":false},{"index":4,"rate":5.22,"lower_original":53407.2,"upper_original":120000.2,"lower_nominal_eur":53407.2,"upper_nominal_eur":120000.2,"lower_real_eur_1986":21362.88,"upper_real_eur_1986":48000.08,"is_open":false},{"index":5,"rate":5.23,"lower_original":120000.2,"upper_original":175000.2,"lower_nominal_eur":120000.2,"upper_nominal_eur":175000.2,"lower_real_eur_1986":48000.08,"upper_real_eur_1986":70000.08,"is_open":false},{"index":6,"rate":5.0,"lower_original":175000.2,"upper_original":null,"lower_nominal_eur":175000.2,"upper_nominal_eur":null,"lower_real_eur_1986":70000.08,"upper_real_eur_1986":null,"is_open":true}]},{"year":2014,"regime":"2014_2016_linear_pdf_state_plus_ccaa","deflator_hasta_1986":0.39,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/2014/Manual_Renta_2014_es_es.pdf?utm_source=chatgpt.com","row_count":6,"finite_bracket_count":5,"brackets":[{"index":1,"rate":12.0,"lower_original":0.0,"upper_original":17707.2,"lower_nominal_eur":0.0,"upper_nominal_eur":17707.2,"lower_real_eur_1986":0.0,"upper_real_eur_1986":6905.808,"is_open":false},{"index":2,"rate":14.0,"lower_original":17707.2,"upper_original":33007.2,"lower_nominal_eur":17707.2,"upper_nominal_eur":33007.2,"lower_real_eur_1986":6905.808,"upper_real_eur_1986":12872.808,"is_open":false},{"index":3,"rate":18.5,"lower_original":33007.2,"upper_original":53407.2,"lower_nominal_eur":33007.2,"upper_nominal_eur":53407.2,"lower_real_eur_1986":12872.808,"upper_real_eur_1986":20828.808,"is_open":false},{"index":4,"rate":21.5,"lower_original":53407.2,"upper_original":120000.2,"lower_nominal_eur":53407.2,"upper_nominal_eur":120000.2,"lower_real_eur_1986":20828.808,"upper_real_eur_1986":46800.078,"is_open":false},{"index":5,"rate":22.5,"lower_original":120000.2,"upper_original":175000.2,"lower_nominal_eur":120000.2,"upper_nominal_eur":175000.2,"lower_real_eur_1986":46800.078,"upper_real_eur_1986":68250.078,"is_open":false},{"index":6,"rate":23.5,"lower_original":175000.2,"upper_original":null,"lower_nominal_eur":175000.2,"upper_nominal_eur":null,"lower_real_eur_1986":68250.078,"upper_real_eur_1986":null,"is_open":true}]},{"year":2015,"regime":"2014_2016_linear_pdf_state_plus_ccaa","deflator_hasta_1986":0.39,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/IRPF-2015/Manual_Renta_2015_es_es.pdf?utm_source=chatgpt.com","row_count":5,"finite_bracket_count":4,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1986":0.0,"upper_real_eur_1986":4855.5,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1986":4855.5,"upper_real_eur_1986":7878.0,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":34000.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":34000.0,"lower_real_eur_1986":7878.0,"upper_real_eur_1986":13260.0,"is_open":false},{"index":4,"rate":18.5,"lower_original":34000.0,"upper_original":60000.0,"lower_nominal_eur":34000.0,"upper_nominal_eur":60000.0,"lower_real_eur_1986":13260.0,"upper_real_eur_1986":23400.0,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":null,"lower_nominal_eur":60000.0,"upper_nominal_eur":null,"lower_real_eur_1986":23400.0,"upper_real_eur_1986":null,"is_open":true}]},{"year":2016,"regime":"2014_2016_linear_pdf_state_plus_ccaa","deflator_hasta_1986":0.39,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/IRPF-2016/ManualRentaPatrimonio2016_es_es.pdf?utm_source=chatgpt.com","row_count":5,"finite_bracket_count":4,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1986":0.0,"upper_real_eur_1986":4855.5,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1986":4855.5,"upper_real_eur_1986":7878.0,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":35200.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":35200.0,"lower_real_eur_1986":7878.0,"upper_real_eur_1986":13728.0,"is_open":false},{"index":4,"rate":18.5,"lower_original":35200.0,"upper_original":60000.0,"lower_nominal_eur":35200.0,"upper_nominal_eur":60000.0,"lower_real_eur_1986":13728.0,"upper_real_eur_1986":23400.0,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":null,"lower_nominal_eur":60000.0,"upper_nominal_eur":null,"lower_real_eur_1986":23400.0,"upper_real_eur_1986":null,"is_open":true}]},{"year":2017,"regime":"2017_2023_labeled_html_state_plus_ccaa","deflator_hasta_1986":0.38,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/Sede/manuales/ejercicio-2017/modelo-100/8-cumplimentacion-irpf/8_6-cuota-integra/8_6_1-gravamen-base-liquidable-general/8_6_1_1-cuota-integra-estatal.html","row_count":5,"finite_bracket_count":4,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1986":0.0,"upper_real_eur_1986":4731.0,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1986":4731.0,"upper_real_eur_1986":7676.0,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":35200.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":35200.0,"lower_real_eur_1986":7676.0,"upper_real_eur_1986":13376.0,"is_open":false},{"index":4,"rate":18.5,"lower_original":35200.0,"upper_original":60000.0,"lower_nominal_eur":35200.0,"upper_nominal_eur":60000.0,"lower_real_eur_1986":13376.0,"upper_real_eur_1986":22800.0,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":null,"lower_nominal_eur":60000.0,"upper_nominal_eur":null,"lower_real_eur_1986":22800.0,"upper_real_eur_1986":null,"is_open":true}]},{"year":2018,"regime":"2017_2023_labeled_html_state_plus_ccaa","deflator_hasta_1986":0.37,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/Sede/manuales/ejercicio-2018/modelo-100/modelo-100/8-cumplimentacion-irpf/8_6-cuota-integra/8_6_1-gravamen-base-liquidable-general/8_6_1_1-cuota-integra-estatal.html","row_count":5,"finite_bracket_count":4,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1986":0.0,"upper_real_eur_1986":4606.5,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1986":4606.5,"upper_real_eur_1986":7474.0,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":35200.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":35200.0,"lower_real_eur_1986":7474.0,"upper_real_eur_1986":13024.0,"is_open":false},{"index":4,"rate":18.5,"lower_original":35200.0,"upper_original":60000.0,"lower_nominal_eur":35200.0,"upper_nominal_eur":60000.0,"lower_real_eur_1986":13024.0,"upper_real_eur_1986":22200.0,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":null,"lower_nominal_eur":60000.0,"upper_nominal_eur":null,"lower_real_eur_1986":22200.0,"upper_real_eur_1986":null,"is_open":true}]},{"year":2021,"regime":"2017_2023_labeled_html_state_plus_ccaa","deflator_hasta_1986":0.36,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2021/capitulo-15-calculo-impuesto-determinacion-integras/gravamen-base-liquidable-general/gravamen-estatal.html","row_count":6,"finite_bracket_count":5,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1986":0.0,"upper_real_eur_1986":4482.0,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1986":4482.0,"upper_real_eur_1986":7272.0,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":35200.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":35200.0,"lower_real_eur_1986":7272.0,"upper_real_eur_1986":12672.0,"is_open":false},{"index":4,"rate":18.5,"lower_original":35200.0,"upper_original":60000.0,"lower_nominal_eur":35200.0,"upper_nominal_eur":60000.0,"lower_real_eur_1986":12672.0,"upper_real_eur_1986":21600.0,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":300000.0,"lower_nominal_eur":60000.0,"upper_nominal_eur":300000.0,"lower_real_eur_1986":21600.0,"upper_real_eur_1986":108000.0,"is_open":false},{"index":6,"rate":24.5,"lower_original":300000.0,"upper_original":null,"lower_nominal_eur":300000.0,"upper_nominal_eur":null,"lower_real_eur_1986":108000.0,"upper_real_eur_1986":null,"is_open":true}]},{"year":2022,"regime":"2017_2023_labeled_html_state_plus_ccaa","deflator_hasta_1986":0.33,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2022/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-estatal.html","row_count":6,"finite_bracket_count":5,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1986":0.0,"upper_real_eur_1986":4108.5,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1986":4108.5,"upper_real_eur_1986":6666.0,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":35200.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":35200.0,"lower_real_eur_1986":6666.0,"upper_real_eur_1986":11616.0,"is_open":false},{"index":4,"rate":18.5,"lower_original":35200.0,"upper_original":60000.0,"lower_nominal_eur":35200.0,"upper_nominal_eur":60000.0,"lower_real_eur_1986":11616.0,"upper_real_eur_1986":19800.0,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":300000.0,"lower_nominal_eur":60000.0,"upper_nominal_eur":300000.0,"lower_real_eur_1986":19800.0,"upper_real_eur_1986":99000.0,"is_open":false},{"index":6,"rate":24.5,"lower_original":300000.0,"upper_original":null,"lower_nominal_eur":300000.0,"upper_nominal_eur":null,"lower_real_eur_1986":99000.0,"upper_real_eur_1986":null,"is_open":true}]},{"year":2023,"regime":"2017_2023_labeled_html_state_plus_ccaa","deflator_hasta_1986":0.32,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2023/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-estatal.html","row_count":6,"finite_bracket_count":5,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1986":0.0,"upper_real_eur_1986":3984.0,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1986":3984.0,"upper_real_eur_1986":6464.0,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":35200.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":35200.0,"lower_real_eur_1986":6464.0,"upper_real_eur_1986":11264.0,"is_open":false},{"index":4,"rate":18.5,"lower_original":35200.0,"upper_original":60000.0,"lower_nominal_eur":35200.0,"upper_nominal_eur":60000.0,"lower_real_eur_1986":11264.0,"upper_real_eur_1986":19200.0,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":300000.0,"lower_nominal_eur":60000.0,"upper_nominal_eur":300000.0,"lower_real_eur_1986":19200.0,"upper_real_eur_1986":96000.0,"is_open":false},{"index":6,"rate":24.5,"lower_original":300000.0,"upper_original":null,"lower_nominal_eur":300000.0,"upper_nominal_eur":null,"lower_real_eur_1986":96000.0,"upper_real_eur_1986":null,"is_open":true}]}];
+    const YEARS = DATA.map(d => d.year);
+    const MAX_TRAMOS = Math.max(...DATA.map(d => d.finite_bracket_count));
+    const YEAR_MAP = new Map(DATA.map(d => [d.year, d]));
+    const MODE_DEFS = [
+      { key: 'real', label: 'Euros constantes 1986' },
+      { key: 'nominal', label: 'Euros corrientes' },
+    ];
+    const state = {
+      mode: 'real',
+      visibleCount: 8,
+      selectedYear: 2023,
+      focusedTramo: null,
+      hoverYear: null,
+    };
+
+    const svg = document.getElementById('chartSvg');
+    const chartBox = document.getElementById('chartBox');
+    const tooltip = document.getElementById('tooltip');
+    const legendEl = document.getElementById('legend');
+    const yearSelect = document.getElementById('yearSelect');
+    const yearHeading = document.getElementById('yearHeading');
+    const yearSource = document.getElementById('yearSource');
+    const cardsEl = document.getElementById('cards');
+    const detailBody = document.getElementById('detailBody');
+    const chartMeta = document.getElementById('chartMeta');
+    const lineSummary = document.getElementById('lineSummary');
+    const detailModeNote = document.getElementById('detailModeNote');
+    const deflatorExplain = document.getElementById('deflatorExplain');
+
+    function money(value, digits = 0) {
+      if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+      return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
+    }
+
+    function pct(value) {
+      if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+      return new Intl.NumberFormat('es-ES', { minimumFractionDigits: value % 1 ? 2 : 0, maximumFractionDigits: 2 }).format(value) + '%';
+    }
+
+    function euroShort(v) {
+      if (!Number.isFinite(v)) return '—';
+      const abs = Math.abs(v);
+      if (abs >= 1_000_000) return new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 }).format(v / 1_000_000) + ' M€';
+      if (abs >= 1_000) return new Intl.NumberFormat('es-ES', { maximumFractionDigits: abs >= 100_000 ? 0 : 1 }).format(v / 1_000) + ' k€';
+      return money(v, 0);
+    }
+
+    function originalMoney(value, currency) {
+      if (value === null || value === undefined || !Number.isFinite(value)) return 'En adelante';
+      if (currency === 'pesetas') return new Intl.NumberFormat('es-ES', { maximumFractionDigits: 0 }).format(value) + ' ptas';
+      return money(value, 2);
+    }
+
+    function getColor(index) {
+      const hue = (index * 37) % 360;
+      return `hsl(${hue} 72% 58%)`;
+    }
+
+    function modeFieldPrefix() {
+      return state.mode === 'real' ? 'real_eur_1986' : 'nominal_eur';
+    }
+
+    function getFiniteBracketsForYear(year) {
+      const y = YEAR_MAP.get(year);
+      if (!y) return [];
+      return y.brackets.filter(b => !b.is_open);
+    }
+
+    function getBracketValue(bracket, which) {
+      const prefix = modeFieldPrefix();
+      return bracket[`${which}_${prefix}`];
+    }
+
+    function getSeries(index) {
+      return DATA.map(yearRec => {
+        const finite = yearRec.brackets.filter(b => !b.is_open);
+        const bracket = finite[index - 1];
+        return { year: yearRec.year, value: bracket ? getBracketValue(bracket, 'upper') : null };
+      }).filter(p => p.value !== null && Number.isFinite(p.value));
+    }
+
+    function visibleTramos() {
+      return Array.from({ length: state.visibleCount }, (_, i) => i + 1);
+    }
+
+    function buildButtons() {
+      const modeButtons = document.getElementById('modeButtons');
+      modeButtons.innerHTML = MODE_DEFS.map(m => `<button class="btn ${state.mode === m.key ? 'active' : ''}" data-mode="${m.key}">${m.label}</button>`).join('');
+      modeButtons.querySelectorAll('[data-mode]').forEach(btn => btn.addEventListener('click', () => {
+        state.mode = btn.dataset.mode;
+        renderAll();
+      }));
+
+      const presets = Array.from(new Set([5, 8, 12, MAX_TRAMOS].filter(n => n > 0 && n <= MAX_TRAMOS))).sort((a,b) => a-b);
+      const countButtons = document.getElementById('countButtons');
+      countButtons.innerHTML = presets.map(n => `<button class="btn ${state.visibleCount === n ? 'active' : ''}" data-count="${n}">${n === MAX_TRAMOS ? 'Todos (' + n + ')' : 'Primeros ' + n}</button>`).join('');
+      countButtons.querySelectorAll('[data-count]').forEach(btn => btn.addEventListener('click', () => {
+        state.visibleCount = Number(btn.dataset.count);
+        if (state.focusedTramo && state.focusedTramo > state.visibleCount) state.focusedTramo = null;
+        renderAll();
+      }));
+    }
+
+    function buildYearSelect() {
+      yearSelect.innerHTML = YEARS.map(y => `<option value="${y}" ${y === state.selectedYear ? 'selected' : ''}>${y}</option>`).join('');
+      yearSelect.addEventListener('change', () => {
+        state.selectedYear = Number(yearSelect.value);
+        renderAll();
+      });
+    }
+
+    function renderLegend() {
+      const selected = YEAR_MAP.get(state.selectedYear);
+      legendEl.innerHTML = visibleTramos().map(n => {
+        const color = getColor(n);
+        const finite = getFiniteBracketsForYear(state.selectedYear);
+        const bracket = finite[n - 1];
+        const value = bracket ? euroShort(getBracketValue(bracket, 'upper')) : '—';
+        const focused = state.focusedTramo === n;
+        const muted = state.focusedTramo && state.focusedTramo !== n;
+        return `
+          <div class="legendItem ${focused ? 'is-focused' : ''} ${muted ? 'is-muted' : ''}" data-tramo="${n}">
+            <div class="swatch" style="background:${color}"></div>
+            <div class="legendMain">
+              <div class="legendName">Tramo ${n}</div>
+              <div class="legendSub">Tope superior del tramo ${n} en el año seleccionado</div>
+            </div>
+            <div class="legendValue">${value}</div>
+          </div>`;
+      }).join('');
+      legendEl.querySelectorAll('[data-tramo]').forEach(el => el.addEventListener('click', () => {
+        const n = Number(el.dataset.tramo);
+        state.focusedTramo = state.focusedTramo === n ? null : n;
+        renderAll();
+      }));
+    }
+
+    function niceStep(maxValue) {
+      const rough = maxValue / 6;
+      const power = Math.pow(10, Math.floor(Math.log10(Math.max(1, rough))));
+      const normalized = rough / power;
+      let step = 1;
+      if (normalized > 5) step = 10;
+      else if (normalized > 2) step = 5;
+      else if (normalized > 1) step = 2;
+      return step * power;
+    }
+
+    function yTicks(maxValue) {
+      const step = niceStep(maxValue);
+      const top = Math.ceil(maxValue / step) * step;
+      const ticks = [];
+      for (let v = 0; v <= top + 0.0001; v += step) ticks.push(v);
+      return ticks;
+    }
+
+    function renderChart() {
+      const width = 1200;
+      const height = 620;
+      const m = { top: 28, right: 28, bottom: 74, left: 84 };
+      const plot = { x: m.left, y: m.top, w: width - m.left - m.right, h: height - m.top - m.bottom };
+      const minYear = Math.min(...YEARS);
+      const maxYear = Math.max(...YEARS);
+      const visible = visibleTramos();
+      const seriesData = visible.map(n => ({ tramo: n, color: getColor(n), points: getSeries(n) }));
+      const filteredSeries = state.focusedTramo ? seriesData.filter(s => s.tramo === state.focusedTramo) : seriesData;
+      let maxValue = 0;
+      filteredSeries.forEach(s => s.points.forEach(p => { if (Number.isFinite(p.value)) maxValue = Math.max(maxValue, p.value); }));
+      maxValue = Math.max(1, maxValue * 1.08);
+      const ticks = yTicks(maxValue);
+      const yMax = ticks[ticks.length - 1] || maxValue;
+      const x = year => plot.x + ((year - minYear) / (maxYear - minYear)) * plot.w;
+      const y = value => plot.y + plot.h - (value / yMax) * plot.h;
+
+      let out = '';
+      out += `<rect x="0" y="0" width="${width}" height="${height}" fill="transparent"></rect>`;
+      out += `<rect x="${plot.x}" y="${plot.y}" width="${plot.w}" height="${plot.h}" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,.05)"></rect>`;
+
+      ticks.forEach(v => {
+        const yy = y(v);
+        out += `<line x1="${plot.x}" y1="${yy}" x2="${plot.x + plot.w}" y2="${yy}" stroke="rgba(255,255,255,.08)" stroke-width="1"></line>`;
+        out += `<text x="${plot.x - 12}" y="${yy + 4}" text-anchor="end" fill="#bfbfbf" font-size="12">${euroShort(v)}</text>`;
+      });
+
+      const approxLabelCount = chartBox.clientWidth < 700 ? 9 : YEARS.length;
+      const step = Math.max(1, Math.ceil(YEARS.length / approxLabelCount));
+      YEARS.forEach((year, idx) => {
+        const xx = x(year);
+        out += `<line x1="${xx}" y1="${plot.y + plot.h}" x2="${xx}" y2="${plot.y + plot.h + 6}" stroke="rgba(255,255,255,.25)"></line>`;
+        if (idx % step === 0 || idx === YEARS.length - 1) {
+          out += `<text x="${xx}" y="${plot.y + plot.h + 24}" text-anchor="middle" fill="#bfbfbf" font-size="12" transform="rotate(-35 ${xx} ${plot.y + plot.h + 24})">${year}</text>`;
+        }
+      });
+
+      const hoverYear = state.hoverYear;
+      if (hoverYear) {
+        const xx = x(hoverYear);
+        out += `<line x1="${xx}" y1="${plot.y}" x2="${xx}" y2="${plot.y + plot.h}" stroke="rgba(254,247,2,.45)" stroke-dasharray="5 4"></line>`;
+      }
+
+      seriesData.forEach(series => {
+        const hiddenByFocus = state.focusedTramo && state.focusedTramo !== series.tramo;
+        const opacity = hiddenByFocus ? 0.16 : 0.95;
+        const strokeWidth = state.focusedTramo === series.tramo ? 3.5 : 2.4;
+        if (!series.points.length) return;
+        let d = '';
+        series.points.forEach((p, i) => { d += `${i ? 'L' : 'M'}${x(p.year)},${y(p.value)} `; });
+        out += `<path d="${d.trim()}" fill="none" stroke="${series.color}" stroke-width="${strokeWidth}" opacity="${opacity}"></path>`;
+        series.points.forEach(p => {
+          const r = (state.selectedYear === p.year || hoverYear === p.year) ? 5 : 3.2;
+          out += `<circle cx="${x(p.year)}" cy="${y(p.value)}" r="${r}" fill="${series.color}" opacity="${opacity}"></circle>`;
+        });
+      });
+
+      out += `<text x="${plot.x}" y="${18}" fill="#FEF702" font-size="13" font-weight="700">Límite superior del tramo (€)</text>`;
+      out += `<text x="${plot.x + plot.w}" y="${18}" fill="#bfbfbf" font-size="12" text-anchor="end">Escala estatal/general · ${state.mode === 'real' ? 'euros constantes de 1986' : 'euros corrientes'}</text>`;
+      svg.innerHTML = out;
+
+      chartMeta.innerHTML = state.mode === 'real'
+        ? 'Visualización principal en euros constantes de 1986: convierte pesetas/euros nominales a una base real homogénea usando el campo <b>deflactor_hasta_1986</b> del CSV.'
+        : 'Visualización en euros corrientes: pesetas convertidas a euros nominales con 1 € = 166,386 ptas; los años ya en euros se muestran en su importe original.';
+      lineSummary.textContent = `Series visibles: ${visible.length} de ${MAX_TRAMOS}.` + (state.focusedTramo ? ` En foco: tramo ${state.focusedTramo}.` : '');
+    }
+
+    function nearestYearFromClientX(clientX) {
+      const rect = chartBox.getBoundingClientRect();
+      const rel = Math.max(0, Math.min(rect.width, clientX - rect.left));
+      const ratio = rect.width ? (rel / rect.width) : 0;
+      const target = 1200 * ratio;
+      const m = { left: 84, right: 28 };
+      const plotW = 1200 - m.left - m.right;
+      const minYear = Math.min(...YEARS);
+      const maxYear = Math.max(...YEARS);
+      let best = YEARS[0];
+      let bestDist = Infinity;
+      YEARS.forEach(year => {
+        const xx = m.left + ((year - minYear) / (maxYear - minYear)) * plotW;
+        const dist = Math.abs(xx - target);
+        if (dist < bestDist) { bestDist = dist; best = year; }
+      });
+      return best;
+    }
+
+    function renderTooltip(clientX, clientY) {
+      const year = state.hoverYear;
+      if (!year) { tooltip.style.display = 'none'; return; }
+      const finite = getFiniteBracketsForYear(year);
+      const rows = visibleTramos().map(n => {
+        const bracket = finite[n - 1];
+        if (!bracket) return null;
+        const value = getBracketValue(bracket, 'upper');
+        return `
+          <div class="ttRow">
+            <div class="ttDot" style="background:${getColor(n)}"></div>
+            <div class="ttName">Tramo ${n}</div>
+            <div class="ttVal">${money(value, value < 10000 ? 0 : 0)}</div>
+          </div>`;
+      }).filter(Boolean).join('');
+      const yRec = YEAR_MAP.get(year);
+      tooltip.innerHTML = `
+        <div class="ttYear">${year}</div>
+        ${rows || '<div class="smallNote">No hay datos para los tramos visibles.</div>'}
+        <div class="smallNote" style="margin-top:8px;">Moneda original: ${yRec.original_currency} · Deflactor a 1986: ${new Intl.NumberFormat('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}).format(yRec.deflator_hasta_1986)}</div>`;
+      tooltip.style.display = 'block';
+      const rect = chartBox.getBoundingClientRect();
+      const ttRect = tooltip.getBoundingClientRect();
+      let left = clientX - rect.left + 14;
+      let top = clientY - rect.top + 14;
+      if (left + ttRect.width > rect.width - 10) left = rect.width - ttRect.width - 10;
+      if (top + ttRect.height > rect.height - 10) top = rect.height - ttRect.height - 10;
+      tooltip.style.left = left + 'px';
+      tooltip.style.top = top + 'px';
+    }
+
+    function buildCards(yearRec) {
+      const finite = yearRec.brackets.filter(b => !b.is_open);
+      const open = yearRec.brackets.find(b => b.is_open);
+      const lastFinite = finite[finite.length - 1];
+      const firstFinite = finite[0];
+      const modeLabel = state.mode === 'real' ? 'euros constantes 1986' : 'euros corrientes';
+      const maxRate = Math.max(...yearRec.brackets.map(b => Number.isFinite(b.rate) ? b.rate : -Infinity));
+      const firstTope = firstFinite ? getBracketValue(firstFinite, 'upper') : null;
+      const lastTope = lastFinite ? getBracketValue(lastFinite, 'upper') : null;
+      const openStart = open ? getBracketValue(open, 'lower') : null;
+      const items = [
+        { label: 'Tramos finitos', value: String(yearRec.finite_bracket_count), sub: 'Cortes con límite superior definido' },
+        { label: 'Primer tope', value: money(firstTope, 0), sub: modeLabel },
+        { label: 'Último tope finito', value: money(lastTope, 0), sub: modeLabel },
+        { label: 'Tramo abierto final', value: open ? ('Desde ' + money(openStart, 0)) : '—', sub: 'Inicio del último tramo sin techo' },
+        { label: 'Tipo marginal máximo', value: pct(maxRate), sub: 'Máximo del año seleccionado' },
+        { label: 'Moneda original', value: yearRec.original_currency === 'pesetas' ? 'Pesetas' : 'Euros', sub: 'Tal como aparece la tabla de origen' },
+        { label: 'Deflactor a 1986', value: new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(yearRec.deflator_hasta_1986), sub: 'Factor usado en el modo real' },
+        { label: 'Régimen del JSON', value: yearRec.regime || '—', sub: 'Etiqueta técnica del fichero' },
+      ];
+      cardsEl.innerHTML = items.map(item => `
+        <div class="card">
+          <div class="cardLabel">${item.label}</div>
+          <div class="cardValue">${item.value}</div>
+          <div class="cardSub">${item.sub}</div>
+        </div>`).join('');
+    }
+
+    function buildDetailTable(yearRec) {
+      detailBody.innerHTML = yearRec.brackets.map(b => {
+        const fromDisplay = state.mode === 'real' ? money(b.lower_real_eur_1986, 2) : money(b.lower_nominal_eur, 2);
+        const toDisplay = b.is_open ? 'En adelante' : (state.mode === 'real' ? money(b.upper_real_eur_1986, 2) : money(b.upper_nominal_eur, 2));
+        const currencyLabel = yearRec.original_currency === 'pesetas'
+          ? `${originalMoney(b.lower_original, 'pesetas')} → ${b.upper_original === null ? 'En adelante' : originalMoney(b.upper_original, 'pesetas')}`
+          : `${originalMoney(b.lower_original, 'euros')} → ${b.upper_original === null ? 'En adelante' : originalMoney(b.upper_original, 'euros')}`;
+        return `
+          <tr>
+            <td><b>Tramo ${b.index}</b></td>
+            <td>${fromDisplay}</td>
+            <td>${toDisplay}</td>
+            <td>${pct(b.rate)}</td>
+            <td>${currencyLabel}</td>
+          </tr>`;
+      }).join('');
+    }
+
+    function renderDetails() {
+      const yearRec = YEAR_MAP.get(state.selectedYear);
+      yearHeading.textContent = `Ejercicio ${yearRec.year}`;
+      yearSource.href = yearRec.source_url || '#';
+      yearSource.textContent = yearRec.source_url ? 'Fuente normativa' : 'Fuente no disponible';
+      detailModeNote.textContent = state.mode === 'real'
+        ? 'Tabla mostrada en euros constantes de 1986.'
+        : 'Tabla mostrada en euros corrientes.';
+      deflatorExplain.textContent = `En ${yearRec.year}, el factor deflactor_hasta_1986 del CSV es ${new Intl.NumberFormat('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}).format(yearRec.deflator_hasta_1986)}.`;
+      buildCards(yearRec);
+      buildDetailTable(yearRec);
+    }
+
+    function renderAll() {
+      buildButtons();
+      renderLegend();
+      renderChart();
+      renderDetails();
+    }
+
+    chartBox.addEventListener('mousemove', ev => {
+      state.hoverYear = nearestYearFromClientX(ev.clientX);
+      renderChart();
+      renderTooltip(ev.clientX, ev.clientY);
+    });
+
+    chartBox.addEventListener('mouseleave', () => {
+      state.hoverYear = null;
+      tooltip.style.display = 'none';
+      renderChart();
+    });
+
+    chartBox.addEventListener('click', () => {
+      if (!state.hoverYear) return;
+      state.selectedYear = state.hoverYear;
+      yearSelect.value = String(state.selectedYear);
+      renderAll();
+    });
+
+    window.addEventListener('resize', () => {
+      renderChart();
+      if (!state.hoverYear) tooltip.style.display = 'none';
+    });
+
+    buildYearSelect();
+    renderAll();
+  </script>
+</body>
+</html>
