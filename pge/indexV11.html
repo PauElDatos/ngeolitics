@@ -147,14 +147,6 @@
       justify-content:flex-end;
       flex:1 1 auto;
     }
-    .chartMeta{
-      white-space:normal;
-      text-align:right;
-      line-height:1.2;
-      max-width: 460px;
-      font-size: calc(11px * var(--uiScale));
-      opacity:.88;
-    }
 
     .pc{
       padding:12px;
@@ -780,7 +772,7 @@
 
   <header>
     <div class="h-title">
-      <h1>Entendiendo la economía de España</h1>
+      <h1>entendiendo la economía de España</h1>
       <div class="tabs" role="tablist" aria-label="Secciones">
         <button class="btn tab on" data-view="pge" role="tab" aria-selected="true">Presupuestos generales del Estado</button>
         <button class="btn tab" data-view="gb" role="tab" aria-selected="false">Gasto vs beneficio</button>
@@ -807,7 +799,7 @@
       <section class="panel">
         <div class="ph">
           <div class="ttl">Gráfico</div>
-          <!-- <div class="sub chartMeta">Serie expresada como porcentaje del presupuesto total; al ser una magnitud relativa, no requiere deflactación monetaria.</div> -->
+          <div class="sub"></div>
         </div>
 
         <div class="pc chartPc">
@@ -858,9 +850,6 @@
               </ul>
             </div>
             <div style="margin-top:8px;">
-              Como en el gráfico se representan participaciones sobre el presupuesto total, la comparación es relativa: muestra qué peso gana o pierde cada política dentro del conjunto, sin necesidad de deflactar importes monetarios en esta vista.
-            </div>
-            <div style="margin-top:8px;">
               La tabla siguiente indica la correspondencia usada (columna <code>politicas_antiguas_encontradas</code> → serie moderna).
             </div>
           </div>
@@ -902,7 +891,7 @@
       <section class="panel">
         <div class="ph">
           <div class="ttl">Gráfico</div>
-          <div class="sub chartMeta">Magnitudes monetarias expresadas en euros constantes de 1986, es decir, series deflactadas con año base 1986.</div>
+          <div class="sub"></div>
         </div>
 
         <div class="pc chartPc">
@@ -955,7 +944,7 @@
       <div class="explainBox" id="gbExplain">
                 <div class="explainTitle">Cómo leer estas series</div>
                 <div class="explainText">
-                  <div>En esta vista se comparan niveles totales y por habitante después de ajustar las magnitudes monetarias por inflación con base 1986, para que la comparación entre años refleje cambios de volumen y no solo cambios de precios.</div>
+                  <div><b>PIB total</b> y <b>Gasto público total</b> están en euros reales de 1986 (miles de millones).</div>
                   <div style="margin-top:8px;">
                     Reglas rápidas:
                     <ul>
@@ -990,7 +979,7 @@
       <section class="panel">
         <div class="ph">
           <div class="ttl">Gráfico</div>
-          <!-- <div class="sub chartMeta">Ratios calculadas sobre series monetarias expresadas en euros constantes de 1986; el esfuerzo fiscal simple se muestra como índice.</div> -->
+          <div class="sub"></div>
         </div>
 
         <div class="pc chartPc">
@@ -1027,10 +1016,9 @@
       <div class="explainBox" id="paExplain">
                 <div class="explainTitle">Definiciones</div>
                 <div class="explainText">
-                  <div><b>Presión fiscal</b><br>Indica qué parte de la producción total de la economía capta el Estado a través de impuestos y cotizaciones sociales. Cuando sube, significa que la recaudación representa una porción mayor del PIB; cuando baja, una porción menor.</div>
-                  <div style="margin-top:8px;"><b>Presión de gasto público</b><br>Indica qué parte del tamaño de la economía representa el gasto del sector público. No debe leerse solo como “el Estado gasta más o menos”, sino como cuánto pesa ese gasto en relación con el PIB del país.</div>
-                  <div style="margin-top:8px;"><b>Esfuerzo fiscal simple</b><br>Es un indicador aproximado que relaciona la presión fiscal con la renta por habitante. Intenta reflejar cuánto puede “pesar” la carga fiscal según el nivel de ingresos: a igual presión fiscal, una renta per cápita menor implica un esfuerzo relativo mayor.</div>
-                  <div style="margin-top:8px; opacity:.95;">En esta sección, las ratios principales se construyen sobre series monetarias previamente deflactadas a precios constantes de 1986, para comparar los años sin mezclar crecimiento nominal e inflación.</div>
+                  <div><b>Presión fiscal</b><br>Mide cuánto recauda el Estado sobre la economía.</div>
+                  <div style="margin-top:8px;"><b>Presión de gasto público</b><br>Mide cuánto gasta el Estado sobre la economía.</div>
+                  <div style="margin-top:8px;"><b>Esfuerzo fiscal simple</b><br>Mide cómo de pesada resulta esa carga fiscal según la renta de la población.</div>
                   <div class="explainText" id="patreonNotePA" style="margin-top:12px; padding:0;"></div>
                 </div>
               </div>
