@@ -8,10 +8,10 @@
     :root {
       --bg: #252525;
       --panel: rgba(255,255,255,.03);
-      --panel2: rgba(255,255,255,.05);
+      --panel-2: rgba(255,255,255,.05);
       --stroke: #3a3a3a;
-      --grid: rgba(255,255,255,.10);
-      --text: #e3e3e3;
+      --grid: #4A4A4A;
+      --text: #d8d8d8;
       --muted: #b0b0b0;
       --accent: #FEF702;
       --shadow: 0 14px 34px rgba(0,0,0,.26);
@@ -26,282 +26,282 @@
       font-family: Arial, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
       line-height: 1.4;
     }
-    .page {
-      min-height: 100vh;
-      width: 100%;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
+    a { color: var(--accent); }
+    .wrap {
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .hero {
+      display: grid;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(26px, 3vw, 40px);
+      color: var(--accent);
+      letter-spacing: .2px;
+    }
+    .lead {
+      max-width: 1100px;
+      color: var(--muted);
+      font-size: 15px;
+    }
+    .layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
       gap: 14px;
+      min-height: calc(100vh - 150px);
     }
     .panel {
-      width: 100%;
       background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
       border: 1px solid var(--stroke);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       overflow: hidden;
+      min-height: 0;
     }
-    .topBar {
-      padding: 18px 20px 14px;
-      display: grid;
-      gap: 14px;
-    }
-    .titleRow {
+    .panelHead {
+      padding: 14px 16px 12px;
+      border-bottom: 1px solid var(--stroke);
+      background: rgba(255,255,255,.02);
       display: flex;
-      align-items: end;
+      align-items: center;
       justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
+      gap: 12px;
     }
-    h1 {
+    .panelHead h2 {
       margin: 0;
-      color: var(--accent);
-      font-size: clamp(26px, 3vw, 42px);
-      letter-spacing: .2px;
-      line-height: 1.05;
-    }
-    .subtle {
-      color: var(--muted);
       font-size: 13px;
-    }
-    .controls {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px 18px;
-      align-items: end;
-    }
-    .field {
-      display: grid;
-      gap: 8px;
-      min-width: 220px;
-    }
-    .label {
-      font-size: 12px;
-      letter-spacing: .35px;
+      letter-spacing: .45px;
       text-transform: uppercase;
-      color: var(--muted);
+      color: var(--accent);
     }
-    .segmented {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
+    .panelBody { padding: 14px; }
+    .controls { display: grid; gap: 12px; }
+    .field { display: grid; gap: 8px; }
+    .label { font-size: 12px; letter-spacing: .3px; text-transform: uppercase; color: var(--muted); }
+    .segmented { display: flex; flex-wrap: wrap; gap: 8px; }
     .btn {
       appearance: none;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.04);
       color: rgba(255,255,255,.92);
-      padding: 10px 13px;
+      padding: 9px 12px;
       border-radius: 999px;
       font-size: 13px;
       cursor: pointer;
       transition: .15s ease;
-      line-height: 1;
-      user-select: none;
     }
-    .btn:hover {
-      border-color: rgba(254,247,2,.35);
-      background: rgba(255,255,255,.06);
+    .btn:hover { border-color: rgba(254,247,2,.35); background: rgba(255,255,255,.06); }
+    .btn.active { background: rgba(254,247,2,.92); border-color: rgba(254,247,2,.98); color: #161616; font-weight: 700; }
+    select {
+      width: 100%;
+      background: rgba(255,255,255,.05);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 12px;
+      padding: 11px 12px;
+      font-size: 14px;
     }
-    .btn.active {
-      background: rgba(254,247,2,.92);
-      border-color: rgba(254,247,2,.98);
-      color: #161616;
-      font-weight: 700;
-    }
-    .chartPanel {
+    .legend { display: grid; gap: 8px; max-height: 42vh; overflow: auto; padding-right: 4px; }
+    .legendItem {
       display: grid;
-      grid-template-rows: auto 1fr auto;
+      grid-template-columns: 14px 1fr auto;
+      align-items: start;
+      gap: 10px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      border-radius: 12px;
+      padding: 10px;
+      cursor: pointer;
     }
-    .chartHead {
-      padding: 14px 18px 10px;
-      border-top: 1px solid rgba(255,255,255,.05);
-      border-bottom: 1px solid rgba(255,255,255,.05);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
-    }
-    .chartHead .left {
-      color: var(--accent);
-      font-size: 13px;
-      text-transform: uppercase;
-      letter-spacing: .45px;
-      font-weight: 700;
-    }
-    .chartHead .right {
-      color: var(--muted);
-      font-size: 12px;
-      text-align: right;
-      max-width: 900px;
-    }
-    .chartWrap {
-      padding: 14px;
-      min-height: 0;
-    }
+    .legendItem:hover { border-color: rgba(254,247,2,.26); }
+    .legendItem.is-muted { opacity: .45; }
+    .legendItem.is-focused { border-color: rgba(254,247,2,.75); background: rgba(254,247,2,.08); }
+    .swatch { width: 12px; height: 12px; border-radius: 4px; margin-top: 3px; }
+    .legendMain { min-width: 0; }
+    .legendName { font-size: 13px; font-weight: 700; }
+    .legendSub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .legendValue { font-size: 12px; color: var(--text); white-space: nowrap; margin-top: 2px; }
+    .smallNote { font-size: 12px; color: var(--muted); }
+    .rightCol { display: grid; grid-template-rows: minmax(470px, 1fr) auto; gap: 14px; min-height: 0; }
+    .chartPanel { display: grid; grid-template-rows: auto 1fr auto; min-height: 0; }
+    .chartMeta { font-size: 12px; color: var(--muted); text-align: right; max-width: 720px; }
+    .chartWrap { position: relative; min-height: 0; padding: 14px; }
     .chartBox {
       position: relative;
-      width: 100%;
-      height: calc(100vh - 245px);
-      min-height: 560px;
+      height: 100%;
+      min-height: 460px;
       border-radius: 14px;
       background: rgba(0,0,0,.12);
       border: 1px solid rgba(255,255,255,.06);
       overflow: hidden;
     }
-    svg {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
+    svg { display: block; width: 100%; height: 100%; }
     .tooltip {
       position: absolute;
       z-index: 3;
-      min-width: 280px;
-      max-width: min(420px, calc(100vw - 44px));
-      max-height: min(70vh, 560px);
-      overflow: auto;
+      min-width: 260px;
+      max-width: min(380px, calc(100vw - 48px));
       border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.86);
+      background: rgba(0,0,0,.84);
       border-radius: 12px;
       padding: 10px 12px;
       box-shadow: 0 16px 34px rgba(0,0,0,.36);
       pointer-events: none;
       display: none;
     }
-    .ttYear {
-      color: var(--accent);
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-    .ttRow {
-      display: grid;
-      grid-template-columns: 10px 1fr auto;
-      gap: 8px;
-      align-items: center;
-      padding: 3px 0;
-      border-bottom: 1px dashed rgba(255,255,255,.08);
-    }
+    .ttYear { color: var(--accent); font-weight: 700; margin-bottom: 6px; }
+    .ttRow { display: grid; grid-template-columns: 10px 1fr auto; gap: 8px; align-items: center; padding: 3px 0; border-bottom: 1px dashed rgba(255,255,255,.08); }
     .ttRow:last-child { border-bottom: 0; }
     .ttDot { width: 10px; height: 10px; border-radius: 50%; }
-    .ttName, .ttVal { font-size: 12px; color: rgba(255,255,255,.95); }
-    .ttName { color: rgba(255,255,255,.9); }
-    .chartFoot {
-      padding: 0 18px 16px;
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-size: 12px;
+    .ttName { font-size: 12px; color: rgba(255,255,255,.9); }
+    .ttVal { font-size: 12px; color: rgba(255,255,255,.95); white-space: nowrap; }
+    .chartFoot { padding: 0 14px 14px; display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; font-size: 12px; color: var(--muted); }
+    .detailsGrid { display: grid; grid-template-columns: 1.25fr .95fr; gap: 14px; }
+    .cards { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 10px; }
+    .card { border: 1px solid rgba(255,255,255,.08); border-radius: 12px; background: rgba(255,255,255,.02); padding: 12px; }
+    .cardLabel { font-size: 12px; color: var(--muted); text-transform: uppercase; letter-spacing: .25px; }
+    .cardValue { font-size: 22px; font-weight: 700; margin-top: 6px; }
+    .cardSub { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .tableWrap { overflow: auto; max-height: 430px; border: 1px solid rgba(255,255,255,.07); border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; min-width: 620px; }
+    th, td { padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,.06); text-align: left; font-size: 13px; }
+    th { position: sticky; top: 0; background: #2b2b2b; color: var(--accent); z-index: 1; font-size: 12px; text-transform: uppercase; letter-spacing: .35px; }
+    tr:hover td { background: rgba(255,255,255,.03); }
+    .explain { display: grid; gap: 10px; font-size: 14px; color: var(--muted); }
+    .pill { display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid rgba(255,255,255,.08); border-radius: 999px; background: rgba(255,255,255,.03); font-size: 12px; color: var(--text); }
+    .pillRow { display: flex; flex-wrap: wrap; gap: 8px; }
+    .yearTitle { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:12px; }
+    .yearTitle h3 { margin:0; color:var(--accent); font-size:20px; }
+    .muted { color: var(--muted); }
+    .sourceLink { font-size: 12px; }
+    @media (max-width: 1150px) {
+      .layout { grid-template-columns: 1fr; }
+      .rightCol { grid-template-rows: auto auto; }
+      .detailsGrid { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .legend { max-height: none; }
     }
-    .explain {
-      padding: 16px 18px 18px;
-      display: grid;
-      gap: 10px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-    .pillRow {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
-    .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 999px;
-      background: rgba(255,255,255,.03);
-      color: var(--text);
-      font-size: 12px;
-    }
-    .legendNote { color: var(--muted); font-size: 12px; }
-    @media (max-width: 900px) {
-      .page { padding: 12px; }
-      .topBar { padding: 16px 16px 12px; }
-      .chartBox { height: calc(100vh - 270px); min-height: 460px; }
-      .chartHead { align-items: start; flex-direction: column; }
-    }
-    @media (max-width: 620px) {
-      .field { min-width: 100%; }
-      .chartBox { height: calc(100vh - 320px); min-height: 400px; }
+    @media (max-width: 720px) {
+      .wrap { padding: 14px; }
+      .panelHead { align-items: start; flex-direction: column; }
+      .cards { grid-template-columns: 1fr; }
+      .chartBox { min-height: 420px; }
     }
   </style>
 </head>
 <body>
-  <div class="page">
-    <section class="panel">
-      <div class="topBar">
-        <div class="titleRow">
-          <h1>Tramos del IRPF nacional en el tiempo</h1>
-          <div class="subtle" id="topMeta"></div>
-        </div>
+  <div class="wrap">
+    <section class="hero">
+      <h1>Tramos del IRPF nacional en el tiempo</h1>
+      <div class="lead">
+        Esta página toma la <b>escala estatal/general</b> del IRPF de cada año presente en tu JSON y representa la evolución de los <b>límites superiores de cada tramo</b>. Para los años en pesetas, se convierten primero a euros; además puedes ver la serie en <b>euros corrientes</b> o en <b>euros constantes de 1986</b> aplicando el deflactor del CSV. Así se puede comparar mejor el tamaño real de los tramos a lo largo del tiempo.
+      </div>
+    </section>
 
-        <div class="controls">
+    <section class="layout">
+      <aside class="panel">
+        <div class="panelHead">
+          <h2>Controles y tramos</h2>
+          <div class="smallNote">Años disponibles: 1990–2023</div>
+        </div>
+        <div class="panelBody controls">
           <div class="field">
             <div class="label">Modo de importes</div>
             <div class="segmented" id="modeButtons"></div>
           </div>
 
           <div class="field">
-            <div class="label">Escala del eje Y</div>
-            <div class="segmented" id="scaleButtons"></div>
-          </div>
-
-          <div class="field">
             <div class="label">Tramos visibles</div>
             <div class="segmented" id="countButtons"></div>
+            <div class="smallNote">Cada línea representa el <b>límite superior</b> del tramo n.º correspondiente. Cuando un año tiene menos tramos, las líneas altas desaparecen.</div>
           </div>
 
           <div class="field">
-            <div class="label">Bandas políticas</div>
-            <div class="segmented" id="politicsButtons"></div>
+            <div class="label">Año seleccionado</div>
+            <select id="yearSelect" aria-label="Seleccionar año"></select>
+          </div>
+
+          <div class="field">
+            <div class="label">Leyenda interactiva</div>
+            <div id="legend" class="legend"></div>
+            <div class="smallNote">Haz clic en un tramo para aislarlo visualmente; vuelve a pulsar para restaurar la vista completa.</div>
           </div>
         </div>
-      </div>
+      </aside>
 
-      <div class="chartPanel">
-        <div class="chartHead">
-          <div class="left">Gráfica principal</div>
-          <div class="right" id="chartMeta"></div>
-        </div>
-
-        <div class="chartWrap">
-          <div class="chartBox" id="chartBox">
-            <svg id="chartSvg" viewBox="0 0 1600 760" preserveAspectRatio="none" aria-label="Gráfica de tramos del IRPF"></svg>
-            <div class="tooltip" id="tooltip"></div>
+      <div class="rightCol">
+        <section class="panel chartPanel">
+          <div class="panelHead">
+            <h2>Gráfica</h2>
+            <div class="chartMeta" id="chartMeta"></div>
           </div>
-        </div>
+          <div class="chartWrap">
+            <div class="chartBox" id="chartBox">
+              <svg id="chartSvg" viewBox="0 0 1200 620" preserveAspectRatio="none" aria-label="Gráfica de tramos del IRPF"></svg>
+              <div class="tooltip" id="tooltip"></div>
+            </div>
+          </div>
+          <div class="chartFoot">
+            <div>Consejo: mueve el cursor por la gráfica para ver un año concreto y haz clic para fijarlo en la tabla.</div>
+            <div id="lineSummary"></div>
+          </div>
+        </section>
 
-        <div class="chartFoot">
-          <div>Pasa el cursor por la gráfica para ver el detalle del año. Las líneas representan el <b>tope superior</b> de cada tramo finito.</div>
-          <div id="lineSummary"></div>
-        </div>
-      </div>
-    </section>
+        <section class="panel">
+          <div class="panelHead">
+            <h2>Detalle del año</h2>
+            <div class="smallNote" id="detailModeNote"></div>
+          </div>
+          <div class="panelBody detailsGrid">
+            <div>
+              <div class="yearTitle">
+                <h3 id="yearHeading"></h3>
+                <div class="sourceLink"><a id="yearSource" href="#" target="_blank" rel="noopener noreferrer">Fuente normativa</a></div>
+              </div>
+              <div class="cards" id="cards"></div>
+              <div style="height:12px"></div>
+              <div class="tableWrap">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Tramo</th>
+                      <th>Desde</th>
+                      <th>Hasta</th>
+                      <th>Tipo marginal</th>
+                      <th>Moneda original</th>
+                    </tr>
+                  </thead>
+                  <tbody id="detailBody"></tbody>
+                </table>
+              </div>
+            </div>
 
-    <section class="panel">
-      <div class="explain">
-        <div class="pillRow">
-          <span class="pill">Serie base: <b>escala estatal/general</b></span>
-          <span class="pill" id="yearsPill"></span>
-          <span class="pill" id="maxPill"></span>
-        </div>
-
-        <div>
-          Esta página toma la escala estatal/general del IRPF de cada año presente en tu JSON y representa la evolución de los límites superiores de cada tramo. Para los años en pesetas, se convierten primero a euros; además puedes ver la serie en euros corrientes o en euros constantes de 1986 aplicando el deflactor del CSV. Así se puede comparar mejor el tamaño real de los tramos a lo largo del tiempo.
-        </div>
-
-        <div>
-          Para resolver la diferencia entre los años 90, que tienen muchos tramos, y los años del euro, que tienen menos, cada color se interpreta como <b>tramo 1, tramo 2, tramo 3…</b> dentro de cada ejercicio. De ese modo la comparación sigue siendo consistente aunque el número total de tramos cambie.
-        </div>
-
-        <div class="legendNote" id="deflatorExplain"></div>
+            <div class="explain">
+              <div class="pillRow">
+                <span class="pill">Serie base: <b>escala estatal/general</b></span>
+                <span class="pill">Máximo histórico cargado: <b>17 tramos finitos</b></span>
+                <span class="pill">Años del JSON: <b>26</b></span>
+              </div>
+              <div>
+                <b>Cómo se ha resuelto el problema de los muchos tramos en los 90:</b> en vez de intentar dibujar “bandas” incompatibles entre años, cada color representa el <b>tope del tramo n.º 1, n.º 2, n.º 3...</b> de cada ejercicio. Esto permite comparar cómo cambian los cortes del impuesto aunque el número total de tramos suba o baje.
+              </div>
+              <div>
+                <b>Modo euros corrientes:</b> los años en pesetas se convierten a euros con la equivalencia legal 1 € = 166,386 ptas. Los años ya expresados en euros se mantienen tal como aparecen en la tabla.
+              </div>
+              <div>
+                <b>Modo euros constantes de 1986:</b> después de pasar a euros, cada importe se multiplica por el <b>deflactor_hasta_1986</b> del CSV. Así la comparación temporal es mucho más homogénea.
+              </div>
+              <div>
+                <b>Importante:</b> el JSON no contiene todos los ejercicios intermedios; solo los años presentes en tu fichero. Por eso verás saltos entre algunos puntos.
+              </div>
+              <div class="muted" id="deflatorExplain"></div>
+            </div>
+          </div>
+        </section>
       </div>
     </section>
   </div>
@@ -311,48 +311,40 @@
     const YEARS = DATA.map(d => d.year);
     const MAX_TRAMOS = Math.max(...DATA.map(d => d.finite_bracket_count));
     const YEAR_MAP = new Map(DATA.map(d => [d.year, d]));
-
-    const PRES_BANDS = [
-      { name:"Felipe González", start:1982, end:1996, color:"#552222" },
-      { name:"José María Aznar", start:1996, end:2004, color:"#223C66" },
-      { name:"José Luis Rodríguez Zapatero", start:2004, end:2011, color:"#552222" },
-      { name:"Mariano Rajoy", start:2011, end:2018, color:"#223C66" },
-      { name:"Pedro Sánchez", start:2018, end:null, color:"#552222" },
-    ];
-
     const MODE_DEFS = [
       { key: 'real', label: 'Euros constantes 1986' },
       { key: 'nominal', label: 'Euros corrientes' },
     ];
-    const SCALE_DEFS = [
-      { key: 'exp', label: 'Exponencial' },
-      { key: 'log', label: 'Logarítmica' },
-    ];
-
     const state = {
       mode: 'real',
-      scaleMode: 'exp',
-      visibleCount: 5,
-      showPresBands: true,
+      visibleCount: 8,
+      selectedYear: 2023,
+      focusedTramo: null,
       hoverYear: null,
     };
 
     const svg = document.getElementById('chartSvg');
     const chartBox = document.getElementById('chartBox');
     const tooltip = document.getElementById('tooltip');
+    const legendEl = document.getElementById('legend');
+    const yearSelect = document.getElementById('yearSelect');
+    const yearHeading = document.getElementById('yearHeading');
+    const yearSource = document.getElementById('yearSource');
+    const cardsEl = document.getElementById('cards');
+    const detailBody = document.getElementById('detailBody');
     const chartMeta = document.getElementById('chartMeta');
     const lineSummary = document.getElementById('lineSummary');
+    const detailModeNote = document.getElementById('detailModeNote');
     const deflatorExplain = document.getElementById('deflatorExplain');
-    const topMeta = document.getElementById('topMeta');
 
     function money(value, digits = 0) {
       if (value === null || value === undefined || !Number.isFinite(value)) return '—';
-      return new Intl.NumberFormat('es-ES', {
-        style: 'currency',
-        currency: 'EUR',
-        minimumFractionDigits: digits,
-        maximumFractionDigits: digits
-      }).format(value);
+      return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', minimumFractionDigits: digits, maximumFractionDigits: digits }).format(value);
+    }
+
+    function pct(value) {
+      if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+      return new Intl.NumberFormat('es-ES', { minimumFractionDigits: value % 1 ? 2 : 0, maximumFractionDigits: 2 }).format(value) + '%';
     }
 
     function euroShort(v) {
@@ -361,6 +353,12 @@
       if (abs >= 1_000_000) return new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 }).format(v / 1_000_000) + ' M€';
       if (abs >= 1_000) return new Intl.NumberFormat('es-ES', { maximumFractionDigits: abs >= 100_000 ? 0 : 1 }).format(v / 1_000) + ' k€';
       return money(v, 0);
+    }
+
+    function originalMoney(value, currency) {
+      if (value === null || value === undefined || !Number.isFinite(value)) return 'En adelante';
+      if (currency === 'pesetas') return new Intl.NumberFormat('es-ES', { maximumFractionDigits: 0 }).format(value) + ' ptas';
+      return money(value, 2);
     }
 
     function getColor(index) {
@@ -372,15 +370,15 @@
       return state.mode === 'real' ? 'real_eur_1986' : 'nominal_eur';
     }
 
+    function getFiniteBracketsForYear(year) {
+      const y = YEAR_MAP.get(year);
+      if (!y) return [];
+      return y.brackets.filter(b => !b.is_open);
+    }
+
     function getBracketValue(bracket, which) {
       const prefix = modeFieldPrefix();
       return bracket[`${which}_${prefix}`];
-    }
-
-    function visibleTramos() {
-      return state.visibleCount === MAX_TRAMOS
-        ? Array.from({ length: MAX_TRAMOS }, (_, i) => i + 1)
-        : [1, 2, 3, 4, 5];
     }
 
     function getSeries(index) {
@@ -391,44 +389,60 @@
       }).filter(p => p.value !== null && Number.isFinite(p.value));
     }
 
-    function buildSegmentedButtons(containerId, defs, activeKey, onClick) {
-      const el = document.getElementById(containerId);
-      el.innerHTML = defs.map(d => `<button class="btn ${d.key === activeKey ? 'active' : ''}" data-key="${d.key}">${d.label}</button>`).join('');
-      el.querySelectorAll('[data-key]').forEach(btn => btn.addEventListener('click', () => onClick(btn.dataset.key)));
+    function visibleTramos() {
+      return Array.from({ length: state.visibleCount }, (_, i) => i + 1);
     }
 
     function buildButtons() {
-      buildSegmentedButtons('modeButtons', MODE_DEFS, state.mode, key => {
-        state.mode = key;
+      const modeButtons = document.getElementById('modeButtons');
+      modeButtons.innerHTML = MODE_DEFS.map(m => `<button class="btn ${state.mode === m.key ? 'active' : ''}" data-mode="${m.key}">${m.label}</button>`).join('');
+      modeButtons.querySelectorAll('[data-mode]').forEach(btn => btn.addEventListener('click', () => {
+        state.mode = btn.dataset.mode;
         renderAll();
-      });
+      }));
 
-      buildSegmentedButtons('scaleButtons', SCALE_DEFS, state.scaleMode, key => {
-        state.scaleMode = key;
+      const presets = Array.from(new Set([5, 8, 12, MAX_TRAMOS].filter(n => n > 0 && n <= MAX_TRAMOS))).sort((a,b) => a-b);
+      const countButtons = document.getElementById('countButtons');
+      countButtons.innerHTML = presets.map(n => `<button class="btn ${state.visibleCount === n ? 'active' : ''}" data-count="${n}">${n === MAX_TRAMOS ? 'Todos (' + n + ')' : 'Primeros ' + n}</button>`).join('');
+      countButtons.querySelectorAll('[data-count]').forEach(btn => btn.addEventListener('click', () => {
+        state.visibleCount = Number(btn.dataset.count);
+        if (state.focusedTramo && state.focusedTramo > state.visibleCount) state.focusedTramo = null;
         renderAll();
-      });
+      }));
+    }
 
-      buildSegmentedButtons('countButtons', [
-        { key: '5', label: 'Primeros 5' },
-        { key: String(MAX_TRAMOS), label: 'Todos' },
-      ], String(state.visibleCount), key => {
-        state.visibleCount = Number(key);
-        renderAll();
-      });
-
-      buildSegmentedButtons('politicsButtons', [
-        { key: 'on', label: 'Políticos: ON' },
-        { key: 'off', label: 'Políticos: OFF' },
-      ], state.showPresBands ? 'on' : 'off', key => {
-        state.showPresBands = key === 'on';
+    function buildYearSelect() {
+      yearSelect.innerHTML = YEARS.map(y => `<option value="${y}" ${y === state.selectedYear ? 'selected' : ''}>${y}</option>`).join('');
+      yearSelect.addEventListener('change', () => {
+        state.selectedYear = Number(yearSelect.value);
         renderAll();
       });
     }
 
-    function yTransform(v) {
-      if (!Number.isFinite(v)) return NaN;
-      if (state.scaleMode === 'log') return Math.log10(1 + Math.max(0, v));
-      return v;
+    function renderLegend() {
+      const selected = YEAR_MAP.get(state.selectedYear);
+      legendEl.innerHTML = visibleTramos().map(n => {
+        const color = getColor(n);
+        const finite = getFiniteBracketsForYear(state.selectedYear);
+        const bracket = finite[n - 1];
+        const value = bracket ? euroShort(getBracketValue(bracket, 'upper')) : '—';
+        const focused = state.focusedTramo === n;
+        const muted = state.focusedTramo && state.focusedTramo !== n;
+        return `
+          <div class="legendItem ${focused ? 'is-focused' : ''} ${muted ? 'is-muted' : ''}" data-tramo="${n}">
+            <div class="swatch" style="background:${color}"></div>
+            <div class="legendMain">
+              <div class="legendName">Tramo ${n}</div>
+              <div class="legendSub">Tope superior del tramo ${n} en el año seleccionado</div>
+            </div>
+            <div class="legendValue">${value}</div>
+          </div>`;
+      }).join('');
+      legendEl.querySelectorAll('[data-tramo]').forEach(el => el.addEventListener('click', () => {
+        const n = Number(el.dataset.tramo);
+        state.focusedTramo = state.focusedTramo === n ? null : n;
+        renderAll();
+      }));
     }
 
     function niceStep(maxValue) {
@@ -442,7 +456,7 @@
       return step * power;
     }
 
-    function linearTicks(maxValue) {
+    function yTicks(maxValue) {
       const step = niceStep(maxValue);
       const top = Math.ceil(maxValue / step) * step;
       const ticks = [];
@@ -450,31 +464,81 @@
       return ticks;
     }
 
-    function logTicks(maxValue) {
-      const top = Math.max(1, maxValue);
-      const ticks = [0];
-      for (let p = 0; p < 8; p++) {
-        const base = Math.pow(10, p);
-        for (const m of [1, 2, 5]) {
-          const v = m * base;
-          if (v <= top * 1.001) ticks.push(v);
-        }
-      }
-      const unique = Array.from(new Set(ticks)).sort((a, b) => a - b);
-      return unique.filter((v, i) => i === 0 || v >= 1000 || top < 1000);
-    }
+    function renderChart() {
+      const width = 1200;
+      const height = 620;
+      const m = { top: 28, right: 28, bottom: 74, left: 84 };
+      const plot = { x: m.left, y: m.top, w: width - m.left - m.right, h: height - m.top - m.bottom };
+      const minYear = Math.min(...YEARS);
+      const maxYear = Math.max(...YEARS);
+      const visible = visibleTramos();
+      const seriesData = visible.map(n => ({ tramo: n, color: getColor(n), points: getSeries(n) }));
+      const filteredSeries = state.focusedTramo ? seriesData.filter(s => s.tramo === state.focusedTramo) : seriesData;
+      let maxValue = 0;
+      filteredSeries.forEach(s => s.points.forEach(p => { if (Number.isFinite(p.value)) maxValue = Math.max(maxValue, p.value); }));
+      maxValue = Math.max(1, maxValue * 1.08);
+      const ticks = yTicks(maxValue);
+      const yMax = ticks[ticks.length - 1] || maxValue;
+      const x = year => plot.x + ((year - minYear) / (maxYear - minYear)) * plot.w;
+      const y = value => plot.y + plot.h - (value / yMax) * plot.h;
 
-    function currentTicks(maxValue) {
-      return state.scaleMode === 'log' ? logTicks(maxValue) : linearTicks(maxValue);
+      let out = '';
+      out += `<rect x="0" y="0" width="${width}" height="${height}" fill="transparent"></rect>`;
+      out += `<rect x="${plot.x}" y="${plot.y}" width="${plot.w}" height="${plot.h}" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,.05)"></rect>`;
+
+      ticks.forEach(v => {
+        const yy = y(v);
+        out += `<line x1="${plot.x}" y1="${yy}" x2="${plot.x + plot.w}" y2="${yy}" stroke="rgba(255,255,255,.08)" stroke-width="1"></line>`;
+        out += `<text x="${plot.x - 12}" y="${yy + 4}" text-anchor="end" fill="#bfbfbf" font-size="12">${euroShort(v)}</text>`;
+      });
+
+      const approxLabelCount = chartBox.clientWidth < 700 ? 9 : YEARS.length;
+      const step = Math.max(1, Math.ceil(YEARS.length / approxLabelCount));
+      YEARS.forEach((year, idx) => {
+        const xx = x(year);
+        out += `<line x1="${xx}" y1="${plot.y + plot.h}" x2="${xx}" y2="${plot.y + plot.h + 6}" stroke="rgba(255,255,255,.25)"></line>`;
+        if (idx % step === 0 || idx === YEARS.length - 1) {
+          out += `<text x="${xx}" y="${plot.y + plot.h + 24}" text-anchor="middle" fill="#bfbfbf" font-size="12" transform="rotate(-35 ${xx} ${plot.y + plot.h + 24})">${year}</text>`;
+        }
+      });
+
+      const hoverYear = state.hoverYear;
+      if (hoverYear) {
+        const xx = x(hoverYear);
+        out += `<line x1="${xx}" y1="${plot.y}" x2="${xx}" y2="${plot.y + plot.h}" stroke="rgba(254,247,2,.45)" stroke-dasharray="5 4"></line>`;
+      }
+
+      seriesData.forEach(series => {
+        const hiddenByFocus = state.focusedTramo && state.focusedTramo !== series.tramo;
+        const opacity = hiddenByFocus ? 0.16 : 0.95;
+        const strokeWidth = state.focusedTramo === series.tramo ? 3.5 : 2.4;
+        if (!series.points.length) return;
+        let d = '';
+        series.points.forEach((p, i) => { d += `${i ? 'L' : 'M'}${x(p.year)},${y(p.value)} `; });
+        out += `<path d="${d.trim()}" fill="none" stroke="${series.color}" stroke-width="${strokeWidth}" opacity="${opacity}"></path>`;
+        series.points.forEach(p => {
+          const r = (state.selectedYear === p.year || hoverYear === p.year) ? 5 : 3.2;
+          out += `<circle cx="${x(p.year)}" cy="${y(p.value)}" r="${r}" fill="${series.color}" opacity="${opacity}"></circle>`;
+        });
+      });
+
+      out += `<text x="${plot.x}" y="${18}" fill="#FEF702" font-size="13" font-weight="700">Límite superior del tramo (€)</text>`;
+      out += `<text x="${plot.x + plot.w}" y="${18}" fill="#bfbfbf" font-size="12" text-anchor="end">Escala estatal/general · ${state.mode === 'real' ? 'euros constantes de 1986' : 'euros corrientes'}</text>`;
+      svg.innerHTML = out;
+
+      chartMeta.innerHTML = state.mode === 'real'
+        ? 'Visualización principal en euros constantes de 1986: convierte pesetas/euros nominales a una base real homogénea usando el campo <b>deflactor_hasta_1986</b> del CSV.'
+        : 'Visualización en euros corrientes: pesetas convertidas a euros nominales con 1 € = 166,386 ptas; los años ya en euros se muestran en su importe original.';
+      lineSummary.textContent = `Series visibles: ${visible.length} de ${MAX_TRAMOS}.` + (state.focusedTramo ? ` En foco: tramo ${state.focusedTramo}.` : '');
     }
 
     function nearestYearFromClientX(clientX) {
       const rect = chartBox.getBoundingClientRect();
       const rel = Math.max(0, Math.min(rect.width, clientX - rect.left));
       const ratio = rect.width ? (rel / rect.width) : 0;
-      const target = 1600 * ratio;
-      const m = { left: 90, right: 34 };
-      const plotW = 1600 - m.left - m.right;
+      const target = 1200 * ratio;
+      const m = { left: 84, right: 28 };
+      const plotW = 1200 - m.left - m.right;
       const minYear = Math.min(...YEARS);
       const maxYear = Math.max(...YEARS);
       let best = YEARS[0];
@@ -489,12 +553,8 @@
 
     function renderTooltip(clientX, clientY) {
       const year = state.hoverYear;
-      if (!year) {
-        tooltip.style.display = 'none';
-        return;
-      }
-      const yearRec = YEAR_MAP.get(year);
-      const finite = yearRec.brackets.filter(b => !b.is_open);
+      if (!year) { tooltip.style.display = 'none'; return; }
+      const finite = getFiniteBracketsForYear(year);
       const rows = visibleTramos().map(n => {
         const bracket = finite[n - 1];
         if (!bracket) return null;
@@ -503,16 +563,15 @@
           <div class="ttRow">
             <div class="ttDot" style="background:${getColor(n)}"></div>
             <div class="ttName">Tramo ${n}</div>
-            <div class="ttVal">${money(value, 0)}</div>
+            <div class="ttVal">${money(value, value < 10000 ? 0 : 0)}</div>
           </div>`;
       }).filter(Boolean).join('');
-
+      const yRec = YEAR_MAP.get(year);
       tooltip.innerHTML = `
         <div class="ttYear">${year}</div>
-        ${rows}
-        <div class="subtle" style="margin-top:8px;">Moneda original: ${yearRec.original_currency} · Deflactor a 1986: ${new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(yearRec.deflator_hasta_1986)}</div>`;
+        ${rows || '<div class="smallNote">No hay datos para los tramos visibles.</div>'}
+        <div class="smallNote" style="margin-top:8px;">Moneda original: ${yRec.original_currency} · Deflactor a 1986: ${new Intl.NumberFormat('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}).format(yRec.deflator_hasta_1986)}</div>`;
       tooltip.style.display = 'block';
-
       const rect = chartBox.getBoundingClientRect();
       const ttRect = tooltip.getBoundingClientRect();
       let left = clientX - rect.left + 14;
@@ -523,97 +582,70 @@
       tooltip.style.top = top + 'px';
     }
 
-    function renderChart() {
-      const width = 1600;
-      const height = 760;
-      const m = { top: 34, right: 34, bottom: 92, left: 90 };
-      const plot = { x: m.left, y: m.top, w: width - m.left - m.right, h: height - m.top - m.bottom };
-      const minYear = Math.min(...YEARS);
-      const maxYear = Math.max(...YEARS);
-      const visible = visibleTramos();
-      const seriesData = visible.map(n => ({ tramo: n, color: getColor(n), points: getSeries(n) }));
-      let maxValue = 0;
-      seriesData.forEach(s => s.points.forEach(p => {
-        if (Number.isFinite(p.value)) maxValue = Math.max(maxValue, p.value);
-      }));
-      maxValue = Math.max(1, maxValue * 1.08);
-      let ticks = currentTicks(maxValue);
-      if (!ticks.length) ticks = [0, maxValue];
-      const yMax = ticks[ticks.length - 1] || maxValue;
-      const x = year => plot.x + ((year - minYear) / (maxYear - minYear)) * plot.w;
-      const y = value => plot.y + plot.h - (yTransform(value) / yTransform(yMax)) * plot.h;
+    function buildCards(yearRec) {
+      const finite = yearRec.brackets.filter(b => !b.is_open);
+      const open = yearRec.brackets.find(b => b.is_open);
+      const lastFinite = finite[finite.length - 1];
+      const firstFinite = finite[0];
+      const modeLabel = state.mode === 'real' ? 'euros constantes 1986' : 'euros corrientes';
+      const maxRate = Math.max(...yearRec.brackets.map(b => Number.isFinite(b.rate) ? b.rate : -Infinity));
+      const firstTope = firstFinite ? getBracketValue(firstFinite, 'upper') : null;
+      const lastTope = lastFinite ? getBracketValue(lastFinite, 'upper') : null;
+      const openStart = open ? getBracketValue(open, 'lower') : null;
+      const items = [
+        { label: 'Tramos finitos', value: String(yearRec.finite_bracket_count), sub: 'Cortes con límite superior definido' },
+        { label: 'Primer tope', value: money(firstTope, 0), sub: modeLabel },
+        { label: 'Último tope finito', value: money(lastTope, 0), sub: modeLabel },
+        { label: 'Tramo abierto final', value: open ? ('Desde ' + money(openStart, 0)) : '—', sub: 'Inicio del último tramo sin techo' },
+        { label: 'Tipo marginal máximo', value: pct(maxRate), sub: 'Máximo del año seleccionado' },
+        { label: 'Moneda original', value: yearRec.original_currency === 'pesetas' ? 'Pesetas' : 'Euros', sub: 'Tal como aparece la tabla de origen' },
+        { label: 'Deflactor a 1986', value: new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(yearRec.deflator_hasta_1986), sub: 'Factor usado en el modo real' },
+        { label: 'Régimen del JSON', value: yearRec.regime || '—', sub: 'Etiqueta técnica del fichero' },
+      ];
+      cardsEl.innerHTML = items.map(item => `
+        <div class="card">
+          <div class="cardLabel">${item.label}</div>
+          <div class="cardValue">${item.value}</div>
+          <div class="cardSub">${item.sub}</div>
+        </div>`).join('');
+    }
 
-      let out = '';
-      out += `<rect x="0" y="0" width="${width}" height="${height}" fill="transparent"></rect>`;
+    function buildDetailTable(yearRec) {
+      detailBody.innerHTML = yearRec.brackets.map(b => {
+        const fromDisplay = state.mode === 'real' ? money(b.lower_real_eur_1986, 2) : money(b.lower_nominal_eur, 2);
+        const toDisplay = b.is_open ? 'En adelante' : (state.mode === 'real' ? money(b.upper_real_eur_1986, 2) : money(b.upper_nominal_eur, 2));
+        const currencyLabel = yearRec.original_currency === 'pesetas'
+          ? `${originalMoney(b.lower_original, 'pesetas')} → ${b.upper_original === null ? 'En adelante' : originalMoney(b.upper_original, 'pesetas')}`
+          : `${originalMoney(b.lower_original, 'euros')} → ${b.upper_original === null ? 'En adelante' : originalMoney(b.upper_original, 'euros')}`;
+        return `
+          <tr>
+            <td><b>Tramo ${b.index}</b></td>
+            <td>${fromDisplay}</td>
+            <td>${toDisplay}</td>
+            <td>${pct(b.rate)}</td>
+            <td>${currencyLabel}</td>
+          </tr>`;
+      }).join('');
+    }
 
-      if (state.showPresBands) {
-        PRES_BANDS.forEach(band => {
-          const start = Math.max(minYear, band.start);
-          const end = Math.min(maxYear, band.end === null ? maxYear : band.end);
-          if (end <= minYear || start >= maxYear) return;
-          const x1 = x(start);
-          const x2 = x(end);
-          const labelX = (x1 + x2) / 2;
-          out += `<rect x="${x1}" y="${plot.y}" width="${Math.max(0, x2 - x1)}" height="${plot.h}" fill="${band.color}" opacity="0.22"></rect>`;
-          out += `<text x="${labelX}" y="${plot.y + 18}" text-anchor="middle" fill="rgba(255,255,255,.68)" font-size="12" font-weight="700">${band.name}</text>`;
-        });
-      }
-
-      out += `<rect x="${plot.x}" y="${plot.y}" width="${plot.w}" height="${plot.h}" fill="rgba(255,255,255,0.02)" stroke="rgba(255,255,255,.05)"></rect>`;
-
-      ticks.forEach(v => {
-        const yy = y(v);
-        out += `<line x1="${plot.x}" y1="${yy}" x2="${plot.x + plot.w}" y2="${yy}" stroke="rgba(255,255,255,.10)" stroke-width="1"></line>`;
-        out += `<text x="${plot.x - 12}" y="${yy + 4}" text-anchor="end" fill="#bfbfbf" font-size="12">${euroShort(v)}</text>`;
-      });
-
-      const approxLabelCount = chartBox.clientWidth < 720 ? 10 : YEARS.length;
-      const step = Math.max(1, Math.ceil(YEARS.length / approxLabelCount));
-      YEARS.forEach((year, idx) => {
-        const xx = x(year);
-        out += `<line x1="${xx}" y1="${plot.y + plot.h}" x2="${xx}" y2="${plot.y + plot.h + 6}" stroke="rgba(255,255,255,.25)"></line>`;
-        if (idx % step === 0 || idx === YEARS.length - 1) {
-          out += `<text x="${xx}" y="${plot.y + plot.h + 24}" text-anchor="middle" fill="#bfbfbf" font-size="12" transform="rotate(-35 ${xx} ${plot.y + plot.h + 24})">${year}</text>`;
-        }
-      });
-
-      if (state.hoverYear) {
-        const xx = x(state.hoverYear);
-        out += `<line x1="${xx}" y1="${plot.y}" x2="${xx}" y2="${plot.y + plot.h}" stroke="rgba(254,247,2,.55)" stroke-dasharray="6 5"></line>`;
-      }
-
-      seriesData.forEach(series => {
-        if (!series.points.length) return;
-        let d = '';
-        series.points.forEach((p, i) => {
-          d += `${i ? 'L' : 'M'}${x(p.year)},${y(p.value)} `;
-        });
-        out += `<path d="${d.trim()}" fill="none" stroke="${series.color}" stroke-width="2.7" opacity="0.96"></path>`;
-        series.points.forEach(p => {
-          const r = state.hoverYear === p.year ? 5 : 3.3;
-          out += `<circle cx="${x(p.year)}" cy="${y(p.value)}" r="${r}" fill="${series.color}" opacity="0.96"></circle>`;
-        });
-      });
-
-      out += `<text x="${plot.x}" y="18" fill="#FEF702" font-size="13" font-weight="700">Límite superior del tramo (€)</text>`;
-      out += `<text x="${plot.x + plot.w}" y="18" fill="#bfbfbf" font-size="12" text-anchor="end">${state.scaleMode === 'log' ? 'Escala logarítmica' : 'Escala exponencial'} · ${state.mode === 'real' ? 'euros constantes de 1986' : 'euros corrientes'}</text>`;
-      svg.innerHTML = out;
-
-      chartMeta.innerHTML = state.mode === 'real'
-        ? 'Serie principal en <b>euros constantes de 1986</b>: primero se convierten las pesetas a euros y después se aplica el deflactor del CSV.'
-        : 'Serie en <b>euros corrientes</b>: los años en pesetas se convierten a euros nominales con la equivalencia legal 1 € = 166,386 ptas.';
-
-      lineSummary.textContent = `Series visibles: ${visible.length} de ${MAX_TRAMOS} · Escala Y: ${state.scaleMode === 'log' ? 'logarítmica' : 'exponencial'} · Políticos: ${state.showPresBands ? 'ON' : 'OFF'}`;
-      topMeta.textContent = `Años disponibles: ${Math.min(...YEARS)}–${Math.max(...YEARS)} · Máximo histórico cargado: ${MAX_TRAMOS} tramos finitos`;
-      document.getElementById('yearsPill').innerHTML = `Años del JSON: <b>${DATA.length}</b>`;
-      document.getElementById('maxPill').innerHTML = `Máximo histórico cargado: <b>${MAX_TRAMOS} tramos finitos</b>`;
-      const refYear = YEAR_MAP.get(Math.max(...YEARS));
-      deflatorExplain.textContent = `El ejercicio más reciente del JSON es ${Math.max(...YEARS)} y su factor deflactor_hasta_1986 es ${new Intl.NumberFormat('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(refYear.deflator_hasta_1986)}.`;
+    function renderDetails() {
+      const yearRec = YEAR_MAP.get(state.selectedYear);
+      yearHeading.textContent = `Ejercicio ${yearRec.year}`;
+      yearSource.href = yearRec.source_url || '#';
+      yearSource.textContent = yearRec.source_url ? 'Fuente normativa' : 'Fuente no disponible';
+      detailModeNote.textContent = state.mode === 'real'
+        ? 'Tabla mostrada en euros constantes de 1986.'
+        : 'Tabla mostrada en euros corrientes.';
+      deflatorExplain.textContent = `En ${yearRec.year}, el factor deflactor_hasta_1986 del CSV es ${new Intl.NumberFormat('es-ES', {minimumFractionDigits:2, maximumFractionDigits:2}).format(yearRec.deflator_hasta_1986)}.`;
+      buildCards(yearRec);
+      buildDetailTable(yearRec);
     }
 
     function renderAll() {
       buildButtons();
+      renderLegend();
       renderChart();
+      renderDetails();
     }
 
     chartBox.addEventListener('mousemove', ev => {
@@ -628,11 +660,19 @@
       renderChart();
     });
 
+    chartBox.addEventListener('click', () => {
+      if (!state.hoverYear) return;
+      state.selectedYear = state.hoverYear;
+      yearSelect.value = String(state.selectedYear);
+      renderAll();
+    });
+
     window.addEventListener('resize', () => {
       renderChart();
       if (!state.hoverYear) tooltip.style.display = 'none';
     });
 
+    buildYearSelect();
     renderAll();
   </script>
 </body>
