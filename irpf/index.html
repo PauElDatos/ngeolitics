@@ -398,7 +398,7 @@
       if (seriesType === 'gdp') return isHover ? 5.2 : 3.6;
       const { min, max } = RATE_EXTENT;
       const t = (!Number.isFinite(rate) || max <= min) ? 0.5 : (rate - min) / (max - min);
-      const base = 3 + (t * 4.8);
+      const base = 3 + (t * 20);
       return isHover ? base + 1.2 : base;
     }
 
