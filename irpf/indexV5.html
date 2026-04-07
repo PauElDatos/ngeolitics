@@ -402,17 +402,6 @@
       return isHover ? base + 1.2 : base;
     }
 
-    function buildStepPath(points, xFn, yFn) {
-      if (!points.length) return '';
-      let d = `M${xFn(points[0].year)},${yFn(points[0].value)}`;
-      for (let i = 1; i < points.length; i++) {
-        const prev = points[i - 1];
-        const curr = points[i];
-        d += ` H${xFn(curr.year)} V${yFn(curr.value)}`;
-      }
-      return d;
-    }
-
     function buildSegmentedButtons(containerId, defs, activeKey, onClick) {
       const el = document.getElementById(containerId);
       el.innerHTML = defs.map(def => `<button class="btn ${def.key === activeKey ? 'active' : ''}" data-key="${def.key}">${def.label}</button>`).join('');
@@ -625,7 +614,7 @@
 
       seriesData.forEach(series => {
         if (!series.points.length) return;
-        const d = buildStepPath(series.points, x, y);
+        const d = series.points.map((p, i) => `${i ? 'L' : 'M'}${x(p.year)},${y(p.value)}`).join(' ');
         out += `<path d="${d}" fill="none" stroke="${series.color}" stroke-width="2.7" opacity="0.96"></path>`;
         series.points.forEach(p => {
           const r = pointRadiusFromRate(p.rate, state.hoverYear === p.year, 'tramo');
@@ -634,7 +623,7 @@
       });
 
       if (gdpSeries.length) {
-        const d = buildStepPath(gdpSeries, x, y);
+        const d = gdpSeries.map((p, i) => `${i ? 'L' : 'M'}${x(p.year)},${y(p.value)}`).join(' ');
         out += `<path d="${d}" fill="none" stroke="rgba(255,255,255,.96)" stroke-width="3.2" stroke-dasharray="10 6"></path>`;
         gdpSeries.forEach(p => {
           const r = pointRadiusFromRate(null, state.hoverYear === p.year, 'gdp');
@@ -647,8 +636,8 @@
       svg.innerHTML = out;
 
       chartMeta.innerHTML = state.mode === 'real1990'
-        ? 'Serie en <b>euros constantes de 1990</b> aplicando el deflactor del CSV. La línea blanca discontinua representa el <b>PIB per cápita</b> también en euros constantes de 1990. El tamaño de cada punto de tramo es proporcional al <b>tipo marginal</b> y las conexiones entre años se dibujan en <b>escalones horizontales + salto vertical</b>.'
-        : 'Serie en <b>euros corrientes</b>. Los años en pesetas se convierten a euros nominales con la equivalencia legal 1 € = 166,386 ptas. La línea blanca discontinua representa el <b>PIB per cápita</b> nominal. El tamaño de cada punto de tramo es proporcional al <b>tipo marginal</b> y las conexiones entre años se dibujan en <b>escalones horizontales + salto vertical</b>.';
+        ? 'Serie en <b>euros constantes de 1990</b> aplicando el deflactor del CSV. La línea blanca discontinua representa el <b>PIB per cápita</b> también en euros constantes de 1990. El tamaño de cada punto de tramo es proporcional al <b>tipo marginal</b>.'
+        : 'Serie en <b>euros corrientes</b>. Los años en pesetas se convierten a euros nominales con la equivalencia legal 1 € = 166,386 ptas. La línea blanca discontinua representa el <b>PIB per cápita</b> nominal. El tamaño de cada punto de tramo es proporcional al <b>tipo marginal</b>.';
 
       lineSummary.textContent = `Series visibles: ${visible.length} tramos + PIB per cápita · Escala Y: ${state.scaleMode === 'log' ? 'logarítmica' : 'lineal'} · Base real: 1990 · Tamaño del punto: tipo marginal · Bandas políticas: ${state.showPresBands ? 'ON' : 'OFF'}`;
       topMeta.textContent = `Años disponibles: ${Math.min(...YEARS)}–${Math.max(...YEARS)} · Máximo histórico cargado: ${MAX_TRAMOS} tramos finitos`;
