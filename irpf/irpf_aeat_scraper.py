@@ -2,16 +2,7 @@
 """
 Scrapea las tablas del IRPF general estatal y autonómico desde páginas de la AEAT
 para los ejercicios 2017, 2018, 2021, 2022 y 2023, y genera una salida en texto
-con HTML normalizado estilo BOE:
-
-AÑO
-URL
-<table class="tabla">...</table>
-
-Incluye:
-- tabla estatal/nacional
-- tablas autonómicas de todas las CCAA presentes en la AEAT para ese ejercicio
-- opción para incluir o excluir la especialidad de Ceuta/Melilla
+con HTML normalizado estilo BOE.
 
 Uso:
     python irpf_aeat_scraper.py --out irpf_tablas.txt
@@ -28,7 +19,6 @@ import html
 import re
 import sys
 import time
-
 import unicodedata
 from dataclasses import dataclass
 from typing import Iterable, List, Optional, Sequence
@@ -48,8 +38,8 @@ HEADERS = {
 
 TIMEOUT = 30
 SLEEP_SECONDS = 0.25
+MAX_RETRIES = 3
 
-# Años solicitados por el usuario. Puedes añadir más si localizas páginas AEAT homogéneas.
 YEAR_CONFIG = {
     2023: {
         "state": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2023/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-estatal.html",
@@ -102,23 +92,30 @@ ROW_RE = re.compile(
     re.IGNORECASE,
 )
 
+TRAILING_ROW_RE = re.compile(
+    r"(0(?:,00)?|\d[\d\.,]*)\s+"
+    r"(0(?:,00)?|\d[\d\.,]*)\s+"
+    r"(En\s+adelante|en\s+adelante|\d[\d\.,]*)\s+"
+    r"(\d[\d\.,]*%?)$",
+    re.IGNORECASE,
+)
+
 
 @dataclass
 class TableBlock:
     year: int
-    scope: str  # estatal | autonómica
+    scope: str
     label: str
     url: str
     rows: List[List[str]]
 
 
 def repair_mojibake(text: str) -> str:
-    """Repara mojibake típico como 'LeÃ³n' -> 'León'."""
     if not text:
         return text
 
     original = text
-    bad_markers = ("Ã", "Â", "â€", "â€“", "â€”", "â€œ", "â€", "â€")
+    bad_markers = ("Ã", "Â", "â€", "â€“", "â€”", "â€œ", "â€\x9d", "â€\x99")
     if any(marker in text for marker in bad_markers):
         candidates = []
         for src in ("latin-1", "cp1252"):
@@ -130,7 +127,6 @@ def repair_mojibake(text: str) -> str:
         if candidates:
             def score(s: str) -> tuple[int, int]:
                 penalty = sum(s.count(m) for m in bad_markers)
-                # Prioriza la versión con menos marcadores rotos y más letras acentuadas válidas
                 bonus = sum(s.count(ch) for ch in "áéíóúÁÉÍÓÚñÑüÜ")
                 return (penalty, -bonus)
             text = min(candidates, key=score)
@@ -144,19 +140,25 @@ def normalize_space(text: str) -> str:
 
 
 def request_html(session: requests.Session, url: str) -> str:
-    resp = session.get(url, headers=HEADERS, timeout=TIMEOUT)
-    resp.raise_for_status()
-
-    # Evita depender ciegamente de resp.text, que a veces produce mojibake
-    # si la codificación declarada por la página es ambigua o incorrecta.
-    dammit = UnicodeDammit(resp.content, is_html=True)
-    text = dammit.unicode_markup
-    if text is None:
-        text = resp.content.decode(resp.apparent_encoding or "utf-8", errors="replace")
-
-    text = repair_mojibake(text)
-    time.sleep(SLEEP_SECONDS)
-    return text
+    last_exc: Optional[Exception] = None
+    for attempt in range(1, MAX_RETRIES + 1):
+        try:
+            resp = session.get(url, headers=HEADERS, timeout=TIMEOUT)
+            resp.raise_for_status()
+            dammit = UnicodeDammit(resp.content, is_html=True)
+            text = dammit.unicode_markup
+            if text is None:
+                text = resp.content.decode(resp.apparent_encoding or "utf-8", errors="replace")
+            text = repair_mojibake(text)
+            time.sleep(SLEEP_SECONDS)
+            return text
+        except Exception as exc:  # noqa: BLE001
+            last_exc = exc
+            if attempt < MAX_RETRIES:
+                time.sleep(0.5 * attempt)
+                continue
+            break
+    raise RuntimeError(f"No pude descargar {url}: {last_exc}")
 
 
 def soup_from_html(text: str) -> BeautifulSoup:
@@ -173,15 +175,29 @@ def table_rows_from_table_tag(table: Tag) -> List[List[str]]:
     return rows
 
 
+def is_numericish(value: str) -> bool:
+    v = normalize_space(value).lower()
+    return bool(re.search(r"\d", v) or "adelante" in v or v.endswith("%"))
+
+
 def is_candidate_table(rows: Sequence[Sequence[str]]) -> bool:
     if len(rows) < 2:
         return False
-    joined = " ".join(" ".join(r) for r in rows[:3]).lower()
-    return (
+    joined = " ".join(" ".join(r) for r in rows[:4]).lower()
+    if (
         "base liquidable" in joined
         and "cuota íntegra" in joined
-        and "tipo aplicable" in joined
-    )
+        and ("tipo aplicable" in joined or "tipo" in joined)
+    ):
+        return True
+
+    numeric_rows = 0
+    for row in rows:
+        if len(row) >= 4:
+            tail = row[-4:]
+            if sum(1 for cell in tail if is_numericish(cell)) >= 3:
+                numeric_rows += 1
+    return numeric_rows >= 2
 
 
 def extract_html_tables(soup: BeautifulSoup) -> List[List[List[str]]]:
@@ -200,7 +216,6 @@ def clean_cell(value: str) -> str:
 
 
 def normalize_rows(rows: List[List[str]]) -> List[List[str]]:
-    """Normaliza filas a 4 columnas de datos, quitando encabezados textuales repetidos."""
     normalized: List[List[str]] = []
     for row in rows:
         row = [clean_cell(x) for x in row if clean_cell(x)]
@@ -210,30 +225,15 @@ def normalize_rows(rows: List[List[str]]) -> List[List[str]]:
         if "base liquidable" in joined and "cuota íntegra" in joined:
             continue
         if row[0].lower().startswith("escala aplicable"):
-            # A veces la primera celda contiene la frase completa + primera fila.
-            first = row[0]
-            m = re.search(
-                r"(0(?:,00)?|\d[\d\.,]*)\s+"
-                r"(0(?:,00)?|\d[\d\.,]*)\s+"
-                r"(En\s+adelante|en\s+adelante|\d[\d\.,]*)\s+"
-                r"(\d[\d\.,]*%?)$",
-                first,
-                flags=re.IGNORECASE,
-            )
+            m = TRAILING_ROW_RE.search(row[0])
             if m:
-                normalized.append([
-                    clean_cell(m.group(1)),
-                    clean_cell(m.group(2)),
-                    clean_cell(m.group(3)),
-                    clean_cell(m.group(4)),
-                ])
+                normalized.append([clean_cell(m.group(i)) for i in range(1, 5)])
             elif len(row) >= 5:
                 normalized.append([clean_cell(x) for x in row[-4:]])
             continue
         if len(row) >= 4:
-            # Coge normalmente las últimas 4 columnas, que suelen ser las de la tabla.
             candidate = [clean_cell(x) for x in row[-4:]]
-            if any(re.search(r"\d|adelante", c, re.I) for c in candidate):
+            if sum(1 for c in candidate if is_numericish(c)) >= 3:
                 normalized.append(candidate)
                 continue
         if len(row) == 1:
@@ -258,13 +258,16 @@ def extract_single_table_from_text(soup: BeautifulSoup) -> List[List[str]]:
     lines = text_lines(soup)
     rows: List[List[str]] = []
     capture = False
+
+    # Primer intento: desde la cabecera de tabla hacia abajo.
     for line in lines:
-        if "base liquidable" in line.lower() and "cuota íntegra" in line.lower():
+        low = line.lower()
+        if "base liquidable" in low and "cuota íntegra" in low:
             capture = True
             continue
         if not capture:
             continue
-        if line.lower().startswith("tipo medio") or line.lower().startswith("generar pdf"):
+        if low.startswith("tipo medio") or low.startswith("generar pdf"):
             break
         m = ROW_RE.match(line)
         if m:
@@ -275,25 +278,33 @@ def extract_single_table_from_text(soup: BeautifulSoup) -> List[List[str]]:
                 clean_cell(m.group("tipo")),
             ])
             continue
-        # caso típico: frase introductoria + primera fila al final
-        m2 = re.search(
-            r"(0(?:,00)?|\d[\d\.,]*)\s+"
-            r"(0(?:,00)?|\d[\d\.,]*)\s+"
-            r"(En\s+adelante|en\s+adelante|\d[\d\.,]*)\s+"
-            r"(\d[\d\.,]*%?)$",
-            line,
-            flags=re.IGNORECASE,
-        )
+        m2 = TRAILING_ROW_RE.search(line)
         if m2:
+            rows.append([clean_cell(m2.group(i)) for i in range(1, 5)])
+
+    if len(rows) >= 2:
+        return rows
+
+    # Segundo intento: barrido general por si la página vino sin la línea cabecera.
+    rows = []
+    for line in lines:
+        m = ROW_RE.match(line)
+        if m:
             rows.append([
-                clean_cell(m2.group(1)),
-                clean_cell(m2.group(2)),
-                clean_cell(m2.group(3)),
-                clean_cell(m2.group(4)),
+                clean_cell(m.group("base")),
+                clean_cell(m.group("cuota")),
+                clean_cell(m.group("resto")),
+                clean_cell(m.group("tipo")),
             ])
-    if not rows:
-        raise ValueError("No pude reconstruir la tabla única desde el texto de la página")
-    return rows
+            continue
+        m2 = TRAILING_ROW_RE.search(line)
+        if m2 and ("escala aplicable" in line.lower() or len(rows) > 0):
+            rows.append([clean_cell(m2.group(i)) for i in range(1, 5)])
+
+    if len(rows) >= 2:
+        return rows
+
+    raise ValueError("No pude reconstruir la tabla única desde el texto de la página")
 
 
 def extract_community_links(index_html: str, base_url: str, include_special: bool) -> List[tuple[str, str]]:
@@ -308,10 +319,8 @@ def extract_community_links(index_html: str, base_url: str, include_special: boo
             continue
         if not include_special and label.lower().startswith("especialidad"):
             continue
-        abs_url = urljoin(base_url, href)
-        candidates.append((label, abs_url))
+        candidates.append((label, urljoin(base_url, href)))
 
-    # Desduplicado conservando orden.
     seen = set()
     unique: List[tuple[str, str]] = []
     for label, url in candidates:
@@ -333,11 +342,18 @@ def extract_blocks_from_single_table_page(
     html_text = request_html(session, url)
     soup = soup_from_html(html_text)
 
-    tables = extract_html_tables(soup)
-    if tables:
-        rows = normalize_rows(tables[0])
-    else:
-        rows = extract_single_table_from_text(soup)
+    try:
+        tables = extract_html_tables(soup)
+        if tables:
+            best = max(tables, key=lambda t: len(normalize_rows(t)))
+            rows = normalize_rows(best)
+        else:
+            rows = extract_single_table_from_text(soup)
+    except Exception as exc:  # noqa: BLE001
+        raise RuntimeError(f"Fallo extrayendo tabla en {year} | {label} | {url}: {exc}") from exc
+
+    if len(rows) < 2:
+        raise RuntimeError(f"Tabla vacía o incompleta en {year} | {label} | {url}")
 
     return [TableBlock(year=year, scope=scope, label=label, url=url, rows=rows)]
 
@@ -358,7 +374,6 @@ def extract_blocks_from_multi_community_page(
 
     html_tables = extract_html_tables(soup)
     if html_tables:
-        # Empareja cada tabla con el heading anterior más cercano.
         blocks: List[TableBlock] = []
         for table in soup.find_all("table"):
             rows = table_rows_from_table_tag(table)
@@ -373,25 +388,19 @@ def extract_blocks_from_multi_community_page(
                 if isinstance(prev, Tag):
                     txt = normalize_space(prev.get_text(" ", strip=True))
                     if is_heading_text(txt):
-                        heading = txt
+                        heading = txt.rstrip(":")
                         break
             if heading is None:
                 heading = "Comunidad no identificada"
             if (not include_special) and heading.lower().startswith("especialidad"):
                 continue
-            blocks.append(
-                TableBlock(
-                    year=year,
-                    scope="autonómica",
-                    label=heading,
-                    url=url,
-                    rows=normalize_rows(rows),
-                )
-            )
+            parsed_rows = normalize_rows(rows)
+            if len(parsed_rows) < 2:
+                continue
+            blocks.append(TableBlock(year=year, scope="autonómica", label=heading, url=url, rows=parsed_rows))
         if blocks:
             return dedupe_blocks(blocks)
 
-    # Fallback por texto plano.
     lines = text_lines(soup)
     blocks: List[TableBlock] = []
     current_label: Optional[str] = None
@@ -399,17 +408,9 @@ def extract_blocks_from_multi_community_page(
 
     def flush() -> None:
         nonlocal current_label, current_rows
-        if current_label and current_rows:
+        if current_label and len(current_rows) >= 2:
             if include_special or not current_label.lower().startswith("especialidad"):
-                blocks.append(
-                    TableBlock(
-                        year=year,
-                        scope="autonómica",
-                        label=current_label,
-                        url=url,
-                        rows=current_rows,
-                    )
-                )
+                blocks.append(TableBlock(year=year, scope="autonómica", label=current_label, url=url, rows=current_rows))
         current_label = None
         current_rows = []
 
@@ -420,7 +421,8 @@ def extract_blocks_from_multi_community_page(
             continue
         if current_label is None:
             continue
-        if line.lower().startswith("tipo medio") or line.lower().startswith("generar pdf"):
+        low = line.lower()
+        if low.startswith("tipo medio") or low.startswith("generar pdf"):
             flush()
             break
         m = ROW_RE.match(line)
@@ -431,10 +433,14 @@ def extract_blocks_from_multi_community_page(
                 clean_cell(m.group("resto")),
                 clean_cell(m.group("tipo")),
             ])
+            continue
+        m2 = TRAILING_ROW_RE.search(line)
+        if m2 and "escala aplicable" in low:
+            current_rows.append([clean_cell(m2.group(i)) for i in range(1, 5)])
     flush()
 
     if not blocks:
-        raise ValueError("No pude extraer tablas autonómicas de la página multi-comunidad")
+        raise RuntimeError(f"No pude extraer tablas autonómicas de la página multi-comunidad: {url}")
     return dedupe_blocks(blocks)
 
 
@@ -458,7 +464,7 @@ def render_table_html(rows: Sequence[Sequence[str]]) -> str:
     for header_group in TABLE_HEADERS:
         out.append("      <th>")
         for part in header_group:
-            out.append(f"        <p class=\"cabeza_tabla\">{html.escape(part)}</p>")
+            out.append(f'        <p class="cabeza_tabla">{html.escape(part)}</p>')
         out.append("      </th>")
     out.append("    </tr>")
 
@@ -468,16 +474,16 @@ def render_table_html(rows: Sequence[Sequence[str]]) -> str:
         base, cuota, resto, tipo = [html.escape(clean_cell(c)) for c in row]
         out.append("    <tr>")
         out.append("      <td>")
-        out.append(f"        <p class=\"cuerpo_tabla_der\">{base}</p>")
+        out.append(f'        <p class="cuerpo_tabla_der">{base}</p>')
         out.append("      </td>")
         out.append("      <td>")
-        out.append(f"        <p class=\"cuerpo_tabla_der\">{cuota}</p>")
+        out.append(f'        <p class="cuerpo_tabla_der">{cuota}</p>')
         out.append("      </td>")
         out.append("      <td>")
-        out.append(f"        <p class=\"cuerpo_tabla_centro\">{resto}</p>")
+        out.append(f'        <p class="cuerpo_tabla_centro">{resto}</p>')
         out.append("      </td>")
         out.append("      <td>")
-        out.append(f"        <p class=\"cuerpo_tabla_centro\">{tipo}</p>")
+        out.append(f'        <p class="cuerpo_tabla_centro">{tipo}</p>')
         out.append("      </td>")
         out.append("    </tr>")
 
@@ -587,7 +593,6 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
         for year in years:
             print(f"[INFO] Descargando {year}...", file=sys.stderr)
             blocks = scrape_year(session, year, include_special=args.include_special)
-            # Orden: estatal primero, luego autonómicas alfabéticas.
             state = [b for b in blocks if b.scope == "estatal"]
             auto = sorted([b for b in blocks if b.scope == "autonómica"], key=lambda b: b.label.casefold())
             all_blocks.extend(state + auto)
