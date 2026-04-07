@@ -2270,37 +2270,37 @@
               "base_hasta": "0,17",
               "cuota_integra": "0",
               "resto_base": "17.707,20",
-              "tipo_aplicable": "12,14"
+              "tipo_aplicable": "12"
             },
             {
               "base_hasta": "17.707,20",
               "cuota_integra": "2.124,86",
               "resto_base": "15.300,00",
-              "tipo_aplicable": "18"
+              "tipo_aplicable": "14"
             },
             {
               "base_hasta": "33.007,20",
               "cuota_integra": "4.266,86",
               "resto_base": "20.400,00",
-              "tipo_aplicable": "5,21"
+              "tipo_aplicable": "18,5"
             },
             {
               "base_hasta": "53.407,20",
               "cuota_integra": "8.040,86",
               "resto_base": "66.593,00",
-              "tipo_aplicable": "5,22"
+              "tipo_aplicable": "21,5"
             },
             {
               "base_hasta": "120.000,20",
               "cuota_integra": "22.358,36",
               "resto_base": "55.000,00",
-              "tipo_aplicable": "5,23"
+              "tipo_aplicable": "22,5"
             },
             {
               "base_hasta": "175.000,20",
               "cuota_integra": "34.733,36",
               "resto_base": "En adelante",
-              "tipo_aplicable": "5"
+              "tipo_aplicable": "23,5"
             }
           ],
           "row_count": 6,
