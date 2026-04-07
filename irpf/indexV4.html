@@ -267,7 +267,7 @@
 
       <div class="chartFoot">
         <div id="lineSummary"></div>
-        <div class="legendInline">Línea blanca discontinua: <strong>PIB per cápita</strong> · Tamaño del punto de color: <strong>tipo marginal del tramo</strong></div>
+        <div class="legendInline">Línea blanca discontinua: <strong>PIB per cápita</strong></div>
       </div>
     </section>
 
@@ -277,9 +277,6 @@
       </div>
       <div>
         El PIB per cápita sale del CSV que me pasaste y se muestra en la misma escala monetaria: en nominal cuando eliges euros corrientes y en real cuando eliges euros constantes de 1990.
-      </div>
-      <div>
-        Además, el tamaño de cada punto de color es proporcional al <strong>tipo marginal</strong> del tramo en ese año: así ves a la vez el límite monetario en el eje vertical y el peso fiscal relativo del tramo mediante el tamaño del marcador.
       </div>
     </section>
   </div>
@@ -371,7 +368,7 @@
         const finite = rec.brackets.filter(b => !b.is_open);
         const bracket = finite[index - 1];
         const value = bracket ? getBracketValue(bracket, 'upper') : null;
-        return value == null ? null : { year: rec.year, value, rate: bracket.rate };
+        return value == null ? null : { year: rec.year, value };
       }).filter(Boolean);
     }
 
@@ -380,26 +377,6 @@
         const value = getGDPValue(rec);
         return value == null ? null : { year: rec.year, value };
       }).filter(Boolean);
-    }
-
-    const RATE_EXTENT = (() => {
-      const rates = DATA.flatMap(rec =>
-        rec.brackets
-          .filter(b => !b.is_open && Number.isFinite(b.rate))
-          .map(b => b.rate)
-      );
-      return {
-        min: Math.min(...rates),
-        max: Math.max(...rates)
-      };
-    })();
-
-    function pointRadiusFromRate(rate, isHover = false, seriesType = 'tramo') {
-      if (seriesType === 'gdp') return isHover ? 5.2 : 3.6;
-      const { min, max } = RATE_EXTENT;
-      const t = (!Number.isFinite(rate) || max <= min) ? 0.5 : (rate - min) / (max - min);
-      const base = 3 + (t * 4.8);
-      return isHover ? base + 1.2 : base;
     }
 
     function buildSegmentedButtons(containerId, defs, activeKey, onClick) {
@@ -617,7 +594,7 @@
         const d = series.points.map((p, i) => `${i ? 'L' : 'M'}${x(p.year)},${y(p.value)}`).join(' ');
         out += `<path d="${d}" fill="none" stroke="${series.color}" stroke-width="2.7" opacity="0.96"></path>`;
         series.points.forEach(p => {
-          const r = pointRadiusFromRate(p.rate, state.hoverYear === p.year, 'tramo');
+          const r = state.hoverYear === p.year ? 5 : 3.2;
           out += `<circle cx="${x(p.year)}" cy="${y(p.value)}" r="${r}" fill="${series.color}" opacity="0.96"></circle>`;
         });
       });
@@ -626,7 +603,7 @@
         const d = gdpSeries.map((p, i) => `${i ? 'L' : 'M'}${x(p.year)},${y(p.value)}`).join(' ');
         out += `<path d="${d}" fill="none" stroke="rgba(255,255,255,.96)" stroke-width="3.2" stroke-dasharray="10 6"></path>`;
         gdpSeries.forEach(p => {
-          const r = pointRadiusFromRate(null, state.hoverYear === p.year, 'gdp');
+          const r = state.hoverYear === p.year ? 5.2 : 3.6;
           out += `<circle cx="${x(p.year)}" cy="${y(p.value)}" r="${r}" fill="#ffffff" stroke="rgba(0,0,0,.45)" stroke-width="1"></circle>`;
         });
       }
@@ -636,10 +613,10 @@
       svg.innerHTML = out;
 
       chartMeta.innerHTML = state.mode === 'real1990'
-        ? 'Serie en <b>euros constantes de 1990</b> aplicando el deflactor del CSV. La línea blanca discontinua representa el <b>PIB per cápita</b> también en euros constantes de 1990. El tamaño de cada punto de tramo es proporcional al <b>tipo marginal</b>.'
-        : 'Serie en <b>euros corrientes</b>. Los años en pesetas se convierten a euros nominales con la equivalencia legal 1 € = 166,386 ptas. La línea blanca discontinua representa el <b>PIB per cápita</b> nominal. El tamaño de cada punto de tramo es proporcional al <b>tipo marginal</b>.';
+        ? 'Serie en <b>euros constantes de 1990</b> aplicando el deflactor del CSV. La línea blanca discontinua representa el <b>PIB per cápita</b> también en euros constantes de 1990.'
+        : 'Serie en <b>euros corrientes</b>. Los años en pesetas se convierten a euros nominales con la equivalencia legal 1 € = 166,386 ptas. La línea blanca discontinua representa el <b>PIB per cápita</b> nominal.';
 
-      lineSummary.textContent = `Series visibles: ${visible.length} tramos + PIB per cápita · Escala Y: ${state.scaleMode === 'log' ? 'logarítmica' : 'lineal'} · Base real: 1990 · Tamaño del punto: tipo marginal · Bandas políticas: ${state.showPresBands ? 'ON' : 'OFF'}`;
+      lineSummary.textContent = `Series visibles: ${visible.length} tramos + PIB per cápita · Escala Y: ${state.scaleMode === 'log' ? 'logarítmica' : 'lineal'} · Base real: 1990 · Bandas políticas: ${state.showPresBands ? 'ON' : 'OFF'}`;
       topMeta.textContent = `Años disponibles: ${Math.min(...YEARS)}–${Math.max(...YEARS)} · Máximo histórico cargado: ${MAX_TRAMOS} tramos finitos`;
     }
 
