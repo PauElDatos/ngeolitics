@@ -1985,6 +1985,36 @@ function interpAtYear(series, year){
 }
 
 /* ===================== Chart controller (SVG) ===================== */
+function formatCompactTick(v){
+  if (!Number.isFinite(v)) return "—";
+
+  const sign = v < 0 ? "-" : "";
+  const abs = Math.abs(v);
+  const units = [
+    { value: 1e9, suffix: "B" },
+    { value: 1e6, suffix: "M" },
+    { value: 1e3, suffix: "k" },
+  ];
+
+  for (const unit of units){
+    if (abs >= unit.value){
+      const scaled = abs / unit.value;
+      const intDigits = Math.floor(scaled).toString().length;
+      const decimals = Math.max(0, Math.min(2, 3 - intDigits));
+      const formatted = new Intl.NumberFormat("es-ES", {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: decimals,
+      }).format(scaled);
+      return sign + formatted + unit.suffix;
+    }
+  }
+
+  return sign + new Intl.NumberFormat("es-ES", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(abs);
+}
+
 function makeChartController(opts){
   const {
     svg, wrap, tooltipEl, errorEl,
@@ -2004,6 +2034,7 @@ function makeChartController(opts){
     yLabelRight,
     yLabelLeftMarkers,
     yLabelRightMarkers,
+    leftAxisFormatTick,
     defaultOrderTooltip,
     topN,
     valueSorter,
@@ -2226,7 +2257,7 @@ function makeChartController(opts){
       const y = yScaleLeftT(yTransform(tv));
       gGrid.appendChild(createSvgEl("line", { x1:margin.l, y1:y, x2:margin.l+plotW, y2:y, stroke:"rgba(74,74,74,.38)", "stroke-width":1 }));
       const tx = createSvgEl("text", { x: margin.l-10, y: y+4, fill:"rgba(176,176,176,.95)", "text-anchor":"end", "font-size":12, "font-family":"Arial, system-ui, sans-serif" });
-      tx.textContent = String(tv);
+      tx.textContent = leftAxisFormatTick ? leftAxisFormatTick(tv) : String(tv);
       gAxes.appendChild(tx);
     }
 
@@ -4079,6 +4110,7 @@ function renderMappingTable(mapping, dataCsvParsed){
       yLabelRight: "Miles de € por persona (1986)",
       yLabelLeftMarkers,
       yLabelRightMarkers,
+      leftAxisFormatTick: (v) => formatCompactTick(v),
       defaultOrderTooltip: seriesDefs.map(s=>s.key),
       topN: 0
     });
@@ -4752,10 +4784,7 @@ try{
       yLabelRight: def.pctAxisLabel,
       yLabelLeftMarkers: [def.absColor],
       yLabelRightMarkers: [def.pctColor],
-      leftAxisFormatTick: (v)=> new Intl.NumberFormat("es-ES", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: Math.abs(v) >= 100000 ? 0 : 1
-      }).format(v / 1000),
+      leftAxisFormatTick: (v) => formatCompactTick(v / 1000),
       defaultOrderTooltip: [ds.cfg.absKey, ds.cfg.pctKey],
       topN: 0,
       segmentBreakRule: () => false,
