@@ -251,38 +251,6 @@
     }
     .muted{ opacity:.35; }
 
-    .legendAux{
-      cursor:default;
-      user-select:text;
-    }
-    .legendAux:hover{
-      border-color: rgba(255,255,255,.08);
-    }
-    .arrowLegendTitle{
-      font-family:var(--fontTitle);
-      color:var(--primary);
-      font-size: calc(11px * var(--uiScale));
-      letter-spacing:.2px;
-      margin-bottom:6px;
-      text-transform:uppercase;
-    }
-    .arrowLegendRow{
-      display:flex;
-      align-items:flex-start;
-      gap:8px;
-      margin-top:4px;
-    }
-    .arrowGlyph{
-      flex:0 0 auto;
-      width:16px;
-      text-align:center;
-      font-weight:700;
-      line-height:1.1;
-    }
-    .arrowGlyph.up{ color: rgba(0, 200, 90, .95); }
-    .arrowGlyph.down{ color: rgba(230, 60, 60, .95); }
-    .arrowGlyph.note{ color: rgba(176,176,176,.95); }
-
     /* GRÁFICO */
     .chartPc{
       display:flex;
@@ -964,14 +932,6 @@
         </div>
         <div class="pc">
           <div class="legend" id="legendGB"></div>
-          <div class="item legendAux" id="legendGBPopInfo" aria-label="Leyenda de flechas de población">
-            <div class="nm">
-              <div class="arrowLegendTitle">Flechas de población</div>
-              <div class="arrowLegendRow"><span class="arrowGlyph up">↑</span><span>La población crece respecto al año anterior.</span></div>
-              <div class="arrowLegendRow"><span class="arrowGlyph down">↓</span><span>La población disminuye respecto al año anterior.</span></div>
-              <div class="arrowLegendRow"><span class="arrowGlyph note">↕</span><span>Cuanto más larga sea la flecha, mayor será la variación anual.</span></div>
-            </div>
-          </div>
           <div class="presStats" id="gbPresStats" aria-label="Resumen por presidencias"></div>
         </div>
       </section>
