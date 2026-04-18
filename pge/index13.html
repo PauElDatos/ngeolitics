@@ -30,7 +30,7 @@
 
   <script>
     // Cambia aquí el enlace cuando tengas tu página definitiva
-    const PATREON_URL = "https://www.patreon.com/c/NGeolitics?vanity=user";
+    const PATREON_URL = "https://www.patreon.com/posts/entendiendo-la-154917096";
   </script>
 
   <style>
@@ -786,6 +786,12 @@
   
 
     /* ===== Vista 4: Deuda pública ===== */
+    .wideToggleBar{
+      width:100%;
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
     .wideToggleBtn{
       width:100%;
       min-height:52px;
@@ -795,16 +801,34 @@
       letter-spacing:.2px;
       text-transform:none;
     }
-    .dpModeBar{
-      width:100%;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
+    .axisHintRow{
+      display:flex;
+      flex-wrap:wrap;
       gap:12px;
-      align-items:stretch;
-      margin-bottom: 2px;
+      align-items:center;
+      font-size: calc(12px * var(--uiScale));
+      line-height:1.25;
+      opacity:.92;
     }
-    .dpModeBar .wideToggleBtn{
-      min-height:48px;
+    .axisHint{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.03);
+    }
+    .axisHintSw{
+      width:10px;
+      height:10px;
+      border-radius:3px;
+      flex:0 0 auto;
+    }
+    @media (max-width: 900px){
+      .wideToggleBar{
+        grid-template-columns: 1fr;
+      }
     }
 
   </style>
@@ -816,7 +840,7 @@
 
   <header>
     <div class="h-title">
-      <h1>entendiendo la economía de España</h1>
+      <h1>Entendiendo la economía de España</h1>
       <div class="tabs" role="tablist" aria-label="Secciones">
         <button class="btn tab on" data-view="pge" role="tab" aria-selected="true">Presupuestos generales del Estado</button>
         <button class="btn tab" data-view="gb" role="tab" aria-selected="false">Gasto vs beneficio</button>
@@ -1080,11 +1104,16 @@
 
 <!-- ===================== VISTA 4: Deuda pública ===================== -->
   <main id="viewDP" class="view">
+    <div class="wideToggleBar" aria-label="Selector de serie de deuda pública">
+      <button class="btn wideToggleBtn on" id="btnDebtModeDeuda" type="button">Deuda pública</button>
+      <button class="btn wideToggleBtn" id="btnDebtModeDeficit" type="button">Déficit público</button>
+    </div>
+
     <div class="topGrid">
       <section class="panel">
         <div class="ph">
           <div class="ttl">Series</div>
-          <div class="sub" id="dpSeriesRange">1986–2025</div>
+          <div class="sub" id="dpSeriesRange">1980–2025</div>
         </div>
         <div class="pc">
           <div class="legend" id="legendDP"></div>
@@ -1098,9 +1127,9 @@
         </div>
 
         <div class="pc chartPc">
-          <div class="dpModeBar" aria-label="Selector de serie de deuda pública">
-            <button class="btn wideToggleBtn on" id="btnDebtModeDeuda" type="button">Deuda pública</button>
-            <button class="btn wideToggleBtn" id="btnDebtModeDeficit" type="button">Déficit público</button>
+          <div class="axisHintRow" id="dpAxisHints">
+            <span class="axisHint"><span class="axisHintSw" id="dpHintAbs"></span><span id="dpHintAbsText">Eje izquierdo: millones de euros (M€)</span></span>
+            <span class="axisHint"><span class="axisHintSw" id="dpHintPct"></span><span id="dpHintPctText">Eje derecho: porcentaje del PIB</span></span>
           </div>
 
           <div class="svgWrap" id="svgWrapDP">
@@ -1117,7 +1146,7 @@
 
           <div class="footerSingle">
             <span class="footerSource">Fuente: <span style="color:#fff">espana_evolucion_deuda.csv</span> / <span style="color:#fff">espana_evolucion_deficit.csv</span> · <span style="opacity:.9;">N.Geolitics</span></span>
-            <span class="footerPres">1986–2025 · Bandas políticas desde 1986: Felipe González · José María Aznar · José Luis Rodríguez Zapatero · Mariano Rajoy · Pedro Sánchez</span>
+            <span class="footerPres">1980–2025 · Bandas políticas desde 1982: Felipe González · José María Aznar · José Luis Rodríguez Zapatero · Mariano Rajoy · Pedro Sánchez</span>
           </div>
         </div>
       </section>
@@ -1134,7 +1163,7 @@
           <div class="explainText">
             <div><b>Deuda pública</b>: muestra el stock total acumulado de deuda de las administraciones públicas y, al mismo tiempo, su peso relativo sobre el PIB.</div>
             <div style="margin-top:8px;"><b>Déficit público</b>: muestra el saldo anual entre ingresos y gastos públicos. Cuando el valor absoluto es negativo, el sector público gasta más de lo que ingresa ese año.</div>
-            <div style="margin-top:8px;">Los dos botones del gráfico cambian entre las dos lecturas. En ambos casos, el <b>eje izquierdo</b> representa la magnitud absoluta en <b>millones de euros (M€)</b> y el <b>eje derecho</b> representa el <b>porcentaje sobre el PIB</b>.</div>
+            <div style="margin-top:8px;">Los dos botones superiores cambian entre las dos lecturas. En ambos casos, el <b>eje izquierdo</b> representa la magnitud absoluta en <b>millones de euros (M€)</b> y el <b>eje derecho</b> representa el <b>porcentaje sobre el PIB</b>.</div>
             <div style="margin-top:8px; opacity:.95;">La leyenda y los ejes usan los mismos colores que las series para que la lectura visual sea inmediata.</div>
             <div class="explainText" id="patreonNoteDP" style="margin-top:12px; padding:0;"></div>
           </div>
@@ -1480,7 +1509,6 @@ function makeChartController(opts){
     yLabelRight,
     yLabelLeftMarkers,
     yLabelRightMarkers,
-    leftAxisFormatTick,
     leftAxisColor,
     rightAxisColor,
     yLabelLeftColor,
@@ -1707,7 +1735,7 @@ function makeChartController(opts){
       const y = yScaleLeftT(yTransform(tv));
       gGrid.appendChild(createSvgEl("line", { x1:margin.l, y1:y, x2:margin.l+plotW, y2:y, stroke:"rgba(74,74,74,.38)", "stroke-width":1 }));
       const tx = createSvgEl("text", { x: margin.l-10, y: y+4, fill:(leftAxisColor || "rgba(176,176,176,.95)"), "text-anchor":"end", "font-size":12, "font-family":"Arial, system-ui, sans-serif" });
-      tx.textContent = leftAxisFormatTick ? leftAxisFormatTick(tv) : String(tv);
+      tx.textContent = String(tv);
       gAxes.appendChild(tx);
     }
 
@@ -3876,11 +3904,15 @@ try{
   const chartTitleEl = document.getElementById("dpChartTitle");
   const chartMetaEl = document.getElementById("dpChartMeta");
   const rangeEl = document.getElementById("dpSeriesRange");
+  const hintAbs = document.getElementById("dpHintAbs");
+  const hintPct = document.getElementById("dpHintPct");
+  const hintAbsText = document.getElementById("dpHintAbsText");
+  const hintPctText = document.getElementById("dpHintPctText");
 
   const app = {
     mode: "deuda",
     datasets: { deuda: null, deficit: null },
-    xDomain: { min: 1986, max: 2025 },
+    xDomain: { min: 1980, max: 2025 },
     showPresBands: true,
     controller: null,
   };
@@ -3893,8 +3925,10 @@ try{
       pctLabel: "Deuda sobre PIB",
       absColor: "#F59E0B",
       pctColor: "#3DA6FF",
-      absAxisLabel: "Miles de millones de €",
+      absAxisLabel: "Deuda pública (M€)",
       pctAxisLabel: "% del PIB",
+      absHint: "Eje izquierdo: deuda pública en millones de euros (M€)",
+      pctHint: "Eje derecho: deuda pública como porcentaje del PIB",
       file: "espana_evolucion_deuda.csv",
       build: async function(){
         const txt = await fetchText("espana_evolucion_deuda.csv");
@@ -3910,7 +3944,7 @@ try{
           const year = Math.round(toNum(r[cYear]));
           const abs = toNum(r[cAbs]);
           const pct = toNum(r[cPct]);
-          if (!Number.isFinite(year) || year < 1986) continue;
+          if (!Number.isFinite(year)) continue;
           if (!Number.isFinite(abs) && !Number.isFinite(pct)) continue;
           rows.push({ year, abs, pct });
         }
@@ -3938,8 +3972,10 @@ try{
       pctLabel: "Déficit sobre PIB",
       absColor: "#F87171",
       pctColor: "#34D399",
-      absAxisLabel: "Miles de millones de €",
+      absAxisLabel: "Déficit público (M€)",
       pctAxisLabel: "% del PIB",
+      absHint: "Eje izquierdo: déficit público en millones de euros (M€)",
+      pctHint: "Eje derecho: déficit público como porcentaje del PIB",
       file: "espana_evolucion_deficit.csv",
       build: async function(){
         const txt = await fetchText("espana_evolucion_deficit.csv");
@@ -3955,7 +3991,7 @@ try{
           const year = Math.round(toNum(r[cYear]));
           const abs = toNum(r[cAbs]);
           const pct = toNum(r[cPct]);
-          if (!Number.isFinite(year) || year < 1986) continue;
+          if (!Number.isFinite(year)) continue;
           if (!Number.isFinite(abs) && !Number.isFinite(pct)) continue;
           rows.push({ year, abs, pct });
         }
@@ -4000,20 +4036,7 @@ try{
     return new Intl.NumberFormat("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(v) + "%";
   }
 
-  function niceStepSmart(span, targetTicks = 6){
-    const raw = Math.max(1e-9, Math.abs(span) / Math.max(1, targetTicks));
-    const pow = Math.pow(10, Math.floor(Math.log10(raw)));
-    const norm = raw / pow;
-    let mult;
-    if (norm <= 1) mult = 1;
-    else if (norm <= 2) mult = 2;
-    else if (norm <= 2.5) mult = 2.5;
-    else if (norm <= 5) mult = 5;
-    else mult = 10;
-    return mult * pow;
-  }
-
-  function niceTicksRange(minV, maxV, targetTicks = 6){
+  function niceTicksRange(minV, maxV){
     if (!Number.isFinite(minV) || !Number.isFinite(maxV)) return [0,1];
     if (minV === maxV){
       const bump = Math.abs(minV || 1) * 0.2;
@@ -4021,7 +4044,7 @@ try{
       maxV += bump;
     }
     const span = Math.max(1e-9, maxV - minV);
-    const step = niceStepSmart(span, targetTicks);
+    const step = niceStepY(span / 5) || 1;
     const a = Math.floor(minV / step) * step;
     const b = Math.ceil(maxV / step) * step;
     const out = [];
@@ -4075,8 +4098,8 @@ try{
     const rightMin = cfg.forceRightMinZero ? 0 : pctMin - pctPad;
     const rightMax = pctMax + pctPad;
 
-    const leftTicks = niceTicksRange(leftMin, leftMax, 7);
-    const rightTicks = niceTicksRange(rightMin, rightMax, 6);
+    const leftTicks = niceTicksRange(leftMin, leftMax);
+    const rightTicks = niceTicksRange(rightMin, rightMax);
 
     return {
       xDomain: { min: minYear, max: maxYear },
@@ -4170,6 +4193,10 @@ try{
     if (chartTitleEl) chartTitleEl.textContent = def.title;
     if (chartMetaEl) chartMetaEl.textContent = def.meta;
     if (rangeEl && ds) rangeEl.textContent = `${ds.xDomain.min}–${ds.xDomain.max}`;
+    if (hintAbs){ hintAbs.style.background = def.absColor; hintAbs.style.boxShadow = `0 0 0 1px ${def.absColor}`; }
+    if (hintPct){ hintPct.style.background = def.pctColor; hintPct.style.boxShadow = `0 0 0 1px ${def.pctColor}`; }
+    if (hintAbsText) hintAbsText.textContent = def.absHint;
+    if (hintPctText) hintPctText.textContent = def.pctHint;
   }
 
   function rebuild(){
@@ -4195,10 +4222,7 @@ try{
       xDomain: ds.xDomain,
       yDomain: { left: { min: ds.leftMin, max: ds.leftMax } },
       yTickBuilder: (side) => side === "left" ? ds.leftTicks : ds.rightTicks,
-      rightAxis: { ticks: ds.rightTicks, formatTick: (v)=> {
-        const decimals = Math.abs(v) >= 20 ? 0 : 1;
-        return new Intl.NumberFormat("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(v) + "%";
-      } },
+      rightAxis: { ticks: ds.rightTicks, formatTick: (v)=> new Intl.NumberFormat("es-ES", { maximumFractionDigits: 1 }).format(v) + (Math.abs(v) <= 250 ? "%" : "") },
       formatValue,
       extraBackground: drawPresBands,
       alwaysTooltip: true,
@@ -4206,10 +4230,6 @@ try{
       yLabelRight: def.pctAxisLabel,
       yLabelLeftMarkers: [def.absColor],
       yLabelRightMarkers: [def.pctColor],
-      leftAxisFormatTick: (v)=> new Intl.NumberFormat("es-ES", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: Math.abs(v) >= 100000 ? 0 : 1
-      }).format(v / 1000),
       leftAxisColor: def.absColor,
       rightAxisColor: def.pctColor,
       yLabelLeftColor: def.absColor,
