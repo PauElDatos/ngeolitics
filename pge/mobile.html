@@ -1257,15 +1257,17 @@
         gap:12px;
       }
 
+      /* En Deuda pública mantenemos el mismo flujo vertical que en el resto:
+         leyenda arriba y gráfico debajo, también en horizontal. */
       #viewDP .topGrid{
-        grid-template-columns: minmax(270px, 31vw) minmax(0, 1fr) !important;
+        grid-template-columns: 1fr !important;
         align-items: stretch;
       }
 
       #viewDP > .topGrid > section.panel:first-child .pc{
-        overflow-y: auto !important;
-        max-height: min(62svh, 560px);
-        padding-right: 6px;
+        overflow: visible !important;
+        max-height: none !important;
+        padding-right: 0;
       }
 
       #viewDP > .topGrid > section.panel:nth-child(2) .pc{
