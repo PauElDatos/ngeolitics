@@ -251,39 +251,6 @@
     }
     .muted{ opacity:.35; }
 
-    .legendAux{
-      cursor:default;
-      user-select:text;
-    }
-    .legendAux:hover{
-      border-color: rgba(255,255,255,.08);
-    }
-    .arrowLegendTitle{
-      font-family:var(--fontTitle);
-      color:var(--primary);
-      font-size: calc(11px * var(--uiScale));
-      letter-spacing:.2px;
-      margin-bottom:6px;
-      text-transform:uppercase;
-    }
-    .arrowLegendRow{
-      display:flex;
-      align-items:flex-start;
-      gap:8px;
-      margin-top:4px;
-    }
-    .arrowGlyph{
-      flex:0 0 auto;
-      width:16px;
-      text-align:center;
-      font-weight:700;
-      line-height:1.1;
-    }
-    .arrowGlyph.up{ color: rgba(0, 200, 90, .95); }
-    .arrowGlyph.down{ color: rgba(230, 60, 60, .95); }
-    .arrowGlyph.note{ color: rgba(176,176,176,.95); }
-
-
     /* GRÁFICO */
     .chartPc{
       display:flex;
@@ -539,14 +506,12 @@
     /* ===== Ajustes de layout para evitar “apelmazado” en Vistas 2 y 3 ===== */
     #viewGB .pc.chartPc,
     #viewPA .pc.chartPc,
-    #viewPGE .pc.chartPc,
-    #viewDP .pc.chartPc{
+    #viewPGE .pc.chartPc{
       overflow-y: auto;
     }
     #viewGB .svgWrap,
     #viewPA .svgWrap,
-    #viewPGE .svgWrap,
-    #viewDP .svgWrap{
+    #viewPGE .svgWrap{
       flex: 1 1 auto;
       min-height: 520px;
     }
@@ -554,15 +519,13 @@
 
     #viewPGE #btnExplainPGE,
     #viewGB #btnExplainGB,
-    #viewPA #btnExplainPA,
-    #viewDP #btnExplainDP{
+    #viewPA #btnExplainPA{
       margin-left: auto;
     }
 
         /* Scroll en el panel izquierdo (GB/PA) como en PGE */
     #viewGB > section.panel:first-child .pc,
-    #viewPA > section.panel:first-child .pc,
-    #viewDP > section.panel:first-child .pc{
+    #viewPA > section.panel:first-child .pc{
       overflow-y:auto;
       padding-right: 4px;
     }
@@ -713,8 +676,7 @@
     /* ===== Vistas GB/PA: explicación debajo de Series + Gráfico (se ve con scroll) ===== */
     #viewGB.view.active,
     #viewPA.view.active,
-    #viewPGE.view.active,
-    #viewDP.view.active{
+    #viewPGE.view.active{
       display:flex !important;
       flex-direction:column;
       gap:12px;
@@ -727,14 +689,12 @@
        Forzamos a que NO se encoja, para que quede debajo y se pueda ver haciendo scroll. */
     #viewGB.view.active > section.panel,
     #viewPA.view.active > section.panel,
-    #viewPGE.view.active > section.panel,
-    #viewDP.view.active > section.panel{
+    #viewPGE.view.active > section.panel{
       flex: 0 0 auto;
     }
     #viewGB .topGrid,
     #viewPA .topGrid,
-    #viewPGE .topGrid,
-    #viewDP .topGrid{
+    #viewPGE .topGrid{
       display:grid;
       grid-template-columns: 340px 1fr;
       grid-template-rows: 1fr;
@@ -746,21 +706,18 @@
     }
     #viewGB .topGrid > .panel,
     #viewPA .topGrid > .panel,
-    #viewPGE .topGrid > .panel,
-    #viewDP .topGrid > .panel{
+    #viewPGE .topGrid > .panel{
       height:100%;
     }
     /* sin scroll interno del panel de gráfico (el scroll es del main) */
     #viewGB .pc.chartPc,
     #viewPA .pc.chartPc,
-    #viewPGE .pc.chartPc,
-    #viewDP .pc.chartPc{
+    #viewPGE .pc.chartPc{
       overflow:hidden;
     }
     #viewGB .svgWrap,
     #viewPA .svgWrap,
-    #viewPGE .svgWrap,
-    #viewDP .svgWrap{
+    #viewPGE .svgWrap{
       flex: 1 1 auto;
       min-height: 520px;
     }
@@ -768,14 +725,12 @@
     @media (max-width: 900px){
       #viewGB.view.active,
     #viewPA.view.active,
-    #viewPGE.view.active,
-    #viewDP.view.active{
+    #viewPGE.view.active{
         overflow:visible;
       }
       #viewGB .topGrid,
     #viewPA .topGrid,
-    #viewPGE .topGrid,
-    #viewDP .topGrid{
+    #viewPGE .topGrid{
         grid-template-columns: 1fr;
         min-height:0;
       }
@@ -816,29 +771,6 @@
       text-decoration:none !important;
       outline:none !important;
     }
-    /* ===== Vista 4: Deuda pública ===== */
-    .wideToggleBtn{
-      width:100%;
-      min-height:52px;
-      border-radius:14px;
-      font-family:var(--fontTitle);
-      font-size: calc(13px * var(--uiScale));
-      letter-spacing:.2px;
-      text-transform:none;
-    }
-    .dpModeBar{
-      width:100%;
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:12px;
-      align-items:stretch;
-      margin-bottom: 2px;
-    }
-    .dpModeBar .wideToggleBtn{
-      min-height:48px;
-    }
-
-
   </style>
 
   <meta name="theme-color" content="#252525" />
@@ -918,8 +850,7 @@
 
     #viewGB.view.active,
     #viewPA.view.active,
-    #viewPGE.view.active,
-    #viewDP.view.active{
+    #viewPGE.view.active{
       display:block !important;
       overflow:visible !important;
     }
@@ -929,8 +860,7 @@
     #viewPGE.view.active > section.panel,
     #viewGB .topGrid > .panel,
     #viewPA .topGrid > .panel,
-    #viewPGE .topGrid > .panel,
-    #viewDP .topGrid > .panel{
+    #viewPGE .topGrid > .panel{
       height:auto !important;
       min-height:0 !important;
       flex: 0 0 auto !important;
@@ -938,8 +868,7 @@
 
     #viewGB .topGrid,
     #viewPA .topGrid,
-    #viewPGE .topGrid,
-    #viewDP .topGrid{
+    #viewPGE .topGrid{
       display:grid !important;
       grid-template-columns: 1fr !important;
       grid-template-rows: none !important;
@@ -1013,8 +942,7 @@
     .svgWrap,
     #viewGB .svgWrap,
     #viewPA .svgWrap,
-    #viewPGE .svgWrap,
-    #viewDP .svgWrap{
+    #viewPGE .svgWrap{
       flex: none !important;
       height: min(62svh, 520px) !important;
       min-height: 360px !important;
@@ -1223,8 +1151,7 @@
       .svgWrap,
       #viewGB .svgWrap,
       #viewPA .svgWrap,
-      #viewPGE .svgWrap,
-      #viewDP .svgWrap{
+      #viewPGE .svgWrap{
         min-height: 320px !important;
         height: min(58svh, 460px) !important;
       }
@@ -1263,7 +1190,6 @@
         <button class="btn tab on" data-view="pge" role="tab" aria-selected="true">Presupuestos generales del Estado</button>
         <button class="btn tab" data-view="gb" role="tab" aria-selected="false">Gasto vs beneficio</button>
         <button class="btn tab" data-view="pa" role="tab" aria-selected="false">Presión fiscal</button>
-        <button class="btn tab" data-view="dp" role="tab" aria-selected="false">Deuda pública</button>
 </div>
     </div>
   </header>
@@ -1372,14 +1298,6 @@
         </div>
         <div class="pc">
           <div class="legend" id="legendGB"></div>
-          <div class="item legendAux" id="legendGBPopInfo" aria-label="Leyenda de flechas de población">
-            <div class="nm">
-              <div class="arrowLegendTitle">Flechas de población</div>
-              <div class="arrowLegendRow"><span class="arrowGlyph up">↑</span><span>La población crece respecto al año anterior.</span></div>
-              <div class="arrowLegendRow"><span class="arrowGlyph down">↓</span><span>La población disminuye respecto al año anterior.</span></div>
-              <div class="arrowLegendRow"><span class="arrowGlyph note">↕</span><span>Cuanto más larga sea la flecha, mayor será la variación anual.</span></div>
-            </div>
-          </div>
           <div class="presStats" id="gbPresStats" aria-label="Resumen por presidencias"></div>
         </div>
       </section>
@@ -1522,71 +1440,6 @@
     </section>
   </main>
 
-<!-- ===================== VISTA 4: Deuda pública ===================== -->
-  <main id="viewDP" class="view">
-    <div class="topGrid">
-      <section class="panel">
-        <div class="ph">
-          <div class="ttl">Series</div>
-          <div class="sub" id="dpSeriesRange">1986–2025</div>
-        </div>
-        <div class="pc">
-          <div class="legend" id="legendDP"></div>
-        </div>
-      </section>
-
-      <section class="panel">
-        <div class="ph">
-          <div class="ttl" id="dpChartTitle">Gráfico</div>
-          <div class="sub chartMeta" id="dpChartMeta">Comparación simultánea entre la magnitud absoluta en millones de euros y su peso relativo sobre el PIB.</div>
-        </div>
-
-        <div class="pc chartPc">
-          <div class="dpModeBar" aria-label="Selector de serie de deuda pública">
-            <button class="btn wideToggleBtn on" id="btnDebtModeDeuda" type="button">Deuda pública</button>
-            <button class="btn wideToggleBtn" id="btnDebtModeDeficit" type="button">Déficit público</button>
-          </div>
-
-          <div class="svgWrap" id="svgWrapDP">
-            <svg id="chartSvgDP" class="chartSvg" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Gráfico de deuda pública y déficit público"></svg>
-            <div class="tooltip" id="tooltipDP" style="display:none;"></div>
-            <div class="errorBox" id="errorBoxDP" style="display:none;"></div>
-          </div>
-
-          <div class="chartControls">
-            <button class="btn" id="btnCrosshairDP">Línea vertical: OFF</button>
-            <button class="btn on" id="btnPolBandsDP" title="Mostrar/ocultar colores de presidencias">Políticos: ON</button>
-            <button class="btn" id="btnExplainDP" title="Ir a la explicación">Explicación</button>
-          </div>
-
-          <div class="footerSingle">
-            <span class="footerSource">Fuente: <span style="color:#fff">espana_evolucion_deuda.csv</span> / <span style="color:#fff">espana_evolucion_deficit.csv</span> · <span style="opacity:.9;">N.Geolitics</span></span>
-            <span class="footerPres">1986–2025 · Bandas políticas desde 1986: Felipe González · José María Aznar · José Luis Rodríguez Zapatero · Mariano Rajoy · Pedro Sánchez</span>
-          </div>
-        </div>
-      </section>
-    </div>
-
-    <section class="panel">
-      <div class="ph">
-        <div class="ttl">Explicación</div>
-        <div class="sub"></div>
-      </div>
-      <div class="pc">
-        <div class="explainBox" id="dpExplain">
-          <div class="explainTitle">Cómo leer esta sección</div>
-          <div class="explainText">
-            <div><b>Deuda pública</b>: muestra el stock total acumulado de deuda de las administraciones públicas y, al mismo tiempo, su peso relativo sobre el PIB.</div>
-            <div style="margin-top:8px;"><b>Déficit público</b>: muestra el saldo anual entre ingresos y gastos públicos. Cuando el valor absoluto es negativo, el sector público gasta más de lo que ingresa ese año.</div>
-            <div style="margin-top:8px;">Los dos botones del gráfico cambian entre las dos lecturas. En ambos casos, el <b>eje izquierdo</b> representa la magnitud absoluta en <b>millones de euros (M€)</b> y el <b>eje derecho</b> representa el <b>porcentaje sobre el PIB</b>.</div>
-            <div style="margin-top:8px; opacity:.95;">Los puntos de color junto al nombre de cada eje usan los mismos colores que las series para que la lectura visual sea inmediata, pero los números y líneas de los ejes se mantienen neutros para facilitar la lectura.</div>
-            <div class="explainText" id="patreonNoteDP" style="margin-top:12px; padding:0;"></div>
-          </div>
-        </div>
-      </div>
-    </section>
-  </main>
-
 <script>
 function renderPatreonNote(targetId){
   const el = document.getElementById(targetId);
@@ -1599,7 +1452,6 @@ function renderPatreonNote(targetId){
 renderPatreonNote("patreonNotePGE");
 renderPatreonNote("patreonNoteGB");
 renderPatreonNote("patreonNotePA");
-renderPatreonNote("patreonNoteDP");
 </script>
 
 <script>
@@ -1632,7 +1484,6 @@ renderPatreonNote("patreonNoteDP");
       if (k === "pge") window.__pge?.onShow?.();
       if (k === "gb")  window.__gb?.onShow?.();
       if (k === "pa")  window.__pa?.onShow?.();
-      if (k === "dp")  window.__dp?.onShow?.();
 });
   }
 
@@ -4306,427 +4157,6 @@ try{
   window.__pa = { onShow: () => controller.onShow() };
   if (window.__activeViewKey === "pa") requestAnimationFrame(() => controller.onShow());
 })();
-
-/* ===================== Vista 4: Deuda pública ===================== */
-(async function(){
-  const svg = document.getElementById("chartSvgDP");
-  const wrap = document.getElementById("svgWrapDP");
-  const tooltipEl = document.getElementById("tooltipDP");
-  const errorEl = document.getElementById("errorBoxDP");
-  const legendEl = document.getElementById("legendDP");
-
-  const btnModeDeuda = document.getElementById("btnDebtModeDeuda");
-  const btnModeDeficit = document.getElementById("btnDebtModeDeficit");
-  const btnCrosshair = document.getElementById("btnCrosshairDP");
-  const btnPolBands = document.getElementById("btnPolBandsDP");
-  const btnExplain = document.getElementById("btnExplainDP");
-  const explainEl = document.getElementById("dpExplain");
-  const chartTitleEl = document.getElementById("dpChartTitle");
-  const chartMetaEl = document.getElementById("dpChartMeta");
-  const rangeEl = document.getElementById("dpSeriesRange");
-
-  const app = {
-    mode: "deuda",
-    datasets: { deuda: null, deficit: null },
-    xDomain: { min: 1986, max: 2025 },
-    showPresBands: true,
-    controller: null,
-  };
-
-  const defsByMode = {
-    deuda: {
-      title: "Gráfico",
-      meta: "Stock total de deuda y porcentaje de deuda pública sobre el PIB.",
-      absLabel: "Deuda pública",
-      pctLabel: "Deuda sobre PIB",
-      absColor: "#F59E0B",
-      pctColor: "#3DA6FF",
-      absAxisLabel: "Miles de millones de €",
-      pctAxisLabel: "% del PIB",
-      file: "espana_evolucion_deuda.csv",
-      build: async function(){
-        const txt = await fetchText("espana_evolucion_deuda.csv");
-        const csv = parseCSV(txt);
-        const h = csv.headers;
-        const cYear = pickCol(h, ["Fecha","anio","año","year"]);
-        const cAbs = pickCol(h, ["Deuda_total_MEUR","deuda total meur","deuda_total_meur"]);
-        const cPct = pickCol(h, ["Deuda_pct_PIB","deuda pct pib","deuda_pct_pib"]);
-        if (!cYear || !cAbs || !cPct) throw new Error("espana_evolucion_deuda.csv: faltan columnas esperadas (Fecha, Deuda_total_MEUR, Deuda_pct_PIB).");
-
-        const rows = [];
-        for (const r of csv.rows){
-          const year = Math.round(toNum(r[cYear]));
-          const abs = toNum(r[cAbs]);
-          const pct = toNum(r[cPct]);
-          if (!Number.isFinite(year) || year < 1986) continue;
-          if (!Number.isFinite(abs) && !Number.isFinite(pct)) continue;
-          rows.push({ year, abs, pct });
-        }
-        if (!rows.length) throw new Error("espana_evolucion_deuda.csv no tiene filas válidas.");
-        rows.sort((a,b)=>a.year-b.year);
-
-        return buildDualAxisDataset(rows, {
-          absKey: "abs",
-          pctKey: "pct",
-          absLabel: this.absLabel,
-          pctLabel: this.pctLabel,
-          absColor: this.absColor,
-          pctColor: this.pctColor,
-          absAxisLabel: this.absAxisLabel,
-          pctAxisLabel: this.pctAxisLabel,
-          forceLeftMinZero: true,
-          forceRightMinZero: true,
-        });
-      }
-    },
-    deficit: {
-      title: "Gráfico",
-      meta: "Saldo anual de déficit público y su peso relativo sobre el PIB.",
-      absLabel: "Déficit público",
-      pctLabel: "Déficit sobre PIB",
-      absColor: "#F87171",
-      pctColor: "#34D399",
-      absAxisLabel: "Miles de millones de €",
-      pctAxisLabel: "% del PIB",
-      file: "espana_evolucion_deficit.csv",
-      build: async function(){
-        const txt = await fetchText("espana_evolucion_deficit.csv");
-        const csv = parseCSV(txt);
-        const h = csv.headers;
-        const cYear = pickCol(h, ["Fecha","anio","año","year"]);
-        const cAbs = pickCol(h, ["Deficit_MEUR","déficit_meur","deficit meur","deficit_meur"]);
-        const cPct = pickCol(h, ["Deficit_pct_PIB","déficit_pct_pib","deficit pct pib","deficit_pct_pib"]);
-        if (!cYear || !cAbs || !cPct) throw new Error("espana_evolucion_deficit.csv: faltan columnas esperadas (Fecha, Deficit_MEUR, Deficit_pct_PIB).");
-
-        const rows = [];
-        for (const r of csv.rows){
-          const year = Math.round(toNum(r[cYear]));
-          const abs = toNum(r[cAbs]);
-          const pct = toNum(r[cPct]);
-          if (!Number.isFinite(year) || year < 1986) continue;
-          if (!Number.isFinite(abs) && !Number.isFinite(pct)) continue;
-          rows.push({ year, abs, pct });
-        }
-        if (!rows.length) throw new Error("espana_evolucion_deficit.csv no tiene filas válidas.");
-        rows.sort((a,b)=>a.year-b.year);
-
-        return buildDualAxisDataset(rows, {
-          absKey: "abs",
-          pctKey: "pct",
-          absLabel: this.absLabel,
-          pctLabel: this.pctLabel,
-          absColor: this.absColor,
-          pctColor: this.pctColor,
-          absAxisLabel: this.absAxisLabel,
-          pctAxisLabel: this.pctAxisLabel,
-          forceLeftIncludeZero: true,
-          forceRightIncludeZero: true,
-        });
-      }
-    }
-  };
-
-  function pulseExplainDP(){
-    if (!explainEl) return;
-    requestAnimationFrame(() => {
-      const scroller = document.getElementById("viewDP") || explainEl.closest(".view");
-      if (scroller && typeof scroller.scrollTo === "function"){
-        const sr = scroller.getBoundingClientRect();
-        const tr = explainEl.getBoundingClientRect();
-        const top = (tr.top - sr.top) + (scroller.scrollTop || 0) - 8;
-        scroller.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-      } else {
-        explainEl.scrollIntoView({ behavior: "smooth", block: "start" });
-      }
-    });
-  }
-
-  function formatMillions(v){
-    return new Intl.NumberFormat("es-ES", { maximumFractionDigits: 0 }).format(v) + " M€";
-  }
-  function formatPct(v){
-    return new Intl.NumberFormat("es-ES", { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(v) + "%";
-  }
-
-  function niceStepSmart(span, targetTicks = 6){
-    const raw = Math.max(1e-9, Math.abs(span) / Math.max(1, targetTicks));
-    const pow = Math.pow(10, Math.floor(Math.log10(raw)));
-    const norm = raw / pow;
-    let mult;
-    if (norm <= 1) mult = 1;
-    else if (norm <= 2) mult = 2;
-    else if (norm <= 2.5) mult = 2.5;
-    else if (norm <= 5) mult = 5;
-    else mult = 10;
-    return mult * pow;
-  }
-
-  function niceTicksRange(minV, maxV, targetTicks = 6){
-    if (!Number.isFinite(minV) || !Number.isFinite(maxV)) return [0,1];
-    if (minV === maxV){
-      const bump = Math.abs(minV || 1) * 0.2;
-      minV -= bump;
-      maxV += bump;
-    }
-    const span = Math.max(1e-9, maxV - minV);
-    const step = niceStepSmart(span, targetTicks);
-    const a = Math.floor(minV / step) * step;
-    const b = Math.ceil(maxV / step) * step;
-    const out = [];
-    for (let x = a; x <= b + 1e-9; x += step){
-      out.push(Math.round(x * 1000) / 1000);
-    }
-    return out;
-  }
-
-  function buildDualAxisDataset(rows, cfg){
-    const years = rows.map(r => r.year).filter(Number.isFinite).sort((a,b)=>a-b);
-    const minYear = years[0];
-    const maxYear = years[years.length - 1];
-
-    const absMap = new Map();
-    const pctMap = new Map();
-    const absXs = [];
-    const absYs = [];
-    const pctXs = [];
-    const pctYs = [];
-
-    for (const r of rows){
-      if (Number.isFinite(r.abs)){
-        absMap.set(r.year, r.abs);
-        absXs.push(r.year);
-        absYs.push(r.abs);
-      }
-      if (Number.isFinite(r.pct)){
-        pctMap.set(r.year, r.pct);
-        pctXs.push(r.year);
-        pctYs.push(r.pct);
-      }
-    }
-
-    if (absXs.length < 2 || pctXs.length < 2){
-      throw new Error("No hay suficientes puntos válidos para construir ambas series.");
-    }
-
-    let absMin = Math.min(...absYs), absMax = Math.max(...absYs);
-    let pctMin = Math.min(...pctYs), pctMax = Math.max(...pctYs);
-
-    if (cfg.forceLeftMinZero) absMin = 0;
-    if (cfg.forceRightMinZero) pctMin = 0;
-    if (cfg.forceLeftIncludeZero){ absMin = Math.min(absMin, 0); absMax = Math.max(absMax, 0); }
-    if (cfg.forceRightIncludeZero){ pctMin = Math.min(pctMin, 0); pctMax = Math.max(pctMax, 0); }
-
-    const absPad = Math.max(1, Math.abs(absMax - absMin) * 0.08 || Math.abs(absMax || 1) * 0.08);
-    const pctPad = Math.max(0.2, Math.abs(pctMax - pctMin) * 0.08 || Math.abs(pctMax || 1) * 0.08);
-    const leftMin = cfg.forceLeftMinZero ? 0 : absMin - absPad;
-    const leftMax = absMax + absPad;
-    const rightMin = cfg.forceRightMinZero ? 0 : pctMin - pctPad;
-    const rightMax = pctMax + pctPad;
-
-    const leftTicks = niceTicksRange(leftMin, leftMax, 7);
-    const rightTicks = niceTicksRange(rightMin, rightMax, 6);
-
-    return {
-      xDomain: { min: minYear, max: maxYear },
-      yearVal: new Map([
-        [cfg.absKey, absMap],
-        [cfg.pctKey, pctMap],
-      ]),
-      series: new Map([
-        [cfg.absKey, { xs: absXs, ys: absYs }],
-        [cfg.pctKey, { xs: pctXs, ys: pctYs }],
-      ]),
-      seriesList: [
-        { key: cfg.absKey, label: cfg.absLabel, color: cfg.absColor, axis: "left" },
-        { key: cfg.pctKey, label: cfg.pctLabel, color: cfg.pctColor, axis: "right" },
-      ],
-      leftTicks,
-      rightTicks,
-      leftMin,
-      leftMax,
-      rightMin,
-      rightMax,
-      cfg,
-    };
-  }
-
-  function drawPresBands(gBg, xScale, plotRect){
-    if (!app.showPresBands) return;
-    const ds = app.datasets[app.mode];
-    if (!ds) return;
-    for (const p of PRES_BANDS){
-      const x0 = Math.max(ds.xDomain.min, p.start);
-      const x1 = Math.min(ds.xDomain.max, (p.end ?? ds.xDomain.max));
-      if (x1 <= x0) continue;
-      const x = xScale(x0);
-      const w = xScale(x1) - xScale(x0);
-      gBg.appendChild(createSvgEl("rect", {
-        x, y: plotRect.y, width: w, height: plotRect.h,
-        fill: p.color, opacity: 0.18
-      }));
-    }
-  }
-
-  function getSeriesForPath(key){
-    const ds = app.datasets[app.mode];
-    return ds?.series.get(key) || null;
-  }
-
-  function getValueAtYear(key, year){
-    const ds = app.datasets[app.mode];
-    if (!ds) return null;
-    const mp = ds.yearVal.get(key);
-    const ser = ds.series.get(key);
-    if (!mp || !ser || !ser.xs || !ser.xs.length) return null;
-
-    const v0 = mp.get(year);
-    if (Number.isFinite(v0)) return v0;
-
-    const xs = ser.xs;
-    const ys = ser.ys;
-    if (year < xs[0] || year > xs[xs.length - 1]) return null;
-
-    const i1 = lowerBound(xs, year);
-    const i0 = i1 - 1;
-    if (i0 < 0 || i1 >= xs.length) return null;
-    const x0 = xs[i0], x1 = xs[i1], y0 = ys[i0], y1 = ys[i1];
-    if (!Number.isFinite(y0) || !Number.isFinite(y1) || !Number.isFinite(x0) || !Number.isFinite(x1) || x1 === x0) return null;
-    const t = (year - x0) / (x1 - x0);
-    return y0 + t * (y1 - y0);
-  }
-
-  function formatValue(key, v){
-    const ds = app.datasets[app.mode];
-    if (!ds || !Number.isFinite(v)) return "—";
-    return key === ds.cfg.pctKey ? formatPct(v) : formatMillions(v);
-  }
-
-  function updateModeButtons(){
-    if (btnModeDeuda){
-      btnModeDeuda.classList.toggle("on", app.mode === "deuda");
-      btnModeDeuda.setAttribute("aria-pressed", app.mode === "deuda" ? "true" : "false");
-    }
-    if (btnModeDeficit){
-      btnModeDeficit.classList.toggle("on", app.mode === "deficit");
-      btnModeDeficit.setAttribute("aria-pressed", app.mode === "deficit" ? "true" : "false");
-    }
-  }
-
-  function updateMeta(){
-    const def = defsByMode[app.mode];
-    const ds = app.datasets[app.mode];
-    if (chartTitleEl) chartTitleEl.textContent = def.title;
-    if (chartMetaEl) chartMetaEl.textContent = def.meta;
-    if (rangeEl && ds) rangeEl.textContent = `${ds.xDomain.min}–${ds.xDomain.max}`;
-  }
-
-  function rebuild(){
-    const ds = app.datasets[app.mode];
-    const def = defsByMode[app.mode];
-    if (!ds) return;
-
-    updateModeButtons();
-    updateMeta();
-
-    if (app.controller){
-      try { app.controller.destroy(); } catch(_){}
-      app.controller = null;
-    }
-
-    app.controller = makeChartController({
-      svg, wrap, tooltipEl, errorEl,
-      legendEl,
-      controls: { btnCrosshair },
-      seriesList: ds.seriesList,
-      getValueAtYear,
-      getSeriesForPath,
-      xDomain: ds.xDomain,
-      yDomain: { left: { min: ds.leftMin, max: ds.leftMax } },
-      yTickBuilder: (side) => side === "left" ? ds.leftTicks : ds.rightTicks,
-      rightAxis: { ticks: ds.rightTicks, formatTick: (v)=> {
-        const decimals = Math.abs(v) >= 20 ? 0 : 1;
-        return new Intl.NumberFormat("es-ES", { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(v) + "%";
-      } },
-      formatValue,
-      extraBackground: drawPresBands,
-      extraAnnotations: (gAnn, geom) => {
-        if (app.mode !== "deficit") return;
-        const y0 = geom.yScaleLeftT(geom.yTransform(0));
-        if (!Number.isFinite(y0)) return;
-        if (y0 < geom.margin.t || y0 > geom.margin.t + geom.plotH) return;
-
-        gAnn.appendChild(createSvgEl("line", {
-          x1: geom.margin.l,
-          y1: y0,
-          x2: geom.margin.l + geom.plotW,
-          y2: y0,
-          stroke: "rgba(255,255,255,.38)",
-          "stroke-width": 1.35,
-          "stroke-dasharray": "6 6",
-          "vector-effect": "non-scaling-stroke"
-        }));
-      },
-      alwaysTooltip: true,
-      yLabelLeft: def.absAxisLabel,
-      yLabelRight: def.pctAxisLabel,
-      yLabelLeftMarkers: [def.absColor],
-      yLabelRightMarkers: [def.pctColor],
-      leftAxisFormatTick: (v)=> new Intl.NumberFormat("es-ES", {
-        minimumFractionDigits: 0,
-        maximumFractionDigits: Math.abs(v) >= 100000 ? 0 : 1
-      }).format(v / 1000),
-      defaultOrderTooltip: [ds.cfg.absKey, ds.cfg.pctKey],
-      topN: 0,
-      segmentBreakRule: () => false,
-    });
-
-    window.__dp = { onShow: () => app.controller?.onShow?.() };
-    if (window.__activeViewKey === "dp") requestAnimationFrame(() => app.controller?.onShow?.());
-  }
-
-  try {
-    app.datasets.deuda = await defsByMode.deuda.build();
-    app.datasets.deficit = await defsByMode.deficit.build();
-    app.xDomain = app.datasets.deuda.xDomain;
-  } catch (e){
-    if (errorEl){
-      errorEl.style.display = "flex";
-      errorEl.textContent = e.message || String(e);
-    }
-    window.__dp = { onShow: ()=>{} };
-    return;
-  }
-
-  if (btnPolBands){
-    btnPolBands.classList.toggle("on", app.showPresBands);
-    btnPolBands.textContent = "Políticos: " + (app.showPresBands ? "ON" : "OFF");
-    btnPolBands.addEventListener("click", () => {
-      app.showPresBands = !app.showPresBands;
-      btnPolBands.classList.toggle("on", app.showPresBands);
-      btnPolBands.textContent = "Políticos: " + (app.showPresBands ? "ON" : "OFF");
-      app.controller?.onShow?.();
-    });
-  }
-
-  if (btnModeDeuda) btnModeDeuda.addEventListener("click", () => {
-    if (app.mode === "deuda") return;
-    app.mode = "deuda";
-    rebuild();
-  });
-  if (btnModeDeficit) btnModeDeficit.addEventListener("click", () => {
-    if (app.mode === "deficit") return;
-    app.mode = "deficit";
-    rebuild();
-  });
-  if (btnExplain){
-    btnExplain.classList.remove("on");
-    btnExplain.textContent = "Explicación";
-    btnExplain.addEventListener("click", pulseExplainDP);
-  }
-
-  rebuild();
-})();
-
 </script>
 
 <script id="mobile-enhancements">
@@ -4747,8 +4177,7 @@ try{
   const explainPairs = [
     ['btnExplainPGE','pgeExplain'],
     ['btnExplainGB','gbExplain'],
-    ['btnExplainPA','paExplain'],
-    ['btnExplainDP','dpExplain']
+    ['btnExplainPA','paExplain']
   ];
 
   for (const [btnId, targetId] of explainPairs){
