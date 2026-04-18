@@ -1135,7 +1135,7 @@
             <div><b>Deuda pública</b>: muestra el stock total acumulado de deuda de las administraciones públicas y, al mismo tiempo, su peso relativo sobre el PIB.</div>
             <div style="margin-top:8px;"><b>Déficit público</b>: muestra el saldo anual entre ingresos y gastos públicos. Cuando el valor absoluto es negativo, el sector público gasta más de lo que ingresa ese año.</div>
             <div style="margin-top:8px;">Los dos botones del gráfico cambian entre las dos lecturas. En ambos casos, el <b>eje izquierdo</b> representa la magnitud absoluta en <b>millones de euros (M€)</b> y el <b>eje derecho</b> representa el <b>porcentaje sobre el PIB</b>.</div>
-            <div style="margin-top:8px; opacity:.95;">Los puntos de color junto al nombre de cada eje usan los mismos colores que las series para que la lectura visual sea inmediata, pero los números y líneas de los ejes se mantienen neutros para facilitar la lectura.</div>
+            <div style="margin-top:8px; opacity:.95;">La leyenda y los ejes usan los mismos colores que las series para que la lectura visual sea inmediata.</div>
             <div class="explainText" id="patreonNoteDP" style="margin-top:12px; padding:0;"></div>
           </div>
         </div>
@@ -4201,23 +4201,6 @@ try{
       } },
       formatValue,
       extraBackground: drawPresBands,
-      extraAnnotations: (gAnn, geom) => {
-        if (app.mode !== "deficit") return;
-        const y0 = geom.yScaleLeftT(geom.yTransform(0));
-        if (!Number.isFinite(y0)) return;
-        if (y0 < geom.margin.t || y0 > geom.margin.t + geom.plotH) return;
-
-        gAnn.appendChild(createSvgEl("line", {
-          x1: geom.margin.l,
-          y1: y0,
-          x2: geom.margin.l + geom.plotW,
-          y2: y0,
-          stroke: "rgba(255,255,255,.38)",
-          "stroke-width": 1.35,
-          "stroke-dasharray": "6 6",
-          "vector-effect": "non-scaling-stroke"
-        }));
-      },
       alwaysTooltip: true,
       yLabelLeft: def.absAxisLabel,
       yLabelRight: def.pctAxisLabel,
@@ -4227,6 +4210,10 @@ try{
         minimumFractionDigits: 0,
         maximumFractionDigits: Math.abs(v) >= 100000 ? 0 : 1
       }).format(v / 1000),
+      leftAxisColor: def.absColor,
+      rightAxisColor: def.pctColor,
+      yLabelLeftColor: def.absColor,
+      yLabelRightColor: def.pctColor,
       defaultOrderTooltip: [ds.cfg.absKey, ds.cfg.pctKey],
       topN: 0,
       segmentBreakRule: () => false,
