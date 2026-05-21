@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>N.Geolitics — Índices históricos</title>
-<meta content="Índices históricos de precio y retorno real en escala logarítmica, base 1900=100." name="description"/>
+<meta content="Índices históricos de precio y retorno real, base 1900=100." name="description"/>
 <link href="../assets/faviconNG.png" rel="icon"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -387,7 +387,7 @@
 <section class="panel chartPanel">
 <div class="topBar">
 <div class="titleRow">
-<h1>Índices bursátiles históricos en escala logarítmica</h1>
+<h1>Índices bursátiles históricos</h1>
 
 </div>
 
@@ -409,7 +409,7 @@
 </div>
 <div class="chartArea">
 <div class="chartBox">
-<canvas aria-label="Gráfico de índices históricos en escala logarítmica" id="chart"></canvas>
+<canvas aria-label="Gráfico de índices históricos" id="chart"></canvas>
 </div>
 </div>
 
@@ -438,6 +438,7 @@
       seriesTable: document.getElementById('seriesTable'),
       chartTitle: document.getElementById('chartTitle'),
       chartSubtitle: document.getElementById('chartSubtitle'),
+      chartHead: document.querySelector('.chartHead'),
       resetBtn: document.getElementById('resetBtn'),
       selectAllBtn: document.getElementById('selectAllBtn'),
       clearBtn: document.getElementById('clearBtn')
@@ -448,6 +449,19 @@
       nominal: 'Nominal (precio, eq_capgain)',
       real: 'Ajustado por inflación (TR real)'
     };
+
+    const historicalFragments = [
+      {
+        start: Date.UTC(1914, 6, 28),
+        end: Date.UTC(1918, 10, 11),
+        label: 'Primera Guerra Mundial'
+      },
+      {
+        start: Date.UTC(1939, 8, 1),
+        end: Date.UTC(1945, 8, 2),
+        label: 'Segunda Guerra Mundial'
+      }
+    ];
 
     function parseDateUTC(s){
       const [y,m,d] = s.split('-').map(Number);
@@ -608,6 +622,38 @@
       ctx.fillRect(margin.left, margin.top, plotW, plotH);
       ctx.strokeRect(margin.left, margin.top, plotW, plotH);
 
+      for(const fragment of historicalFragments){
+        const start = Math.max(fragment.start, xMin);
+        const end = Math.min(fragment.end, xMax);
+        if(end <= start) continue;
+        const x1 = tx(start);
+        const x2 = tx(end);
+        const bandW = Math.max(1, x2 - x1);
+
+        ctx.fillStyle = 'rgba(254,247,2,.08)';
+        ctx.fillRect(x1, margin.top, bandW, plotH);
+
+        ctx.save();
+        ctx.strokeStyle = 'rgba(254,247,2,.18)';
+        ctx.setLineDash([3, 5]);
+        ctx.beginPath();
+        ctx.moveTo(x1, margin.top);
+        ctx.lineTo(x1, plotBottom);
+        ctx.moveTo(x2, margin.top);
+        ctx.lineTo(x2, plotBottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        ctx.translate(x1 + bandW / 2, margin.top + 12);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = 'rgba(254,247,2,.88)';
+        ctx.font = width < 620 ? '700 10px Arial' : '700 11px Arial';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(fragment.label, 0, 0);
+        ctx.restore();
+      }
+
       ctx.textAlign = 'right';
       ctx.textBaseline = 'middle';
       ctx.font = '12px Menlo, Consolas, monospace';
@@ -690,7 +736,7 @@
       ctx.font = '700 19px Arial';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
-      ctx.fillText('Índices históricos en escala logarítmica', margin.left, 30);
+      ctx.fillText('Índices históricos', margin.left, 30);
       ctx.font = '13px Arial';
       ctx.fillStyle = '#b0b0b0';
       const subtitle = state.mode === 'real' ? 'JST en modo retorno total real ajustado por inflación' : 'JST en modo precio nominal (eq_capgain)';
@@ -795,9 +841,11 @@
     }
 
     function renderText(){
-      els.chartTitle.textContent = state.mode === 'real' ? 'Índices JST en retorno total real' : 'Índices de precio históricos';
-      els.chartSubtitle.textContent = state.mode === 'real'
-        ? 'JST reconstruido con retorno total y ajustado por inflación; MSPIUKM y S&P 500 permanecen como precio nominal.'
+      const hideJstHeader = state.mode === 'real';
+      if(els.chartHead) els.chartHead.style.display = hideJstHeader ? 'none' : '';
+      els.chartTitle.textContent = hideJstHeader ? '' : 'Índices de precio históricos';
+      els.chartSubtitle.textContent = hideJstHeader
+        ? ''
         : 'Todas las series están rebasadas a 1900=100; Alemania nominal queda desactivada por defecto por la hiperinflación.';
     }
 
