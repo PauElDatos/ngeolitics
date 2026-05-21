@@ -1,0 +1,752 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>N.Geolitics — Índices históricos</title>
+  <meta name="description" content="Índices históricos de precio y retorno real en escala logarítmica, base 1900=100." />
+  <link rel="icon" href="../assets/faviconNG.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --uiScale: 1.16;
+      --bg:#252525;
+      --panel:#2b2b2b;
+      --panel2:#202020;
+      --primary:#FEF702;
+      --text:#B0B0B0;
+      --muted:#858585;
+      --stroke:#3a3a3a;
+      --white:#fff;
+      --radius:16px;
+      --shadow:0 10px 30px rgba(0,0,0,.25);
+      --fontTitle:"Futura","Trebuchet MS",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      --fontText:Arial,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+      --fontBrand:"Afacad",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      --max:1240px;
+    }
+    *{box-sizing:border-box;}
+    html,body{min-height:100%;}
+    body{
+      margin:0;
+      background:var(--bg);
+      color:var(--text);
+      font-family:var(--fontText);
+      font-size:calc(14px * var(--uiScale));
+      padding:18px;
+    }
+    a{color:inherit;text-decoration:none;}
+    button,input{font:inherit;}
+    a:focus-visible,button:focus-visible,input:focus-visible,label:focus-within{
+      outline:2px solid rgba(254,247,2,.55);
+      outline-offset:3px;
+      border-radius:12px;
+    }
+    .wrap{width:min(var(--max),100%);margin:0 auto;display:grid;gap:14px;}
+    header.top{
+      padding:14px 16px;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background:#000;
+      box-shadow:var(--shadow);
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:14px;
+    }
+    .brand{display:flex;align-items:center;min-width:0;}
+    .brandText .t{margin:0;font-family:var(--fontBrand);color:#fff;font-size:calc(34px * var(--uiScale));letter-spacing:.2px;white-space:nowrap;font-weight:400;line-height:1;}
+    .topActions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
+    .btn{
+      appearance:none;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.04);
+      color:rgba(255,255,255,.9);
+      padding:9px 12px;
+      border-radius:999px;
+      cursor:pointer;
+      user-select:none;
+      transition:transform .04s ease,border-color .12s ease,background .12s ease;
+      line-height:1;
+      white-space:nowrap;
+      font-family:var(--fontText);
+    }
+    .btn:hover{border-color:rgba(254,247,2,.35);background:rgba(255,255,255,.06);}
+    .btn:active{transform:translateY(1px);}
+    .btn.primary{background:rgba(254,247,2,.95);border-color:rgba(254,247,2,.95);color:rgba(0,0,0,.92);font-weight:800;}
+    .hero{
+      padding:18px 16px;
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background:var(--panel);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+      display:grid;
+      gap:16px;
+    }
+    .hero h1{margin:0;font-family:var(--fontTitle);color:#fff;font-size:calc(28px * var(--uiScale));letter-spacing:.2px;line-height:1.05;}
+    .hero p{margin:10px 0 0 0;opacity:.9;font-size:calc(13px * var(--uiScale));line-height:1.45;max-width:105ch;}
+    .heroGrid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:end;}
+    .pillRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
+    .pill{border:1px solid rgba(254,247,2,.28);background:rgba(254,247,2,.07);color:#fff;border-radius:999px;padding:7px 10px;font-size:calc(11px * var(--uiScale));white-space:nowrap;}
+    .panel{
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.02));
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .panelPad{padding:16px;}
+    .sectionHead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:0 2px;margin-top:4px;}
+    .sectionHead h2{margin:0;font-family:var(--fontTitle);color:var(--primary);font-size:calc(16px * var(--uiScale));letter-spacing:.35px;text-transform:uppercase;}
+    .sectionHead p{margin:0;color:var(--muted);font-size:calc(12px * var(--uiScale));}
+    .controls{display:grid;grid-template-columns:1fr;gap:12px;}
+    .controlBlock{display:grid;gap:8px;}
+    .labelTitle{font-family:var(--fontTitle);color:var(--primary);text-transform:uppercase;letter-spacing:.35px;font-size:calc(12px * var(--uiScale));}
+    .modeRow,.seriesGrid{display:flex;gap:8px;flex-wrap:wrap;}
+    .toggle{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.16);
+      color:#eee;
+      border-radius:999px;
+      padding:8px 10px;
+      cursor:pointer;
+      user-select:none;
+      line-height:1;
+      transition:border-color .12s ease, background .12s ease;
+    }
+    .toggle:hover{border-color:rgba(254,247,2,.35);background:rgba(255,255,255,.05);}
+    .toggle input{accent-color:var(--primary);margin:0;}
+    .toggle .swatch{width:12px;height:12px;border-radius:999px;display:inline-block;border:1px solid rgba(255,255,255,.35);}
+    .chartPanel{background:#1d1d1d;}
+    .chartTop{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--stroke);padding:12px 14px;background:#000;}
+    .chartTop h2{margin:0;font-family:var(--fontTitle);color:#fff;font-size:calc(19px * var(--uiScale));line-height:1.1;}
+    .chartTop p{margin:4px 0 0 0;color:var(--muted);font-size:calc(11px * var(--uiScale));}
+    .chartActions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
+    .canvasWrap{position:relative;background:#f9f8f2;min-height:620px;}
+    #chart{display:block;width:100%;height:620px;touch-action:none;}
+    .status{
+      border-top:1px solid var(--stroke);
+      background:#000;
+      color:#f4f4f4;
+      padding:10px 14px;
+      font-family:Menlo,Consolas,monospace;
+      font-size:12px;
+      line-height:1.45;
+      min-height:44px;
+      overflow-x:auto;
+      white-space:nowrap;
+    }
+    .legend{display:flex;gap:10px;flex-wrap:wrap;padding:12px 14px;border-top:1px solid var(--stroke);background:#222;}
+    .legendItem{display:inline-flex;align-items:center;gap:7px;color:#ddd;font-size:calc(11px * var(--uiScale));}
+    .lineKey{width:24px;height:3px;border-radius:99px;display:inline-block;}
+    .statsGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
+    .statCard{border:1px solid var(--stroke);border-radius:14px;background:#222;padding:14px;min-height:112px;}
+    .statCard .k{font-family:var(--fontTitle);color:var(--primary);text-transform:uppercase;letter-spacing:.35px;font-size:calc(11px * var(--uiScale));}
+    .statCard .v{color:#fff;font-family:var(--fontTitle);font-size:calc(24px * var(--uiScale));line-height:1.05;margin-top:8px;}
+    .statCard .s{color:var(--muted);font-size:calc(11px * var(--uiScale));line-height:1.35;margin-top:8px;}
+    .tableWrap{overflow:auto;border-top:1px solid var(--stroke);}
+    table{width:100%;border-collapse:collapse;min-width:760px;}
+    th,td{text-align:left;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08);font-size:calc(12px * var(--uiScale));}
+    th{font-family:var(--fontTitle);color:var(--primary);text-transform:uppercase;letter-spacing:.28px;background:#000;position:sticky;top:0;}
+    td{color:#e4e4e4;}
+    td.muted{color:var(--muted);}
+    .conclusion{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .note{border:1px solid var(--stroke);border-radius:14px;background:#222;padding:16px;}
+    .note h3{margin:0 0 8px 0;color:#fff;font-family:var(--fontTitle);font-size:calc(18px * var(--uiScale));}
+    .note p{margin:0;color:var(--text);font-size:calc(13px * var(--uiScale));line-height:1.48;}
+    .note strong{color:#fff;}
+    .sources{font-size:calc(12px * var(--uiScale));line-height:1.55;color:var(--text);}
+    .sources code{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:2px 5px;color:#fff;}
+    @media (max-width:980px){
+      body{padding:14px;}
+      .heroGrid{grid-template-columns:1fr;}
+      .statsGrid{grid-template-columns:repeat(2,minmax(0,1fr));}
+      .conclusion{grid-template-columns:1fr;}
+      .canvasWrap{min-height:520px;}
+      #chart{height:520px;}
+      .chartTop{align-items:flex-start;flex-direction:column;}
+    }
+    @media (max-width:620px){
+      :root{--uiScale:1.02;}
+      header.top{align-items:flex-start;flex-direction:column;}
+      .brandText .t{font-size:32px;}
+      .statsGrid{grid-template-columns:1fr;}
+      .toggle{width:100%;justify-content:flex-start;}
+      .canvasWrap{min-height:460px;}
+      #chart{height:460px;}
+      .status{white-space:normal;}
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="top" aria-label="Cabecera principal">
+      <a class="brand" href="../index.html" aria-label="Volver a N.Geolitics">
+        <div class="brandText"><h1 class="t">N.Geolitics</h1></div>
+      </a>
+      <div class="topActions">
+        <a class="btn" href="../index.html">← Análisis</a>
+        <button class="btn primary" type="button" id="resetBtn">Restablecer vista</button>
+      </div>
+    </header>
+
+    <section class="hero" aria-label="Presentación">
+      <div class="heroGrid">
+        <div>
+          <h1>Índices bursátiles históricos en escala logarítmica</h1>
+          <p>
+            Comparador de series históricas rebasadas a <b>1900=100</b>. Permite alternar el bloque JST entre
+            <b>precio nominal</b> y <b>retorno total real</b>, activar o desactivar países, y consultar el valor más cercano
+            a cada fecha pasando el cursor sobre el gráfico.
+          </p>
+          <div class="pillRow" aria-label="Resumen de funcionalidades">
+            <span class="pill">Escala Y logarítmica</span>
+            <span class="pill">Base 1900=100</span>
+            <span class="pill">Modo nominal / real</span>
+            <span class="pill">Lectura interactiva</span>
+          </div>
+        </div>
+        <div class="pillRow" aria-label="Marcadores históricos">
+          <span class="pill">I Guerra Mundial</span>
+          <span class="pill">II Guerra Mundial</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel panelPad" aria-label="Controles">
+      <div class="controls">
+        <div class="controlBlock">
+          <div class="labelTitle">Modo JST</div>
+          <div class="modeRow" id="modeRow"></div>
+        </div>
+        <div class="controlBlock">
+          <div class="labelTitle">Series visibles</div>
+          <div class="seriesGrid" id="seriesGrid"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel chartPanel" aria-label="Gráfico interactivo">
+      <div class="chartTop">
+        <div>
+          <h2 id="chartTitle">Índices de precio históricos</h2>
+          <p id="chartSubtitle">Todas las series empiezan en 1900=100.</p>
+        </div>
+        <div class="chartActions">
+          <button class="btn" type="button" id="selectAllBtn">Activar todo</button>
+          <button class="btn" type="button" id="clearBtn">Limpiar</button>
+        </div>
+      </div>
+      <div class="canvasWrap">
+        <canvas id="chart" aria-label="Gráfico de índices históricos en escala logarítmica"></canvas>
+      </div>
+      <div class="status" id="status">Cargando datos…</div>
+      <div class="legend" id="legend"></div>
+    </section>
+
+    <div class="sectionHead">
+      <h2>Lectura rápida</h2>
+      <p>Calculado sobre las series actualmente visibles.</p>
+    </div>
+    <section class="statsGrid" id="statsGrid" aria-label="Estadísticas principales"></section>
+
+    <section class="panel" aria-label="Tabla de series visibles">
+      <div class="panelPad">
+        <div class="sectionHead" style="padding:0;margin:0;">
+          <h2>Detalle de series</h2>
+          <p>Último dato, rango temporal y crecimiento anualizado.</p>
+        </div>
+      </div>
+      <div class="tableWrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Serie</th>
+              <th>Periodo</th>
+              <th>Último valor</th>
+              <th>CAGR</th>
+              <th>Fuente</th>
+            </tr>
+          </thead>
+          <tbody id="seriesTable"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="sectionHead">
+      <h2>Conclusión</h2>
+    </div>
+    <section class="conclusion" aria-label="Conclusión del análisis">
+      <article class="note">
+        <h3>La escala logarítmica cambia la lectura</h3>
+        <p>
+          En series de muy largo plazo, la escala lineal suele esconder casi todo lo que ocurre antes de las últimas décadas.
+          La escala logarítmica permite comparar <strong>ritmos de crecimiento</strong>: una pendiente similar implica una tasa compuesta parecida, aunque los niveles sean muy distintos.
+        </p>
+      </article>
+      <article class="note">
+        <h3>Nominal no siempre significa comparable</h3>
+        <p>
+          El modo nominal muestra precios sin descontar inflación. Por eso Alemania queda desactivada por defecto: su serie nominal incorpora el salto extremo de la hiperinflación y comprime visualmente el resto. El modo <strong>TR real</strong> es más útil para comparar poder adquisitivo y retorno total.
+        </p>
+      </article>
+    </section>
+
+    <section class="panel panelPad sources" aria-label="Fuentes y metodología">
+      <div class="sectionHead" style="padding:0;margin:0 0 10px 0;">
+        <h2>Fuentes y método</h2>
+      </div>
+      <p>
+        Datos cargados desde <code>MSPIUKM.csv</code>, <code>SP500_serie_historica_completa.csv</code> y <code>JSTdatasetR6.xlsx</code>.
+        Todas las series se filtran desde 1900, se rebasan a 100 en el primer dato disponible de 1900 y se dibujan con eje Y logarítmico.
+        En JST nominal se usa <code>eq_capgain</code>. En JST real se reconstruye un índice de retorno total con <code>eq_tr</code> y se ajusta por inflación usando <code>cpi</code>.
+      </p>
+    </section>
+  </div>
+
+  <script src="series-data.js"></script>
+  <script>
+    const DATA = window.NG_SERIES_DATA;
+    const state = {
+      mode: 'nominal',
+      visible: new Map(),
+      hover: null,
+      pixelRatio: Math.max(1, window.devicePixelRatio || 1)
+    };
+
+    const els = {
+      modeRow: document.getElementById('modeRow'),
+      seriesGrid: document.getElementById('seriesGrid'),
+      chart: document.getElementById('chart'),
+      status: document.getElementById('status'),
+      legend: document.getElementById('legend'),
+      statsGrid: document.getElementById('statsGrid'),
+      seriesTable: document.getElementById('seriesTable'),
+      chartTitle: document.getElementById('chartTitle'),
+      chartSubtitle: document.getElementById('chartSubtitle'),
+      resetBtn: document.getElementById('resetBtn'),
+      selectAllBtn: document.getElementById('selectAllBtn'),
+      clearBtn: document.getElementById('clearBtn')
+    };
+    const ctx = els.chart.getContext('2d');
+
+    const modeLabels = {
+      nominal: 'Nominal (precio, eq_capgain)',
+      real: 'Ajustado por inflación (TR real)'
+    };
+
+    function parseDateUTC(s){
+      const [y,m,d] = s.split('-').map(Number);
+      return Date.UTC(y, m - 1, d);
+    }
+    function yearFromMs(ms){ return new Date(ms).getUTCFullYear(); }
+    function dateLabel(ms){
+      const d = new Date(ms);
+      const y = d.getUTCFullYear();
+      const m = String(d.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(d.getUTCDate()).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+    function formatValue(v){
+      if(!Number.isFinite(v)) return '—';
+      if(v >= 1e9) return v.toExponential(3);
+      if(v >= 100000) return Math.round(v).toLocaleString('es-ES');
+      if(v >= 1000) return Math.round(v).toLocaleString('es-ES');
+      if(v >= 100) return v.toLocaleString('es-ES', {maximumFractionDigits:1});
+      if(v >= 10) return v.toLocaleString('es-ES', {maximumFractionDigits:2});
+      return v.toLocaleString('es-ES', {maximumFractionDigits:4});
+    }
+    function cagr(points){
+      if(points.length < 2) return NaN;
+      const first = points[0];
+      const last = points[points.length - 1];
+      const years = (last.t - first.t) / (365.2425 * 24 * 3600 * 1000);
+      return years > 0 ? Math.pow(last.v / first.v, 1 / years) - 1 : NaN;
+    }
+    function formatPct(v){
+      return Number.isFinite(v) ? (v * 100).toLocaleString('es-ES', {maximumFractionDigits:2}) + '%' : '—';
+    }
+
+    for(const mode of Object.keys(DATA.modes)){
+      for(const serie of DATA.modes[mode]){
+        serie.points = serie.points
+          .map(([date, value]) => ({t: parseDateUTC(date), v: Number(value)}))
+          .filter(p => p.v > 0 && Number.isFinite(p.v))
+          .sort((a,b) => a.t - b.t);
+      }
+    }
+
+    function currentSeries(){ return DATA.modes[state.mode]; }
+    function activeSeries(){
+      return currentSeries().filter(s => state.visible.get(s.sid) === true);
+    }
+    function initVisibility(){
+      state.visible.clear();
+      for(const serie of currentSeries()) state.visible.set(serie.sid, !!serie.visibleByDefault);
+    }
+
+    function renderModes(){
+      els.modeRow.innerHTML = '';
+      for(const mode of Object.keys(DATA.modes)){
+        const label = document.createElement('label');
+        label.className = 'toggle';
+        label.innerHTML = `<input type="radio" name="mode" value="${mode}" ${mode === state.mode ? 'checked' : ''}> <span>${modeLabels[mode]}</span>`;
+        label.querySelector('input').addEventListener('change', () => {
+          const previous = new Map(state.visible);
+          state.mode = mode;
+          state.visible.clear();
+          for(const serie of currentSeries()){
+            state.visible.set(serie.sid, previous.has(serie.sid) ? previous.get(serie.sid) : !!serie.visibleByDefault);
+          }
+          state.hover = null;
+          renderAll();
+        });
+        els.modeRow.appendChild(label);
+      }
+    }
+
+    function renderSeriesSelectors(){
+      els.seriesGrid.innerHTML = '';
+      for(const serie of currentSeries()){
+        const label = document.createElement('label');
+        label.className = 'toggle';
+        label.title = serie.source;
+        label.innerHTML = `<input type="checkbox" ${state.visible.get(serie.sid) ? 'checked' : ''}> <span class="swatch" style="background:${serie.color}"></span> <span>${serie.name}</span>`;
+        label.querySelector('input').addEventListener('change', (ev) => {
+          state.visible.set(serie.sid, ev.target.checked);
+          state.hover = null;
+          renderAll(false);
+        });
+        els.seriesGrid.appendChild(label);
+      }
+    }
+
+    function computeTransform(width, height){
+      const active = activeSeries();
+      if(active.length === 0) return null;
+      const margin = {
+        left: width < 620 ? 58 : 88,
+        right: width < 620 ? 18 : 34,
+        top: width < 620 ? 58 : 72,
+        bottom: width < 620 ? 72 : 96
+      };
+      const plotW = Math.max(1, width - margin.left - margin.right);
+      const plotH = Math.max(1, height - margin.top - margin.bottom);
+      let xMin = Infinity, xMax = -Infinity, yMin = Infinity, yMax = -Infinity;
+      for(const serie of active){
+        for(const p of serie.points){
+          xMin = Math.min(xMin, p.t); xMax = Math.max(xMax, p.t);
+          yMin = Math.min(yMin, p.v); yMax = Math.max(yMax, p.v);
+        }
+      }
+      if(!Number.isFinite(xMin) || !Number.isFinite(yMin)) return null;
+      if(xMin === xMax) xMax += 24 * 3600 * 1000;
+      const logMin = Math.floor(Math.log10(yMin));
+      const logMax = Math.ceil(Math.log10(yMax));
+      const logSpan = Math.max(1, logMax - logMin);
+      const tx = (t) => margin.left + ((t - xMin) / (xMax - xMin)) * plotW;
+      const ty = (v) => margin.top + (1 - ((Math.log10(v) - logMin) / logSpan)) * plotH;
+      return {active, margin, plotW, plotH, xMin, xMax, yMin, yMax, logMin, logMax: logMin + logSpan, tx, ty};
+    }
+
+    function resizeCanvas(){
+      const rect = els.chart.getBoundingClientRect();
+      const ratio = Math.max(1, window.devicePixelRatio || 1);
+      state.pixelRatio = ratio;
+      const width = Math.max(320, Math.round(rect.width));
+      const height = Math.max(420, Math.round(rect.height));
+      if(els.chart.width !== width * ratio || els.chart.height !== height * ratio){
+        els.chart.width = width * ratio;
+        els.chart.height = height * ratio;
+      }
+      ctx.setTransform(ratio,0,0,ratio,0,0);
+      return {width, height};
+    }
+
+    function draw(){
+      const {width, height} = resizeCanvas();
+      ctx.clearRect(0,0,width,height);
+      ctx.fillStyle = '#f9f8f2';
+      ctx.fillRect(0,0,width,height);
+
+      const tr = computeTransform(width, height);
+      if(!tr){
+        ctx.fillStyle = '#111827';
+        ctx.font = '700 18px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Activa al menos una serie.', width / 2, height / 2);
+        els.status.textContent = 'Sin series visibles';
+        return;
+      }
+      const {margin, plotW, plotH, xMin, xMax, logMin, logMax, tx, ty, active} = tr;
+      const plotRight = width - margin.right;
+      const plotBottom = height - margin.bottom;
+
+      ctx.fillStyle = '#ffffff';
+      ctx.strokeStyle = '#c7c7c7';
+      ctx.lineWidth = 1;
+      ctx.fillRect(margin.left, margin.top, plotW, plotH);
+      ctx.strokeRect(margin.left, margin.top, plotW, plotH);
+
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      ctx.font = '12px Menlo, Consolas, monospace';
+      for(let exp = logMin; exp <= logMax; exp++){
+        const value = Math.pow(10, exp);
+        const y = ty(value);
+        ctx.beginPath();
+        ctx.strokeStyle = '#e6e6e6';
+        ctx.moveTo(margin.left, y);
+        ctx.lineTo(plotRight, y);
+        ctx.stroke();
+        ctx.fillStyle = '#353535';
+        ctx.fillText(`10^${exp}`, margin.left - 9, y);
+      }
+
+      const firstYear = yearFromMs(xMin);
+      const lastYear = yearFromMs(xMax);
+      const step = (lastYear - firstYear > 180) ? 50 : 25;
+      const startYear = Math.ceil(firstYear / step) * step;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      ctx.font = '12px Arial';
+      for(let year = startYear; year <= lastYear; year += step){
+        const x = tx(Date.UTC(year, 0, 1));
+        ctx.beginPath();
+        ctx.strokeStyle = '#f0f0f0';
+        ctx.moveTo(x, margin.top);
+        ctx.lineTo(x, plotBottom);
+        ctx.stroke();
+        ctx.fillStyle = '#353535';
+        ctx.fillText(String(year), x, plotBottom + 18);
+      }
+
+      const markers = [
+        ['I GM inicio', Date.UTC(1914,6,28), '#7f1d1d'],
+        ['I GM fin', Date.UTC(1918,10,11), '#166534'],
+        ['II GM inicio', Date.UTC(1939,8,1), '#7f1d1d'],
+        ['II GM fin', Date.UTC(1945,8,2), '#166534']
+      ];
+      ctx.font = '11px Arial';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'top';
+      for(const [label, t, color] of markers){
+        if(t < xMin || t > xMax) continue;
+        const x = tx(t);
+        ctx.save();
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 1.5;
+        ctx.setLineDash([5,4]);
+        ctx.beginPath();
+        ctx.moveTo(x, margin.top);
+        ctx.lineTo(x, plotBottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.translate(x + 5, margin.top + 5);
+        ctx.rotate(-Math.PI / 2);
+        ctx.fillStyle = color;
+        ctx.fillText(label, 0, 0);
+        ctx.restore();
+      }
+
+      for(const serie of active){
+        if(serie.points.length < 2) continue;
+        ctx.beginPath();
+        ctx.strokeStyle = serie.color;
+        ctx.lineWidth = serie.width;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        let started = false;
+        let lastX = -Infinity;
+        for(const p of serie.points){
+          const x = tx(p.t);
+          const y = ty(p.v);
+          // Slight pixel decimation for dense daily series. Keeps endpoints and visible movement.
+          if(started && Math.abs(x - lastX) < 0.28) continue;
+          if(!started){ ctx.moveTo(x, y); started = true; }
+          else ctx.lineTo(x, y);
+          lastX = x;
+        }
+        ctx.stroke();
+      }
+
+      if(state.hover && state.hover.x >= margin.left && state.hover.x <= plotRight && state.hover.y >= margin.top && state.hover.y <= plotBottom){
+        ctx.save();
+        ctx.strokeStyle = 'rgba(0,0,0,.45)';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([4,4]);
+        ctx.beginPath();
+        ctx.moveTo(state.hover.x, margin.top);
+        ctx.lineTo(state.hover.x, plotBottom);
+        ctx.moveTo(margin.left, state.hover.y);
+        ctx.lineTo(plotRight, state.hover.y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+      }
+
+      ctx.strokeStyle = '#1f1f1f';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(margin.left, plotBottom);
+      ctx.lineTo(plotRight, plotBottom);
+      ctx.moveTo(margin.left, margin.top);
+      ctx.lineTo(margin.left, plotBottom);
+      ctx.stroke();
+
+      ctx.fillStyle = '#111';
+      ctx.font = '700 19px Arial';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText('Índices históricos en escala logarítmica', margin.left, 30);
+      ctx.font = '13px Arial';
+      ctx.fillStyle = '#5e5e5e';
+      const subtitle = state.mode === 'real' ? 'JST en modo retorno total real ajustado por inflación' : 'JST en modo precio nominal (eq_capgain)';
+      ctx.fillText(`Base 1900=100 · ${subtitle}`, margin.left, 52);
+
+      ctx.save();
+      ctx.translate(width < 620 ? 18 : 24, margin.top + plotH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillStyle = '#111';
+      ctx.font = '700 13px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Valor (log10)', 0, 0);
+      ctx.restore();
+
+      if(state.hover){ updateHoverStatus(tr); }
+      else updateSummaryStatus();
+    }
+
+    function nearestPoint(points, target){
+      let lo = 0, hi = points.length - 1;
+      while(lo < hi){
+        const mid = (lo + hi) >> 1;
+        if(points[mid].t < target) lo = mid + 1;
+        else hi = mid;
+      }
+      const a = points[lo];
+      const b = points[Math.max(0, lo - 1)];
+      if(!b) return a;
+      return Math.abs(a.t - target) < Math.abs(b.t - target) ? a : b;
+    }
+
+    function updateHoverStatus(transform){
+      const {margin, plotW, xMin, xMax, active} = transform;
+      const target = xMin + ((state.hover.x - margin.left) / plotW) * (xMax - xMin);
+      const parts = active.map(s => {
+        const p = nearestPoint(s.points, target);
+        return `${s.shortName}: ${dateLabel(p.t)}=${formatValue(p.v)}`;
+      });
+      els.status.textContent = parts.join(' | ');
+    }
+    function updateSummaryStatus(){
+      const active = activeSeries();
+      if(!active.length){ els.status.textContent = 'Sin series visibles'; return; }
+      els.status.textContent = active.map(s => {
+        const a = s.points[0];
+        const b = s.points[s.points.length - 1];
+        return `${s.shortName}: ${yearFromMs(a.t)}-${yearFromMs(b.t)}, último=${formatValue(b.v)}`;
+      }).join(' | ');
+    }
+
+    function renderLegend(){
+      els.legend.innerHTML = '';
+      for(const serie of activeSeries()){
+        const item = document.createElement('span');
+        item.className = 'legendItem';
+        item.innerHTML = `<span class="lineKey" style="background:${serie.color}"></span>${serie.name}`;
+        els.legend.appendChild(item);
+      }
+    }
+
+    function renderStats(){
+      const active = activeSeries();
+      const cards = [];
+      if(!active.length){
+        cards.push(['Series activas', '0', 'Activa al menos una serie para calcular métricas.']);
+      } else {
+        const points = active.flatMap(s => s.points.map(p => ({...p, sid:s.sid, name:s.shortName})));
+        const firstYear = Math.min(...points.map(p => yearFromMs(p.t)));
+        const lastYear = Math.max(...points.map(p => yearFromMs(p.t)));
+        const latest = active.map(s => ({s, p:s.points[s.points.length - 1], cg:cagr(s.points)})).sort((a,b) => b.p.v - a.p.v)[0];
+        const fastest = active.map(s => ({s, p:s.points[s.points.length - 1], cg:cagr(s.points)})).sort((a,b) => b.cg - a.cg)[0];
+        cards.push(['Series activas', String(active.length), state.mode === 'real' ? 'JST en retorno total real.' : 'JST en precio nominal.']);
+        cards.push(['Periodo visible', `${firstYear}–${lastYear}`, 'Rango mínimo y máximo entre las series seleccionadas.']);
+        cards.push(['Mayor último valor', formatValue(latest.p.v), latest.s.name]);
+        cards.push(['Mayor CAGR', formatPct(fastest.cg), fastest.s.name]);
+      }
+      els.statsGrid.innerHTML = cards.map(([k,v,s]) => `<article class="statCard"><div class="k">${k}</div><div class="v">${v}</div><div class="s">${s}</div></article>`).join('');
+    }
+
+    function renderTable(){
+      const active = activeSeries();
+      if(!active.length){
+        els.seriesTable.innerHTML = '<tr><td colspan="5" class="muted">No hay series visibles.</td></tr>';
+        return;
+      }
+      els.seriesTable.innerHTML = active.map(s => {
+        const first = s.points[0];
+        const last = s.points[s.points.length - 1];
+        return `<tr>
+          <td><span class="lineKey" style="background:${s.color}"></span> ${s.name}</td>
+          <td>${dateLabel(first.t)} → ${dateLabel(last.t)}</td>
+          <td>${formatValue(last.v)}</td>
+          <td>${formatPct(cagr(s.points))}</td>
+          <td class="muted">${s.source}</td>
+        </tr>`;
+      }).join('');
+    }
+
+    function renderText(){
+      els.chartTitle.textContent = state.mode === 'real' ? 'Índices JST en retorno total real' : 'Índices de precio históricos';
+      els.chartSubtitle.textContent = state.mode === 'real'
+        ? 'JST reconstruido con retorno total y ajustado por inflación; MSPIUKM y S&P 500 permanecen como precio nominal.'
+        : 'Todas las series están rebasadas a 1900=100; Alemania nominal queda desactivada por defecto por la hiperinflación.';
+    }
+
+    function renderAll(rebuildSelectors = true){
+      renderModes();
+      if(rebuildSelectors) renderSeriesSelectors();
+      renderText();
+      draw();
+      renderLegend();
+      renderStats();
+      renderTable();
+    }
+
+    els.chart.addEventListener('mousemove', (ev) => {
+      const rect = els.chart.getBoundingClientRect();
+      state.hover = {x: ev.clientX - rect.left, y: ev.clientY - rect.top};
+      draw();
+    });
+    els.chart.addEventListener('mouseleave', () => { state.hover = null; draw(); });
+    els.chart.addEventListener('touchmove', (ev) => {
+      if(!ev.touches.length) return;
+      const rect = els.chart.getBoundingClientRect();
+      state.hover = {x: ev.touches[0].clientX - rect.left, y: ev.touches[0].clientY - rect.top};
+      draw();
+    }, {passive:true});
+    els.chart.addEventListener('touchend', () => { state.hover = null; draw(); });
+
+    els.resetBtn.addEventListener('click', () => { initVisibility(); state.hover = null; renderAll(); });
+    els.selectAllBtn.addEventListener('click', () => {
+      for(const s of currentSeries()) state.visible.set(s.sid, true);
+      state.hover = null; renderAll();
+    });
+    els.clearBtn.addEventListener('click', () => {
+      for(const s of currentSeries()) state.visible.set(s.sid, false);
+      state.hover = null; renderAll();
+    });
+    window.addEventListener('resize', () => draw());
+
+    initVisibility();
+    renderAll();
+  </script>
+</body>
+</html>
