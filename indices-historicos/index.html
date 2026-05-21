@@ -422,7 +422,7 @@
 <script>
     const DATA = window.NG_SERIES_DATA;
     const state = {
-      mode: 'nominal',
+      mode: 'real',
       visible: new Map(),
       hover: null,
       pixelRatio: Math.max(1, window.devicePixelRatio || 1)
@@ -487,6 +487,12 @@
           .map(([date, value]) => ({t: parseDateUTC(date), v: Number(value)}))
           .filter(p => p.v > 0 && Number.isFinite(p.v))
           .sort((a,b) => a.t - b.t);
+
+        const serieKey = `${serie.sid || ''} ${serie.name || ''} ${serie.shortName || ''}`.toLowerCase();
+        if(serieKey.includes('alemania') || serieKey.includes('germany') || serieKey.includes('jst_germany')){
+          serie.color = '#00D5FF';
+          serie.width = Math.max(Number(serie.width) || 2, 2.6);
+        }
       }
     }
 
@@ -633,34 +639,6 @@
         ctx.stroke();
         ctx.fillStyle = '#b0b0b0';
         ctx.fillText(String(year), x, plotBottom + 18);
-      }
-
-      const markers = [
-        ['I GM inicio', Date.UTC(1914,6,28), '#ff6b6b'],
-        ['I GM fin', Date.UTC(1918,10,11), '#73d13d'],
-        ['II GM inicio', Date.UTC(1939,8,1), '#ff6b6b'],
-        ['II GM fin', Date.UTC(1945,8,2), '#73d13d']
-      ];
-      ctx.font = '11px Arial';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'top';
-      for(const [label, t, color] of markers){
-        if(t < xMin || t > xMax) continue;
-        const x = tx(t);
-        ctx.save();
-        ctx.strokeStyle = color;
-        ctx.lineWidth = 1.5;
-        ctx.setLineDash([5,4]);
-        ctx.beginPath();
-        ctx.moveTo(x, margin.top);
-        ctx.lineTo(x, plotBottom);
-        ctx.stroke();
-        ctx.setLineDash([]);
-        ctx.translate(x + 5, margin.top + 5);
-        ctx.rotate(-Math.PI / 2);
-        ctx.fillStyle = color;
-        ctx.fillText(label, 0, 0);
-        ctx.restore();
       }
 
       for(const serie of active){
