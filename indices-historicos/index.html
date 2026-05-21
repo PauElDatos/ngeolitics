@@ -10,258 +10,436 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root{
-      --uiScale: 1.16;
-      --bg:#252525;
-      --panel:#2b2b2b;
-      --panel2:#202020;
-      --primary:#FEF702;
-      --text:#B0B0B0;
-      --muted:#858585;
-      --stroke:#3a3a3a;
-      --white:#fff;
-      --radius:16px;
-      --shadow:0 10px 30px rgba(0,0,0,.25);
-      --fontTitle:"Futura","Trebuchet MS",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      --fontText:Arial,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
-      --fontBrand:"Afacad",system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
-      --max:1240px;
+    :root {
+      --bg: #252525;
+      --panel: rgba(255,255,255,.03);
+      --panel2: rgba(255,255,255,.05);
+      --stroke: #3a3a3a;
+      --grid: rgba(255,255,255,.10);
+      --text: #e3e3e3;
+      --muted: #b0b0b0;
+      --accent: #FEF702;
+      --shadow: 0 14px 34px rgba(0,0,0,.26);
+      --radius: 16px;
     }
-    *{box-sizing:border-box;}
-    html,body{min-height:100%;}
-    body{
-      margin:0;
-      background:var(--bg);
-      color:var(--text);
-      font-family:var(--fontText);
-      font-size:calc(14px * var(--uiScale));
-      padding:18px;
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Arial, system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      line-height: 1.4;
     }
-    a{color:inherit;text-decoration:none;}
-    button,input{font:inherit;}
-    a:focus-visible,button:focus-visible,input:focus-visible,label:focus-within{
-      outline:2px solid rgba(254,247,2,.55);
-      outline-offset:3px;
-      border-radius:12px;
+    a { color: inherit; text-decoration: none; }
+    button, input { font: inherit; }
+    a:focus-visible, button:focus-visible, input:focus-visible, label:focus-within {
+      outline: 2px solid rgba(254,247,2,.55);
+      outline-offset: 3px;
+      border-radius: 12px;
     }
-    .wrap{width:min(var(--max),100%);margin:0 auto;display:grid;gap:14px;}
-    header.top{
-      padding:14px 16px;
-      border:1px solid var(--stroke);
-      border-radius:var(--radius);
-      background:#000;
-      box-shadow:var(--shadow);
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
+    .page {
+      min-height: 100vh;
+      width: 100%;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
     }
-    .brand{display:flex;align-items:center;min-width:0;}
-    .brandText .t{margin:0;font-family:var(--fontBrand);color:#fff;font-size:calc(34px * var(--uiScale));letter-spacing:.2px;white-space:nowrap;font-weight:400;line-height:1;}
-    .topActions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end;}
-    .btn{
-      appearance:none;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.04);
-      color:rgba(255,255,255,.9);
-      padding:9px 12px;
-      border-radius:999px;
-      cursor:pointer;
-      user-select:none;
-      transition:transform .04s ease,border-color .12s ease,background .12s ease;
-      line-height:1;
-      white-space:nowrap;
-      font-family:var(--fontText);
+    .panel {
+      width: 100%;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
     }
-    .btn:hover{border-color:rgba(254,247,2,.35);background:rgba(255,255,255,.06);}
-    .btn:active{transform:translateY(1px);}
-    .btn.primary{background:rgba(254,247,2,.95);border-color:rgba(254,247,2,.95);color:rgba(0,0,0,.92);font-weight:800;}
-    .hero{
-      padding:18px 16px;
-      border:1px solid var(--stroke);
-      border-radius:var(--radius);
-      background:var(--panel);
-      box-shadow:var(--shadow);
-      overflow:hidden;
-      display:grid;
-      gap:16px;
+    .chartPanel {
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto auto minmax(0,1fr) auto;
     }
-    .hero h1{margin:0;font-family:var(--fontTitle);color:#fff;font-size:calc(28px * var(--uiScale));letter-spacing:.2px;line-height:1.05;}
-    .hero p{margin:10px 0 0 0;opacity:.9;font-size:calc(13px * var(--uiScale));line-height:1.45;max-width:105ch;}
-    .heroGrid{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:end;}
-    .pillRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:14px;}
-    .pill{border:1px solid rgba(254,247,2,.28);background:rgba(254,247,2,.07);color:#fff;border-radius:999px;padding:7px 10px;font-size:calc(11px * var(--uiScale));white-space:nowrap;}
-    .panel{
-      border:1px solid var(--stroke);
-      border-radius:var(--radius);
-      background:linear-gradient(180deg,rgba(255,255,255,.035),rgba(255,255,255,.02));
-      box-shadow:var(--shadow);
-      overflow:hidden;
+    .topBar {
+      padding: 16px 18px 12px;
+      display: grid;
+      gap: 12px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
     }
-    .panelPad{padding:16px;}
-    .sectionHead{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:0 2px;margin-top:4px;}
-    .sectionHead h2{margin:0;font-family:var(--fontTitle);color:var(--primary);font-size:calc(16px * var(--uiScale));letter-spacing:.35px;text-transform:uppercase;}
-    .sectionHead p{margin:0;color:var(--muted);font-size:calc(12px * var(--uiScale));}
-    .controls{display:grid;grid-template-columns:1fr;gap:12px;}
-    .controlBlock{display:grid;gap:8px;}
-    .labelTitle{font-family:var(--fontTitle);color:var(--primary);text-transform:uppercase;letter-spacing:.35px;font-size:calc(12px * var(--uiScale));}
-    .modeRow,.seriesGrid{display:flex;gap:8px;flex-wrap:wrap;}
-    .toggle{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(0,0,0,.16);
-      color:#eee;
-      border-radius:999px;
-      padding:8px 10px;
-      cursor:pointer;
-      user-select:none;
-      line-height:1;
-      transition:border-color .12s ease, background .12s ease;
+    .titleRow {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
     }
-    .toggle:hover{border-color:rgba(254,247,2,.35);background:rgba(255,255,255,.05);}
-    .toggle input{accent-color:var(--primary);margin:0;}
-    .toggle .swatch{width:12px;height:12px;border-radius:999px;display:inline-block;border:1px solid rgba(255,255,255,.35);}
-    .chartPanel{background:#1d1d1d;}
-    .chartTop{display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid var(--stroke);padding:12px 14px;background:#000;}
-    .chartTop h2{margin:0;font-family:var(--fontTitle);color:#fff;font-size:calc(19px * var(--uiScale));line-height:1.1;}
-    .chartTop p{margin:4px 0 0 0;color:var(--muted);font-size:calc(11px * var(--uiScale));}
-    .chartActions{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;}
-    .canvasWrap{position:relative;background:#f9f8f2;min-height:620px;}
-    #chart{display:block;width:100%;height:620px;touch-action:none;}
-    .status{
-      border-top:1px solid var(--stroke);
-      background:#000;
-      color:#f4f4f4;
-      padding:10px 14px;
-      font-family:Menlo,Consolas,monospace;
-      font-size:12px;
-      line-height:1.45;
-      min-height:44px;
-      overflow-x:auto;
-      white-space:nowrap;
+    h1 {
+      margin: 0;
+      color: var(--accent);
+      font-size: clamp(24px, 2.7vw, 40px);
+      letter-spacing: .2px;
+      line-height: 1.05;
     }
-    .legend{display:flex;gap:10px;flex-wrap:wrap;padding:12px 14px;border-top:1px solid var(--stroke);background:#222;}
-    .legendItem{display:inline-flex;align-items:center;gap:7px;color:#ddd;font-size:calc(11px * var(--uiScale));}
-    .lineKey{width:24px;height:3px;border-radius:99px;display:inline-block;}
-    .statsGrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;}
-    .statCard{border:1px solid var(--stroke);border-radius:14px;background:#222;padding:14px;min-height:112px;}
-    .statCard .k{font-family:var(--fontTitle);color:var(--primary);text-transform:uppercase;letter-spacing:.35px;font-size:calc(11px * var(--uiScale));}
-    .statCard .v{color:#fff;font-family:var(--fontTitle);font-size:calc(24px * var(--uiScale));line-height:1.05;margin-top:8px;}
-    .statCard .s{color:var(--muted);font-size:calc(11px * var(--uiScale));line-height:1.35;margin-top:8px;}
-    .tableWrap{overflow:auto;border-top:1px solid var(--stroke);}
-    table{width:100%;border-collapse:collapse;min-width:760px;}
-    th,td{text-align:left;padding:10px 12px;border-bottom:1px solid rgba(255,255,255,.08);font-size:calc(12px * var(--uiScale));}
-    th{font-family:var(--fontTitle);color:var(--primary);text-transform:uppercase;letter-spacing:.28px;background:#000;position:sticky;top:0;}
-    td{color:#e4e4e4;}
-    td.muted{color:var(--muted);}
-    .conclusion{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
-    .note{border:1px solid var(--stroke);border-radius:14px;background:#222;padding:16px;}
-    .note h3{margin:0 0 8px 0;color:#fff;font-family:var(--fontTitle);font-size:calc(18px * var(--uiScale));}
-    .note p{margin:0;color:var(--text);font-size:calc(13px * var(--uiScale));line-height:1.48;}
-    .note strong{color:#fff;}
-    .sources{font-size:calc(12px * var(--uiScale));line-height:1.55;color:var(--text);}
-    .sources code{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.08);border-radius:6px;padding:2px 5px;color:#fff;}
-    @media (max-width:980px){
-      body{padding:14px;}
-      .heroGrid{grid-template-columns:1fr;}
-      .statsGrid{grid-template-columns:repeat(2,minmax(0,1fr));}
-      .conclusion{grid-template-columns:1fr;}
-      .canvasWrap{min-height:520px;}
-      #chart{height:520px;}
-      .chartTop{align-items:flex-start;flex-direction:column;}
+    .subtle {
+      color: var(--muted);
+      font-size: 13px;
     }
-    @media (max-width:620px){
-      :root{--uiScale:1.02;}
-      header.top{align-items:flex-start;flex-direction:column;}
-      .brandText .t{font-size:32px;}
-      .statsGrid{grid-template-columns:1fr;}
-      .toggle{width:100%;justify-content:flex-start;}
-      .canvasWrap{min-height:460px;}
-      #chart{height:460px;}
-      .status{white-space:normal;}
+    .backLink {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: rgba(255,255,255,.9);
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      padding: 9px 12px;
+      border-radius: 999px;
+      transition: .15s ease;
+      line-height: 1;
+    }
+    .backLink:hover {
+      border-color: rgba(254,247,2,.35);
+      background: rgba(255,255,255,.06);
+    }
+    .intro {
+      margin: 0;
+      max-width: 1120px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.48;
+    }
+    .intro strong { color: var(--text); }
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px 18px;
+      align-items: end;
+    }
+    .field {
+      display: grid;
+      gap: 8px;
+      min-width: 220px;
+    }
+    .field.seriesField {
+      flex: 1 1 520px;
+      min-width: min(100%, 520px);
+    }
+    .field.actionsField { min-width: 250px; }
+    .label, .labelTitle {
+      font-size: 12px;
+      letter-spacing: .35px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .labelTitle { color: var(--muted); }
+    .segmented, .modeRow, .seriesGrid, .actionRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .btn, .toggle {
+      appearance: none;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.04);
+      color: rgba(255,255,255,.92);
+      padding: 10px 13px;
+      border-radius: 999px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: .15s ease;
+      line-height: 1;
+      user-select: none;
+      white-space: nowrap;
+    }
+    .toggle {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 11px;
+      background: rgba(0,0,0,.16);
+    }
+    .btn:hover, .toggle:hover {
+      border-color: rgba(254,247,2,.35);
+      background: rgba(255,255,255,.06);
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn.primary {
+      background: rgba(254,247,2,.92);
+      border-color: rgba(254,247,2,.98);
+      color: #161616;
+      font-weight: 700;
+    }
+    .toggle input { accent-color: var(--accent); margin: 0; }
+    .toggle .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+      border: 1px solid rgba(255,255,255,.35);
+    }
+    .chartHead {
+      padding: 14px 18px 10px;
+      border-top: 1px solid rgba(255,255,255,.05);
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+    .chartHead .left {
+      color: var(--accent);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .45px;
+      font-weight: 700;
+    }
+    .chartHead .right {
+      color: var(--muted);
+      font-size: 12px;
+      text-align: right;
+      max-width: 980px;
+    }
+    .chartArea {
+      min-height: 0;
+      padding: 14px;
+    }
+    .chartBox {
+      position: relative;
+      width: 100%;
+      height: calc(100vh - 330px);
+      min-height: 560px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.12);
+      border: 1px solid rgba(255,255,255,.06);
+      overflow: hidden;
+    }
+    #chart {
+      display: block;
+      width: 100%;
+      height: 100%;
+      touch-action: none;
+    }
+    .chartFoot {
+      padding: 0 18px 14px;
+      display: grid;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .status {
+      color: #f4f4f4;
+      font-family: Menlo, Consolas, monospace;
+      font-size: 12px;
+      line-height: 1.45;
+      min-height: 22px;
+      overflow-x: auto;
+      white-space: nowrap;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.06);
+      border-radius: 12px;
+      padding: 9px 10px;
+    }
+    .legend {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      color: var(--muted);
+    }
+    .legendItem {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      color: rgba(255,255,255,.86);
+      font-size: 12px;
+    }
+    .lineKey {
+      width: 24px;
+      height: 3px;
+      border-radius: 99px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 6px;
+    }
+    .statsGrid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap: 12px;
+    }
+    .statCard {
+      width: 100%;
+      background: linear-gradient(180deg, rgba(255,255,255,.03), rgba(255,255,255,.02));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px 18px 16px;
+      min-height: 112px;
+    }
+    .statCard .k {
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .35px;
+      font-size: 12px;
+    }
+    .statCard .v {
+      color: var(--accent);
+      font-weight: 700;
+      font-size: clamp(22px, 2.1vw, 32px);
+      line-height: 1.05;
+      margin-top: 8px;
+    }
+    .statCard .s {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+      margin-top: 8px;
+    }
+    .panelTitle {
+      padding: 14px 18px 10px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    .panelTitle h2 {
+      margin: 0;
+      color: var(--accent);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: .45px;
+    }
+    .panelTitle p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+    .tableWrap { overflow: auto; }
+    table { width: 100%; border-collapse: collapse; min-width: 760px; }
+    th, td {
+      text-align: left;
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      font-size: 13px;
+    }
+    th {
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: .28px;
+      background: rgba(0,0,0,.22);
+      position: sticky;
+      top: 0;
+    }
+    td { color: rgba(255,255,255,.88); }
+    td.muted { color: var(--muted); }
+    .explain {
+      padding: 14px 18px 16px;
+      display: grid;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 14px;
+    }
+    .explain strong { color: var(--text); }
+    .explainGrid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .note {
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 14px;
+      background: rgba(0,0,0,.14);
+      padding: 14px;
+    }
+    .note h3 {
+      margin: 0 0 8px 0;
+      color: var(--text);
+      font-size: 15px;
+    }
+    .note p { margin: 0; line-height: 1.48; }
+    .sources code {
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.08);
+      border-radius: 6px;
+      padding: 2px 5px;
+      color: #fff;
+    }
+    @media (max-width: 980px) {
+      .page { padding: 12px; }
+      .chartHead { align-items: start; flex-direction: column; }
+      .chartHead .right { text-align: left; }
+      .chartArea { padding: 12px; }
+      .chartBox { min-height: 480px; height: calc(100vh - 390px); }
+      .statsGrid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .explainGrid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) {
+      .field, .field.seriesField, .field.actionsField { min-width: 100%; }
+      .toggle, .btn { width: 100%; justify-content: flex-start; }
+      .chartBox { min-height: 420px; height: calc(100vh - 430px); }
+      .statsGrid { grid-template-columns: 1fr; }
+      .status { white-space: normal; }
+      h1 { font-size: 25px; }
     }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <header class="top" aria-label="Cabecera principal">
-      <a class="brand" href="../index.html" aria-label="Volver a N.Geolitics">
-        <div class="brandText"><h1 class="t">N.Geolitics</h1></div>
-      </a>
-      <div class="topActions">
-        <a class="btn" href="../index.html">← Análisis</a>
-        <button class="btn primary" type="button" id="resetBtn">Restablecer vista</button>
-      </div>
-    </header>
-
-    <section class="hero" aria-label="Presentación">
-      <div class="heroGrid">
-        <div>
+  <div class="page">
+    <section class="panel chartPanel">
+      <div class="topBar">
+        <div class="titleRow">
           <h1>Índices bursátiles históricos en escala logarítmica</h1>
-          <p>
-            Comparador de series históricas rebasadas a <b>1900=100</b>. Permite alternar el bloque JST entre
-            <b>precio nominal</b> y <b>retorno total real</b>, activar o desactivar países, y consultar el valor más cercano
-            a cada fecha pasando el cursor sobre el gráfico.
-          </p>
-          <div class="pillRow" aria-label="Resumen de funcionalidades">
-            <span class="pill">Escala Y logarítmica</span>
-            <span class="pill">Base 1900=100</span>
-            <span class="pill">Modo nominal / real</span>
-            <span class="pill">Lectura interactiva</span>
+          <div class="subtle"><a class="backLink" href="../index.html">← Análisis</a></div>
+        </div>
+        <p class="intro">
+          Comparador de series históricas rebasadas a <strong>1900=100</strong>. Permite alternar el bloque JST entre
+          <strong>precio nominal</strong> y <strong>retorno total real</strong>, activar o desactivar países, y consultar el valor más cercano
+          a cada fecha pasando el cursor sobre el gráfico.
+        </p>
+
+        <div class="controls">
+          <div class="field">
+            <div class="label">Modo JST</div>
+            <div class="segmented modeRow" id="modeRow"></div>
+          </div>
+
+          <div class="field seriesField">
+            <div class="label">Series visibles</div>
+            <div class="segmented seriesGrid" id="seriesGrid"></div>
+          </div>
+
+          <div class="field actionsField">
+            <div class="label">Acciones</div>
+            <div class="segmented actionRow">
+              <button class="btn primary" type="button" id="resetBtn">Restablecer vista</button>
+              <button class="btn" type="button" id="selectAllBtn">Activar todo</button>
+              <button class="btn" type="button" id="clearBtn">Limpiar</button>
+            </div>
           </div>
         </div>
-        <div class="pillRow" aria-label="Marcadores históricos">
-          <span class="pill">I Guerra Mundial</span>
-          <span class="pill">II Guerra Mundial</span>
+      </div>
+
+      <div class="chartHead">
+        <div class="left" id="chartTitle">Índices de precio históricos</div>
+        <div class="right" id="chartSubtitle">Todas las series están rebasadas a 1900=100.</div>
+      </div>
+
+      <div class="chartArea">
+        <div class="chartBox">
+          <canvas id="chart" aria-label="Gráfico de índices históricos en escala logarítmica"></canvas>
         </div>
+      </div>
+
+      <div class="chartFoot">
+        <div class="status" id="status">Cargando datos…</div>
+        <div class="legend" id="legend"></div>
       </div>
     </section>
 
-    <section class="panel panelPad" aria-label="Controles">
-      <div class="controls">
-        <div class="controlBlock">
-          <div class="labelTitle">Modo JST</div>
-          <div class="modeRow" id="modeRow"></div>
-        </div>
-        <div class="controlBlock">
-          <div class="labelTitle">Series visibles</div>
-          <div class="seriesGrid" id="seriesGrid"></div>
-        </div>
-      </div>
-    </section>
-
-    <section class="panel chartPanel" aria-label="Gráfico interactivo">
-      <div class="chartTop">
-        <div>
-          <h2 id="chartTitle">Índices de precio históricos</h2>
-          <p id="chartSubtitle">Todas las series empiezan en 1900=100.</p>
-        </div>
-        <div class="chartActions">
-          <button class="btn" type="button" id="selectAllBtn">Activar todo</button>
-          <button class="btn" type="button" id="clearBtn">Limpiar</button>
-        </div>
-      </div>
-      <div class="canvasWrap">
-        <canvas id="chart" aria-label="Gráfico de índices históricos en escala logarítmica"></canvas>
-      </div>
-      <div class="status" id="status">Cargando datos…</div>
-      <div class="legend" id="legend"></div>
-    </section>
-
-    <div class="sectionHead">
-      <h2>Lectura rápida</h2>
-      <p>Calculado sobre las series actualmente visibles.</p>
-    </div>
     <section class="statsGrid" id="statsGrid" aria-label="Estadísticas principales"></section>
 
     <section class="panel" aria-label="Tabla de series visibles">
-      <div class="panelPad">
-        <div class="sectionHead" style="padding:0;margin:0;">
-          <h2>Detalle de series</h2>
-          <p>Último dato, rango temporal y crecimiento anualizado.</p>
-        </div>
+      <div class="panelTitle">
+        <h2>Detalle de series</h2>
+        <p>Último dato, rango temporal y crecimiento anualizado.</p>
       </div>
       <div class="tableWrap">
         <table>
@@ -279,34 +457,31 @@
       </div>
     </section>
 
-    <div class="sectionHead">
-      <h2>Conclusión</h2>
-    </div>
-    <section class="conclusion" aria-label="Conclusión del análisis">
-      <article class="note">
-        <h3>La escala logarítmica cambia la lectura</h3>
-        <p>
-          En series de muy largo plazo, la escala lineal suele esconder casi todo lo que ocurre antes de las últimas décadas.
-          La escala logarítmica permite comparar <strong>ritmos de crecimiento</strong>: una pendiente similar implica una tasa compuesta parecida, aunque los niveles sean muy distintos.
-        </p>
-      </article>
-      <article class="note">
-        <h3>Nominal no siempre significa comparable</h3>
-        <p>
-          El modo nominal muestra precios sin descontar inflación. Por eso Alemania queda desactivada por defecto: su serie nominal incorpora el salto extremo de la hiperinflación y comprime visualmente el resto. El modo <strong>TR real</strong> es más útil para comparar poder adquisitivo y retorno total.
-        </p>
-      </article>
-    </section>
-
-    <section class="panel panelPad sources" aria-label="Fuentes y metodología">
-      <div class="sectionHead" style="padding:0;margin:0 0 10px 0;">
-        <h2>Fuentes y método</h2>
+    <section class="panel explain" aria-label="Conclusión y metodología">
+      <div class="panelTitle" style="padding:0 0 10px 0;border-bottom:0;">
+        <h2>Conclusión</h2>
       </div>
-      <p>
+      <div class="explainGrid">
+        <article class="note">
+          <h3>La escala logarítmica cambia la lectura</h3>
+          <p>
+            En series de muy largo plazo, la escala lineal suele esconder casi todo lo que ocurre antes de las últimas décadas.
+            La escala logarítmica permite comparar <strong>ritmos de crecimiento</strong>: una pendiente similar implica una tasa compuesta parecida.
+          </p>
+        </article>
+        <article class="note">
+          <h3>Nominal no siempre significa comparable</h3>
+          <p>
+            El modo nominal muestra precios sin descontar inflación. Por eso Alemania queda desactivada por defecto: su serie nominal incorpora
+            el salto extremo de la hiperinflación. El modo <strong>TR real</strong> es más útil para comparar poder adquisitivo y retorno total.
+          </p>
+        </article>
+      </div>
+      <div class="sources">
         Datos cargados desde <code>MSPIUKM.csv</code>, <code>SP500_serie_historica_completa.csv</code> y <code>JSTdatasetR6.xlsx</code>.
         Todas las series se filtran desde 1900, se rebasan a 100 en el primer dato disponible de 1900 y se dibujan con eje Y logarítmico.
         En JST nominal se usa <code>eq_capgain</code>. En JST real se reconstruye un índice de retorno total con <code>eq_tr</code> y se ajusta por inflación usando <code>cpi</code>.
-      </p>
+      </div>
     </section>
   </div>
 
@@ -472,12 +647,12 @@
     function draw(){
       const {width, height} = resizeCanvas();
       ctx.clearRect(0,0,width,height);
-      ctx.fillStyle = '#f9f8f2';
+      ctx.fillStyle = '#252525';
       ctx.fillRect(0,0,width,height);
 
       const tr = computeTransform(width, height);
       if(!tr){
-        ctx.fillStyle = '#111827';
+        ctx.fillStyle = '#e3e3e3';
         ctx.font = '700 18px Arial';
         ctx.textAlign = 'center';
         ctx.fillText('Activa al menos una serie.', width / 2, height / 2);
@@ -488,8 +663,8 @@
       const plotRight = width - margin.right;
       const plotBottom = height - margin.bottom;
 
-      ctx.fillStyle = '#ffffff';
-      ctx.strokeStyle = '#c7c7c7';
+      ctx.fillStyle = 'rgba(0,0,0,.12)';
+      ctx.strokeStyle = 'rgba(255,255,255,.16)';
       ctx.lineWidth = 1;
       ctx.fillRect(margin.left, margin.top, plotW, plotH);
       ctx.strokeRect(margin.left, margin.top, plotW, plotH);
@@ -501,11 +676,11 @@
         const value = Math.pow(10, exp);
         const y = ty(value);
         ctx.beginPath();
-        ctx.strokeStyle = '#e6e6e6';
+        ctx.strokeStyle = 'rgba(255,255,255,.10)';
         ctx.moveTo(margin.left, y);
         ctx.lineTo(plotRight, y);
         ctx.stroke();
-        ctx.fillStyle = '#353535';
+        ctx.fillStyle = '#b0b0b0';
         ctx.fillText(`10^${exp}`, margin.left - 9, y);
       }
 
@@ -519,19 +694,19 @@
       for(let year = startYear; year <= lastYear; year += step){
         const x = tx(Date.UTC(year, 0, 1));
         ctx.beginPath();
-        ctx.strokeStyle = '#f0f0f0';
+        ctx.strokeStyle = 'rgba(255,255,255,.07)';
         ctx.moveTo(x, margin.top);
         ctx.lineTo(x, plotBottom);
         ctx.stroke();
-        ctx.fillStyle = '#353535';
+        ctx.fillStyle = '#b0b0b0';
         ctx.fillText(String(year), x, plotBottom + 18);
       }
 
       const markers = [
-        ['I GM inicio', Date.UTC(1914,6,28), '#7f1d1d'],
-        ['I GM fin', Date.UTC(1918,10,11), '#166534'],
-        ['II GM inicio', Date.UTC(1939,8,1), '#7f1d1d'],
-        ['II GM fin', Date.UTC(1945,8,2), '#166534']
+        ['I GM inicio', Date.UTC(1914,6,28), '#ff6b6b'],
+        ['I GM fin', Date.UTC(1918,10,11), '#73d13d'],
+        ['II GM inicio', Date.UTC(1939,8,1), '#ff6b6b'],
+        ['II GM fin', Date.UTC(1945,8,2), '#73d13d']
       ];
       ctx.font = '11px Arial';
       ctx.textAlign = 'left';
@@ -578,7 +753,7 @@
 
       if(state.hover && state.hover.x >= margin.left && state.hover.x <= plotRight && state.hover.y >= margin.top && state.hover.y <= plotBottom){
         ctx.save();
-        ctx.strokeStyle = 'rgba(0,0,0,.45)';
+        ctx.strokeStyle = 'rgba(254,247,2,.45)';
         ctx.lineWidth = 1;
         ctx.setLineDash([4,4]);
         ctx.beginPath();
@@ -591,7 +766,7 @@
         ctx.restore();
       }
 
-      ctx.strokeStyle = '#1f1f1f';
+      ctx.strokeStyle = 'rgba(255,255,255,.72)';
       ctx.lineWidth = 1.4;
       ctx.beginPath();
       ctx.moveTo(margin.left, plotBottom);
@@ -600,20 +775,20 @@
       ctx.lineTo(margin.left, plotBottom);
       ctx.stroke();
 
-      ctx.fillStyle = '#111';
+      ctx.fillStyle = '#FEF702';
       ctx.font = '700 19px Arial';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
       ctx.fillText('Índices históricos en escala logarítmica', margin.left, 30);
       ctx.font = '13px Arial';
-      ctx.fillStyle = '#5e5e5e';
+      ctx.fillStyle = '#b0b0b0';
       const subtitle = state.mode === 'real' ? 'JST en modo retorno total real ajustado por inflación' : 'JST en modo precio nominal (eq_capgain)';
       ctx.fillText(`Base 1900=100 · ${subtitle}`, margin.left, 52);
 
       ctx.save();
       ctx.translate(width < 620 ? 18 : 24, margin.top + plotH / 2);
       ctx.rotate(-Math.PI / 2);
-      ctx.fillStyle = '#111';
+      ctx.fillStyle = '#e3e3e3';
       ctx.font = '700 13px Arial';
       ctx.textAlign = 'center';
       ctx.fillText('Valor (log10)', 0, 0);
