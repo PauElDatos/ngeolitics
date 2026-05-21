@@ -1,15 +1,16 @@
 <!doctype html>
+
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>N.Geolitics — Índices históricos</title>
-  <meta name="description" content="Índices históricos de precio y retorno real en escala logarítmica, base 1900=100." />
-  <link rel="icon" href="../assets/faviconNG.png" />
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1" name="viewport"/>
+<title>N.Geolitics — Índices históricos</title>
+<meta content="Índices históricos de precio y retorno real en escala logarítmica, base 1900=100." name="description"/>
+<link href="../assets/faviconNG.png" rel="icon"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<style>
     :root {
       --bg: #252525;
       --panel: rgba(255,255,255,.03);
@@ -57,7 +58,7 @@
     .chartPanel {
       min-height: 0;
       display: grid;
-      grid-template-rows: auto auto minmax(0,1fr) auto;
+      grid-template-rows: auto auto minmax(0,1fr);
     }
     .topBar {
       padding: 16px 18px 12px;
@@ -205,7 +206,7 @@
     .chartBox {
       position: relative;
       width: 100%;
-      height: calc(100vh - 330px);
+      height: calc(100vh - 250px);
       min-height: 560px;
       border-radius: 14px;
       background: rgba(0,0,0,.12);
@@ -367,14 +368,14 @@
       .chartHead { align-items: start; flex-direction: column; }
       .chartHead .right { text-align: left; }
       .chartArea { padding: 12px; }
-      .chartBox { min-height: 480px; height: calc(100vh - 390px); }
+      .chartBox { min-height: 480px; height: calc(100vh - 310px); }
       .statsGrid { grid-template-columns: repeat(2, minmax(0,1fr)); }
       .explainGrid { grid-template-columns: 1fr; }
     }
     @media (max-width: 620px) {
       .field, .field.seriesField, .field.actionsField { min-width: 100%; }
       .toggle, .btn { width: 100%; justify-content: flex-start; }
-      .chartBox { min-height: 420px; height: calc(100vh - 430px); }
+      .chartBox { min-height: 420px; height: calc(100vh - 350px); }
       .statsGrid { grid-template-columns: 1fr; }
       .status { white-space: normal; }
       h1 { font-size: 25px; }
@@ -382,111 +383,43 @@
   </style>
 </head>
 <body>
-  <div class="page">
-    <section class="panel chartPanel">
-      <div class="topBar">
-        <div class="titleRow">
-          <h1>Índices bursátiles históricos en escala logarítmica</h1>
-          <div class="subtle"><a class="backLink" href="../index.html">← Análisis</a></div>
-        </div>
-        <p class="intro">
-          Comparador de series históricas rebasadas a <strong>1900=100</strong>. Permite alternar el bloque JST entre
-          <strong>precio nominal</strong> y <strong>retorno total real</strong>, activar o desactivar países, y consultar el valor más cercano
-          a cada fecha pasando el cursor sobre el gráfico.
-        </p>
+<div class="page">
+<section class="panel chartPanel">
+<div class="topBar">
+<div class="titleRow">
+<h1>Índices bursátiles históricos en escala logarítmica</h1>
 
-        <div class="controls">
-          <div class="field">
-            <div class="label">Modo JST</div>
-            <div class="segmented modeRow" id="modeRow"></div>
-          </div>
+</div>
 
-          <div class="field seriesField">
-            <div class="label">Series visibles</div>
-            <div class="segmented seriesGrid" id="seriesGrid"></div>
-          </div>
+<div class="controls">
+<div class="field">
+<div class="label">Modo JST</div>
+<div class="segmented modeRow" id="modeRow"></div>
+</div>
+<div class="field seriesField">
+<div class="label">Series visibles</div>
+<div class="segmented seriesGrid" id="seriesGrid"></div>
+</div>
 
-          <div class="field actionsField">
-            <div class="label">Acciones</div>
-            <div class="segmented actionRow">
-              <button class="btn primary" type="button" id="resetBtn">Restablecer vista</button>
-              <button class="btn" type="button" id="selectAllBtn">Activar todo</button>
-              <button class="btn" type="button" id="clearBtn">Limpiar</button>
-            </div>
-          </div>
-        </div>
-      </div>
+</div>
+</div>
+<div class="chartHead">
+<div class="left" id="chartTitle">Índices de precio históricos</div>
+<div class="right" id="chartSubtitle">Todas las series están rebasadas a 1900=100.</div>
+</div>
+<div class="chartArea">
+<div class="chartBox">
+<canvas aria-label="Gráfico de índices históricos en escala logarítmica" id="chart"></canvas>
+</div>
+</div>
 
-      <div class="chartHead">
-        <div class="left" id="chartTitle">Índices de precio históricos</div>
-        <div class="right" id="chartSubtitle">Todas las series están rebasadas a 1900=100.</div>
-      </div>
+</section>
 
-      <div class="chartArea">
-        <div class="chartBox">
-          <canvas id="chart" aria-label="Gráfico de índices históricos en escala logarítmica"></canvas>
-        </div>
-      </div>
 
-      <div class="chartFoot">
-        <div class="status" id="status">Cargando datos…</div>
-        <div class="legend" id="legend"></div>
-      </div>
-    </section>
 
-    <section class="statsGrid" id="statsGrid" aria-label="Estadísticas principales"></section>
-
-    <section class="panel" aria-label="Tabla de series visibles">
-      <div class="panelTitle">
-        <h2>Detalle de series</h2>
-        <p>Último dato, rango temporal y crecimiento anualizado.</p>
-      </div>
-      <div class="tableWrap">
-        <table>
-          <thead>
-            <tr>
-              <th>Serie</th>
-              <th>Periodo</th>
-              <th>Último valor</th>
-              <th>CAGR</th>
-              <th>Fuente</th>
-            </tr>
-          </thead>
-          <tbody id="seriesTable"></tbody>
-        </table>
-      </div>
-    </section>
-
-    <section class="panel explain" aria-label="Conclusión y metodología">
-      <div class="panelTitle" style="padding:0 0 10px 0;border-bottom:0;">
-        <h2>Conclusión</h2>
-      </div>
-      <div class="explainGrid">
-        <article class="note">
-          <h3>La escala logarítmica cambia la lectura</h3>
-          <p>
-            En series de muy largo plazo, la escala lineal suele esconder casi todo lo que ocurre antes de las últimas décadas.
-            La escala logarítmica permite comparar <strong>ritmos de crecimiento</strong>: una pendiente similar implica una tasa compuesta parecida.
-          </p>
-        </article>
-        <article class="note">
-          <h3>Nominal no siempre significa comparable</h3>
-          <p>
-            El modo nominal muestra precios sin descontar inflación. Por eso Alemania queda desactivada por defecto: su serie nominal incorpora
-            el salto extremo de la hiperinflación. El modo <strong>TR real</strong> es más útil para comparar poder adquisitivo y retorno total.
-          </p>
-        </article>
-      </div>
-      <div class="sources">
-        Datos cargados desde <code>MSPIUKM.csv</code>, <code>SP500_serie_historica_completa.csv</code> y <code>JSTdatasetR6.xlsx</code>.
-        Todas las series se filtran desde 1900, se rebasan a 100 en el primer dato disponible de 1900 y se dibujan con eje Y logarítmico.
-        En JST nominal se usa <code>eq_capgain</code>. En JST real se reconstruye un índice de retorno total con <code>eq_tr</code> y se ajusta por inflación usando <code>cpi</code>.
-      </div>
-    </section>
-  </div>
-
-  <script src="series-data.js"></script>
-  <script>
+</div>
+<script src="series-data.js"></script>
+<script>
     const DATA = window.NG_SERIES_DATA;
     const state = {
       mode: 'nominal',
@@ -656,7 +589,7 @@
         ctx.font = '700 18px Arial';
         ctx.textAlign = 'center';
         ctx.fillText('Activa al menos una serie.', width / 2, height / 2);
-        els.status.textContent = 'Sin series visibles';
+        if(els.status) els.status.textContent = 'Sin series visibles';
         return;
       }
       const {margin, plotW, plotH, xMin, xMax, logMin, logMax, tx, ty, active} = tr;
@@ -812,6 +745,7 @@
     }
 
     function updateHoverStatus(transform){
+      if(!els.status) return;
       const {margin, plotW, xMin, xMax, active} = transform;
       const target = xMin + ((state.hover.x - margin.left) / plotW) * (xMax - xMin);
       const parts = active.map(s => {
@@ -821,6 +755,7 @@
       els.status.textContent = parts.join(' | ');
     }
     function updateSummaryStatus(){
+      if(!els.status) return;
       const active = activeSeries();
       if(!active.length){ els.status.textContent = 'Sin series visibles'; return; }
       els.status.textContent = active.map(s => {
@@ -831,6 +766,7 @@
     }
 
     function renderLegend(){
+      if(!els.legend) return;
       els.legend.innerHTML = '';
       for(const serie of activeSeries()){
         const item = document.createElement('span');
@@ -841,6 +777,7 @@
     }
 
     function renderStats(){
+      if(!els.statsGrid) return;
       const active = activeSeries();
       const cards = [];
       if(!active.length){
@@ -860,6 +797,7 @@
     }
 
     function renderTable(){
+      if(!els.seriesTable) return;
       const active = activeSeries();
       if(!active.length){
         els.seriesTable.innerHTML = '<tr><td colspan="5" class="muted">No hay series visibles.</td></tr>';
@@ -909,12 +847,12 @@
     }, {passive:true});
     els.chart.addEventListener('touchend', () => { state.hover = null; draw(); });
 
-    els.resetBtn.addEventListener('click', () => { initVisibility(); state.hover = null; renderAll(); });
-    els.selectAllBtn.addEventListener('click', () => {
+    if(els.resetBtn) els.resetBtn.addEventListener('click', () => { initVisibility(); state.hover = null; renderAll(); });
+    if(els.selectAllBtn) els.selectAllBtn.addEventListener('click', () => {
       for(const s of currentSeries()) state.visible.set(s.sid, true);
       state.hover = null; renderAll();
     });
-    els.clearBtn.addEventListener('click', () => {
+    if(els.clearBtn) els.clearBtn.addEventListener('click', () => {
       for(const s of currentSeries()) state.visible.set(s.sid, false);
       state.hover = null; renderAll();
     });
