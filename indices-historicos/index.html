@@ -649,16 +649,6 @@
         <div class="panelMeta">1900–2020</div>
       </div>
       <div class="panelContent selectorContent">
-        <div class="field">
-          <div class="label">Modo</div>
-          <div class="modeRow" id="modeRow"></div>
-        </div>
-
-        <div class="field">
-          <div class="label">Visualización</div>
-          <div class="modeRow" id="metricRow"></div>
-        </div>
-
         <div class="field seriesField">
           <div class="label">Series visibles</div>
           <div class="seriesGrid" id="seriesGrid"></div>
@@ -676,6 +666,8 @@
           <canvas aria-label="Gráfico de índices históricos" id="chart"></canvas>
         </div>
         <div class="chartControls">
+          <button class="btn" id="btnMode" type="button">Modo: Ajustado por inflación</button>
+          <button class="btn" id="btnMetric" type="button">Visualización: Índice acumulado</button>
           <button class="btn" id="btnHoverFocus" type="button" aria-pressed="false">Resaltar al pasar: OFF</button>
         </div>
         <div class="footerSingle">
@@ -698,11 +690,11 @@
     };
 
     const els = {
-      modeRow: document.getElementById('modeRow'),
-      metricRow: document.getElementById('metricRow'),
       seriesGrid: document.getElementById('seriesGrid'),
       chart: document.getElementById('chart'),
       chartMeta: document.getElementById('chartMeta'),
+      btnMode: document.getElementById('btnMode'),
+      btnMetric: document.getElementById('btnMetric'),
       btnHoverFocus: document.getElementById('btnHoverFocus'),
       status: document.getElementById('status'),
       statsGrid: document.getElementById('statsGrid'),
@@ -789,47 +781,6 @@
     function initVisibility(){
       state.visible.clear();
       for(const serie of currentSeries()) state.visible.set(serie.sid, true);
-    }
-
-    function renderModes(){
-      els.modeRow.innerHTML = '';
-      for(const mode of Object.keys(DATA.modes)){
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = `btn modeButton${mode === state.mode ? ' on' : ''}`;
-        button.textContent = modeLabels[mode];
-        button.setAttribute('aria-pressed', mode === state.mode ? 'true' : 'false');
-        button.addEventListener('click', () => {
-          if(mode === state.mode) return;
-          const previous = new Map(state.visible);
-          state.mode = mode;
-          state.visible.clear();
-          for(const serie of currentSeries()){
-            state.visible.set(serie.sid, previous.has(serie.sid) ? previous.get(serie.sid) : !!serie.visibleByDefault);
-          }
-          state.hover = null;
-          renderAll();
-        });
-        els.modeRow.appendChild(button);
-      }
-    }
-
-    function renderMetrics(){
-      els.metricRow.innerHTML = '';
-      for(const metric of Object.keys(metricLabels)){
-        const button = document.createElement('button');
-        button.type = 'button';
-        button.className = `btn modeButton${metric === state.metric ? ' on' : ''}`;
-        button.textContent = metricLabels[metric];
-        button.setAttribute('aria-pressed', metric === state.metric ? 'true' : 'false');
-        button.addEventListener('click', () => {
-          if(metric === state.metric) return;
-          state.metric = metric;
-          state.hover = null;
-          renderAll();
-        });
-        els.metricRow.appendChild(button);
-      }
     }
 
     function seriesDisplayName(serie){
@@ -1345,12 +1296,16 @@
       els.btnHoverFocus.setAttribute('aria-pressed', state.hoverFocusMode ? 'true' : 'false');
     }
 
+    function renderChartControls(){
+      els.btnMode.textContent = `Modo: ${modeLabels[state.mode]}`;
+      els.btnMetric.textContent = `Visualización: ${metricLabels[state.metric]}`;
+      renderHoverFocusControl();
+    }
+
     function renderAll(rebuildSelectors = true){
-      renderModes();
-      renderMetrics();
       if(rebuildSelectors) renderSeriesSelectors();
       renderChartMeta();
-      renderHoverFocusControl();
+      renderChartControls();
       draw();
       renderStats();
       renderTable();
@@ -1369,6 +1324,23 @@
       draw();
     }, {passive:true});
     els.chart.addEventListener('touchend', () => { state.hover = null; draw(); });
+
+    els.btnMode.addEventListener('click', () => {
+      const previous = new Map(state.visible);
+      state.mode = state.mode === 'nominal' ? 'real' : 'nominal';
+      state.visible.clear();
+      for(const serie of currentSeries()){
+        state.visible.set(serie.sid, previous.has(serie.sid) ? previous.get(serie.sid) : true);
+      }
+      state.hover = null;
+      renderAll();
+    });
+
+    els.btnMetric.addEventListener('click', () => {
+      state.metric = state.metric === 'index' ? 'annual' : 'index';
+      state.hover = null;
+      renderAll();
+    });
 
     els.btnHoverFocus.addEventListener('click', () => {
       state.hoverFocusMode = !state.hoverFocusMode;
