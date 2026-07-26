@@ -345,19 +345,9 @@
       letter-spacing: .35px;
       text-transform: uppercase;
     }
-    .segmented {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-    }
     .btn {
       border-radius: 10px;
       font-size: calc(12px * var(--uiScale));
-    }
-    .modeButton {
-      flex: 1 1 120px;
-      min-height: 40px;
-      white-space: normal;
     }
     .btn.active {
       background: rgba(254,247,2,.9);
@@ -409,6 +399,14 @@
       flex: 1 1 auto;
       border-radius: 12px;
     }
+    .chartControls {
+      display: flex;
+      flex: 0 0 auto;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
+    .chartControls .btn { white-space: nowrap; }
     .chartNotes {
       display: flex;
       flex: 0 0 auto;
@@ -469,10 +467,14 @@
       }
       .panelMeta { text-align: left; }
       .chartPanel {
-        height: 680px;
-        min-height: 620px;
+        height: 880px;
+        min-height: 880px;
       }
       .chartBox { min-height: 440px; }
+      .chartControls .btn {
+        width: 100%;
+        white-space: normal;
+      }
       .chartNotes { flex-direction: column; }
       .tooltip { min-width: min(290px, calc(100vw - 64px)); }
     }
@@ -495,26 +497,6 @@
       </div>
       <div class="panelContent selectorContent">
           <div class="field">
-            <div class="label">Importes</div>
-            <div class="segmented" id="modeButtons"></div>
-          </div>
-
-          <div class="field">
-            <div class="label">Escala</div>
-            <div class="segmented" id="scaleButtons"></div>
-          </div>
-
-          <div class="field">
-            <div class="label">Tramos visibles</div>
-            <div class="segmented" id="countButtons"></div>
-          </div>
-
-          <div class="field">
-            <div class="label">Bandas políticas</div>
-            <div class="segmented" id="politicsButtons"></div>
-          </div>
-
-          <div class="field">
             <div class="label">Leyenda</div>
             <div class="seriesLegend" id="seriesLegend"></div>
           </div>
@@ -531,6 +513,13 @@
         <div class="chartBox" id="chartBox">
           <svg id="chart" viewBox="0 0 1600 760" preserveAspectRatio="none" aria-label="Gráfica de tramos del IRPF"></svg>
           <div class="tooltip" id="tooltip"></div>
+        </div>
+
+        <div class="chartControls" aria-label="Controles del gráfico">
+          <button class="btn" id="btnAmountMode" type="button">Importes: Constantes de 1990</button>
+          <button class="btn" id="btnScaleMode" type="button">Escala: Lineal</button>
+          <button class="btn" id="btnVisibleCount" type="button">Tramos visibles: Primeros 5</button>
+          <button class="btn active" id="btnPolitics" type="button" aria-pressed="true">Políticos: ON</button>
         </div>
 
         <div class="chartNotes">
@@ -556,7 +545,7 @@
           La vista permite comparar euros corrientes con <strong>euros constantes de 1990</strong>. El PIB per cápita utiliza la misma unidad seleccionada para que ambas magnitudes sean comparables.
         </p>
         <p>
-          El tamaño de cada punto indica el <strong>tipo marginal</strong> correspondiente. Las bandas de fondo identifican el Gobierno de cada periodo y pueden ocultarse desde el panel lateral.
+          El tamaño de cada punto indica el <strong>tipo marginal</strong> correspondiente. Las bandas de fondo identifican el Gobierno de cada periodo y pueden ocultarse con los controles situados bajo el gráfico.
         </p>
       </div>
     </section>
@@ -577,11 +566,6 @@
       { name:"Pedro Sánchez", start:2018, end:null, color:"#552222" },
     ];
 
-    const MODE_DEFS = [
-      { key:'real1990', label:'Constantes de 1990' },
-      { key:'nominal', label:'Euros corrientes' },
-    ];
-
     const state = {
       mode: 'real1990',
       scaleMode: 'linear',
@@ -597,6 +581,10 @@
     const lineSummary = document.getElementById('lineSummary');
     const topMeta = document.getElementById('topMeta');
     const seriesLegend = document.getElementById('seriesLegend');
+    const btnAmountMode = document.getElementById('btnAmountMode');
+    const btnScaleMode = document.getElementById('btnScaleMode');
+    const btnVisibleCount = document.getElementById('btnVisibleCount');
+    const btnPolitics = document.getElementById('btnPolitics');
 
     function money(value, digits = 0) {
       if (!Number.isFinite(value)) return '—';
@@ -728,41 +716,13 @@
       return d;
     }
 
-    function buildSegmentedButtons(containerId, defs, activeKey, onClick) {
-      const el = document.getElementById(containerId);
-      el.innerHTML = defs.map(def => `<button class="btn modeButton ${def.key === activeKey ? 'active' : ''}" type="button" data-key="${def.key}" aria-pressed="${def.key === activeKey ? 'true' : 'false'}">${def.label}</button>`).join('');
-      Array.from(el.querySelectorAll('.btn')).forEach(btn => btn.addEventListener('click', () => onClick(btn.dataset.key)));
-    }
-
-    function buildButtons() {
-      buildSegmentedButtons('modeButtons', MODE_DEFS, state.mode, key => {
-        state.mode = key;
-        renderAll();
-      });
-
-      buildSegmentedButtons('scaleButtons', [
-        { key: 'linear', label: 'Lineal' },
-        { key: 'log', label: 'Logarítmica' },
-      ], state.scaleMode, key => {
-        state.scaleMode = key;
-        renderAll();
-      });
-
-      buildSegmentedButtons('countButtons', [
-        { key: '5', label: 'Primeros 5' },
-        { key: String(MAX_TRAMOS), label: 'Todos' },
-      ], String(state.visibleCount), key => {
-        state.visibleCount = Number(key);
-        renderAll();
-      });
-
-      buildSegmentedButtons('politicsButtons', [
-        { key: 'on', label: 'ON' },
-        { key: 'off', label: 'OFF' },
-      ], state.showPresBands ? 'on' : 'off', key => {
-        state.showPresBands = key === 'on';
-        renderAll();
-      });
+    function renderChartControls() {
+      btnAmountMode.textContent = `Importes: ${state.mode === 'real1990' ? 'Constantes de 1990' : 'Euros corrientes'}`;
+      btnScaleMode.textContent = `Escala: ${state.scaleMode === 'log' ? 'Logarítmica' : 'Lineal'}`;
+      btnVisibleCount.textContent = `Tramos visibles: ${state.visibleCount === MAX_TRAMOS ? 'Todos' : 'Primeros 5'}`;
+      btnPolitics.textContent = `Políticos: ${state.showPresBands ? 'ON' : 'OFF'}`;
+      btnPolitics.classList.toggle('active', state.showPresBands);
+      btnPolitics.setAttribute('aria-pressed', state.showPresBands ? 'true' : 'false');
     }
 
     function renderLegend() {
@@ -1035,10 +995,39 @@
     }
 
     function renderAll() {
-      buildButtons();
+      renderChartControls();
       renderLegend();
       renderChart();
     }
+
+    function resetChartInteraction() {
+      state.hoverYear = null;
+      hideTooltip();
+    }
+
+    btnAmountMode.addEventListener('click', () => {
+      state.mode = state.mode === 'real1990' ? 'nominal' : 'real1990';
+      resetChartInteraction();
+      renderAll();
+    });
+
+    btnScaleMode.addEventListener('click', () => {
+      state.scaleMode = state.scaleMode === 'linear' ? 'log' : 'linear';
+      resetChartInteraction();
+      renderAll();
+    });
+
+    btnVisibleCount.addEventListener('click', () => {
+      state.visibleCount = state.visibleCount === MAX_TRAMOS ? 5 : MAX_TRAMOS;
+      resetChartInteraction();
+      renderAll();
+    });
+
+    btnPolitics.addEventListener('click', () => {
+      state.showPresBands = !state.showPresBands;
+      resetChartInteraction();
+      renderAll();
+    });
 
     chartBox.addEventListener('mousemove', ev => {
       if (!isInsidePlotArea(ev.clientX, ev.clientY)) {
