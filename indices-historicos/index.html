@@ -565,18 +565,6 @@
       overflow-wrap: anywhere;
       word-break: break-word;
     }
-    .seriesBadge {
-      flex: 0 0 auto;
-      align-self: flex-start;
-      margin-top: 1px;
-      padding: 3px 8px;
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 999px;
-      font-size: calc(10px * var(--uiScale));
-      line-height: 1;
-      opacity: .85;
-      white-space: nowrap;
-    }
     .chartPanel { min-height: 0; display: flex; flex-direction: column; }
     .chartContent {
       min-height: 0;
@@ -826,15 +814,7 @@
     }
 
     function seriesDisplayName(serie){
-      if(state.metric === 'annual'){
-        return serie.name
-          .replace(' precio nominal base 1900=100', ' rendimiento nominal anual')
-          .replace(' TR real base 1900=100', ' rendimiento real anual');
-      }
-      if(state.mode === 'nominal' && serie.sid === GERMANY_SID){
-        return 'JST Alemania precio nominal';
-      }
-      return serie.name;
+      return serie.shortName.replace(/^JST\s+/, '');
     }
 
     function renderSeriesSelectors(){
@@ -846,10 +826,7 @@
         item.className = `seriesItem${isVisible ? '' : ' isHidden'}`;
         item.title = serie.source;
         item.setAttribute('aria-pressed', isVisible ? 'true' : 'false');
-        const badge = state.mode === 'nominal' && serie.sid === GERMANY_SID
-          ? `<span class="seriesBadge">${state.metric === 'index' ? '1924=100' : 'Ruptura 1923'}</span>`
-          : '';
-        item.innerHTML = `<span class="seriesSwatch" style="background:${serie.color}"></span><span class="seriesName">${seriesDisplayName(serie)}</span>${badge}`;
+        item.innerHTML = `<span class="seriesSwatch" style="background:${serie.color}"></span><span class="seriesName">${seriesDisplayName(serie)}</span>`;
         item.addEventListener('click', () => {
           state.visible.set(serie.sid, !state.visible.get(serie.sid));
           state.hover = null;
