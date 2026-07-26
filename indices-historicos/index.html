@@ -380,44 +380,270 @@
       .status { white-space: normal; }
       h1 { font-size: 25px; }
     }
+
+    /* Maqueta alineada con las páginas analíticas de N.Geolitics. */
+    :root {
+      --fontTitle: "Futura", "Trebuchet MS", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      --fontText: Arial, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      --uiScale: 1.35;
+      --radius: 14px;
+    }
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      min-height: 100vh;
+      overflow: hidden;
+      font-family: var(--fontText);
+      font-size: calc(14px * var(--uiScale));
+    }
+    header {
+      padding: 18px 220px 8px 18px;
+      flex: 0 0 auto;
+    }
+    .h-title { line-height: 1.05; }
+    h1 {
+      color: var(--accent);
+      font-family: var(--fontTitle);
+      font-size: calc(22px * var(--uiScale));
+      letter-spacing: .3px;
+    }
+    .homeTopRight {
+      position: fixed;
+      top: 18px;
+      right: 18px;
+      z-index: 20;
+    }
+    a.btn.homeTopRight {
+      width: auto;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(0,0,0,.18);
+      color: var(--accent);
+      padding: 10px 14px;
+      border-radius: 999px;
+      box-shadow: var(--shadow);
+      font-family: var(--fontTitle);
+      font-size: calc(12px * var(--uiScale));
+      letter-spacing: .2px;
+      text-decoration: none;
+    }
+    a.btn.homeTopRight:hover {
+      border-color: rgba(254,247,2,.35);
+      background: linear-gradient(180deg, rgba(254,247,2,.07), rgba(0,0,0,.18));
+    }
+    .page {
+      flex: 1 1 auto;
+      min-height: 0;
+      padding: 12px 12px 18px;
+      display: grid;
+      grid-template-columns: 340px minmax(0, 1fr);
+      gap: 12px;
+      overflow: hidden;
+    }
+    .panel {
+      min-height: 0;
+      display: flex;
+      flex-direction: column;
+      border-radius: var(--radius);
+    }
+    .panelHeader {
+      min-height: 44px;
+      padding: 12px 12px 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      border-bottom: 1px solid var(--stroke);
+      background: rgba(255,255,255,.02);
+    }
+    .panelTitleText {
+      color: var(--accent);
+      font-family: var(--fontTitle);
+      font-size: calc(13px * var(--uiScale));
+      font-weight: 700;
+      letter-spacing: .35px;
+      text-transform: uppercase;
+    }
+    .panelMeta {
+      color: var(--muted);
+      font-size: calc(11px * var(--uiScale));
+      line-height: 1.2;
+      text-align: right;
+    }
+    .panelContent {
+      flex: 1 1 auto;
+      min-height: 0;
+      padding: 12px;
+      overflow: auto;
+    }
+    .selectorContent {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .field,
+    .field.seriesField,
+    .field.actionsField {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+    }
+    .label,
+    .labelTitle {
+      color: var(--muted);
+      font-family: var(--fontTitle);
+      font-size: calc(11px * var(--uiScale));
+      letter-spacing: .35px;
+      text-transform: uppercase;
+    }
+    .modeRow,
+    .seriesGrid,
+    .actionRow {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .toggle,
+    .btn {
+      border-radius: 10px;
+      font-size: calc(12px * var(--uiScale));
+    }
+    .toggle {
+      width: 100%;
+      align-items: flex-start;
+      padding: 10px;
+      white-space: normal;
+      background: rgba(255,255,255,.02);
+      box-shadow: 0 6px 18px rgba(0,0,0,.10);
+    }
+    .toggle span:last-child {
+      min-width: 0;
+      overflow-wrap: anywhere;
+    }
+    .toggle input { flex: 0 0 auto; margin-top: 2px; }
+    .toggle .swatch {
+      flex: 0 0 auto;
+      margin-top: 3px;
+      border-radius: 3px;
+    }
+    .actionRow {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+    .actionRow .btn {
+      width: 100%;
+      padding: 9px 8px;
+      white-space: normal;
+      text-align: center;
+    }
+    .legend {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .legendItem {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: rgba(255,255,255,.86);
+      font-size: calc(12px * var(--uiScale));
+      line-height: 1.25;
+    }
+    .lineKey { flex: 0 0 auto; margin-right: 0; }
+    .chartPanel { min-height: 0; display: flex; flex-direction: column; }
+    .chartContent {
+      min-height: 0;
+      display: flex;
+      flex: 1 1 auto;
+      flex-direction: column;
+      padding: 12px;
+    }
+    .chartBox {
+      flex: 1 1 auto;
+      min-height: 420px;
+      height: auto;
+      border-radius: 12px;
+    }
+    @media (max-width: 900px) {
+      body { height: auto; min-height: 100vh; overflow: auto; }
+      header { padding: 18px 190px 8px 18px; }
+      .page {
+        display: flex;
+        flex-direction: column;
+        overflow: visible;
+      }
+      .selectorPanel { min-height: 0; }
+      .selectorContent { max-height: none; }
+      .chartPanel { min-height: 620px; }
+    }
+    @media (max-width: 620px) {
+      header { padding: 64px 12px 8px; }
+      .homeTopRight { top: 10px; right: 10px; }
+      .page { padding: 12px; }
+      .panelMeta { text-align: left; }
+      .panelHeader { align-items: flex-start; flex-direction: column; }
+      .chartPanel { min-height: 520px; }
+      .chartBox { min-height: 420px; }
+    }
   </style>
 </head>
 <body>
-<div class="page">
-<section class="panel chartPanel">
-<div class="topBar">
-<div class="titleRow">
-<h1>Índices bursátiles históricos</h1>
+  <a class="btn homeTopRight" href="../index.html" title="Volver al inicio">← Volver al inicio</a>
 
-</div>
+  <header>
+    <div class="h-title">
+      <h1>Índices bursátiles históricos</h1>
+    </div>
+  </header>
 
-<div class="controls">
-<div class="field">
-<div class="label">Modo JST</div>
-<div class="segmented modeRow" id="modeRow"></div>
-</div>
-<div class="field seriesField">
-<div class="label">Series visibles</div>
-<div class="segmented seriesGrid" id="seriesGrid"></div>
-</div>
+  <main class="page">
+    <section class="panel selectorPanel" aria-label="Datos del gráfico">
+      <div class="panelHeader">
+        <div class="panelTitleText">Datos del gráfico</div>
+      </div>
+      <div class="panelContent selectorContent">
+        <div class="field">
+          <div class="label">Modo JST</div>
+          <div class="modeRow" id="modeRow"></div>
+        </div>
 
-</div>
-</div>
-<div class="chartHead">
-<div class="left" id="chartTitle">Índices de precio históricos</div>
-<div class="right" id="chartSubtitle">Todas las series están rebasadas a 1900=100.</div>
-</div>
-<div class="chartArea">
-<div class="chartBox">
-<canvas aria-label="Gráfico de índices históricos" id="chart"></canvas>
-</div>
-</div>
+        <div class="field seriesField">
+          <div class="label">Series visibles</div>
+          <div class="seriesGrid" id="seriesGrid"></div>
+        </div>
 
-</section>
+        <div class="field actionsField">
+          <div class="label">Selección</div>
+          <div class="actionRow">
+            <button class="btn" id="resetBtn" type="button">Restablecer</button>
+            <button class="btn" id="selectAllBtn" type="button">Todas</button>
+            <button class="btn" id="clearBtn" type="button">Ninguna</button>
+          </div>
+        </div>
 
+        <div class="field">
+          <div class="label">Leyenda</div>
+          <div class="legend" id="legend" aria-label="Leyenda de series visibles"></div>
+        </div>
+      </div>
+    </section>
 
-
-</div>
+    <section class="panel chartPanel">
+      <div class="panelHeader">
+        <div class="panelTitleText">Gráfico</div>
+        <div class="panelMeta">Base 1900 = 100 · Escala logarítmica</div>
+      </div>
+      <div class="chartContent">
+        <div class="chartBox">
+          <canvas aria-label="Gráfico de índices históricos" id="chart"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
 <script src="series-data.js"></script>
 <script>
     const DATA = window.NG_SERIES_DATA;
@@ -739,7 +965,9 @@
       ctx.fillText('Índices históricos', margin.left, 30);
       ctx.font = '13px Arial';
       ctx.fillStyle = '#b0b0b0';
-      const subtitle = state.mode === 'real' ? 'JST en modo retorno total real ajustado por inflación' : 'JST en modo precio nominal (eq_capgain)';
+      const subtitle = state.mode === 'real'
+        ? (width < 620 ? 'JST: retorno total real ajustado' : 'JST en modo retorno total real ajustado por inflación')
+        : (width < 620 ? 'JST: precio nominal' : 'JST en modo precio nominal (eq_capgain)');
       ctx.fillText(`Base 1900=100 · ${subtitle}`, margin.left, 52);
 
       ctx.save();
@@ -843,10 +1071,12 @@
     function renderText(){
       const hideJstHeader = state.mode === 'real';
       if(els.chartHead) els.chartHead.style.display = hideJstHeader ? 'none' : '';
-      els.chartTitle.textContent = hideJstHeader ? '' : 'Índices de precio históricos';
-      els.chartSubtitle.textContent = hideJstHeader
-        ? ''
-        : 'Todas las series están rebasadas a 1900=100; Alemania nominal queda desactivada por defecto por la hiperinflación.';
+      if(els.chartTitle) els.chartTitle.textContent = hideJstHeader ? '' : 'Índices de precio históricos';
+      if(els.chartSubtitle) {
+        els.chartSubtitle.textContent = hideJstHeader
+          ? ''
+          : 'Todas las series están rebasadas a 1900=100; Alemania nominal queda desactivada por defecto por la hiperinflación.';
+      }
     }
 
     function renderAll(rebuildSelectors = true){
