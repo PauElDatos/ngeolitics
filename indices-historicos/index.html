@@ -962,6 +962,49 @@
       return {width, height};
     }
 
+    function clampBetween(value, a, b){
+      return Math.max(Math.min(a, b), Math.min(Math.max(a, b), value));
+    }
+
+    function smoothCurveControls(points, index){
+      const p0 = points[Math.max(0, index - 1)];
+      const p1 = points[index];
+      const p2 = points[index + 1];
+      const p3 = points[Math.min(points.length - 1, index + 2)];
+      const tension = .72 / 6;
+      return {
+        cp1x: p1.x + (p2.x - p1.x) / 3,
+        cp1y: clampBetween(p1.y + (p2.y - p0.y) * tension, p1.y, p2.y),
+        cp2x: p2.x - (p2.x - p1.x) / 3,
+        cp2y: clampBetween(p2.y - (p3.y - p1.y) * tension, p1.y, p2.y)
+      };
+    }
+
+    function projectedSeriesPoints(points, tx, ty){
+      const projected = [];
+      for(let index = 0; index < points.length; index++){
+        const point = points[index];
+        const next = {x: tx(point.t), y: ty(point.v), t: point.t};
+        const previous = projected[projected.length - 1];
+        // Slight pixel decimation for dense series while always preserving the endpoint.
+        if(previous && Math.abs(next.x - previous.x) < .28){
+          if(index === points.length - 1) projected[projected.length - 1] = next;
+          continue;
+        }
+        projected.push(next);
+      }
+      return projected;
+    }
+
+    function traceSmoothSeries(points){
+      ctx.moveTo(points[0].x, points[0].y);
+      for(let index = 0; index < points.length - 1; index++){
+        const controls = smoothCurveControls(points, index);
+        const end = points[index + 1];
+        ctx.bezierCurveTo(controls.cp1x, controls.cp1y, controls.cp2x, controls.cp2y, end.x, end.y);
+      }
+    }
+
     function draw(){
       const {width, height} = resizeCanvas();
       ctx.clearRect(0,0,width,height);
@@ -1104,23 +1147,14 @@
         ctx.save();
         ctx.globalAlpha = hoverSid && serie.sid !== hoverSid ? .12 : 1;
         for(const points of segments){
-          if(points.length < 2) continue;
+          const projected = projectedSeriesPoints(points, tx, ty);
+          if(projected.length < 2) continue;
           ctx.beginPath();
           ctx.strokeStyle = serie.color;
           ctx.lineWidth = hoverSid === serie.sid ? serie.width + .8 : serie.width;
           ctx.lineJoin = 'round';
           ctx.lineCap = 'round';
-          let started = false;
-          let lastX = -Infinity;
-          for(const point of points){
-            const x = tx(point.t);
-            const y = ty(point.v);
-            // Slight pixel decimation for dense daily series. Keeps endpoints and visible movement.
-            if(started && Math.abs(x - lastX) < 0.28) continue;
-            if(!started){ ctx.moveTo(x, y); started = true; }
-            else ctx.lineTo(x, y);
-            lastX = x;
-          }
+          traceSmoothSeries(projected);
           ctx.stroke();
         }
         ctx.restore();
@@ -1182,7 +1216,15 @@
       return Math.abs(a.t - target) < Math.abs(b.t - target) ? a : b;
     }
 
-    function interpolatedSeriesY(segments, target, ty){
+    function cubicBezierValue(start, control1, control2, end, ratio){
+      const inverse = 1 - ratio;
+      return inverse ** 3 * start
+        + 3 * inverse ** 2 * ratio * control1
+        + 3 * inverse * ratio ** 2 * control2
+        + ratio ** 3 * end;
+    }
+
+    function interpolatedSeriesY(segments, target, tx, ty){
       for(const points of segments){
         if(points.length < 2 || target < points[0].t || target > points[points.length - 1].t) continue;
         let lo = 0;
@@ -1195,15 +1237,17 @@
         const right = points[lo];
         const left = points[Math.max(0, lo - 1)];
         if(!left || right.t === left.t) return ty(right.v);
+        const projected = points.map(point => ({x: tx(point.t), y: ty(point.v), t: point.t}));
+        const controls = smoothCurveControls(projected, Math.max(0, lo - 1));
         const ratio = (target - left.t) / (right.t - left.t);
-        return ty(left.v) + ratio * (ty(right.v) - ty(left.v));
+        return cubicBezierValue(ty(left.v), controls.cp1y, controls.cp2y, ty(right.v), ratio);
       }
       return null;
     }
 
     function hoveredSeriesId(transform){
       if(!state.hover) return null;
-      const {margin, plotW, plotH, xMin, xMax, plotted, ty} = transform;
+      const {margin, plotW, plotH, xMin, xMax, plotted, tx, ty} = transform;
       if(
         state.hover.x < margin.left || state.hover.x > margin.left + plotW ||
         state.hover.y < margin.top || state.hover.y > margin.top + plotH
@@ -1213,7 +1257,7 @@
       let bestSid = null;
       let bestDistance = Infinity;
       for(const {serie, segments} of plotted){
-        const y = interpolatedSeriesY(segments, target, ty);
+        const y = interpolatedSeriesY(segments, target, tx, ty);
         if(y === null) continue;
         const distance = Math.abs(y - state.hover.y);
         if(distance < bestDistance){
