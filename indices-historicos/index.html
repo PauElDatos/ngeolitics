@@ -162,6 +162,12 @@
       background: rgba(255,255,255,.06);
     }
     .btn:active { transform: translateY(1px); }
+    .btn.on {
+      background: rgba(254,247,2,.9);
+      border-color: rgba(254,247,2,.95);
+      color: rgba(0,0,0,.92);
+      font-weight: 700;
+    }
     .btn.primary {
       background: rgba(254,247,2,.92);
       border-color: rgba(254,247,2,.98);
@@ -580,6 +586,13 @@
       height: auto;
       border-radius: 12px;
     }
+    .chartControls {
+      display: flex;
+      flex: 0 0 auto;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+    }
     .footerSingle {
       flex: 0 0 auto;
       display: flex;
@@ -662,6 +675,9 @@
         <div class="chartBox">
           <canvas aria-label="Gráfico de índices históricos" id="chart"></canvas>
         </div>
+        <div class="chartControls">
+          <button class="btn" id="btnHoverFocus" type="button" aria-pressed="false">Resaltar al pasar: OFF</button>
+        </div>
         <div class="footerSingle">
           <span class="footerSource">Fuente: <a class="sourceLink" href="https://www.macrohistory.net/database/" target="_blank" rel="noopener noreferrer">Jordà-Schularick-Taylor Macrohistory Database</a> (<span style="color:#fff">JSTdatasetR6.xlsx</span>, R.6) · <span style="opacity:.9;">N.Geolitics</span></span>
         </div>
@@ -676,6 +692,8 @@
       metric: 'index',
       visible: new Map(),
       hover: null,
+      hoverFocusMode: false,
+      hoverSid: null,
       pixelRatio: Math.max(1, window.devicePixelRatio || 1)
     };
 
@@ -685,6 +703,7 @@
       seriesGrid: document.getElementById('seriesGrid'),
       chart: document.getElementById('chart'),
       chartMeta: document.getElementById('chartMeta'),
+      btnHoverFocus: document.getElementById('btnHoverFocus'),
       status: document.getElementById('status'),
       statsGrid: document.getElementById('statsGrid'),
       seriesTable: document.getElementById('seriesTable')
@@ -951,6 +970,7 @@
 
       const tr = computeTransform(width, height);
       if(!tr){
+        state.hoverSid = null;
         ctx.fillStyle = '#e3e3e3';
         ctx.font = '700 18px Arial';
         ctx.textAlign = 'center';
@@ -961,6 +981,8 @@
       const {margin, plotW, plotH, xMin, xMax, logMin, logMax, tx, ty, active, plotted, scale} = tr;
       const plotRight = width - margin.right;
       const plotBottom = height - margin.bottom;
+      const hoverSid = state.hoverFocusMode ? hoveredSeriesId(tr) : null;
+      state.hoverSid = hoverSid;
 
       ctx.fillStyle = 'rgba(0,0,0,.12)';
       ctx.strokeStyle = 'rgba(255,255,255,.16)';
@@ -1075,12 +1097,17 @@
         ctx.restore();
       }
 
-      for(const {serie, segments} of plotted){
+      const drawQueue = hoverSid
+        ? [...plotted.filter(item => item.serie.sid !== hoverSid), ...plotted.filter(item => item.serie.sid === hoverSid)]
+        : plotted;
+      for(const {serie, segments} of drawQueue){
+        ctx.save();
+        ctx.globalAlpha = hoverSid && serie.sid !== hoverSid ? .12 : 1;
         for(const points of segments){
           if(points.length < 2) continue;
           ctx.beginPath();
           ctx.strokeStyle = serie.color;
-          ctx.lineWidth = serie.width;
+          ctx.lineWidth = hoverSid === serie.sid ? serie.width + .8 : serie.width;
           ctx.lineJoin = 'round';
           ctx.lineCap = 'round';
           let started = false;
@@ -1096,6 +1123,7 @@
           }
           ctx.stroke();
         }
+        ctx.restore();
       }
 
       if(state.hover && state.hover.x >= margin.left && state.hover.x <= plotRight && state.hover.y >= margin.top && state.hover.y <= plotBottom){
@@ -1152,6 +1180,48 @@
       const b = points[Math.max(0, lo - 1)];
       if(!b) return a;
       return Math.abs(a.t - target) < Math.abs(b.t - target) ? a : b;
+    }
+
+    function interpolatedSeriesY(segments, target, ty){
+      for(const points of segments){
+        if(points.length < 2 || target < points[0].t || target > points[points.length - 1].t) continue;
+        let lo = 0;
+        let hi = points.length - 1;
+        while(lo < hi){
+          const mid = (lo + hi) >> 1;
+          if(points[mid].t < target) lo = mid + 1;
+          else hi = mid;
+        }
+        const right = points[lo];
+        const left = points[Math.max(0, lo - 1)];
+        if(!left || right.t === left.t) return ty(right.v);
+        const ratio = (target - left.t) / (right.t - left.t);
+        return ty(left.v) + ratio * (ty(right.v) - ty(left.v));
+      }
+      return null;
+    }
+
+    function hoveredSeriesId(transform){
+      if(!state.hover) return null;
+      const {margin, plotW, plotH, xMin, xMax, plotted, ty} = transform;
+      if(
+        state.hover.x < margin.left || state.hover.x > margin.left + plotW ||
+        state.hover.y < margin.top || state.hover.y > margin.top + plotH
+      ) return null;
+
+      const target = xMin + ((state.hover.x - margin.left) / plotW) * (xMax - xMin);
+      let bestSid = null;
+      let bestDistance = Infinity;
+      for(const {serie, segments} of plotted){
+        const y = interpolatedSeriesY(segments, target, ty);
+        if(y === null) continue;
+        const distance = Math.abs(y - state.hover.y);
+        if(distance < bestDistance){
+          bestDistance = distance;
+          bestSid = serie.sid;
+        }
+      }
+      return bestSid;
     }
 
     function updateHoverStatus(transform){
@@ -1225,11 +1295,18 @@
       );
     }
 
+    function renderHoverFocusControl(){
+      els.btnHoverFocus.textContent = `Resaltar al pasar: ${state.hoverFocusMode ? 'ON' : 'OFF'}`;
+      els.btnHoverFocus.classList.toggle('on', state.hoverFocusMode);
+      els.btnHoverFocus.setAttribute('aria-pressed', state.hoverFocusMode ? 'true' : 'false');
+    }
+
     function renderAll(rebuildSelectors = true){
       renderModes();
       renderMetrics();
       if(rebuildSelectors) renderSeriesSelectors();
       renderChartMeta();
+      renderHoverFocusControl();
       draw();
       renderStats();
       renderTable();
@@ -1248,6 +1325,12 @@
       draw();
     }, {passive:true});
     els.chart.addEventListener('touchend', () => { state.hover = null; draw(); });
+
+    els.btnHoverFocus.addEventListener('click', () => {
+      state.hoverFocusMode = !state.hoverFocusMode;
+      renderHoverFocusControl();
+      draw();
+    });
 
     window.addEventListener('resize', () => draw());
 
