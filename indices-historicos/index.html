@@ -788,7 +788,7 @@
     }
     function initVisibility(){
       state.visible.clear();
-      for(const serie of currentSeries()) state.visible.set(serie.sid, !!serie.visibleByDefault);
+      for(const serie of currentSeries()) state.visible.set(serie.sid, true);
     }
 
     function renderModes(){
