@@ -526,10 +526,6 @@
             <div class="seriesLegend" id="seriesLegend"></div>
           </div>
 
-          <div class="field">
-            <div class="label">Representación del tipo marginal</div>
-            <button class="btn modeButton active" id="btnRateVisualization" type="button">Tipo marginal: Mapa de calor</button>
-          </div>
         </div>
     </section>
 
@@ -603,7 +599,6 @@
       scaleMode: 'log',
       visibleCount: 5,
       showPresBands: true,
-      rateVisualization: 'heatmap',
       hoverYear: null,
     };
 
@@ -615,7 +610,6 @@
     const topMeta = document.getElementById('topMeta');
     const seriesLegend = document.getElementById('seriesLegend');
     const btnPolitics = document.getElementById('btnPolitics');
-    const btnRateVisualization = document.getElementById('btnRateVisualization');
     const rateEncodingNote = document.getElementById('rateEncodingNote');
 
     function money(value, digits = 0) {
@@ -732,21 +726,9 @@
       return isHover ? base + 1.3 : base;
     }
 
-    function rateMarkerSvg(cx, cy, rate, color, isHover, compact) {
+    function pointMarkerSvg(cx, cy, color, isHover, compact) {
       const coreRadius = pointRadius(isHover, 'tramo', compact);
-      let marker = '';
-
-      if (state.rateVisualization === 'rings') {
-        const ringRadius = (compact ? 13 : 9.5) + (isHover ? 1.2 : 0);
-        const strokeWidth = compact ? 3.2 : 2.5;
-        const circumference = 2 * Math.PI * ringRadius;
-        const progress = rateRatio(rate) * circumference;
-        marker += `<circle class="rateRingTrack" cx="${cx}" cy="${cy}" r="${ringRadius}" fill="rgba(0,0,0,.42)" stroke="rgba(255,255,255,.22)" stroke-width="${strokeWidth}"></circle>`;
-        marker += `<circle class="rateRingProgress" cx="${cx}" cy="${cy}" r="${ringRadius}" fill="none" stroke="#FEF702" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-dasharray="${progress} ${circumference}" transform="rotate(-90 ${cx} ${cy})"></circle>`;
-      }
-
-      marker += `<circle class="ratePoint" cx="${cx}" cy="${cy}" r="${coreRadius}" fill="${color}" stroke="rgba(0,0,0,.5)" stroke-width="1" opacity="0.98"></circle>`;
-      return marker;
+      return `<circle class="ratePoint" cx="${cx}" cy="${cy}" r="${coreRadius}" fill="${color}" stroke="rgba(0,0,0,.5)" stroke-width="1" opacity="0.98"></circle>`;
     }
 
     function buildStepPath(points, xFn, yFn) {
@@ -820,7 +802,6 @@
       btnPolitics.textContent = `Políticos: ${state.showPresBands ? 'ON' : 'OFF'}`;
       btnPolitics.classList.toggle('active', state.showPresBands);
       btnPolitics.setAttribute('aria-pressed', state.showPresBands ? 'true' : 'false');
-      btnRateVisualization.textContent = `Tipo marginal: ${state.rateVisualization === 'heatmap' ? 'Mapa de calor' : 'Anillos'}`;
     }
 
     function renderLegend() {
@@ -887,26 +868,20 @@
       const compact = chartBox.clientWidth < 720;
       const width = compact ? 780 : 1600;
       const height = VIEWBOX_HEIGHT;
-      const heatmapRowsHeight = state.rateVisualization === 'heatmap'
-        ? Math.max(68, visibleTramos().length * (compact ? 9 : 8))
-        : 0;
+      const heatmapRowsHeight = Math.max(68, visibleTramos().length * (compact ? 9 : 8));
       const heatmapOffset = compact ? 70 : 52;
       const heatmapLegendSpace = compact ? 38 : 34;
-      const heatmapReserve = state.rateVisualization === 'heatmap'
-        ? heatmapOffset + heatmapRowsHeight + heatmapLegendSpace
-        : 0;
+      const heatmapReserve = heatmapOffset + heatmapRowsHeight + heatmapLegendSpace;
       const m = compact
-        ? { top: 46, right: 28, bottom: 104 + heatmapReserve, left: 118 }
-        : { top: 36, right: 36, bottom: 92 + heatmapReserve, left: 92 };
+        ? { top: 46, right: 28, bottom: heatmapReserve, left: 118 }
+        : { top: 36, right: 36, bottom: heatmapReserve, left: 92 };
       const plot = { x: m.left, y: m.top, w: width - m.left - m.right, h: height - m.top - m.bottom };
-      const heatmap = state.rateVisualization === 'heatmap'
-        ? {
-            x: plot.x,
-            y: plot.y + plot.h + heatmapOffset,
-            w: plot.w,
-            h: heatmapRowsHeight
-          }
-        : null;
+      const heatmap = {
+        x: plot.x,
+        y: plot.y + plot.h + heatmapOffset,
+        w: plot.w,
+        h: heatmapRowsHeight
+      };
       svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
       return { width, height, m, plot, heatmap, compact };
     }
@@ -1004,7 +979,8 @@
       let out = `<text x="${heatmap.x}" y="${heatmap.y - 11}" fill="#FEF702" font-size="${titleFont}" font-weight="700">TIPO MARGINAL</text>`;
 
       seriesData.forEach((series, rowIndex) => {
-        const rowY = heatmap.y + (rowIndex * rowHeight);
+        const visualRowIndex = seriesData.length - 1 - rowIndex;
+        const rowY = heatmap.y + (visualRowIndex * rowHeight);
         out += `<rect x="${heatmap.x}" y="${rowY}" width="${heatmap.w}" height="${rowHeight}" fill="rgba(255,255,255,.025)" stroke="rgba(255,255,255,.06)" stroke-width="1"></rect>`;
         out += `<text x="${heatmap.x - 10}" y="${rowY + (rowHeight * 0.68)}" text-anchor="end" fill="#bfbfbf" font-size="${labelFont}" font-weight="700">T${series.tramo}</text>`;
 
@@ -1127,7 +1103,7 @@
         const d = buildStepPath(series.points, x, y);
         out += `<path d="${d}" fill="none" stroke="${series.color}" stroke-width="${compact ? 4.2 : 2.7}" opacity="0.96"></path>`;
         series.points.forEach(p => {
-          out += rateMarkerSvg(x(p.year), y(p.value), p.rate, series.color, state.hoverYear === p.year, compact);
+          out += pointMarkerSvg(x(p.year), y(p.value), series.color, state.hoverYear === p.year, compact);
         });
       });
 
@@ -1147,11 +1123,8 @@
       svg.innerHTML = out;
 
       chartMeta.textContent = `${state.mode === 'real1990' ? 'Euros constantes de 1990' : 'Euros corrientes'} · Escala ${state.scaleMode === 'log' ? 'logarítmica' : 'lineal'}`;
-      const rateVisualizationLabel = state.rateVisualization === 'heatmap' ? 'mapa de calor' : 'anillos';
-      lineSummary.textContent = `${visible.length} tramos + PIB per cápita · Tipo marginal: ${rateVisualizationLabel} · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}`;
-      rateEncodingNote.innerHTML = state.rateVisualization === 'heatmap'
-        ? 'Línea blanca discontinua: <strong>PIB per cápita</strong> · Mapa de calor: <strong>tipo marginal (0%–56%)</strong>'
-        : 'Línea blanca discontinua: <strong>PIB per cápita</strong> · Anillo exterior: <strong>tipo marginal (0%–56%)</strong>';
+      lineSummary.textContent = `${visible.length} tramos + PIB per cápita · Tipo marginal: mapa de calor · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}`;
+      rateEncodingNote.innerHTML = 'Línea blanca discontinua: <strong>PIB per cápita</strong> · Mapa de calor: <strong>tipo marginal (0%–56%)</strong>';
       topMeta.textContent = `${Math.min(...YEARS)}–${Math.max(...YEARS)}`;
     }
 
@@ -1169,12 +1142,6 @@
 
     btnPolitics.addEventListener('click', () => {
       state.showPresBands = !state.showPresBands;
-      resetChartInteraction();
-      renderAll();
-    });
-
-    btnRateVisualization.addEventListener('click', () => {
-      state.rateVisualization = state.rateVisualization === 'heatmap' ? 'rings' : 'heatmap';
       resetChartInteraction();
       renderAll();
     });
