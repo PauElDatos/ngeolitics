@@ -486,9 +486,9 @@
       gap: 18px;
     }
     .field,
-    .field.seriesField,
-    .field.actionsField {
+    .field.seriesField {
       display: grid;
+      flex: 0 0 auto;
       gap: 8px;
       min-width: 0;
     }
@@ -500,66 +500,78 @@
       letter-spacing: .35px;
       text-transform: uppercase;
     }
-    .modeRow,
-    .seriesGrid,
-    .actionRow {
+    .modeRow {
       display: flex;
-      flex-direction: column;
+      flex-wrap: wrap;
       gap: 8px;
     }
-    .toggle,
     .btn {
       border-radius: 10px;
       font-size: calc(12px * var(--uiScale));
     }
-    .toggle {
-      width: 100%;
-      align-items: flex-start;
-      padding: 10px;
+    .modeButton {
+      flex: 1 1 120px;
+      min-height: 40px;
       white-space: normal;
-      background: rgba(255,255,255,.02);
-      box-shadow: 0 6px 18px rgba(0,0,0,.10);
     }
-    .toggle span:last-child {
-      min-width: 0;
-      overflow-wrap: anywhere;
+    .modeButton.on {
+      background: rgba(254,247,2,.9);
+      border-color: rgba(254,247,2,.95);
+      color: rgba(0,0,0,.92);
+      font-weight: 700;
     }
-    .toggle input { flex: 0 0 auto; margin-top: 2px; }
-    .toggle .swatch {
-      flex: 0 0 auto;
-      margin-top: 3px;
-      border-radius: 3px;
-    }
-    .actionRow {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-    }
-    .actionRow .btn {
-      width: 100%;
-      padding: 9px 8px;
-      white-space: normal;
-      text-align: center;
-    }
-    .legend {
+    .seriesGrid {
       display: flex;
       flex-direction: column;
+      flex-wrap: nowrap;
       gap: 8px;
     }
-    .legendItem {
+    .seriesItem {
+      appearance: none;
+      width: 100%;
       display: flex;
-      align-items: center;
-      gap: 8px;
-      color: rgba(255,255,255,.86);
+      align-items: flex-start;
+      gap: 10px;
+      padding: 10px 10px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.02);
+      color: inherit;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(0,0,0,.10);
+      cursor: pointer;
+      user-select: none;
+      min-width: 0;
+      font: inherit;
+      text-align: left;
+      transition: border-color .12s ease, opacity .12s ease;
+    }
+    .seriesItem:hover { border-color: rgba(254,247,2,.25); }
+    .seriesItem.isHidden { opacity: .35; }
+    .seriesSwatch {
+      width: 12px;
+      height: 12px;
+      margin-top: 2px;
+      border-radius: 3px;
+      flex: 0 0 auto;
+    }
+    .seriesName {
+      flex: 1 1 auto;
       font-size: calc(12px * var(--uiScale));
       line-height: 1.25;
+      min-width: 0;
+      overflow: visible;
+      text-overflow: clip;
+      white-space: normal;
+      overflow-wrap: anywhere;
+      word-break: break-word;
     }
-    .lineKey { flex: 0 0 auto; margin-right: 0; }
     .chartPanel { min-height: 0; display: flex; flex-direction: column; }
     .chartContent {
       min-height: 0;
       display: flex;
       flex: 1 1 auto;
       flex-direction: column;
+      gap: 10px;
       padding: 12px;
     }
     .chartBox {
@@ -568,6 +580,23 @@
       height: auto;
       border-radius: 12px;
     }
+    .footerSingle {
+      flex: 0 0 auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: 4px;
+      padding-bottom: 2px;
+      color: var(--muted);
+      font-size: calc(12px * var(--uiScale));
+      opacity: .85;
+    }
+    .sourceLink {
+      color: #fff;
+      text-decoration: none;
+    }
+    .sourceLink:hover { color: var(--accent); }
     @media (max-width: 900px) {
       body { height: auto; min-height: 100vh; overflow: auto; }
       header { padding: 18px 190px 8px 18px; }
@@ -604,30 +633,17 @@
     <section class="panel selectorPanel" aria-label="Datos del gráfico">
       <div class="panelHeader">
         <div class="panelTitleText">Datos del gráfico</div>
+        <div class="panelMeta">1900–2020</div>
       </div>
       <div class="panelContent selectorContent">
         <div class="field">
-          <div class="label">Modo JST</div>
+          <div class="label">Modo</div>
           <div class="modeRow" id="modeRow"></div>
         </div>
 
         <div class="field seriesField">
           <div class="label">Series visibles</div>
           <div class="seriesGrid" id="seriesGrid"></div>
-        </div>
-
-        <div class="field actionsField">
-          <div class="label">Selección</div>
-          <div class="actionRow">
-            <button class="btn" id="resetBtn" type="button">Restablecer</button>
-            <button class="btn" id="selectAllBtn" type="button">Todas</button>
-            <button class="btn" id="clearBtn" type="button">Ninguna</button>
-          </div>
-        </div>
-
-        <div class="field">
-          <div class="label">Leyenda</div>
-          <div class="legend" id="legend" aria-label="Leyenda de series visibles"></div>
         </div>
       </div>
     </section>
@@ -640,6 +656,9 @@
       <div class="chartContent">
         <div class="chartBox">
           <canvas aria-label="Gráfico de índices históricos" id="chart"></canvas>
+        </div>
+        <div class="footerSingle">
+          <span class="footerSource">Fuente: <a class="sourceLink" href="https://www.macrohistory.net/database/" target="_blank" rel="noopener noreferrer">Jordà-Schularick-Taylor Macrohistory Database</a> (<span style="color:#fff">JSTdatasetR6.xlsx</span>, R.6) · <span style="opacity:.9;">N.Geolitics</span></span>
         </div>
       </div>
     </section>
@@ -659,21 +678,14 @@
       seriesGrid: document.getElementById('seriesGrid'),
       chart: document.getElementById('chart'),
       status: document.getElementById('status'),
-      legend: document.getElementById('legend'),
       statsGrid: document.getElementById('statsGrid'),
-      seriesTable: document.getElementById('seriesTable'),
-      chartTitle: document.getElementById('chartTitle'),
-      chartSubtitle: document.getElementById('chartSubtitle'),
-      chartHead: document.querySelector('.chartHead'),
-      resetBtn: document.getElementById('resetBtn'),
-      selectAllBtn: document.getElementById('selectAllBtn'),
-      clearBtn: document.getElementById('clearBtn')
+      seriesTable: document.getElementById('seriesTable')
     };
     const ctx = els.chart.getContext('2d');
 
     const modeLabels = {
-      nominal: 'Nominal (precio, eq_capgain)',
-      real: 'Ajustado por inflación (TR real)'
+      nominal: 'Nominal',
+      real: 'Ajustado por inflación'
     };
 
     const historicalFragments = [
@@ -736,7 +748,9 @@
       }
     }
 
-    function currentSeries(){ return DATA.modes[state.mode]; }
+    function currentSeries(){
+      return DATA.modes[state.mode].filter(serie => String(serie.sid).startsWith('jst_'));
+    }
     function activeSeries(){
       return currentSeries().filter(s => state.visible.get(s.sid) === true);
     }
@@ -748,10 +762,13 @@
     function renderModes(){
       els.modeRow.innerHTML = '';
       for(const mode of Object.keys(DATA.modes)){
-        const label = document.createElement('label');
-        label.className = 'toggle';
-        label.innerHTML = `<input type="radio" name="mode" value="${mode}" ${mode === state.mode ? 'checked' : ''}> <span>${modeLabels[mode]}</span>`;
-        label.querySelector('input').addEventListener('change', () => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = `btn modeButton${mode === state.mode ? ' on' : ''}`;
+        button.textContent = modeLabels[mode];
+        button.setAttribute('aria-pressed', mode === state.mode ? 'true' : 'false');
+        button.addEventListener('click', () => {
+          if(mode === state.mode) return;
           const previous = new Map(state.visible);
           state.mode = mode;
           state.visible.clear();
@@ -761,23 +778,26 @@
           state.hover = null;
           renderAll();
         });
-        els.modeRow.appendChild(label);
+        els.modeRow.appendChild(button);
       }
     }
 
     function renderSeriesSelectors(){
       els.seriesGrid.innerHTML = '';
       for(const serie of currentSeries()){
-        const label = document.createElement('label');
-        label.className = 'toggle';
-        label.title = serie.source;
-        label.innerHTML = `<input type="checkbox" ${state.visible.get(serie.sid) ? 'checked' : ''}> <span class="swatch" style="background:${serie.color}"></span> <span>${serie.name}</span>`;
-        label.querySelector('input').addEventListener('change', (ev) => {
-          state.visible.set(serie.sid, ev.target.checked);
+        const isVisible = state.visible.get(serie.sid) === true;
+        const item = document.createElement('button');
+        item.type = 'button';
+        item.className = `seriesItem${isVisible ? '' : ' isHidden'}`;
+        item.title = serie.source;
+        item.setAttribute('aria-pressed', isVisible ? 'true' : 'false');
+        item.innerHTML = `<span class="seriesSwatch" style="background:${serie.color}"></span><span class="seriesName">${serie.name}</span>`;
+        item.addEventListener('click', () => {
+          state.visible.set(serie.sid, !state.visible.get(serie.sid));
           state.hover = null;
-          renderAll(false);
+          renderAll();
         });
-        els.seriesGrid.appendChild(label);
+        els.seriesGrid.appendChild(item);
       }
     }
 
@@ -787,7 +807,7 @@
       const margin = {
         left: width < 620 ? 58 : 88,
         right: width < 620 ? 18 : 34,
-        top: width < 620 ? 58 : 72,
+        top: width < 620 ? 50 : 52,
         bottom: width < 620 ? 72 : 96
       };
       const plotW = Math.max(1, width - margin.left - margin.right);
@@ -963,12 +983,6 @@
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
       ctx.fillText('Índices históricos', margin.left, 30);
-      ctx.font = '13px Arial';
-      ctx.fillStyle = '#b0b0b0';
-      const subtitle = state.mode === 'real'
-        ? (width < 620 ? 'JST: retorno total real ajustado' : 'JST en modo retorno total real ajustado por inflación')
-        : (width < 620 ? 'JST: precio nominal' : 'JST en modo precio nominal (eq_capgain)');
-      ctx.fillText(`Base 1900=100 · ${subtitle}`, margin.left, 52);
 
       ctx.save();
       ctx.translate(width < 620 ? 18 : 24, margin.top + plotH / 2);
@@ -1017,17 +1031,6 @@
       }).join(' | ');
     }
 
-    function renderLegend(){
-      if(!els.legend) return;
-      els.legend.innerHTML = '';
-      for(const serie of activeSeries()){
-        const item = document.createElement('span');
-        item.className = 'legendItem';
-        item.innerHTML = `<span class="lineKey" style="background:${serie.color}"></span>${serie.name}`;
-        els.legend.appendChild(item);
-      }
-    }
-
     function renderStats(){
       if(!els.statsGrid) return;
       const active = activeSeries();
@@ -1068,23 +1071,10 @@
       }).join('');
     }
 
-    function renderText(){
-      const hideJstHeader = state.mode === 'real';
-      if(els.chartHead) els.chartHead.style.display = hideJstHeader ? 'none' : '';
-      if(els.chartTitle) els.chartTitle.textContent = hideJstHeader ? '' : 'Índices de precio históricos';
-      if(els.chartSubtitle) {
-        els.chartSubtitle.textContent = hideJstHeader
-          ? ''
-          : 'Todas las series están rebasadas a 1900=100; Alemania nominal queda desactivada por defecto por la hiperinflación.';
-      }
-    }
-
     function renderAll(rebuildSelectors = true){
       renderModes();
       if(rebuildSelectors) renderSeriesSelectors();
-      renderText();
       draw();
-      renderLegend();
       renderStats();
       renderTable();
     }
@@ -1103,15 +1093,6 @@
     }, {passive:true});
     els.chart.addEventListener('touchend', () => { state.hover = null; draw(); });
 
-    if(els.resetBtn) els.resetBtn.addEventListener('click', () => { initVisibility(); state.hover = null; renderAll(); });
-    if(els.selectAllBtn) els.selectAllBtn.addEventListener('click', () => {
-      for(const s of currentSeries()) state.visible.set(s.sid, true);
-      state.hover = null; renderAll();
-    });
-    if(els.clearBtn) els.clearBtn.addEventListener('click', () => {
-      for(const s of currentSeries()) state.visible.set(s.sid, false);
-      state.hover = null; renderAll();
-    });
     window.addEventListener('resize', () => draw());
 
     initVisibility();
