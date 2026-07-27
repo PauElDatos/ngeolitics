@@ -402,6 +402,23 @@
       flex-direction: column;
       gap: 10px;
     }
+    .chartModeBar {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      flex: 0 0 auto;
+    }
+    .chartModeButton {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 10px;
+      font-family: var(--fontTitle);
+      font-size: calc(13px * var(--uiScale));
+      letter-spacing: .2px;
+      white-space: normal;
+    }
+    .isHidden { display: none !important; }
     .chartBox {
       width: 100%;
       min-height: 420px;
@@ -487,6 +504,24 @@
       }
       .chartNotes { flex-direction: column; }
       .tooltip { min-width: min(290px, calc(100vw - 64px)); }
+      .chartModeBar { gap: 8px; }
+      .chartModeButton {
+        min-height: 44px;
+        font-size: calc(11px * var(--uiScale));
+      }
+      .chartPanel.populationMode {
+        height: auto;
+        min-height: 0;
+      }
+      body.populationChartMode .seriesLegend {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+      body.populationChartMode .legendItem {
+        padding: 8px;
+        gap: 7px;
+        font-size: calc(10px * var(--uiScale));
+      }
     }
   </style>
 </head>
@@ -506,17 +541,17 @@
         <div class="panelMeta" id="topMeta"></div>
       </div>
       <div class="panelContent selectorContent">
-          <div class="field">
+          <div class="field" id="amountField">
             <div class="label">Importes</div>
             <div class="segmented" id="modeButtons"></div>
           </div>
 
-          <div class="field">
+          <div class="field" id="scaleField">
             <div class="label">Escala</div>
             <div class="segmented" id="scaleButtons"></div>
           </div>
 
-          <div class="field">
+          <div class="field" id="countField">
             <div class="label">Tramos visibles</div>
             <div class="segmented" id="countButtons"></div>
           </div>
@@ -536,6 +571,11 @@
       </div>
 
       <div class="chartContent">
+        <div class="chartModeBar" role="group" aria-label="Selector de gráfico">
+          <button class="btn chartModeButton active" id="btnChartLimits" type="button" aria-pressed="true">Límites del IRPF</button>
+          <button class="btn chartModeButton" id="btnChartPopulation" type="button" aria-pressed="false">Población por tramo</button>
+        </div>
+
         <div class="chartBox" id="chartBox">
           <svg id="chart" viewBox="0 0 1600 760" preserveAspectRatio="none" aria-label="Gráfica de tramos del IRPF"></svg>
           <div class="tooltip" id="tooltip"></div>
@@ -550,7 +590,7 @@
           <div class="legendInline" id="rateEncodingNote"></div>
         </div>
 
-        <div class="footerSingle">
+        <div class="footerSingle" id="sourceFooter">
           Fuente: <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> (tramos del IRPF), BM (PIB/deflactor) · <span style="opacity:.9;">N.Geolitics</span>
         </div>
       </div>
@@ -560,7 +600,7 @@
       <div class="panelHeader">
         <div class="panelTitleText">Explicación</div>
       </div>
-      <div class="panelContent explanationContent">
+      <div class="panelContent explanationContent" id="explanationContent">
         <p>
           Cada serie representa la evolución del <strong>límite superior</strong> de un tramo estatal o general del IRPF. Los importes anteriores al euro se convierten desde pesetas con la equivalencia legal.
         </p>
@@ -574,12 +614,18 @@
     </section>
   </main>
 
+  <script src="renta_por_quintiles_data.js"></script>
   <script>
     const DATA = [{"year":1990,"regime":"1990_1996_general_only","deflator_hasta_1986":0.8,"deflator_hasta_1990":1.0,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1989-30591","row_count":16,"finite_bracket_count":15,"gdp_pc_nominal_eur":8450.83,"gdp_pc_real_eur_1990":8450.83,"brackets":[{"index":1,"rate":25.0,"lower_original":648900.0,"upper_original":1081500.0,"lower_nominal_eur":3899.9675453463633,"upper_nominal_eur":6499.945908910606,"lower_real_eur_1990":3899.9675453463633,"upper_real_eur_1990":6499.945908910606,"is_open":false},{"index":2,"rate":26.0,"lower_original":1081500.0,"upper_original":1622250.0,"lower_nominal_eur":6499.945908910606,"upper_nominal_eur":9749.918863365909,"lower_real_eur_1990":6499.945908910606,"upper_real_eur_1990":9749.918863365909,"is_open":false},{"index":3,"rate":27.0,"lower_original":1622250.0,"upper_original":2163000.0,"lower_nominal_eur":9749.918863365909,"upper_nominal_eur":12999.891817821212,"lower_real_eur_1990":9749.918863365909,"upper_real_eur_1990":12999.891817821212,"is_open":false},{"index":4,"rate":28.0,"lower_original":2163000.0,"upper_original":2703750.0,"lower_nominal_eur":12999.891817821212,"upper_nominal_eur":16249.864772276514,"lower_real_eur_1990":12999.891817821212,"upper_real_eur_1990":16249.864772276514,"is_open":false},{"index":5,"rate":30.0,"lower_original":2703750.0,"upper_original":3244500.0,"lower_nominal_eur":16249.864772276514,"upper_nominal_eur":19499.837726731817,"lower_real_eur_1990":16249.864772276514,"upper_real_eur_1990":19499.837726731817,"is_open":false},{"index":6,"rate":32.0,"lower_original":3244500.0,"upper_original":3785250.0,"lower_nominal_eur":19499.837726731817,"upper_nominal_eur":22749.81068118712,"lower_real_eur_1990":19499.837726731817,"upper_real_eur_1990":22749.81068118712,"is_open":false},{"index":7,"rate":34.0,"lower_original":3785250.0,"upper_original":4326000.0,"lower_nominal_eur":22749.81068118712,"upper_nominal_eur":25999.783635642423,"lower_real_eur_1990":22749.81068118712,"upper_real_eur_1990":25999.783635642423,"is_open":false},{"index":8,"rate":36.0,"lower_original":4326000.0,"upper_original":4866750.0,"lower_nominal_eur":25999.783635642423,"upper_nominal_eur":29249.756590097724,"lower_real_eur_1990":25999.783635642423,"upper_real_eur_1990":29249.756590097724,"is_open":false},{"index":9,"rate":38.5,"lower_original":4866750.0,"upper_original":5407500.0,"lower_nominal_eur":29249.756590097724,"upper_nominal_eur":32499.72954455303,"lower_real_eur_1990":29249.756590097724,"upper_real_eur_1990":32499.72954455303,"is_open":false},{"index":10,"rate":41.0,"lower_original":5407500.0,"upper_original":5948250.0,"lower_nominal_eur":32499.72954455303,"upper_nominal_eur":35749.70249900833,"lower_real_eur_1990":32499.72954455303,"upper_real_eur_1990":35749.70249900833,"is_open":false},{"index":11,"rate":43.5,"lower_original":5948250.0,"upper_original":6489000.0,"lower_nominal_eur":35749.70249900833,"upper_nominal_eur":38999.675453463635,"lower_real_eur_1990":35749.70249900833,"upper_real_eur_1990":38999.675453463635,"is_open":false},{"index":12,"rate":46.0,"lower_original":6489000.0,"upper_original":7029750.0,"lower_nominal_eur":38999.675453463635,"upper_nominal_eur":42249.64840791894,"lower_real_eur_1990":38999.675453463635,"upper_real_eur_1990":42249.64840791894,"is_open":false},{"index":13,"rate":48.5,"lower_original":7029750.0,"upper_original":7570500.0,"lower_nominal_eur":42249.64840791894,"upper_nominal_eur":45499.62136237424,"lower_real_eur_1990":42249.64840791894,"upper_real_eur_1990":45499.62136237424,"is_open":false},{"index":14,"rate":51.0,"lower_original":7570500.0,"upper_original":8111250.0,"lower_nominal_eur":45499.62136237424,"upper_nominal_eur":48749.59431682954,"lower_real_eur_1990":45499.62136237424,"upper_real_eur_1990":48749.59431682954,"is_open":false},{"index":15,"rate":53.5,"lower_original":8111250.0,"upper_original":8652000.0,"lower_nominal_eur":48749.59431682954,"upper_nominal_eur":51999.567271284846,"lower_real_eur_1990":48749.59431682954,"upper_real_eur_1990":51999.567271284846,"is_open":false},{"index":16,"rate":56.0,"lower_original":8652000.0,"upper_original":null,"lower_nominal_eur":51999.567271284846,"upper_nominal_eur":null,"lower_real_eur_1990":51999.567271284846,"upper_real_eur_1990":null,"is_open":true}]},{"year":1992,"regime":"1990_1996_general_only","deflator_hasta_1986":0.71,"deflator_hasta_1990":0.8875,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1991-14391","row_count":17,"finite_bracket_count":16,"gdp_pc_nominal_eur":9906.75,"gdp_pc_real_eur_1990":8792.240625,"brackets":[{"index":1,"rate":20.0,"lower_original":400000.0,"upper_original":1000000.0,"lower_nominal_eur":2404.0484175351294,"upper_nominal_eur":6010.121043837823,"lower_real_eur_1990":2133.592970562427,"upper_real_eur_1990":5333.982426406068,"is_open":false},{"index":2,"rate":22.0,"lower_original":1000000.0,"upper_original":1570000.0,"lower_nominal_eur":6010.121043837823,"upper_nominal_eur":9435.890038825382,"lower_real_eur_1990":5333.982426406068,"upper_real_eur_1990":8374.352409457526,"is_open":false},{"index":3,"rate":24.0,"lower_original":1570000.0,"upper_original":2140000.0,"lower_nominal_eur":9435.890038825382,"upper_nominal_eur":12861.65903381294,"lower_real_eur_1990":8374.352409457526,"upper_real_eur_1990":11414.722392508984,"is_open":false},{"index":4,"rate":26.0,"lower_original":2140000.0,"upper_original":2710000.0,"lower_nominal_eur":12861.65903381294,"upper_nominal_eur":16287.428028800501,"lower_real_eur_1990":11414.722392508984,"upper_real_eur_1990":14455.092375560444,"is_open":false},{"index":5,"rate":28.0,"lower_original":2710000.0,"upper_original":3280000.0,"lower_nominal_eur":16287.428028800501,"upper_nominal_eur":19713.19702378806,"lower_real_eur_1990":14455.092375560444,"upper_real_eur_1990":17495.4623586119,"is_open":false},{"index":6,"rate":30.0,"lower_original":3280000.0,"upper_original":3850000.0,"lower_nominal_eur":19713.19702378806,"upper_nominal_eur":23138.96601877562,"lower_real_eur_1990":17495.4623586119,"upper_real_eur_1990":20535.83234166336,"is_open":false},{"index":7,"rate":32.0,"lower_original":3850000.0,"upper_original":4420000.0,"lower_nominal_eur":23138.96601877562,"upper_nominal_eur":26564.735013763177,"lower_real_eur_1990":20535.83234166336,"upper_real_eur_1990":23576.202324714817,"is_open":false},{"index":8,"rate":34.0,"lower_original":4420000.0,"upper_original":4990000.0,"lower_nominal_eur":26564.735013763177,"upper_nominal_eur":29990.504008750737,"lower_real_eur_1990":23576.202324714817,"upper_real_eur_1990":26616.572307766277,"is_open":false},{"index":9,"rate":36.0,"lower_original":4990000.0,"upper_original":5560000.0,"lower_nominal_eur":29990.504008750737,"upper_nominal_eur":33416.27300373829,"lower_real_eur_1990":26616.572307766277,"upper_real_eur_1990":29656.942290817733,"is_open":false},{"index":10,"rate":38.0,"lower_original":5560000.0,"upper_original":6130000.0,"lower_nominal_eur":33416.27300373829,"upper_nominal_eur":36842.04199872586,"lower_real_eur_1990":29656.942290817733,"upper_real_eur_1990":32697.312273869196,"is_open":false},{"index":11,"rate":40.0,"lower_original":6130000.0,"upper_original":6700000.0,"lower_nominal_eur":36842.04199872586,"upper_nominal_eur":40267.810993713414,"lower_real_eur_1990":32697.312273869196,"upper_real_eur_1990":35737.682256920656,"is_open":false},{"index":12,"rate":42.0,"lower_original":6700000.0,"upper_original":7270000.0,"lower_nominal_eur":40267.810993713414,"upper_nominal_eur":43693.57998870097,"lower_real_eur_1990":35737.682256920656,"upper_real_eur_1990":38778.05223997211,"is_open":false},{"index":13,"rate":44.0,"lower_original":7270000.0,"upper_original":7840000.0,"lower_nominal_eur":43693.57998870097,"upper_nominal_eur":47119.348983688535,"lower_real_eur_1990":38778.05223997211,"upper_real_eur_1990":41818.422223023575,"is_open":false},{"index":14,"rate":46.0,"lower_original":7840000.0,"upper_original":8410000.0,"lower_nominal_eur":47119.348983688535,"upper_nominal_eur":50545.11797867609,"lower_real_eur_1990":41818.422223023575,"upper_real_eur_1990":44858.79220607503,"is_open":false},{"index":15,"rate":48.0,"lower_original":8410000.0,"upper_original":8980000.0,"lower_nominal_eur":50545.11797867609,"upper_nominal_eur":53970.88697366365,"lower_real_eur_1990":44858.79220607503,"upper_real_eur_1990":47899.16218912649,"is_open":false},{"index":16,"rate":50.5,"lower_original":8980000.0,"upper_original":9550000.0,"lower_nominal_eur":53970.88697366365,"upper_nominal_eur":57396.65596865121,"lower_real_eur_1990":47899.16218912649,"upper_real_eur_1990":50939.53217217795,"is_open":false},{"index":17,"rate":53.0,"lower_original":9550000.0,"upper_original":null,"lower_nominal_eur":57396.65596865121,"upper_nominal_eur":null,"lower_real_eur_1990":50939.53217217795,"upper_real_eur_1990":null,"is_open":true}]},{"year":1994,"regime":"1990_1996_general_only","deflator_hasta_1986":0.65,"deflator_hasta_1990":0.8125,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1993-31087","row_count":17,"finite_bracket_count":16,"gdp_pc_nominal_eur":10792.93,"gdp_pc_real_eur_1990":8769.255625,"brackets":[{"index":1,"rate":20.0,"lower_original":400000.0,"upper_original":1000000.0,"lower_nominal_eur":2404.0484175351294,"upper_nominal_eur":6010.121043837823,"lower_real_eur_1990":1953.2893392472927,"upper_real_eur_1990":4883.223348118231,"is_open":false},{"index":2,"rate":22.0,"lower_original":1000000.0,"upper_original":1570000.0,"lower_nominal_eur":6010.121043837823,"upper_nominal_eur":9435.890038825382,"lower_real_eur_1990":4883.223348118231,"upper_real_eur_1990":7666.660656545623,"is_open":false},{"index":3,"rate":24.5,"lower_original":1570000.0,"upper_original":2140000.0,"lower_nominal_eur":9435.890038825382,"upper_nominal_eur":12861.65903381294,"lower_real_eur_1990":7666.660656545623,"upper_real_eur_1990":10450.097964973014,"is_open":false},{"index":4,"rate":27.0,"lower_original":2140000.0,"upper_original":2710000.0,"lower_nominal_eur":12861.65903381294,"upper_nominal_eur":16287.428028800501,"lower_real_eur_1990":10450.097964973014,"upper_real_eur_1990":13233.535273400406,"is_open":false},{"index":5,"rate":30.0,"lower_original":2710000.0,"upper_original":3280000.0,"lower_nominal_eur":16287.428028800501,"upper_nominal_eur":19713.19702378806,"lower_real_eur_1990":13233.535273400406,"upper_real_eur_1990":16016.972581827798,"is_open":false},{"index":6,"rate":32.0,"lower_original":3280000.0,"upper_original":3850000.0,"lower_nominal_eur":19713.19702378806,"upper_nominal_eur":23138.96601877562,"lower_real_eur_1990":16016.972581827798,"upper_real_eur_1990":18800.409890255192,"is_open":false},{"index":7,"rate":34.0,"lower_original":3850000.0,"upper_original":4420000.0,"lower_nominal_eur":23138.96601877562,"upper_nominal_eur":26564.735013763177,"lower_real_eur_1990":18800.409890255192,"upper_real_eur_1990":21583.847198682583,"is_open":false},{"index":8,"rate":36.0,"lower_original":4420000.0,"upper_original":4990000.0,"lower_nominal_eur":26564.735013763177,"upper_nominal_eur":29990.504008750737,"lower_real_eur_1990":21583.847198682583,"upper_real_eur_1990":24367.284507109973,"is_open":false},{"index":9,"rate":38.0,"lower_original":4990000.0,"upper_original":5560000.0,"lower_nominal_eur":29990.504008750737,"upper_nominal_eur":33416.27300373829,"lower_real_eur_1990":24367.284507109973,"upper_real_eur_1990":27150.721815537363,"is_open":false},{"index":10,"rate":40.0,"lower_original":5560000.0,"upper_original":6130000.0,"lower_nominal_eur":33416.27300373829,"upper_nominal_eur":36842.04199872586,"lower_real_eur_1990":27150.721815537363,"upper_real_eur_1990":29934.15912396476,"is_open":false},{"index":11,"rate":42.5,"lower_original":6130000.0,"upper_original":6700000.0,"lower_nominal_eur":36842.04199872586,"upper_nominal_eur":40267.810993713414,"lower_real_eur_1990":29934.15912396476,"upper_real_eur_1990":32717.59643239215,"is_open":false},{"index":12,"rate":45.0,"lower_original":6700000.0,"upper_original":7270000.0,"lower_nominal_eur":40267.810993713414,"upper_nominal_eur":43693.57998870097,"lower_real_eur_1990":32717.59643239215,"upper_real_eur_1990":35501.03374081954,"is_open":false},{"index":13,"rate":47.0,"lower_original":7270000.0,"upper_original":7840000.0,"lower_nominal_eur":43693.57998870097,"upper_nominal_eur":47119.348983688535,"lower_real_eur_1990":35501.03374081954,"upper_real_eur_1990":38284.47104924693,"is_open":false},{"index":14,"rate":49.0,"lower_original":7840000.0,"upper_original":8410000.0,"lower_nominal_eur":47119.348983688535,"upper_nominal_eur":50545.11797867609,"lower_real_eur_1990":38284.47104924693,"upper_real_eur_1990":41067.90835767432,"is_open":false},{"index":15,"rate":51.0,"lower_original":8410000.0,"upper_original":8980000.0,"lower_nominal_eur":50545.11797867609,"upper_nominal_eur":53970.88697366365,"lower_real_eur_1990":41067.90835767432,"upper_real_eur_1990":43851.34566610171,"is_open":false},{"index":16,"rate":53.5,"lower_original":8980000.0,"upper_original":9550000.0,"lower_nominal_eur":53970.88697366365,"upper_nominal_eur":57396.65596865121,"lower_real_eur_1990":43851.34566610171,"upper_real_eur_1990":46634.78297452911,"is_open":false},{"index":17,"rate":56.0,"lower_original":9550000.0,"upper_original":null,"lower_nominal_eur":57396.65596865121,"upper_nominal_eur":null,"lower_real_eur_1990":46634.78297452911,"upper_real_eur_1990":null,"is_open":true}]},{"year":1995,"regime":"1990_1996_general_only","deflator_hasta_1986":0.62,"deflator_hasta_1990":0.7749999999999999,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1994-28967","row_count":18,"finite_bracket_count":17,"gdp_pc_nominal_eur":11586.41,"gdp_pc_real_eur_1990":8979.467749999998,"brackets":[{"index":1,"rate":0.0,"lower_original":0.0,"upper_original":415000.0,"lower_nominal_eur":0.0,"upper_nominal_eur":2494.2002331926965,"lower_real_eur_1990":0.0,"upper_real_eur_1990":1933.0051807243397,"is_open":false},{"index":2,"rate":20.0,"lower_original":415000.0,"upper_original":1035000.0,"lower_nominal_eur":2494.2002331926965,"upper_nominal_eur":6220.475280372147,"lower_real_eur_1990":1933.0051807243397,"upper_real_eur_1990":4820.868342288413,"is_open":false},{"index":3,"rate":22.0,"lower_original":1035000.0,"upper_original":1625000.0,"lower_nominal_eur":6220.475280372147,"upper_nominal_eur":9766.446696236462,"lower_real_eur_1990":4820.868342288413,"upper_real_eur_1990":7568.996189583258,"is_open":false},{"index":4,"rate":24.5,"lower_original":1625000.0,"upper_original":2215000.0,"lower_nominal_eur":9766.446696236462,"upper_nominal_eur":13312.418112100779,"lower_real_eur_1990":7568.996189583258,"upper_real_eur_1990":10317.124036878102,"is_open":false},{"index":5,"rate":27.0,"lower_original":2215000.0,"upper_original":2805000.0,"lower_nominal_eur":13312.418112100779,"upper_nominal_eur":16858.389527965093,"lower_real_eur_1990":10317.124036878102,"upper_real_eur_1990":13065.251884172945,"is_open":false},{"index":6,"rate":30.0,"lower_original":2805000.0,"upper_original":3395000.0,"lower_nominal_eur":16858.389527965093,"upper_nominal_eur":20404.360943829408,"lower_real_eur_1990":13065.251884172945,"upper_real_eur_1990":15813.379731467789,"is_open":false},{"index":7,"rate":32.0,"lower_original":3395000.0,"upper_original":3985000.0,"lower_nominal_eur":20404.360943829408,"upper_nominal_eur":23950.332359693726,"lower_real_eur_1990":15813.379731467789,"upper_real_eur_1990":18561.507578762637,"is_open":false},{"index":8,"rate":34.0,"lower_original":3985000.0,"upper_original":4575000.0,"lower_nominal_eur":23950.332359693726,"upper_nominal_eur":27496.30377555804,"lower_real_eur_1990":18561.507578762637,"upper_real_eur_1990":21309.63542605748,"is_open":false},{"index":9,"rate":36.0,"lower_original":4575000.0,"upper_original":5165000.0,"lower_nominal_eur":27496.30377555804,"upper_nominal_eur":31042.275191422355,"lower_real_eur_1990":21309.63542605748,"upper_real_eur_1990":24057.763273352324,"is_open":false},{"index":10,"rate":38.0,"lower_original":5165000.0,"upper_original":5755000.0,"lower_nominal_eur":31042.275191422355,"upper_nominal_eur":34588.246607286674,"lower_real_eur_1990":24057.763273352324,"upper_real_eur_1990":26805.891120647168,"is_open":false},{"index":11,"rate":40.0,"lower_original":5755000.0,"upper_original":6345000.0,"lower_nominal_eur":34588.246607286674,"upper_nominal_eur":38134.218023150985,"lower_real_eur_1990":26805.891120647168,"upper_real_eur_1990":29554.01896794201,"is_open":false},{"index":12,"rate":42.5,"lower_original":6345000.0,"upper_original":6935000.0,"lower_nominal_eur":38134.218023150985,"upper_nominal_eur":41680.1894390153,"lower_real_eur_1990":29554.01896794201,"upper_real_eur_1990":32302.146815236854,"is_open":false},{"index":13,"rate":45.0,"lower_original":6935000.0,"upper_original":7525000.0,"lower_nominal_eur":41680.1894390153,"upper_nominal_eur":45226.16085487962,"lower_real_eur_1990":32302.146815236854,"upper_real_eur_1990":35050.2746625317,"is_open":false},{"index":14,"rate":47.0,"lower_original":7525000.0,"upper_original":8115000.0,"lower_nominal_eur":45226.16085487962,"upper_nominal_eur":48772.13227074393,"lower_real_eur_1990":35050.2746625317,"upper_real_eur_1990":37798.40250982654,"is_open":false},{"index":15,"rate":49.0,"lower_original":8115000.0,"upper_original":8705000.0,"lower_nominal_eur":48772.13227074393,"upper_nominal_eur":52318.10368660825,"lower_real_eur_1990":37798.40250982654,"upper_real_eur_1990":40546.53035712139,"is_open":false},{"index":16,"rate":51.0,"lower_original":8705000.0,"upper_original":9295000.0,"lower_nominal_eur":52318.10368660825,"upper_nominal_eur":55864.07510247257,"lower_real_eur_1990":40546.53035712139,"upper_real_eur_1990":43294.658204416235,"is_open":false},{"index":17,"rate":53.5,"lower_original":9295000.0,"upper_original":9885000.0,"lower_nominal_eur":55864.07510247257,"upper_nominal_eur":59410.04651833688,"lower_real_eur_1990":43294.658204416235,"upper_real_eur_1990":46042.786051711075,"is_open":false},{"index":18,"rate":56.0,"lower_original":9885000.0,"upper_original":null,"lower_nominal_eur":59410.04651833688,"upper_nominal_eur":null,"lower_real_eur_1990":46042.786051711075,"upper_real_eur_1990":null,"is_open":true}]},{"year":1996,"regime":"1990_1996_general_only","deflator_hasta_1986":0.6,"deflator_hasta_1990":0.7499999999999999,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1995-27964","row_count":18,"finite_bracket_count":17,"gdp_pc_nominal_eur":12257.4,"gdp_pc_real_eur_1990":9193.05,"brackets":[{"index":1,"rate":0.0,"lower_original":0.0,"upper_original":430000.0,"lower_nominal_eur":0.0,"upper_nominal_eur":2584.352048850264,"lower_real_eur_1990":0.0,"upper_real_eur_1990":1938.2640366376977,"is_open":false},{"index":2,"rate":20.0,"lower_original":430000.0,"upper_original":1072000.0,"lower_nominal_eur":2584.352048850264,"upper_nominal_eur":6442.849758994146,"lower_real_eur_1990":1938.2640366376977,"upper_real_eur_1990":4832.1373192456085,"is_open":false},{"index":3,"rate":22.0,"lower_original":1072000.0,"upper_original":1682000.0,"lower_nominal_eur":6442.849758994146,"upper_nominal_eur":10109.023595735218,"lower_real_eur_1990":4832.1373192456085,"upper_real_eur_1990":7581.767696801412,"is_open":false},{"index":4,"rate":24.5,"lower_original":1682000.0,"upper_original":2292000.0,"lower_nominal_eur":10109.023595735218,"upper_nominal_eur":13775.19743247629,"lower_real_eur_1990":7581.767696801412,"upper_real_eur_1990":10331.398074357216,"is_open":false},{"index":5,"rate":27.0,"lower_original":2292000.0,"upper_original":2902000.0,"lower_nominal_eur":13775.19743247629,"upper_nominal_eur":17441.37126921736,"lower_real_eur_1990":10331.398074357216,"upper_real_eur_1990":13081.028451913018,"is_open":false},{"index":6,"rate":30.0,"lower_original":2902000.0,"upper_original":3512000.0,"lower_nominal_eur":17441.37126921736,"upper_nominal_eur":21107.545105958434,"lower_real_eur_1990":13081.028451913018,"upper_real_eur_1990":15830.658829468823,"is_open":false},{"index":7,"rate":32.0,"lower_original":3512000.0,"upper_original":4122000.0,"lower_nominal_eur":21107.545105958434,"upper_nominal_eur":24773.718942699506,"lower_real_eur_1990":15830.658829468823,"upper_real_eur_1990":18580.289207024627,"is_open":false},{"index":8,"rate":34.0,"lower_original":4122000.0,"upper_original":4732000.0,"lower_nominal_eur":24773.718942699506,"upper_nominal_eur":28439.89277944058,"lower_real_eur_1990":18580.289207024627,"upper_real_eur_1990":21329.91958458043,"is_open":false},{"index":9,"rate":36.0,"lower_original":4732000.0,"upper_original":5342000.0,"lower_nominal_eur":28439.89277944058,"upper_nominal_eur":32106.06661618165,"lower_real_eur_1990":21329.91958458043,"upper_real_eur_1990":24079.549962136236,"is_open":false},{"index":10,"rate":38.0,"lower_original":5342000.0,"upper_original":5952000.0,"lower_nominal_eur":32106.06661618165,"upper_nominal_eur":35772.24045292272,"lower_real_eur_1990":24079.549962136236,"upper_real_eur_1990":26829.180339692037,"is_open":false},{"index":11,"rate":40.0,"lower_original":5952000.0,"upper_original":6562000.0,"lower_nominal_eur":35772.24045292272,"upper_nominal_eur":39438.41428966379,"lower_real_eur_1990":26829.180339692037,"upper_real_eur_1990":29578.81071724784,"is_open":false},{"index":12,"rate":42.5,"lower_original":6562000.0,"upper_original":7172000.0,"lower_nominal_eur":39438.41428966379,"upper_nominal_eur":43104.588126404866,"lower_real_eur_1990":29578.81071724784,"upper_real_eur_1990":32328.441094803646,"is_open":false},{"index":13,"rate":45.0,"lower_original":7172000.0,"upper_original":7782000.0,"lower_nominal_eur":43104.588126404866,"upper_nominal_eur":46770.76196314594,"lower_real_eur_1990":32328.441094803646,"upper_real_eur_1990":35078.07147235945,"is_open":false},{"index":14,"rate":47.0,"lower_original":7782000.0,"upper_original":8392000.0,"lower_nominal_eur":46770.76196314594,"upper_nominal_eur":50436.93579988701,"lower_real_eur_1990":35078.07147235945,"upper_real_eur_1990":37827.701849915255,"is_open":false},{"index":15,"rate":49.0,"lower_original":8392000.0,"upper_original":9002000.0,"lower_nominal_eur":50436.93579988701,"upper_nominal_eur":54103.10963662808,"lower_real_eur_1990":37827.701849915255,"upper_real_eur_1990":40577.33222747106,"is_open":false},{"index":16,"rate":51.0,"lower_original":9002000.0,"upper_original":9612000.0,"lower_nominal_eur":54103.10963662808,"upper_nominal_eur":57769.283473369156,"lower_real_eur_1990":40577.33222747106,"upper_real_eur_1990":43326.96260502686,"is_open":false},{"index":17,"rate":53.5,"lower_original":9612000.0,"upper_original":10222000.0,"lower_nominal_eur":57769.283473369156,"upper_nominal_eur":61435.45731011023,"lower_real_eur_1990":43326.96260502686,"upper_real_eur_1990":46076.59298258267,"is_open":false},{"index":18,"rate":56.0,"lower_original":10222000.0,"upper_original":null,"lower_nominal_eur":61435.45731011023,"upper_nominal_eur":null,"lower_real_eur_1990":46076.59298258267,"upper_real_eur_1990":null,"is_open":true}]},{"year":1997,"regime":"1997_1999_state_plus_autonomous_reference","deflator_hasta_1986":0.59,"deflator_hasta_1990":0.7374999999999999,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1996-29118","row_count":10,"finite_bracket_count":9,"gdp_pc_nominal_eur":12955.69,"gdp_pc_real_eur_1990":9554.821375,"brackets":[{"index":1,"rate":17.0,"lower_original":442000.0,"upper_original":1136000.0,"lower_nominal_eur":2656.473501376318,"upper_nominal_eur":6827.497505799767,"lower_real_eur_1990":1959.1492072650342,"upper_real_eur_1990":5035.279410527328,"is_open":false},{"index":2,"rate":19.55,"lower_original":1136000.0,"upper_original":2305000.0,"lower_nominal_eur":6827.497505799767,"upper_nominal_eur":13853.329006046182,"lower_real_eur_1990":5035.279410527328,"upper_real_eur_1990":10216.830141959059,"is_open":false},{"index":3,"rate":23.8,"lower_original":2305000.0,"upper_original":3474000.0,"lower_nominal_eur":13853.329006046182,"upper_nominal_eur":20879.160506292596,"lower_real_eur_1990":10216.830141959059,"upper_real_eur_1990":15398.380873390788,"is_open":false},{"index":4,"rate":27.2,"lower_original":3474000.0,"upper_original":4643000.0,"lower_nominal_eur":20879.160506292596,"upper_nominal_eur":27904.99200653901,"lower_real_eur_1990":15398.380873390788,"upper_real_eur_1990":20579.93160482252,"is_open":false},{"index":5,"rate":30.6,"lower_original":4643000.0,"upper_original":5812000.0,"lower_nominal_eur":27904.99200653901,"upper_nominal_eur":34930.823506785426,"lower_real_eur_1990":20579.93160482252,"upper_real_eur_1990":25761.48233625425,"is_open":false},{"index":6,"rate":34.0,"lower_original":5812000.0,"upper_original":6981000.0,"lower_nominal_eur":34930.823506785426,"upper_nominal_eur":41956.65500703184,"lower_real_eur_1990":25761.48233625425,"upper_real_eur_1990":30943.03306768598,"is_open":false},{"index":7,"rate":38.25,"lower_original":6981000.0,"upper_original":8150000.0,"lower_nominal_eur":41956.65500703184,"upper_nominal_eur":48982.486507278256,"lower_real_eur_1990":30943.03306768598,"upper_real_eur_1990":36124.58379911771,"is_open":false},{"index":8,"rate":41.65,"lower_original":8150000.0,"upper_original":9319000.0,"lower_nominal_eur":48982.486507278256,"upper_nominal_eur":56008.31800752467,"lower_real_eur_1990":36124.58379911771,"upper_real_eur_1990":41306.13453054944,"is_open":false},{"index":9,"rate":45.05,"lower_original":9319000.0,"upper_original":10488000.0,"lower_nominal_eur":56008.31800752467,"upper_nominal_eur":63034.149507771086,"lower_real_eur_1990":41306.13453054944,"upper_real_eur_1990":46487.68526198117,"is_open":false},{"index":10,"rate":47.6,"lower_original":10488000.0,"upper_original":null,"lower_nominal_eur":63034.149507771086,"upper_nominal_eur":null,"lower_real_eur_1990":46487.68526198117,"upper_real_eur_1990":null,"is_open":true}]},{"year":1998,"regime":"1997_1999_state_plus_autonomous_reference","deflator_hasta_1986":0.57,"deflator_hasta_1990":0.7124999999999999,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1997-28052","row_count":8,"finite_bracket_count":7,"gdp_pc_nominal_eur":13811.8,"gdp_pc_real_eur_1990":9840.907499999998,"brackets":[{"index":1,"rate":17.0,"lower_original":467000.0,"upper_original":1161000.0,"lower_nominal_eur":2806.7265274722636,"upper_nominal_eur":6977.750531895713,"lower_real_eur_1990":1999.7926508239875,"upper_real_eur_1990":4971.647253975695,"is_open":false},{"index":2,"rate":19.55,"lower_original":1161000.0,"upper_original":2295000.0,"lower_nominal_eur":6977.750531895713,"upper_nominal_eur":13793.227795607803,"lower_real_eur_1990":4971.647253975695,"upper_real_eur_1990":9827.67480437056,"is_open":false},{"index":3,"rate":23.8,"lower_original":2295000.0,"upper_original":3495000.0,"lower_nominal_eur":13793.227795607803,"upper_nominal_eur":21005.37304821319,"lower_real_eur_1990":9827.67480437056,"upper_real_eur_1990":14966.328296851896,"is_open":false},{"index":4,"rate":27.2,"lower_original":3495000.0,"upper_original":5095000.0,"lower_nominal_eur":21005.37304821319,"upper_nominal_eur":30621.566718353708,"lower_real_eur_1990":14966.328296851896,"upper_real_eur_1990":21817.866286827015,"is_open":false},{"index":5,"rate":33.15,"lower_original":5095000.0,"upper_original":6795000.0,"lower_nominal_eur":30621.566718353708,"upper_nominal_eur":40838.77249287801,"lower_real_eur_1990":21817.866286827015,"upper_real_eur_1990":29097.625401175577,"is_open":false},{"index":6,"rate":38.25,"lower_original":6795000.0,"upper_original":8625000.0,"lower_nominal_eur":40838.77249287801,"upper_nominal_eur":51837.294003101226,"lower_real_eur_1990":29097.625401175577,"upper_real_eur_1990":36934.07197720962,"is_open":false},{"index":7,"rate":44.2,"lower_original":8625000.0,"upper_original":10500000.0,"lower_nominal_eur":51837.294003101226,"upper_nominal_eur":63106.270960297144,"lower_real_eur_1990":36934.07197720962,"upper_real_eur_1990":44963.21805921171,"is_open":false},{"index":8,"rate":47.6,"lower_original":10500000.0,"upper_original":null,"lower_nominal_eur":63106.270960297144,"upper_nominal_eur":null,"lower_real_eur_1990":44963.21805921171,"upper_real_eur_1990":null,"is_open":true}]},{"year":1999,"regime":"1997_1999_state_plus_autonomous_reference","deflator_hasta_1986":0.56,"deflator_hasta_1990":0.7000000000000001,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-1998-28472","row_count":6,"finite_bracket_count":5,"gdp_pc_nominal_eur":14738.5,"gdp_pc_real_eur_1990":10316.95,"brackets":[{"index":1,"rate":15.0,"lower_original":0.0,"upper_original":600000.0,"lower_nominal_eur":0.0,"upper_nominal_eur":3606.0726263026936,"lower_real_eur_1990":0.0,"upper_real_eur_1990":2524.250838411886,"is_open":false},{"index":2,"rate":20.17,"lower_original":600000.0,"upper_original":2100000.0,"lower_nominal_eur":3606.0726263026936,"upper_nominal_eur":12621.254192059429,"lower_real_eur_1990":2524.250838411886,"upper_real_eur_1990":8834.877934441602,"is_open":false},{"index":3,"rate":23.57,"lower_original":2100000.0,"upper_original":4100000.0,"lower_nominal_eur":12621.254192059429,"upper_nominal_eur":24641.496279735074,"lower_real_eur_1990":8834.877934441602,"upper_real_eur_1990":17249.047395814552,"is_open":false},{"index":4,"rate":31.48,"lower_original":4100000.0,"upper_original":6600000.0,"lower_nominal_eur":24641.496279735074,"upper_nominal_eur":39666.798889329635,"lower_real_eur_1990":17249.047395814552,"upper_real_eur_1990":27766.75922253075,"is_open":false},{"index":5,"rate":38.07,"lower_original":6600000.0,"upper_original":11000000.0,"lower_nominal_eur":39666.798889329635,"upper_nominal_eur":66111.33148221605,"lower_real_eur_1990":27766.75922253075,"upper_real_eur_1990":46277.93203755124,"is_open":false},{"index":6,"rate":39.6,"lower_original":11000000.0,"upper_original":null,"lower_nominal_eur":66111.33148221605,"upper_nominal_eur":null,"lower_real_eur_1990":46277.93203755124,"upper_real_eur_1990":null,"is_open":true}]},{"year":2000,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.54,"deflator_hasta_1990":0.675,"original_currency":"pesetas","source_url":"https://www.boe.es/buscar/act.php?id=BOE-A-1999-24785","row_count":6,"finite_bracket_count":5,"gdp_pc_nominal_eur":15962.61,"gdp_pc_real_eur_1990":10774.761750000001,"brackets":[{"index":1,"rate":15.0,"lower_original":0.0,"upper_original":612000.0,"lower_nominal_eur":0.0,"upper_nominal_eur":3678.194078828748,"lower_real_eur_1990":0.0,"upper_real_eur_1990":2482.781003209405,"is_open":false},{"index":2,"rate":20.17,"lower_original":612000.0,"upper_original":2142000.0,"lower_nominal_eur":3678.194078828748,"upper_nominal_eur":12873.679275900617,"lower_real_eur_1990":2482.781003209405,"upper_real_eur_1990":8689.733511232916,"is_open":false},{"index":3,"rate":23.57,"lower_original":2142000.0,"upper_original":4182000.0,"lower_nominal_eur":12873.679275900617,"upper_nominal_eur":25134.326205329777,"lower_real_eur_1990":8689.733511232916,"upper_real_eur_1990":16965.6701885976,"is_open":false},{"index":4,"rate":31.48,"lower_original":4182000.0,"upper_original":6732000.0,"lower_nominal_eur":25134.326205329777,"upper_nominal_eur":40460.13486711623,"lower_real_eur_1990":16965.6701885976,"upper_real_eur_1990":27310.591035303456,"is_open":false},{"index":5,"rate":38.07,"lower_original":6732000.0,"upper_original":11220000.0,"lower_nominal_eur":40460.13486711623,"upper_nominal_eur":67433.55811186037,"lower_real_eur_1990":27310.591035303456,"upper_real_eur_1990":45517.651725505755,"is_open":false},{"index":6,"rate":39.6,"lower_original":11220000.0,"upper_original":null,"lower_nominal_eur":67433.55811186037,"upper_nominal_eur":null,"lower_real_eur_1990":45517.651725505755,"upper_real_eur_1990":null,"is_open":true}]},{"year":2002,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.51,"deflator_hasta_1990":0.6375,"original_currency":"euros","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-2001-24962","row_count":6,"finite_bracket_count":5,"gdp_pc_nominal_eur":18095.96,"gdp_pc_real_eur_1990":11536.1745,"brackets":[{"index":1,"rate":12.06,"lower_original":0.0,"upper_original":3678.19,"lower_nominal_eur":0.0,"upper_nominal_eur":3678.19,"lower_real_eur_1990":0.0,"upper_real_eur_1990":2344.846125,"is_open":false},{"index":2,"rate":16.08,"lower_original":3678.19,"upper_original":12873.68,"lower_nominal_eur":3678.19,"upper_nominal_eur":12873.68,"lower_real_eur_1990":2344.846125,"upper_real_eur_1990":8206.971,"is_open":false},{"index":3,"rate":18.961,"lower_original":12873.68,"upper_original":25134.33,"lower_nominal_eur":12873.68,"upper_nominal_eur":25134.33,"lower_real_eur_1990":8206.971,"upper_real_eur_1990":16023.135375,"is_open":false},{"index":4,"rate":24.924,"lower_original":25134.33,"upper_original":40460.130000000005,"lower_nominal_eur":25134.33,"upper_nominal_eur":40460.130000000005,"lower_real_eur_1990":16023.135375,"upper_real_eur_1990":25793.332875,"is_open":false},{"index":5,"rate":30.15,"lower_original":40460.13,"upper_original":67433.56,"lower_nominal_eur":40460.13,"upper_nominal_eur":67433.56,"lower_real_eur_1990":25793.332874999996,"upper_real_eur_1990":42988.894499999995,"is_open":false},{"index":6,"rate":32.16,"lower_original":67433.56,"upper_original":null,"lower_nominal_eur":67433.56,"upper_nominal_eur":null,"lower_real_eur_1990":42988.894499999995,"upper_real_eur_1990":null,"is_open":true}]},{"year":2003,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.49,"deflator_hasta_1990":0.6124999999999999,"original_currency":"euros","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-2002-24711","row_count":5,"finite_bracket_count":4,"gdp_pc_nominal_eur":19026.49,"gdp_pc_real_eur_1990":11653.725124999999,"brackets":[{"index":1,"rate":9.06,"lower_original":0.0,"upper_original":4000.0,"lower_nominal_eur":0.0,"upper_nominal_eur":4000.0,"lower_real_eur_1990":0.0,"upper_real_eur_1990":2449.9999999999995,"is_open":false},{"index":2,"rate":15.84,"lower_original":4000.0,"upper_original":13800.0,"lower_nominal_eur":4000.0,"upper_nominal_eur":13800.0,"lower_real_eur_1990":2449.9999999999995,"upper_real_eur_1990":8452.499999999998,"is_open":false},{"index":3,"rate":18.68,"lower_original":13800.0,"upper_original":25800.0,"lower_nominal_eur":13800.0,"upper_nominal_eur":25800.0,"lower_real_eur_1990":8452.499999999998,"upper_real_eur_1990":15802.499999999998,"is_open":false},{"index":4,"rate":24.71,"lower_original":25800.0,"upper_original":45000.0,"lower_nominal_eur":25800.0,"upper_nominal_eur":45000.0,"lower_real_eur_1990":15802.499999999998,"upper_real_eur_1990":27562.499999999996,"is_open":false},{"index":5,"rate":29.16,"lower_original":45000.0,"upper_original":null,"lower_nominal_eur":45000.0,"upper_nominal_eur":null,"lower_real_eur_1990":27562.499999999996,"upper_real_eur_1990":null,"is_open":true}]},{"year":2005,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.46,"deflator_hasta_1990":0.575,"original_currency":"euros","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-2004-4347","row_count":5,"finite_bracket_count":4,"gdp_pc_nominal_eur":21261.28,"gdp_pc_real_eur_1990":12225.235999999999,"brackets":[{"index":1,"rate":9.06,"lower_original":0.0,"upper_original":4000.0,"lower_nominal_eur":0.0,"upper_nominal_eur":4000.0,"lower_real_eur_1990":0.0,"upper_real_eur_1990":2300.0,"is_open":false},{"index":2,"rate":15.84,"lower_original":4000.0,"upper_original":13800.0,"lower_nominal_eur":4000.0,"upper_nominal_eur":13800.0,"lower_real_eur_1990":2300.0,"upper_real_eur_1990":7934.999999999999,"is_open":false},{"index":3,"rate":18.68,"lower_original":13800.0,"upper_original":25800.0,"lower_nominal_eur":13800.0,"upper_nominal_eur":25800.0,"lower_real_eur_1990":7934.999999999999,"upper_real_eur_1990":14834.999999999998,"is_open":false},{"index":4,"rate":24.71,"lower_original":25800.0,"upper_original":45000.0,"lower_nominal_eur":25800.0,"upper_nominal_eur":45000.0,"lower_real_eur_1990":14834.999999999998,"upper_real_eur_1990":25874.999999999996,"is_open":false},{"index":5,"rate":29.16,"lower_original":45000.0,"upper_original":null,"lower_nominal_eur":45000.0,"upper_nominal_eur":null,"lower_real_eur_1990":25874.999999999996,"upper_real_eur_1990":null,"is_open":true}]},{"year":2006,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.45,"deflator_hasta_1990":0.5625,"original_currency":"euros","source_url":"https://www.boe.es/buscar/doc.php?id=BOE-A-2005-21525","row_count":5,"finite_bracket_count":4,"gdp_pc_nominal_eur":22635.96,"gdp_pc_real_eur_1990":12732.727499999999,"brackets":[{"index":1,"rate":9.06,"lower_original":0.0,"upper_original":4161.6,"lower_nominal_eur":0.0,"upper_nominal_eur":4161.6,"lower_real_eur_1990":0.0,"upper_real_eur_1990":2340.9,"is_open":false},{"index":2,"rate":15.84,"lower_original":4161.6,"upper_original":14357.52,"lower_nominal_eur":4161.6,"upper_nominal_eur":14357.52,"lower_real_eur_1990":2340.9,"upper_real_eur_1990":8076.1050000000005,"is_open":false},{"index":3,"rate":18.68,"lower_original":14357.52,"upper_original":26842.32,"lower_nominal_eur":14357.52,"upper_nominal_eur":26842.32,"lower_real_eur_1990":8076.1050000000005,"upper_real_eur_1990":15098.805,"is_open":false},{"index":4,"rate":24.71,"lower_original":26842.32,"upper_original":46818.0,"lower_nominal_eur":26842.32,"upper_nominal_eur":46818.0,"lower_real_eur_1990":15098.805,"upper_real_eur_1990":26335.125,"is_open":false},{"index":5,"rate":29.16,"lower_original":46818.0,"upper_original":null,"lower_nominal_eur":46818.0,"upper_nominal_eur":null,"lower_real_eur_1990":26335.125,"upper_real_eur_1990":null,"is_open":true}]},{"year":2007,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.44,"deflator_hasta_1990":0.5499999999999999,"original_currency":"euros","source_url":"https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764","row_count":6,"finite_bracket_count":5,"gdp_pc_nominal_eur":23825.27,"gdp_pc_real_eur_1990":13103.8985,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1990":0.0,"upper_real_eur_1990":6847.499999999999,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1990":6847.499999999999,"upper_real_eur_1990":11109.999999999998,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":35200.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":35200.0,"lower_real_eur_1990":11109.999999999998,"upper_real_eur_1990":19359.999999999996,"is_open":false},{"index":4,"rate":18.5,"lower_original":35200.0,"upper_original":60000.0,"lower_nominal_eur":35200.0,"upper_nominal_eur":60000.0,"lower_real_eur_1990":19359.999999999996,"upper_real_eur_1990":32999.99999999999,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":300000.0,"lower_nominal_eur":60000.0,"upper_nominal_eur":300000.0,"lower_real_eur_1990":32999.99999999999,"upper_real_eur_1990":164999.99999999997,"is_open":false},{"index":6,"rate":24.5,"lower_original":300000.0,"upper_original":null,"lower_nominal_eur":300000.0,"upper_nominal_eur":null,"lower_real_eur_1990":164999.99999999997,"upper_real_eur_1990":null,"is_open":true}]},{"year":2008,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.42,"deflator_hasta_1990":0.5249999999999999,"original_currency":"euros","source_url":"https://www.boe.es/buscar/act.php?id=BOE-A-2007-22295","row_count":4,"finite_bracket_count":3,"gdp_pc_nominal_eur":24207.46,"gdp_pc_real_eur_1990":12708.916499999998,"brackets":[{"index":1,"rate":15.66,"lower_original":0.0,"upper_original":17707.2,"lower_nominal_eur":0.0,"upper_nominal_eur":17707.2,"lower_real_eur_1990":0.0,"upper_real_eur_1990":9296.279999999999,"is_open":false},{"index":2,"rate":18.27,"lower_original":17707.2,"upper_original":33007.2,"lower_nominal_eur":17707.2,"upper_nominal_eur":33007.2,"lower_real_eur_1990":9296.279999999999,"upper_real_eur_1990":17328.779999999995,"is_open":false},{"index":3,"rate":24.14,"lower_original":33007.2,"upper_original":53407.2,"lower_nominal_eur":33007.2,"upper_nominal_eur":53407.2,"lower_real_eur_1990":17328.779999999995,"upper_real_eur_1990":28038.779999999995,"is_open":false},{"index":4,"rate":27.13,"lower_original":53407.2,"upper_original":null,"lower_nominal_eur":53407.2,"upper_nominal_eur":null,"lower_real_eur_1990":28038.779999999995,"upper_real_eur_1990":null,"is_open":true}]},{"year":2009,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.42,"deflator_hasta_1990":0.5249999999999999,"original_currency":"euros","source_url":"https://www.boe.es/buscar/act.php?id=BOE-A-2008-20744","row_count":4,"finite_bracket_count":3,"gdp_pc_nominal_eur":23143.27,"gdp_pc_real_eur_1990":12150.216749999998,"brackets":[{"index":1,"rate":15.66,"lower_original":0.0,"upper_original":17707.2,"lower_nominal_eur":0.0,"upper_nominal_eur":17707.2,"lower_real_eur_1990":0.0,"upper_real_eur_1990":9296.279999999999,"is_open":false},{"index":2,"rate":18.27,"lower_original":17707.2,"upper_original":33007.2,"lower_nominal_eur":17707.2,"upper_nominal_eur":33007.2,"lower_real_eur_1990":9296.279999999999,"upper_real_eur_1990":17328.779999999995,"is_open":false},{"index":3,"rate":24.14,"lower_original":33007.2,"upper_original":53407.2,"lower_nominal_eur":33007.2,"upper_nominal_eur":53407.2,"lower_real_eur_1990":17328.779999999995,"upper_real_eur_1990":28038.779999999995,"is_open":false},{"index":4,"rate":27.13,"lower_original":53407.2,"upper_original":null,"lower_nominal_eur":53407.2,"upper_nominal_eur":null,"lower_real_eur_1990":28038.779999999995,"upper_real_eur_1990":null,"is_open":true}]},{"year":2010,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.41,"deflator_hasta_1990":0.5125,"original_currency":"euros","source_url":"https://www.boe.es/buscar/act.php?id=BOE-A-2009-20765","row_count":4,"finite_bracket_count":3,"gdp_pc_nominal_eur":23126.16,"gdp_pc_real_eur_1990":11852.157,"brackets":[{"index":1,"rate":15.66,"lower_original":0.0,"upper_original":17707.2,"lower_nominal_eur":0.0,"upper_nominal_eur":17707.2,"lower_real_eur_1990":0.0,"upper_real_eur_1990":9074.939999999999,"is_open":false},{"index":2,"rate":18.27,"lower_original":17707.2,"upper_original":33007.2,"lower_nominal_eur":17707.2,"upper_nominal_eur":33007.2,"lower_real_eur_1990":9074.939999999999,"upper_real_eur_1990":16916.19,"is_open":false},{"index":3,"rate":24.14,"lower_original":33007.2,"upper_original":53407.2,"lower_nominal_eur":33007.2,"upper_nominal_eur":53407.2,"lower_real_eur_1990":16916.19,"upper_real_eur_1990":27371.189999999995,"is_open":false},{"index":4,"rate":27.13,"lower_original":53407.2,"upper_original":null,"lower_nominal_eur":53407.2,"upper_nominal_eur":null,"lower_real_eur_1990":27371.189999999995,"upper_real_eur_1990":null,"is_open":true}]},{"year":2011,"regime":"2000_2011_state_plus_autonomous_reference","deflator_hasta_1986":0.4,"deflator_hasta_1990":0.5,"original_currency":"euros","source_url":"https://www.boe.es/buscar/act.php?id=BOE-A-2010-19703","row_count":6,"finite_bracket_count":5,"gdp_pc_nominal_eur":22863.25,"gdp_pc_real_eur_1990":11431.625,"brackets":[{"index":1,"rate":12.14,"lower_original":0.17,"upper_original":17707.2,"lower_nominal_eur":0.17,"upper_nominal_eur":17707.2,"lower_real_eur_1990":0.085,"upper_real_eur_1990":8853.6,"is_open":false},{"index":2,"rate":18.0,"lower_original":17707.2,"upper_original":33007.2,"lower_nominal_eur":17707.2,"upper_nominal_eur":33007.2,"lower_real_eur_1990":8853.6,"upper_real_eur_1990":16503.6,"is_open":false},{"index":3,"rate":5.21,"lower_original":33007.2,"upper_original":53407.2,"lower_nominal_eur":33007.2,"upper_nominal_eur":53407.2,"lower_real_eur_1990":16503.6,"upper_real_eur_1990":26703.6,"is_open":false},{"index":4,"rate":5.22,"lower_original":53407.2,"upper_original":120000.2,"lower_nominal_eur":53407.2,"upper_nominal_eur":120000.2,"lower_real_eur_1990":26703.6,"upper_real_eur_1990":60000.1,"is_open":false},{"index":5,"rate":5.23,"lower_original":120000.2,"upper_original":175000.2,"lower_nominal_eur":120000.2,"upper_nominal_eur":175000.2,"lower_real_eur_1990":60000.1,"upper_real_eur_1990":87500.1,"is_open":false},{"index":6,"rate":5.0,"lower_original":175000.2,"upper_original":null,"lower_nominal_eur":175000.2,"upper_nominal_eur":null,"lower_real_eur_1990":87500.1,"upper_real_eur_1990":null,"is_open":true}]},{"year":2014,"regime":"2014_2016_linear_pdf_state_plus_ccaa","deflator_hasta_1986":0.39,"deflator_hasta_1990":0.4875,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/2014/Manual_Renta_2014_es_es.pdf?utm_source=chatgpt.com","row_count":6,"finite_bracket_count":5,"gdp_pc_nominal_eur":22361.87,"gdp_pc_real_eur_1990":10901.411624999999,"brackets":[{"index":1,"rate":12.0,"lower_original":0.0,"upper_original":17707.2,"lower_nominal_eur":0.0,"upper_nominal_eur":17707.2,"lower_real_eur_1990":0.0,"upper_real_eur_1990":8632.26,"is_open":false},{"index":2,"rate":14.0,"lower_original":17707.2,"upper_original":33007.2,"lower_nominal_eur":17707.2,"upper_nominal_eur":33007.2,"lower_real_eur_1990":8632.26,"upper_real_eur_1990":16091.009999999998,"is_open":false},{"index":3,"rate":18.5,"lower_original":33007.2,"upper_original":53407.2,"lower_nominal_eur":33007.2,"upper_nominal_eur":53407.2,"lower_real_eur_1990":16091.009999999998,"upper_real_eur_1990":26036.01,"is_open":false},{"index":4,"rate":21.5,"lower_original":53407.2,"upper_original":120000.2,"lower_nominal_eur":53407.2,"upper_nominal_eur":120000.2,"lower_real_eur_1990":26036.01,"upper_real_eur_1990":58500.097499999996,"is_open":false},{"index":5,"rate":22.5,"lower_original":120000.2,"upper_original":175000.2,"lower_nominal_eur":120000.2,"upper_nominal_eur":175000.2,"lower_real_eur_1990":58500.097499999996,"upper_real_eur_1990":85312.5975,"is_open":false},{"index":6,"rate":23.5,"lower_original":175000.2,"upper_original":null,"lower_nominal_eur":175000.2,"upper_nominal_eur":null,"lower_real_eur_1990":85312.5975,"upper_real_eur_1990":null,"is_open":true}]},{"year":2015,"regime":"2014_2016_linear_pdf_state_plus_ccaa","deflator_hasta_1986":0.39,"deflator_hasta_1990":0.4875,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/IRPF-2015/Manual_Renta_2015_es_es.pdf?utm_source=chatgpt.com","row_count":5,"finite_bracket_count":4,"gdp_pc_nominal_eur":23417.88,"gdp_pc_real_eur_1990":11416.2165,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1990":0.0,"upper_real_eur_1990":6069.375,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1990":6069.375,"upper_real_eur_1990":9847.5,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":34000.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":34000.0,"lower_real_eur_1990":9847.5,"upper_real_eur_1990":16575.0,"is_open":false},{"index":4,"rate":18.5,"lower_original":34000.0,"upper_original":60000.0,"lower_nominal_eur":34000.0,"upper_nominal_eur":60000.0,"lower_real_eur_1990":16575.0,"upper_real_eur_1990":29250.0,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":null,"lower_nominal_eur":60000.0,"upper_nominal_eur":null,"lower_real_eur_1990":29250.0,"upper_real_eur_1990":null,"is_open":true}]},{"year":2016,"regime":"2014_2016_linear_pdf_state_plus_ccaa","deflator_hasta_1986":0.39,"deflator_hasta_1990":0.4875,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/IRPF-2016/ManualRentaPatrimonio2016_es_es.pdf?utm_source=chatgpt.com","row_count":5,"finite_bracket_count":4,"gdp_pc_nominal_eur":24171.59,"gdp_pc_real_eur_1990":11783.650125,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1990":0.0,"upper_real_eur_1990":6069.375,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1990":6069.375,"upper_real_eur_1990":9847.5,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":35200.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":35200.0,"lower_real_eur_1990":9847.5,"upper_real_eur_1990":17160.0,"is_open":false},{"index":4,"rate":18.5,"lower_original":35200.0,"upper_original":60000.0,"lower_nominal_eur":35200.0,"upper_nominal_eur":60000.0,"lower_real_eur_1990":17160.0,"upper_real_eur_1990":29250.0,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":null,"lower_nominal_eur":60000.0,"upper_nominal_eur":null,"lower_real_eur_1990":29250.0,"upper_real_eur_1990":null,"is_open":true}]},{"year":2017,"regime":"2017_2023_labeled_html_state_plus_ccaa","deflator_hasta_1986":0.38,"deflator_hasta_1990":0.475,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/Sede/manuales/ejercicio-2017/modelo-100/8-cumplimentacion-irpf/8_6-cuota-integra/8_6_1-gravamen-base-liquidable-general/8_6_1_1-cuota-integra-estatal.html","row_count":5,"finite_bracket_count":4,"gdp_pc_nominal_eur":25123.32,"gdp_pc_real_eur_1990":11933.577,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1990":0.0,"upper_real_eur_1990":5913.75,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1990":5913.75,"upper_real_eur_1990":9595.0,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":35200.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":35200.0,"lower_real_eur_1990":9595.0,"upper_real_eur_1990":16720.0,"is_open":false},{"index":4,"rate":18.5,"lower_original":35200.0,"upper_original":60000.0,"lower_nominal_eur":35200.0,"upper_nominal_eur":60000.0,"lower_real_eur_1990":16720.0,"upper_real_eur_1990":28500.0,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":null,"lower_nominal_eur":60000.0,"upper_nominal_eur":null,"lower_real_eur_1990":28500.0,"upper_real_eur_1990":null,"is_open":true}]},{"year":2018,"regime":"2017_2023_labeled_html_state_plus_ccaa","deflator_hasta_1986":0.37,"deflator_hasta_1990":0.46249999999999997,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/Sede/manuales/ejercicio-2018/modelo-100/modelo-100/8-cumplimentacion-irpf/8_6-cuota-integra/8_6_1-gravamen-base-liquidable-general/8_6_1_1-cuota-integra-estatal.html","row_count":5,"finite_bracket_count":4,"gdp_pc_nominal_eur":25913.29,"gdp_pc_real_eur_1990":11984.896625,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1990":0.0,"upper_real_eur_1990":5758.125,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1990":5758.125,"upper_real_eur_1990":9342.5,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":35200.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":35200.0,"lower_real_eur_1990":9342.5,"upper_real_eur_1990":16279.999999999998,"is_open":false},{"index":4,"rate":18.5,"lower_original":35200.0,"upper_original":60000.0,"lower_nominal_eur":35200.0,"upper_nominal_eur":60000.0,"lower_real_eur_1990":16279.999999999998,"upper_real_eur_1990":27749.999999999996,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":null,"lower_nominal_eur":60000.0,"upper_nominal_eur":null,"lower_real_eur_1990":27749.999999999996,"upper_real_eur_1990":null,"is_open":true}]},{"year":2021,"regime":"2017_2023_labeled_html_state_plus_ccaa","deflator_hasta_1986":0.36,"deflator_hasta_1990":0.44999999999999996,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2021/capitulo-15-calculo-impuesto-determinacion-integras/gravamen-base-liquidable-general/gravamen-estatal.html","row_count":6,"finite_bracket_count":5,"gdp_pc_nominal_eur":26040.78,"gdp_pc_real_eur_1990":11718.350999999999,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1990":0.0,"upper_real_eur_1990":5602.499999999999,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1990":5602.499999999999,"upper_real_eur_1990":9090.0,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":35200.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":35200.0,"lower_real_eur_1990":9090.0,"upper_real_eur_1990":15839.999999999998,"is_open":false},{"index":4,"rate":18.5,"lower_original":35200.0,"upper_original":60000.0,"lower_nominal_eur":35200.0,"upper_nominal_eur":60000.0,"lower_real_eur_1990":15839.999999999998,"upper_real_eur_1990":26999.999999999996,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":300000.0,"lower_nominal_eur":60000.0,"upper_nominal_eur":300000.0,"lower_real_eur_1990":26999.999999999996,"upper_real_eur_1990":135000.0,"is_open":false},{"index":6,"rate":24.5,"lower_original":300000.0,"upper_original":null,"lower_nominal_eur":300000.0,"upper_nominal_eur":null,"lower_real_eur_1990":135000.0,"upper_real_eur_1990":null,"is_open":true}]},{"year":2022,"regime":"2017_2023_labeled_html_state_plus_ccaa","deflator_hasta_1986":0.33,"deflator_hasta_1990":0.4125,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2022/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-estatal.html","row_count":6,"finite_bracket_count":5,"gdp_pc_nominal_eur":28745.37,"gdp_pc_real_eur_1990":11857.465124999999,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1990":0.0,"upper_real_eur_1990":5135.625,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1990":5135.625,"upper_real_eur_1990":8332.5,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":35200.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":35200.0,"lower_real_eur_1990":8332.5,"upper_real_eur_1990":14520.0,"is_open":false},{"index":4,"rate":18.5,"lower_original":35200.0,"upper_original":60000.0,"lower_nominal_eur":35200.0,"upper_nominal_eur":60000.0,"lower_real_eur_1990":14520.0,"upper_real_eur_1990":24750.0,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":300000.0,"lower_nominal_eur":60000.0,"upper_nominal_eur":300000.0,"lower_real_eur_1990":24750.0,"upper_real_eur_1990":123750.0,"is_open":false},{"index":6,"rate":24.5,"lower_original":300000.0,"upper_original":null,"lower_nominal_eur":300000.0,"upper_nominal_eur":null,"lower_real_eur_1990":123750.0,"upper_real_eur_1990":null,"is_open":true}]},{"year":2023,"regime":"2017_2023_labeled_html_state_plus_ccaa","deflator_hasta_1986":0.32,"deflator_hasta_1990":0.39999999999999997,"original_currency":"euros","source_url":"https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2023/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-estatal.html","row_count":6,"finite_bracket_count":5,"gdp_pc_nominal_eur":30990.46,"gdp_pc_real_eur_1990":12396.184,"brackets":[{"index":1,"rate":9.5,"lower_original":0.0,"upper_original":12450.0,"lower_nominal_eur":0.0,"upper_nominal_eur":12450.0,"lower_real_eur_1990":0.0,"upper_real_eur_1990":4980.0,"is_open":false},{"index":2,"rate":12.0,"lower_original":12450.0,"upper_original":20200.0,"lower_nominal_eur":12450.0,"upper_nominal_eur":20200.0,"lower_real_eur_1990":4980.0,"upper_real_eur_1990":8079.999999999999,"is_open":false},{"index":3,"rate":15.0,"lower_original":20200.0,"upper_original":35200.0,"lower_nominal_eur":20200.0,"upper_nominal_eur":35200.0,"lower_real_eur_1990":8079.999999999999,"upper_real_eur_1990":14079.999999999998,"is_open":false},{"index":4,"rate":18.5,"lower_original":35200.0,"upper_original":60000.0,"lower_nominal_eur":35200.0,"upper_nominal_eur":60000.0,"lower_real_eur_1990":14079.999999999998,"upper_real_eur_1990":23999.999999999996,"is_open":false},{"index":5,"rate":22.5,"lower_original":60000.0,"upper_original":300000.0,"lower_nominal_eur":60000.0,"upper_nominal_eur":300000.0,"lower_real_eur_1990":23999.999999999996,"upper_real_eur_1990":119999.99999999999,"is_open":false},{"index":6,"rate":24.5,"lower_original":300000.0,"upper_original":null,"lower_nominal_eur":300000.0,"upper_nominal_eur":null,"lower_real_eur_1990":119999.99999999999,"upper_real_eur_1990":null,"is_open":true}]}];
 
+    const INCOME_DISTRIBUTION = Array.isArray(window.IRPF_INCOME_DISTRIBUTION)
+      ? window.IRPF_INCOME_DISTRIBUTION
+      : [];
     const YEARS = DATA.map(d => d.year);
     const YEAR_MAP = new Map(DATA.map(d => [d.year, d]));
     const MAX_TRAMOS = Math.max(...DATA.map(d => d.finite_bracket_count));
+    const POPULATION_YEARS = INCOME_DISTRIBUTION.map(d => d.year);
+    const MAX_POPULATION_TRAMOS = Math.max(...DATA.map(d => d.brackets.length));
 
     const PRESIDENT_BANDS = [
       { name:"Felipe González", start:1990, end:1996, color:"#552222" },
@@ -595,6 +641,7 @@
     ];
 
     const state = {
+      chartMode: 'limits',
       mode: 'nominal',
       scaleMode: 'log',
       visibleCount: 5,
@@ -611,6 +658,14 @@
     const seriesLegend = document.getElementById('seriesLegend');
     const btnPolitics = document.getElementById('btnPolitics');
     const rateEncodingNote = document.getElementById('rateEncodingNote');
+    const btnChartLimits = document.getElementById('btnChartLimits');
+    const btnChartPopulation = document.getElementById('btnChartPopulation');
+    const amountField = document.getElementById('amountField');
+    const scaleField = document.getElementById('scaleField');
+    const countField = document.getElementById('countField');
+    const sourceFooter = document.getElementById('sourceFooter');
+    const explanationContent = document.getElementById('explanationContent');
+    const chartPanel = document.querySelector('.chartPanel');
 
     function money(value, digits = 0) {
       if (!Number.isFinite(value)) return '—';
@@ -647,10 +702,93 @@
       return v.toLocaleString('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 2 }) + '%';
     }
 
+    function people(value) {
+      if (!Number.isFinite(value)) return '—';
+      return Math.round(value).toLocaleString('es-ES') + ' habitantes';
+    }
+
+    function peopleShort(value) {
+      if (!Number.isFinite(value)) return '—';
+      if (Math.abs(value) >= 1_000_000) {
+        return (value / 1_000_000).toLocaleString('es-ES', { maximumFractionDigits: 1 }) + ' M';
+      }
+      if (Math.abs(value) >= 1_000) {
+        return (value / 1_000).toLocaleString('es-ES', { maximumFractionDigits: 0 }) + ' mil';
+      }
+      return Math.round(value).toLocaleString('es-ES');
+    }
+
     function getColor(index) {
       const hue = (index * 41) % 360;
       return `hsl(${hue} 78% 60%)`;
     }
+
+    function scheduleForYear(year) {
+      let schedule = DATA[0];
+      DATA.forEach(record => {
+        if (record.year <= year) schedule = record;
+      });
+      return schedule;
+    }
+
+    function percentileAtIncome(income, distribution) {
+      if (!Number.isFinite(income) || income <= 0) return 0;
+      const percentiles = [0, .2, .4, .6, .8, .9, .99];
+      const incomes = [0, ...distribution.thresholds];
+
+      for (let i = 1; i < incomes.length; i++) {
+        if (income <= incomes[i]) {
+          const span = Math.max(1e-9, incomes[i] - incomes[i - 1]);
+          const ratio = (income - incomes[i - 1]) / span;
+          return percentiles[i - 1] + ((percentiles[i] - percentiles[i - 1]) * ratio);
+        }
+      }
+
+      const p99Income = incomes[incomes.length - 1];
+      const topMean = distribution.topOneMean;
+      const alpha = Number.isFinite(topMean) && topMean > p99Income
+        ? Math.max(1.05, topMean / (topMean - p99Income))
+        : 1.5;
+      const tailShare = .01 * (1 - Math.pow(p99Income / income, alpha));
+      return Math.max(.99, Math.min(1, .99 + tailShare));
+    }
+
+    function buildPopulationRecords() {
+      return INCOME_DISTRIBUTION.map(distribution => {
+        const schedule = scheduleForYear(distribution.year);
+        let previousPercentile = 0;
+        let previousUpper = 0;
+        const tramos = schedule.brackets.map((bracket, index) => {
+          const upper = bracket.is_open ? null : bracket.upper_nominal_eur;
+          const upperPercentile = upper === null
+            ? 1
+            : Math.max(previousPercentile, percentileAtIncome(upper, distribution));
+          const share = Math.max(0, upperPercentile - previousPercentile);
+          const result = {
+            index: index + 1,
+            count: share * distribution.adultPopulation,
+            share,
+            lower: previousUpper,
+            upper,
+            rate: bracket.rate,
+          };
+          previousPercentile = upperPercentile;
+          if (upper !== null) previousUpper = upper;
+          return result;
+        });
+        const counted = tramos.reduce((sum, tramo) => sum + tramo.count, 0);
+        if (tramos.length) tramos[tramos.length - 1].count += distribution.adultPopulation - counted;
+        return {
+          year: distribution.year,
+          adultPopulation: distribution.adultPopulation,
+          sourceScheduleYear: schedule.year,
+          tramos,
+        };
+      });
+    }
+
+    const POPULATION_DATA = buildPopulationRecords();
+    const POPULATION_YEAR_MAP = new Map(POPULATION_DATA.map(d => [d.year, d]));
 
     function valueField(which) {
       return state.mode === 'real1990'
@@ -804,19 +942,37 @@
       btnPolitics.setAttribute('aria-pressed', state.showPresBands ? 'true' : 'false');
     }
 
+    function renderChartModeControls() {
+      const showLimits = state.chartMode === 'limits';
+      btnChartLimits.classList.toggle('active', showLimits);
+      btnChartPopulation.classList.toggle('active', !showLimits);
+      btnChartLimits.setAttribute('aria-pressed', showLimits ? 'true' : 'false');
+      btnChartPopulation.setAttribute('aria-pressed', showLimits ? 'false' : 'true');
+      amountField.classList.toggle('isHidden', !showLimits);
+      scaleField.classList.toggle('isHidden', !showLimits);
+      countField.classList.toggle('isHidden', !showLimits);
+      chartPanel.classList.toggle('populationMode', !showLimits);
+      document.body.classList.toggle('populationChartMode', !showLimits);
+    }
+
     function renderLegend() {
-      const tramoItems = visibleTramos().map(n => `
+      const tramos = state.chartMode === 'limits'
+        ? visibleTramos()
+        : Array.from({ length: MAX_POPULATION_TRAMOS }, (_, i) => i + 1);
+      const tramoItems = tramos.map(n => `
         <div class="legendItem">
           <span class="legendSwatch" style="background:${getColor(n)}"></span>
           <span>Tramo ${n}</span>
         </div>
       `);
-      tramoItems.push(`
-        <div class="legendItem">
-          <span class="legendSwatch gdp"></span>
-          <span>PIB per cápita</span>
-        </div>
-      `);
+      if (state.chartMode === 'limits') {
+        tramoItems.push(`
+          <div class="legendItem">
+            <span class="legendSwatch gdp"></span>
+            <span>PIB per cápita</span>
+          </div>
+        `);
+      }
       seriesLegend.innerHTML = tramoItems.join('');
     }
 
@@ -886,7 +1042,7 @@
       return { width, height, m, plot, heatmap, compact };
     }
 
-    function clientToViewBox(clientX, clientY) {
+    function clientToLimitViewBox(clientX, clientY) {
       const rect = chartBox.getBoundingClientRect();
       const { width, height } = getChartGeometry();
       const x = rect.width ? ((clientX - rect.left) / rect.width) * width : 0;
@@ -894,9 +1050,9 @@
       return { x, y, rect };
     }
 
-    function isInsideInteractiveArea(clientX, clientY) {
+    function isInsideLimitInteractiveArea(clientX, clientY) {
       const { plot, heatmap } = getChartGeometry();
-      const point = clientToViewBox(clientX, clientY);
+      const point = clientToLimitViewBox(clientX, clientY);
       const withinX = point.x >= plot.x && point.x <= plot.x + plot.w;
       const withinPlotY = point.y >= plot.y && point.y <= plot.y + plot.h;
       const withinHeatmapY = heatmap && point.y >= heatmap.y && point.y <= heatmap.y + heatmap.h;
@@ -907,9 +1063,9 @@
       tooltip.style.display = 'none';
     }
 
-    function nearestYearFromClientX(clientX) {
+    function nearestLimitYearFromClientX(clientX) {
       const { plot } = getChartGeometry();
-      const point = clientToViewBox(clientX, 0);
+      const point = clientToLimitViewBox(clientX, 0);
       const target = Math.max(plot.x, Math.min(plot.x + plot.w, point.x));
       const minYear = Math.min(...YEARS);
       const maxYear = Math.max(...YEARS);
@@ -923,7 +1079,7 @@
       return best;
     }
 
-    function renderTooltip(clientX, clientY) {
+    function renderLimitsTooltip(clientX, clientY) {
       const year = state.hoverYear;
       if (!year) {
         hideTooltip();
@@ -1009,7 +1165,7 @@
       return out;
     }
 
-    function renderChart() {
+    function renderLimitsChart() {
       const { width, height, plot, heatmap, compact } = getChartGeometry();
       const minYear = Math.min(...YEARS);
       const maxYear = Math.max(...YEARS);
@@ -1128,9 +1284,208 @@
       topMeta.textContent = `${Math.min(...YEARS)}–${Math.max(...YEARS)}`;
     }
 
+    function getPopulationGeometry() {
+      const compact = chartBox.clientWidth < 720;
+      const width = compact ? 780 : 1600;
+      const height = VIEWBOX_HEIGHT;
+      const m = compact
+        ? { top: 48, right: 26, bottom: 78, left: 118 }
+        : { top: 38, right: 34, bottom: 58, left: 92 };
+      const plot = { x: m.left, y: m.top, w: width - m.left - m.right, h: height - m.top - m.bottom };
+      svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+      return { width, height, plot, compact };
+    }
+
+    function clientToPopulationViewBox(clientX, clientY) {
+      const rect = chartBox.getBoundingClientRect();
+      const { width, height } = getPopulationGeometry();
+      return {
+        x: rect.width ? ((clientX - rect.left) / rect.width) * width : 0,
+        y: rect.height ? ((clientY - rect.top) / rect.height) * height : 0,
+      };
+    }
+
+    function isInsidePopulationInteractiveArea(clientX, clientY) {
+      const { plot } = getPopulationGeometry();
+      const point = clientToPopulationViewBox(clientX, clientY);
+      return point.x >= plot.x && point.x <= plot.x + plot.w
+        && point.y >= plot.y && point.y <= plot.y + plot.h;
+    }
+
+    function nearestPopulationYearFromClientX(clientX) {
+      const { plot } = getPopulationGeometry();
+      const point = clientToPopulationViewBox(clientX, 0);
+      const ratio = Math.max(0, Math.min(.999999, (point.x - plot.x) / plot.w));
+      const index = Math.floor(ratio * POPULATION_DATA.length);
+      return POPULATION_DATA[Math.max(0, Math.min(POPULATION_DATA.length - 1, index))].year;
+    }
+
+    function renderPopulationTooltip(clientX, clientY) {
+      const record = POPULATION_YEAR_MAP.get(state.hoverYear);
+      if (!record) {
+        hideTooltip();
+        return;
+      }
+      const rows = record.tramos
+        .filter(tramo => tramo.count >= 1)
+        .map(tramo => {
+          const range = tramo.upper === null
+            ? `Más de ${money(tramo.lower, 0)}`
+            : tramo.index === 1
+              ? `Hasta ${money(tramo.upper, 0)}`
+              : `${money(tramo.lower, 0)}–${money(tramo.upper, 0)}`;
+          const share = (tramo.count / record.adultPopulation) * 100;
+          return `
+            <div class="ttRow">
+              <div class="ttDot" style="background:${getColor(tramo.index)}"></div>
+              <div class="ttName">Tramo ${tramo.index} · ${range}</div>
+              <div class="ttVal">${people(tramo.count)} · ${pct(share)}</div>
+            </div>
+          `;
+        });
+      const scheduleNote = record.sourceScheduleYear === record.year
+        ? ''
+        : ` · escala fiscal vigente desde ${record.sourceScheduleYear}`;
+      tooltip.innerHTML = `
+        <div class="ttYear">${record.year}</div>
+        <div class="subtle" style="margin-bottom:6px;">Población adulta: ${people(record.adultPopulation)}</div>
+        ${rows.join('')}
+        <div class="subtle" style="margin-top:8px;">Estimación a partir de umbrales WID${scheduleNote}</div>`;
+      tooltip.style.display = 'block';
+
+      const rect = chartBox.getBoundingClientRect();
+      const ttRect = tooltip.getBoundingClientRect();
+      let left = clientX - rect.left + 14;
+      let top = clientY - rect.top + 14;
+      if (left + ttRect.width > rect.width - 10) left = rect.width - ttRect.width - 10;
+      if (top + ttRect.height > rect.height - 10) top = rect.height - ttRect.height - 10;
+      tooltip.style.left = Math.max(10, left) + 'px';
+      tooltip.style.top = Math.max(10, top) + 'px';
+    }
+
+    function renderPopulationChart() {
+      const { width, height, plot, compact } = getPopulationGeometry();
+      const minYear = POPULATION_YEARS[0];
+      const maxYear = POPULATION_YEARS[POPULATION_YEARS.length - 1];
+      const bandWidth = plot.w / POPULATION_DATA.length;
+      const maxPopulation = Math.max(...POPULATION_DATA.map(d => d.adultPopulation));
+      const yStep = niceStep(maxPopulation / 5);
+      const yMax = Math.ceil(maxPopulation / yStep) * yStep;
+      const y = value => plot.y + plot.h - ((value / yMax) * plot.h);
+      const xEdge = year => plot.x + (((year - minYear) / POPULATION_DATA.length) * plot.w);
+      const axisFont = compact ? 20 : 12;
+      const bandFont = compact ? 17 : 12;
+      const titleFont = compact ? 20 : 13;
+      const metaFont = compact ? 18 : 12;
+      let out = `<rect x="0" y="0" width="${width}" height="${height}" fill="transparent"></rect>`;
+
+      if (state.showPresBands) {
+        PRESIDENT_BANDS.forEach(band => {
+          const start = Math.max(minYear, band.start);
+          const end = Math.min(maxYear + 1, band.end === null ? maxYear + 1 : band.end);
+          if (end <= minYear || start > maxYear) return;
+          const x1 = xEdge(start);
+          const x2 = xEdge(end);
+          const bandLabel = compact ? band.name.split(' ').pop() : band.name;
+          out += `<rect x="${x1}" y="${plot.y}" width="${Math.max(0, x2 - x1)}" height="${plot.h}" fill="${band.color}" opacity="0.22"></rect>`;
+          out += `<text x="${(x1 + x2) / 2}" y="${plot.y + (compact ? 26 : 18)}" text-anchor="middle" fill="rgba(255,255,255,.68)" font-size="${bandFont}" font-weight="700">${bandLabel}</text>`;
+        });
+      }
+
+      out += `<rect x="${plot.x}" y="${plot.y}" width="${plot.w}" height="${plot.h}" fill="rgba(255,255,255,.02)" stroke="rgba(255,255,255,.05)"></rect>`;
+      for (let tick = 0; tick <= yMax; tick += yStep) {
+        const yy = y(tick);
+        out += `<line x1="${plot.x}" y1="${yy}" x2="${plot.x + plot.w}" y2="${yy}" stroke="rgba(255,255,255,.10)" stroke-width="1"></line>`;
+        out += `<text x="${plot.x - 12}" y="${yy + (compact ? 7 : 4)}" text-anchor="end" fill="#bfbfbf" font-size="${axisFont}">${peopleShort(tick)}</text>`;
+      }
+
+      POPULATION_DATA.forEach((record, recordIndex) => {
+        let cumulative = 0;
+        const barX = plot.x + (recordIndex * bandWidth) + .4;
+        const barWidth = Math.max(1, bandWidth - .8);
+        record.tramos.forEach(tramo => {
+          const next = cumulative + tramo.count;
+          const top = y(next);
+          const bottom = y(cumulative);
+          if (bottom > top) {
+            out += `<rect x="${barX}" y="${top}" width="${barWidth}" height="${bottom - top}" fill="${getColor(tramo.index)}" opacity="0.88" stroke="rgba(0,0,0,.22)" stroke-width=".5"><title>${record.year} · Tramo ${tramo.index} · ${people(tramo.count)}</title></rect>`;
+          }
+          cumulative = next;
+        });
+        if (state.hoverYear === record.year) {
+          out += `<rect x="${barX}" y="${plot.y}" width="${barWidth}" height="${plot.h}" fill="none" stroke="#FEF702" stroke-width="2"></rect>`;
+        }
+      });
+
+      const yearStep = compact ? 5 : 3;
+      POPULATION_DATA.forEach((record, index) => {
+        const isLast = index === POPULATION_DATA.length - 1;
+        if (index % yearStep !== 0 && !isLast) return;
+        const xx = plot.x + ((index + .5) * bandWidth);
+        const labelY = plot.y + plot.h + (compact ? 36 : 26);
+        out += `<line x1="${xx}" y1="${plot.y + plot.h}" x2="${xx}" y2="${plot.y + plot.h + 6}" stroke="rgba(255,255,255,.25)"></line>`;
+        out += `<text x="${xx}" y="${labelY}" text-anchor="middle" fill="#bfbfbf" font-size="${axisFont}" transform="rotate(${compact ? -42 : -35} ${xx} ${labelY})">${record.year}</text>`;
+      });
+
+      out += `<text x="${plot.x}" y="${compact ? 27 : 19}" fill="#FEF702" font-size="${titleFont}" font-weight="700">Población adulta estimada por tramo del IRPF</text>`;
+      if (!compact) {
+        out += `<text x="${plot.x + plot.w}" y="19" fill="#bfbfbf" font-size="${metaFont}" text-anchor="end">Adultos de 20 años o más · estimación WID</text>`;
+      }
+      svg.innerHTML = out;
+      svg.setAttribute('aria-label', 'Gráfica de población adulta estimada por tramo del IRPF');
+
+      chartMeta.textContent = 'Habitantes por tramo · Población adulta de 20 años o más';
+      lineSummary.textContent = `Población adulta distribuida entre los tramos del IRPF · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}`;
+      rateEncodingNote.innerHTML = 'Cada columna apila el <strong>número estimado de habitantes</strong> de todos los tramos';
+      topMeta.textContent = `${minYear}–${maxYear}`;
+    }
+
+    function renderContextText() {
+      if (state.chartMode === 'limits') {
+        sourceFooter.innerHTML = 'Fuente: <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> (tramos del IRPF), BM (PIB/deflactor) · <span style="opacity:.9;">N.Geolitics</span>';
+        explanationContent.innerHTML = `
+          <p>Cada serie representa la evolución del <strong>límite superior</strong> de un tramo estatal o general del IRPF. Los importes anteriores al euro se convierten desde pesetas con la equivalencia legal.</p>
+          <p>La vista permite comparar euros corrientes con <strong>euros constantes de 1990</strong>. El PIB per cápita utiliza la misma unidad seleccionada para que ambas magnitudes sean comparables.</p>
+          <p>Cada límite está asociado a su <strong>tipo marginal</strong> correspondiente. Las bandas de fondo identifican el Gobierno de cada periodo y pueden ocultarse con los controles situados bajo el gráfico.</p>`;
+        return;
+      }
+      sourceFooter.innerHTML = 'Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta y población adulta; <a class="sourceLink" href="renta_por_quintiles_espana_1990_2023.xlsx">archivo de renta</a>), <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> (tramos del IRPF) · <span style="opacity:.9;">N.Geolitics</span>';
+      explanationContent.innerHTML = `
+        <p>La población se distribuye entre los límites legales del IRPF mediante los <strong>umbrales anuales de renta WID</strong> para P20, P40, P60, P80, P90 y P99.</p>
+        <p>La estimación interpola la distribución entre esos percentiles y aplica una cola de Pareto por encima de P99. Los años sin una nueva escala fiscal conservan la <strong>última escala disponible</strong>.</p>
+        <p>WID mide <strong>renta nacional antes de impuestos por adulto de 20 años o más</strong>, no salarios individuales ni declaraciones reales. La gráfica es una estimación distributiva, no un recuento de contribuyentes.</p>`;
+    }
+
+    function renderChart() {
+      if (state.chartMode === 'population') renderPopulationChart();
+      else {
+        svg.setAttribute('aria-label', 'Gráfica de tramos del IRPF');
+        renderLimitsChart();
+      }
+      renderContextText();
+    }
+
+    function isInsideInteractiveArea(clientX, clientY) {
+      return state.chartMode === 'population'
+        ? isInsidePopulationInteractiveArea(clientX, clientY)
+        : isInsideLimitInteractiveArea(clientX, clientY);
+    }
+
+    function nearestYearFromClientX(clientX) {
+      return state.chartMode === 'population'
+        ? nearestPopulationYearFromClientX(clientX)
+        : nearestLimitYearFromClientX(clientX);
+    }
+
+    function renderTooltip(clientX, clientY) {
+      if (state.chartMode === 'population') renderPopulationTooltip(clientX, clientY);
+      else renderLimitsTooltip(clientX, clientY);
+    }
+
     function renderAll() {
       renderSelectorControls();
       renderChartControls();
+      renderChartModeControls();
       renderLegend();
       renderChart();
     }
@@ -1139,6 +1494,16 @@
       state.hoverYear = null;
       hideTooltip();
     }
+
+    function setChartMode(chartMode) {
+      if (state.chartMode === chartMode) return;
+      state.chartMode = chartMode;
+      resetChartInteraction();
+      renderAll();
+    }
+
+    btnChartLimits.addEventListener('click', () => setChartMode('limits'));
+    btnChartPopulation.addEventListener('click', () => setChartMode('population'));
 
     btnPolitics.addEventListener('click', () => {
       state.showPresBands = !state.showPresBands;
