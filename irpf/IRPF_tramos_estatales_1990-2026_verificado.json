@@ -1,0 +1,4877 @@
+{
+  "version_esquema": "1.0.0",
+  "titulo": "Tramos nacionales/estatales del IRPF sobre la base liquidable general (España), 1990-2026",
+  "fecha_corte": "2026-07-28",
+  "cobertura": {
+    "desde": 1990,
+    "hasta": 2026,
+    "numero_de_anios": 37
+  },
+  "alcance": {
+    "serie_principal": "Escala general nacional unificada en 1990-1996 y escala estatal de la base liquidable general desde 1997.",
+    "tratamiento_2012_2014": "Se suma el gravamen complementario temporal a la escala estatal ordinaria para obtener el tipo estatal marginal aplicable de cada intervalo.",
+    "exclusiones": [
+      "Escalas autonómicas o complementarias de las comunidades autónomas.",
+      "Escala de la base liquidable del ahorro.",
+      "Escalas de retenciones e ingresos a cuenta.",
+      "Mínimos personales y familiares, reducciones, deducciones y cotizaciones.",
+      "Navarra y País Vasco, por sus regímenes forales propios."
+    ],
+    "advertencia": "Desde la cesión del impuesto no existe una única escala total para toda España: el tipo total depende de la comunidad autónoma. Esta serie evita esa ambigüedad mostrando solo la parte estatal comparable."
+  },
+  "convenciones": {
+    "limite_inferior": "Base a partir de la cual se aplica el tipo marginal de la fila.",
+    "limite_superior": "Fin exclusivo del intervalo; null significa sin límite superior.",
+    "cuota_acumulada_en_limite_inferior": "Cuota devengada al alcanzar el límite inferior del tramo.",
+    "banda_cuota_cero_implicita": "Se registra aparte cuando la tabla oficial empieza por encima de cero.",
+    "conversion_pesetas_euros": {
+      "tasa_fija": "1 EUR = 166.386 ESP",
+      "uso": "Conversión informativa redondeada a céntimos."
+    }
+  },
+  "anios": [
+    {
+      "anio": 1990,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_general_nacional_unificada",
+      "moneda_original": "ESP",
+      "unidad_monetaria_original": "peseta española",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-1989-30591",
+          "titulo": "Real Decreto-ley 7/1989, escala aplicable en 1990",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-1989-30591"
+        }
+      ],
+      "banda_cuota_cero_implicita": {
+        "limite_inferior": 0,
+        "limite_superior": 648900,
+        "tipo_marginal_pct": 0,
+        "cuota_acumulada_en_limite_inferior": 0,
+        "limite_inferior_eur": 0,
+        "limite_superior_eur": 3899.97,
+        "nota": "Franja implícita deducida del primer límite de la tabla oficial."
+      },
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 648900,
+          "limite_superior": 1081500,
+          "amplitud": 432600,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 25,
+          "limite_inferior_eur": 3899.97,
+          "limite_superior_eur": 6499.95,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 1081500,
+          "limite_superior": 1622250,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 108150,
+          "tipo_marginal_pct": 26,
+          "limite_inferior_eur": 6499.95,
+          "limite_superior_eur": 9749.92,
+          "cuota_acumulada_en_limite_inferior_eur": 649.99,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 1622250,
+          "limite_superior": 2163000,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 248745,
+          "tipo_marginal_pct": 27,
+          "limite_inferior_eur": 9749.92,
+          "limite_superior_eur": 12999.89,
+          "cuota_acumulada_en_limite_inferior_eur": 1494.99,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 2163000,
+          "limite_superior": 2703750,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 394748,
+          "tipo_marginal_pct": 28,
+          "limite_inferior_eur": 12999.89,
+          "limite_superior_eur": 16249.86,
+          "cuota_acumulada_en_limite_inferior_eur": 2372.48,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 2703750,
+          "limite_superior": 3244500,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 546158,
+          "tipo_marginal_pct": 30,
+          "limite_inferior_eur": 16249.86,
+          "limite_superior_eur": 19499.84,
+          "cuota_acumulada_en_limite_inferior_eur": 3282.48,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 3244500,
+          "limite_superior": 3785250,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 708383,
+          "tipo_marginal_pct": 32,
+          "limite_inferior_eur": 19499.84,
+          "limite_superior_eur": 22749.81,
+          "cuota_acumulada_en_limite_inferior_eur": 4257.47,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 7,
+          "limite_inferior": 3785250,
+          "limite_superior": 4326000,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 881423,
+          "tipo_marginal_pct": 34,
+          "limite_inferior_eur": 22749.81,
+          "limite_superior_eur": 25999.78,
+          "cuota_acumulada_en_limite_inferior_eur": 5297.46,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 8,
+          "limite_inferior": 4326000,
+          "limite_superior": 4866750,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 1065278,
+          "tipo_marginal_pct": 36,
+          "limite_inferior_eur": 25999.78,
+          "limite_superior_eur": 29249.76,
+          "cuota_acumulada_en_limite_inferior_eur": 6402.45,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 9,
+          "limite_inferior": 4866750,
+          "limite_superior": 5407500,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 1259948,
+          "tipo_marginal_pct": 38.5,
+          "limite_inferior_eur": 29249.76,
+          "limite_superior_eur": 32499.73,
+          "cuota_acumulada_en_limite_inferior_eur": 7572.44,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 10,
+          "limite_inferior": 5407500,
+          "limite_superior": 5948250,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 1468136,
+          "tipo_marginal_pct": 41,
+          "limite_inferior_eur": 32499.73,
+          "limite_superior_eur": 35749.7,
+          "cuota_acumulada_en_limite_inferior_eur": 8823.68,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 11,
+          "limite_inferior": 5948250,
+          "limite_superior": 6489000,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 1689844,
+          "tipo_marginal_pct": 43.5,
+          "limite_inferior_eur": 35749.7,
+          "limite_superior_eur": 38999.68,
+          "cuota_acumulada_en_limite_inferior_eur": 10156.17,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 12,
+          "limite_inferior": 6489000,
+          "limite_superior": 7029750,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 1925070,
+          "tipo_marginal_pct": 46,
+          "limite_inferior_eur": 38999.68,
+          "limite_superior_eur": 42249.65,
+          "cuota_acumulada_en_limite_inferior_eur": 11569.9,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 13,
+          "limite_inferior": 7029750,
+          "limite_superior": 7570500,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 2173815,
+          "tipo_marginal_pct": 48.5,
+          "limite_inferior_eur": 42249.65,
+          "limite_superior_eur": 45499.62,
+          "cuota_acumulada_en_limite_inferior_eur": 13064.89,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 14,
+          "limite_inferior": 7570500,
+          "limite_superior": 8111250,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 2436079,
+          "tipo_marginal_pct": 51,
+          "limite_inferior_eur": 45499.62,
+          "limite_superior_eur": 48749.59,
+          "cuota_acumulada_en_limite_inferior_eur": 14641.13,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 15,
+          "limite_inferior": 8111250,
+          "limite_superior": 8652000,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 2711861,
+          "tipo_marginal_pct": 53.5,
+          "limite_inferior_eur": 48749.59,
+          "limite_superior_eur": 51999.57,
+          "cuota_acumulada_en_limite_inferior_eur": 16298.61,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 16,
+          "limite_inferior": 8652000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 3001163,
+          "tipo_marginal_pct": 56,
+          "limite_inferior_eur": 51999.57,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 18037.35,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "La tabla oficial comienza en un límite inferior superior a cero; la franja previa con cuota cero se conserva aparte y no se inventa como fila oficial."
+      ]
+    },
+    {
+      "anio": 1991,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_general_nacional_unificada",
+      "moneda_original": "ESP",
+      "unidad_monetaria_original": "peseta española",
+      "estado_fuente": "prorroga_legal_verificada",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-1990-31180",
+          "titulo": "Ley 31/1990, escala aplicable en 1991",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-1990-31180"
+        }
+      ],
+      "banda_cuota_cero_implicita": {
+        "limite_inferior": 0,
+        "limite_superior": 648900,
+        "tipo_marginal_pct": 0,
+        "cuota_acumulada_en_limite_inferior": 0,
+        "limite_inferior_eur": 0,
+        "limite_superior_eur": 3899.97,
+        "nota": "Franja implícita deducida del primer límite de la tabla oficial."
+      },
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 648900,
+          "limite_superior": 1081500,
+          "amplitud": 432600,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 25,
+          "limite_inferior_eur": 3899.97,
+          "limite_superior_eur": 6499.95,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 1081500,
+          "limite_superior": 1622250,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 108150,
+          "tipo_marginal_pct": 26,
+          "limite_inferior_eur": 6499.95,
+          "limite_superior_eur": 9749.92,
+          "cuota_acumulada_en_limite_inferior_eur": 649.99,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 1622250,
+          "limite_superior": 2163000,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 248745,
+          "tipo_marginal_pct": 27,
+          "limite_inferior_eur": 9749.92,
+          "limite_superior_eur": 12999.89,
+          "cuota_acumulada_en_limite_inferior_eur": 1494.99,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 2163000,
+          "limite_superior": 2703750,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 394748,
+          "tipo_marginal_pct": 28,
+          "limite_inferior_eur": 12999.89,
+          "limite_superior_eur": 16249.86,
+          "cuota_acumulada_en_limite_inferior_eur": 2372.48,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 2703750,
+          "limite_superior": 3244500,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 546158,
+          "tipo_marginal_pct": 30,
+          "limite_inferior_eur": 16249.86,
+          "limite_superior_eur": 19499.84,
+          "cuota_acumulada_en_limite_inferior_eur": 3282.48,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 3244500,
+          "limite_superior": 3785250,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 708383,
+          "tipo_marginal_pct": 32,
+          "limite_inferior_eur": 19499.84,
+          "limite_superior_eur": 22749.81,
+          "cuota_acumulada_en_limite_inferior_eur": 4257.47,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 7,
+          "limite_inferior": 3785250,
+          "limite_superior": 4326000,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 881423,
+          "tipo_marginal_pct": 34,
+          "limite_inferior_eur": 22749.81,
+          "limite_superior_eur": 25999.78,
+          "cuota_acumulada_en_limite_inferior_eur": 5297.46,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 8,
+          "limite_inferior": 4326000,
+          "limite_superior": 4866750,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 1065278,
+          "tipo_marginal_pct": 36,
+          "limite_inferior_eur": 25999.78,
+          "limite_superior_eur": 29249.76,
+          "cuota_acumulada_en_limite_inferior_eur": 6402.45,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 9,
+          "limite_inferior": 4866750,
+          "limite_superior": 5407500,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 1259948,
+          "tipo_marginal_pct": 38.5,
+          "limite_inferior_eur": 29249.76,
+          "limite_superior_eur": 32499.73,
+          "cuota_acumulada_en_limite_inferior_eur": 7572.44,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 10,
+          "limite_inferior": 5407500,
+          "limite_superior": 5948250,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 1468136,
+          "tipo_marginal_pct": 41,
+          "limite_inferior_eur": 32499.73,
+          "limite_superior_eur": 35749.7,
+          "cuota_acumulada_en_limite_inferior_eur": 8823.68,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 11,
+          "limite_inferior": 5948250,
+          "limite_superior": 6489000,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 1689844,
+          "tipo_marginal_pct": 43.5,
+          "limite_inferior_eur": 35749.7,
+          "limite_superior_eur": 38999.68,
+          "cuota_acumulada_en_limite_inferior_eur": 10156.17,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 12,
+          "limite_inferior": 6489000,
+          "limite_superior": 7029750,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 1925070,
+          "tipo_marginal_pct": 46,
+          "limite_inferior_eur": 38999.68,
+          "limite_superior_eur": 42249.65,
+          "cuota_acumulada_en_limite_inferior_eur": 11569.9,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 13,
+          "limite_inferior": 7029750,
+          "limite_superior": 7570500,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 2173815,
+          "tipo_marginal_pct": 48.5,
+          "limite_inferior_eur": 42249.65,
+          "limite_superior_eur": 45499.62,
+          "cuota_acumulada_en_limite_inferior_eur": 13064.89,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 14,
+          "limite_inferior": 7570500,
+          "limite_superior": 8111250,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 2436079,
+          "tipo_marginal_pct": 51,
+          "limite_inferior_eur": 45499.62,
+          "limite_superior_eur": 48749.59,
+          "cuota_acumulada_en_limite_inferior_eur": 14641.13,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 15,
+          "limite_inferior": 8111250,
+          "limite_superior": 8652000,
+          "amplitud": 540750,
+          "cuota_acumulada_en_limite_inferior": 2711861,
+          "tipo_marginal_pct": 53.5,
+          "limite_inferior_eur": 48749.59,
+          "limite_superior_eur": 51999.57,
+          "cuota_acumulada_en_limite_inferior_eur": 16298.61,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 16,
+          "limite_inferior": 8652000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 3001163,
+          "tipo_marginal_pct": 56,
+          "limite_inferior_eur": 51999.57,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 18037.35,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "La tabla oficial comienza en un límite inferior superior a cero; la franja previa con cuota cero se conserva aparte y no se inventa como fila oficial.",
+        "La escala de 1990 se mantuvo sin cambios para 1991."
+      ]
+    },
+    {
+      "anio": 1992,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_general_nacional_unificada",
+      "moneda_original": "ESP",
+      "unidad_monetaria_original": "peseta española",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-1991-14391",
+          "titulo": "Ley 18/1991, artículo 74",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-1991-14391"
+        }
+      ],
+      "banda_cuota_cero_implicita": {
+        "limite_inferior": 0,
+        "limite_superior": 400000,
+        "tipo_marginal_pct": 0,
+        "cuota_acumulada_en_limite_inferior": 0,
+        "limite_inferior_eur": 0,
+        "limite_superior_eur": 2404.05,
+        "nota": "Franja implícita deducida del primer límite de la tabla oficial."
+      },
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 400000,
+          "limite_superior": 1000000,
+          "amplitud": 600000,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 20,
+          "limite_inferior_eur": 2404.05,
+          "limite_superior_eur": 6010.12,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 1000000,
+          "limite_superior": 1570000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 120000,
+          "tipo_marginal_pct": 22,
+          "limite_inferior_eur": 6010.12,
+          "limite_superior_eur": 9435.89,
+          "cuota_acumulada_en_limite_inferior_eur": 721.21,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 1570000,
+          "limite_superior": 2140000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 245400,
+          "tipo_marginal_pct": 24,
+          "limite_inferior_eur": 9435.89,
+          "limite_superior_eur": 12861.66,
+          "cuota_acumulada_en_limite_inferior_eur": 1474.88,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 2140000,
+          "limite_superior": 2710000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 382200,
+          "tipo_marginal_pct": 26,
+          "limite_inferior_eur": 12861.66,
+          "limite_superior_eur": 16287.43,
+          "cuota_acumulada_en_limite_inferior_eur": 2297.07,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 2710000,
+          "limite_superior": 3280000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 530400,
+          "tipo_marginal_pct": 28,
+          "limite_inferior_eur": 16287.43,
+          "limite_superior_eur": 19713.2,
+          "cuota_acumulada_en_limite_inferior_eur": 3187.77,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 3280000,
+          "limite_superior": 3850000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 690000,
+          "tipo_marginal_pct": 30,
+          "limite_inferior_eur": 19713.2,
+          "limite_superior_eur": 23138.97,
+          "cuota_acumulada_en_limite_inferior_eur": 4146.98,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 7,
+          "limite_inferior": 3850000,
+          "limite_superior": 4420000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 861000,
+          "tipo_marginal_pct": 32,
+          "limite_inferior_eur": 23138.97,
+          "limite_superior_eur": 26564.74,
+          "cuota_acumulada_en_limite_inferior_eur": 5174.71,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 8,
+          "limite_inferior": 4420000,
+          "limite_superior": 4990000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1043400,
+          "tipo_marginal_pct": 34,
+          "limite_inferior_eur": 26564.74,
+          "limite_superior_eur": 29990.5,
+          "cuota_acumulada_en_limite_inferior_eur": 6270.96,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 9,
+          "limite_inferior": 4990000,
+          "limite_superior": 5560000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1237200,
+          "tipo_marginal_pct": 36,
+          "limite_inferior_eur": 29990.5,
+          "limite_superior_eur": 33416.27,
+          "cuota_acumulada_en_limite_inferior_eur": 7435.72,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 10,
+          "limite_inferior": 5560000,
+          "limite_superior": 6130000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1442400,
+          "tipo_marginal_pct": 38,
+          "limite_inferior_eur": 33416.27,
+          "limite_superior_eur": 36842.04,
+          "cuota_acumulada_en_limite_inferior_eur": 8669,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 11,
+          "limite_inferior": 6130000,
+          "limite_superior": 6700000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1659000,
+          "tipo_marginal_pct": 40,
+          "limite_inferior_eur": 36842.04,
+          "limite_superior_eur": 40267.81,
+          "cuota_acumulada_en_limite_inferior_eur": 9970.79,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 12,
+          "limite_inferior": 6700000,
+          "limite_superior": 7270000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1887000,
+          "tipo_marginal_pct": 42,
+          "limite_inferior_eur": 40267.81,
+          "limite_superior_eur": 43693.58,
+          "cuota_acumulada_en_limite_inferior_eur": 11341.1,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 13,
+          "limite_inferior": 7270000,
+          "limite_superior": 7840000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 2126400,
+          "tipo_marginal_pct": 44,
+          "limite_inferior_eur": 43693.58,
+          "limite_superior_eur": 47119.35,
+          "cuota_acumulada_en_limite_inferior_eur": 12779.92,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 14,
+          "limite_inferior": 7840000,
+          "limite_superior": 8410000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 2377200,
+          "tipo_marginal_pct": 46,
+          "limite_inferior_eur": 47119.35,
+          "limite_superior_eur": 50545.12,
+          "cuota_acumulada_en_limite_inferior_eur": 14287.26,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 15,
+          "limite_inferior": 8410000,
+          "limite_superior": 8980000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 2639400,
+          "tipo_marginal_pct": 48,
+          "limite_inferior_eur": 50545.12,
+          "limite_superior_eur": 53970.89,
+          "cuota_acumulada_en_limite_inferior_eur": 15863.11,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 16,
+          "limite_inferior": 8980000,
+          "limite_superior": 9550000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 2913000,
+          "tipo_marginal_pct": 50.5,
+          "limite_inferior_eur": 53970.89,
+          "limite_superior_eur": 57396.66,
+          "cuota_acumulada_en_limite_inferior_eur": 17507.48,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 17,
+          "limite_inferior": 9550000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 3200850,
+          "tipo_marginal_pct": 53,
+          "limite_inferior_eur": 57396.66,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 19237.5,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "La tabla oficial comienza en un límite inferior superior a cero; la franja previa con cuota cero se conserva aparte y no se inventa como fila oficial."
+      ]
+    },
+    {
+      "anio": 1993,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_general_nacional_unificada",
+      "moneda_original": "ESP",
+      "unidad_monetaria_original": "peseta española",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-1992-28826",
+          "titulo": "Ley 39/1992, artículo 66",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-1992-28826"
+        }
+      ],
+      "banda_cuota_cero_implicita": {
+        "limite_inferior": 0,
+        "limite_superior": 400000,
+        "tipo_marginal_pct": 0,
+        "cuota_acumulada_en_limite_inferior": 0,
+        "limite_inferior_eur": 0,
+        "limite_superior_eur": 2404.05,
+        "nota": "Franja implícita deducida del primer límite de la tabla oficial."
+      },
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 400000,
+          "limite_superior": 1000000,
+          "amplitud": 600000,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 20,
+          "limite_inferior_eur": 2404.05,
+          "limite_superior_eur": 6010.12,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 1000000,
+          "limite_superior": 1570000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 120000,
+          "tipo_marginal_pct": 22,
+          "limite_inferior_eur": 6010.12,
+          "limite_superior_eur": 9435.89,
+          "cuota_acumulada_en_limite_inferior_eur": 721.21,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 1570000,
+          "limite_superior": 2140000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 245400,
+          "tipo_marginal_pct": 24.5,
+          "limite_inferior_eur": 9435.89,
+          "limite_superior_eur": 12861.66,
+          "cuota_acumulada_en_limite_inferior_eur": 1474.88,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 2140000,
+          "limite_superior": 2710000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 385050,
+          "tipo_marginal_pct": 27,
+          "limite_inferior_eur": 12861.66,
+          "limite_superior_eur": 16287.43,
+          "cuota_acumulada_en_limite_inferior_eur": 2314.2,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 2710000,
+          "limite_superior": 3280000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 538950,
+          "tipo_marginal_pct": 30,
+          "limite_inferior_eur": 16287.43,
+          "limite_superior_eur": 19713.2,
+          "cuota_acumulada_en_limite_inferior_eur": 3239.15,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 3280000,
+          "limite_superior": 3850000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 709950,
+          "tipo_marginal_pct": 32,
+          "limite_inferior_eur": 19713.2,
+          "limite_superior_eur": 23138.97,
+          "cuota_acumulada_en_limite_inferior_eur": 4266.89,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 7,
+          "limite_inferior": 3850000,
+          "limite_superior": 4420000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 892350,
+          "tipo_marginal_pct": 34,
+          "limite_inferior_eur": 23138.97,
+          "limite_superior_eur": 26564.74,
+          "cuota_acumulada_en_limite_inferior_eur": 5363.13,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 8,
+          "limite_inferior": 4420000,
+          "limite_superior": 4990000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1086150,
+          "tipo_marginal_pct": 36,
+          "limite_inferior_eur": 26564.74,
+          "limite_superior_eur": 29990.5,
+          "cuota_acumulada_en_limite_inferior_eur": 6527.89,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 9,
+          "limite_inferior": 4990000,
+          "limite_superior": 5560000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1291350,
+          "tipo_marginal_pct": 38,
+          "limite_inferior_eur": 29990.5,
+          "limite_superior_eur": 33416.27,
+          "cuota_acumulada_en_limite_inferior_eur": 7761.17,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 10,
+          "limite_inferior": 5560000,
+          "limite_superior": 6130000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1507950,
+          "tipo_marginal_pct": 40,
+          "limite_inferior_eur": 33416.27,
+          "limite_superior_eur": 36842.04,
+          "cuota_acumulada_en_limite_inferior_eur": 9062.96,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 11,
+          "limite_inferior": 6130000,
+          "limite_superior": 6700000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1735950,
+          "tipo_marginal_pct": 42.5,
+          "limite_inferior_eur": 36842.04,
+          "limite_superior_eur": 40267.81,
+          "cuota_acumulada_en_limite_inferior_eur": 10433.27,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 12,
+          "limite_inferior": 6700000,
+          "limite_superior": 7270000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1978200,
+          "tipo_marginal_pct": 45,
+          "limite_inferior_eur": 40267.81,
+          "limite_superior_eur": 43693.58,
+          "cuota_acumulada_en_limite_inferior_eur": 11889.22,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 13,
+          "limite_inferior": 7270000,
+          "limite_superior": 7840000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 2234700,
+          "tipo_marginal_pct": 47,
+          "limite_inferior_eur": 43693.58,
+          "limite_superior_eur": 47119.35,
+          "cuota_acumulada_en_limite_inferior_eur": 13430.82,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 14,
+          "limite_inferior": 7840000,
+          "limite_superior": 8410000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 2502600,
+          "tipo_marginal_pct": 49,
+          "limite_inferior_eur": 47119.35,
+          "limite_superior_eur": 50545.12,
+          "cuota_acumulada_en_limite_inferior_eur": 15040.93,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 15,
+          "limite_inferior": 8410000,
+          "limite_superior": 8980000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 2781900,
+          "tipo_marginal_pct": 51,
+          "limite_inferior_eur": 50545.12,
+          "limite_superior_eur": 53970.89,
+          "cuota_acumulada_en_limite_inferior_eur": 16719.56,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 16,
+          "limite_inferior": 8980000,
+          "limite_superior": 9550000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 3072600,
+          "tipo_marginal_pct": 53.5,
+          "limite_inferior_eur": 53970.89,
+          "limite_superior_eur": 57396.66,
+          "cuota_acumulada_en_limite_inferior_eur": 18466.7,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 17,
+          "limite_inferior": 9550000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 3377550,
+          "tipo_marginal_pct": 56,
+          "limite_inferior_eur": 57396.66,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 20299.48,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "La tabla oficial comienza en un límite inferior superior a cero; la franja previa con cuota cero se conserva aparte y no se inventa como fila oficial."
+      ]
+    },
+    {
+      "anio": 1994,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_general_nacional_unificada",
+      "moneda_original": "ESP",
+      "unidad_monetaria_original": "peseta española",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-1993-31087",
+          "titulo": "Ley 21/1993, artículo 64",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-1993-31087"
+        }
+      ],
+      "banda_cuota_cero_implicita": {
+        "limite_inferior": 0,
+        "limite_superior": 400000,
+        "tipo_marginal_pct": 0,
+        "cuota_acumulada_en_limite_inferior": 0,
+        "limite_inferior_eur": 0,
+        "limite_superior_eur": 2404.05,
+        "nota": "Franja implícita deducida del primer límite de la tabla oficial."
+      },
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 400000,
+          "limite_superior": 1000000,
+          "amplitud": 600000,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 20,
+          "limite_inferior_eur": 2404.05,
+          "limite_superior_eur": 6010.12,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 1000000,
+          "limite_superior": 1570000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 120000,
+          "tipo_marginal_pct": 22,
+          "limite_inferior_eur": 6010.12,
+          "limite_superior_eur": 9435.89,
+          "cuota_acumulada_en_limite_inferior_eur": 721.21,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 1570000,
+          "limite_superior": 2140000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 245400,
+          "tipo_marginal_pct": 24.5,
+          "limite_inferior_eur": 9435.89,
+          "limite_superior_eur": 12861.66,
+          "cuota_acumulada_en_limite_inferior_eur": 1474.88,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 2140000,
+          "limite_superior": 2710000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 385050,
+          "tipo_marginal_pct": 27,
+          "limite_inferior_eur": 12861.66,
+          "limite_superior_eur": 16287.43,
+          "cuota_acumulada_en_limite_inferior_eur": 2314.2,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 2710000,
+          "limite_superior": 3280000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 538950,
+          "tipo_marginal_pct": 30,
+          "limite_inferior_eur": 16287.43,
+          "limite_superior_eur": 19713.2,
+          "cuota_acumulada_en_limite_inferior_eur": 3239.15,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 3280000,
+          "limite_superior": 3850000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 709950,
+          "tipo_marginal_pct": 32,
+          "limite_inferior_eur": 19713.2,
+          "limite_superior_eur": 23138.97,
+          "cuota_acumulada_en_limite_inferior_eur": 4266.89,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 7,
+          "limite_inferior": 3850000,
+          "limite_superior": 4420000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 892350,
+          "tipo_marginal_pct": 34,
+          "limite_inferior_eur": 23138.97,
+          "limite_superior_eur": 26564.74,
+          "cuota_acumulada_en_limite_inferior_eur": 5363.13,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 8,
+          "limite_inferior": 4420000,
+          "limite_superior": 4990000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1086150,
+          "tipo_marginal_pct": 36,
+          "limite_inferior_eur": 26564.74,
+          "limite_superior_eur": 29990.5,
+          "cuota_acumulada_en_limite_inferior_eur": 6527.89,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 9,
+          "limite_inferior": 4990000,
+          "limite_superior": 5560000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1291350,
+          "tipo_marginal_pct": 38,
+          "limite_inferior_eur": 29990.5,
+          "limite_superior_eur": 33416.27,
+          "cuota_acumulada_en_limite_inferior_eur": 7761.17,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 10,
+          "limite_inferior": 5560000,
+          "limite_superior": 6130000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1507950,
+          "tipo_marginal_pct": 40,
+          "limite_inferior_eur": 33416.27,
+          "limite_superior_eur": 36842.04,
+          "cuota_acumulada_en_limite_inferior_eur": 9062.96,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 11,
+          "limite_inferior": 6130000,
+          "limite_superior": 6700000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1735950,
+          "tipo_marginal_pct": 42.5,
+          "limite_inferior_eur": 36842.04,
+          "limite_superior_eur": 40267.81,
+          "cuota_acumulada_en_limite_inferior_eur": 10433.27,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 12,
+          "limite_inferior": 6700000,
+          "limite_superior": 7270000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 1978200,
+          "tipo_marginal_pct": 45,
+          "limite_inferior_eur": 40267.81,
+          "limite_superior_eur": 43693.58,
+          "cuota_acumulada_en_limite_inferior_eur": 11889.22,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 13,
+          "limite_inferior": 7270000,
+          "limite_superior": 7840000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 2234700,
+          "tipo_marginal_pct": 47,
+          "limite_inferior_eur": 43693.58,
+          "limite_superior_eur": 47119.35,
+          "cuota_acumulada_en_limite_inferior_eur": 13430.82,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 14,
+          "limite_inferior": 7840000,
+          "limite_superior": 8410000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 2502600,
+          "tipo_marginal_pct": 49,
+          "limite_inferior_eur": 47119.35,
+          "limite_superior_eur": 50545.12,
+          "cuota_acumulada_en_limite_inferior_eur": 15040.93,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 15,
+          "limite_inferior": 8410000,
+          "limite_superior": 8980000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 2781900,
+          "tipo_marginal_pct": 51,
+          "limite_inferior_eur": 50545.12,
+          "limite_superior_eur": 53970.89,
+          "cuota_acumulada_en_limite_inferior_eur": 16719.56,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 16,
+          "limite_inferior": 8980000,
+          "limite_superior": 9550000,
+          "amplitud": 570000,
+          "cuota_acumulada_en_limite_inferior": 3072600,
+          "tipo_marginal_pct": 53.5,
+          "limite_inferior_eur": 53970.89,
+          "limite_superior_eur": 57396.66,
+          "cuota_acumulada_en_limite_inferior_eur": 18466.7,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 17,
+          "limite_inferior": 9550000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 3377550,
+          "tipo_marginal_pct": 56,
+          "limite_inferior_eur": 57396.66,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 20299.48,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "La tabla oficial comienza en un límite inferior superior a cero; la franja previa con cuota cero se conserva aparte y no se inventa como fila oficial."
+      ]
+    },
+    {
+      "anio": 1995,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_general_nacional_unificada",
+      "moneda_original": "ESP",
+      "unidad_monetaria_original": "peseta española",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-1994-28967",
+          "titulo": "Ley 41/1994, artículo 59",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-1994-28967"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 415000,
+          "amplitud": 415000,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 0,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 2494.2,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 415000,
+          "limite_superior": 1035000,
+          "amplitud": 620000,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 20,
+          "limite_inferior_eur": 2494.2,
+          "limite_superior_eur": 6220.48,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 1035000,
+          "limite_superior": 1625000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 124000,
+          "tipo_marginal_pct": 22,
+          "limite_inferior_eur": 6220.48,
+          "limite_superior_eur": 9766.45,
+          "cuota_acumulada_en_limite_inferior_eur": 745.26,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 1625000,
+          "limite_superior": 2215000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 253800,
+          "tipo_marginal_pct": 24.5,
+          "limite_inferior_eur": 9766.45,
+          "limite_superior_eur": 13312.42,
+          "cuota_acumulada_en_limite_inferior_eur": 1525.37,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 2215000,
+          "limite_superior": 2805000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 398350,
+          "tipo_marginal_pct": 27,
+          "limite_inferior_eur": 13312.42,
+          "limite_superior_eur": 16858.39,
+          "cuota_acumulada_en_limite_inferior_eur": 2394.13,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 2805000,
+          "limite_superior": 3395000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 557650,
+          "tipo_marginal_pct": 30,
+          "limite_inferior_eur": 16858.39,
+          "limite_superior_eur": 20404.36,
+          "cuota_acumulada_en_limite_inferior_eur": 3351.54,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 7,
+          "limite_inferior": 3395000,
+          "limite_superior": 3985000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 734650,
+          "tipo_marginal_pct": 32,
+          "limite_inferior_eur": 20404.36,
+          "limite_superior_eur": 23950.33,
+          "cuota_acumulada_en_limite_inferior_eur": 4415.34,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 8,
+          "limite_inferior": 3985000,
+          "limite_superior": 4575000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 923450,
+          "tipo_marginal_pct": 34,
+          "limite_inferior_eur": 23950.33,
+          "limite_superior_eur": 27496.3,
+          "cuota_acumulada_en_limite_inferior_eur": 5550.05,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 9,
+          "limite_inferior": 4575000,
+          "limite_superior": 5165000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 1124050,
+          "tipo_marginal_pct": 36,
+          "limite_inferior_eur": 27496.3,
+          "limite_superior_eur": 31042.28,
+          "cuota_acumulada_en_limite_inferior_eur": 6755.68,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 10,
+          "limite_inferior": 5165000,
+          "limite_superior": 5755000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 1336450,
+          "tipo_marginal_pct": 38,
+          "limite_inferior_eur": 31042.28,
+          "limite_superior_eur": 34588.25,
+          "cuota_acumulada_en_limite_inferior_eur": 8032.23,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 11,
+          "limite_inferior": 5755000,
+          "limite_superior": 6345000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 1560650,
+          "tipo_marginal_pct": 40,
+          "limite_inferior_eur": 34588.25,
+          "limite_superior_eur": 38134.22,
+          "cuota_acumulada_en_limite_inferior_eur": 9379.7,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 12,
+          "limite_inferior": 6345000,
+          "limite_superior": 6935000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 1796650,
+          "tipo_marginal_pct": 42.5,
+          "limite_inferior_eur": 38134.22,
+          "limite_superior_eur": 41680.19,
+          "cuota_acumulada_en_limite_inferior_eur": 10798.08,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 13,
+          "limite_inferior": 6935000,
+          "limite_superior": 7525000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 2047400,
+          "tipo_marginal_pct": 45,
+          "limite_inferior_eur": 41680.19,
+          "limite_superior_eur": 45226.16,
+          "cuota_acumulada_en_limite_inferior_eur": 12305.12,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 14,
+          "limite_inferior": 7525000,
+          "limite_superior": 8115000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 2312900,
+          "tipo_marginal_pct": 47,
+          "limite_inferior_eur": 45226.16,
+          "limite_superior_eur": 48772.13,
+          "cuota_acumulada_en_limite_inferior_eur": 13900.81,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 15,
+          "limite_inferior": 8115000,
+          "limite_superior": 8705000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 2590200,
+          "tipo_marginal_pct": 49,
+          "limite_inferior_eur": 48772.13,
+          "limite_superior_eur": 52318.1,
+          "cuota_acumulada_en_limite_inferior_eur": 15567.42,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 16,
+          "limite_inferior": 8705000,
+          "limite_superior": 9295000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 2879300,
+          "tipo_marginal_pct": 51,
+          "limite_inferior_eur": 52318.1,
+          "limite_superior_eur": 55864.08,
+          "cuota_acumulada_en_limite_inferior_eur": 17304.94,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 17,
+          "limite_inferior": 9295000,
+          "limite_superior": 9885000,
+          "amplitud": 590000,
+          "cuota_acumulada_en_limite_inferior": 3180200,
+          "tipo_marginal_pct": 53.5,
+          "limite_inferior_eur": 55864.08,
+          "limite_superior_eur": 59410.05,
+          "cuota_acumulada_en_limite_inferior_eur": 19113.39,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 18,
+          "limite_inferior": 9885000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 3495850,
+          "tipo_marginal_pct": 56,
+          "limite_inferior_eur": 59410.05,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 21010.48,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 1996,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_general_nacional_unificada",
+      "moneda_original": "ESP",
+      "unidad_monetaria_original": "peseta española",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-1995-27964",
+          "titulo": "Real Decreto-ley 12/1995, artículo 16",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-1995-27964"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 430000,
+          "amplitud": 430000,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 0,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 2584.35,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 430000,
+          "limite_superior": 1072000,
+          "amplitud": 642000,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 20,
+          "limite_inferior_eur": 2584.35,
+          "limite_superior_eur": 6442.85,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 1072000,
+          "limite_superior": 1682000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 128400,
+          "tipo_marginal_pct": 22,
+          "limite_inferior_eur": 6442.85,
+          "limite_superior_eur": 10109.02,
+          "cuota_acumulada_en_limite_inferior_eur": 771.7,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 1682000,
+          "limite_superior": 2292000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 262600,
+          "tipo_marginal_pct": 24.5,
+          "limite_inferior_eur": 10109.02,
+          "limite_superior_eur": 13775.2,
+          "cuota_acumulada_en_limite_inferior_eur": 1578.26,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 2292000,
+          "limite_superior": 2902000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 412050,
+          "tipo_marginal_pct": 27,
+          "limite_inferior_eur": 13775.2,
+          "limite_superior_eur": 17441.37,
+          "cuota_acumulada_en_limite_inferior_eur": 2476.47,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 2902000,
+          "limite_superior": 3512000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 576750,
+          "tipo_marginal_pct": 30,
+          "limite_inferior_eur": 17441.37,
+          "limite_superior_eur": 21107.55,
+          "cuota_acumulada_en_limite_inferior_eur": 3466.34,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 7,
+          "limite_inferior": 3512000,
+          "limite_superior": 4122000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 759750,
+          "tipo_marginal_pct": 32,
+          "limite_inferior_eur": 21107.55,
+          "limite_superior_eur": 24773.72,
+          "cuota_acumulada_en_limite_inferior_eur": 4566.19,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 8,
+          "limite_inferior": 4122000,
+          "limite_superior": 4732000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 954950,
+          "tipo_marginal_pct": 34,
+          "limite_inferior_eur": 24773.72,
+          "limite_superior_eur": 28439.89,
+          "cuota_acumulada_en_limite_inferior_eur": 5739.37,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 9,
+          "limite_inferior": 4732000,
+          "limite_superior": 5342000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 1162350,
+          "tipo_marginal_pct": 36,
+          "limite_inferior_eur": 28439.89,
+          "limite_superior_eur": 32106.07,
+          "cuota_acumulada_en_limite_inferior_eur": 6985.86,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 10,
+          "limite_inferior": 5342000,
+          "limite_superior": 5952000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 1381950,
+          "tipo_marginal_pct": 38,
+          "limite_inferior_eur": 32106.07,
+          "limite_superior_eur": 35772.24,
+          "cuota_acumulada_en_limite_inferior_eur": 8305.69,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 11,
+          "limite_inferior": 5952000,
+          "limite_superior": 6562000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 1613750,
+          "tipo_marginal_pct": 40,
+          "limite_inferior_eur": 35772.24,
+          "limite_superior_eur": 39438.41,
+          "cuota_acumulada_en_limite_inferior_eur": 9698.83,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 12,
+          "limite_inferior": 6562000,
+          "limite_superior": 7172000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 1857750,
+          "tipo_marginal_pct": 42.5,
+          "limite_inferior_eur": 39438.41,
+          "limite_superior_eur": 43104.59,
+          "cuota_acumulada_en_limite_inferior_eur": 11165.3,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 13,
+          "limite_inferior": 7172000,
+          "limite_superior": 7782000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 2117000,
+          "tipo_marginal_pct": 45,
+          "limite_inferior_eur": 43104.59,
+          "limite_superior_eur": 46770.76,
+          "cuota_acumulada_en_limite_inferior_eur": 12723.43,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 14,
+          "limite_inferior": 7782000,
+          "limite_superior": 8392000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 2391500,
+          "tipo_marginal_pct": 47,
+          "limite_inferior_eur": 46770.76,
+          "limite_superior_eur": 50436.94,
+          "cuota_acumulada_en_limite_inferior_eur": 14373.2,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 15,
+          "limite_inferior": 8392000,
+          "limite_superior": 9002000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 2678200,
+          "tipo_marginal_pct": 49,
+          "limite_inferior_eur": 50436.94,
+          "limite_superior_eur": 54103.11,
+          "cuota_acumulada_en_limite_inferior_eur": 16096.31,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 16,
+          "limite_inferior": 9002000,
+          "limite_superior": 9612000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 2977100,
+          "tipo_marginal_pct": 51,
+          "limite_inferior_eur": 54103.11,
+          "limite_superior_eur": 57769.28,
+          "cuota_acumulada_en_limite_inferior_eur": 17892.73,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 17,
+          "limite_inferior": 9612000,
+          "limite_superior": 10222000,
+          "amplitud": 610000,
+          "cuota_acumulada_en_limite_inferior": 3288200,
+          "tipo_marginal_pct": 53.5,
+          "limite_inferior_eur": 57769.28,
+          "limite_superior_eur": 61435.46,
+          "cuota_acumulada_en_limite_inferior_eur": 19762.48,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 18,
+          "limite_inferior": 10222000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 3614550,
+          "tipo_marginal_pct": 56,
+          "limite_inferior_eur": 61435.46,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 21723.88,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 1997,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "ESP",
+      "unidad_monetaria_original": "peseta española",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-1996-29118",
+          "titulo": "Ley 14/1996, escala estatal aplicable en 1997",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-1996-29118"
+        }
+      ],
+      "banda_cuota_cero_implicita": {
+        "limite_inferior": 0,
+        "limite_superior": 442000,
+        "tipo_marginal_pct": 0,
+        "cuota_acumulada_en_limite_inferior": 0,
+        "limite_inferior_eur": 0,
+        "limite_superior_eur": 2656.47,
+        "nota": "Franja implícita deducida del primer límite de la tabla oficial."
+      },
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 442000,
+          "limite_superior": 1136000,
+          "amplitud": 694000,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 17,
+          "limite_inferior_eur": 2656.47,
+          "limite_superior_eur": 6827.5,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 1136000,
+          "limite_superior": 2305000,
+          "amplitud": 1169000,
+          "cuota_acumulada_en_limite_inferior": 117980,
+          "tipo_marginal_pct": 19.55,
+          "limite_inferior_eur": 6827.5,
+          "limite_superior_eur": 13853.33,
+          "cuota_acumulada_en_limite_inferior_eur": 709.07,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 2305000,
+          "limite_superior": 3474000,
+          "amplitud": 1169000,
+          "cuota_acumulada_en_limite_inferior": 346520,
+          "tipo_marginal_pct": 23.8,
+          "limite_inferior_eur": 13853.33,
+          "limite_superior_eur": 20879.16,
+          "cuota_acumulada_en_limite_inferior_eur": 2082.63,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 3474000,
+          "limite_superior": 4643000,
+          "amplitud": 1169000,
+          "cuota_acumulada_en_limite_inferior": 624742,
+          "tipo_marginal_pct": 27.2,
+          "limite_inferior_eur": 20879.16,
+          "limite_superior_eur": 27904.99,
+          "cuota_acumulada_en_limite_inferior_eur": 3754.78,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 4643000,
+          "limite_superior": 5812000,
+          "amplitud": 1169000,
+          "cuota_acumulada_en_limite_inferior": 942710,
+          "tipo_marginal_pct": 30.6,
+          "limite_inferior_eur": 27904.99,
+          "limite_superior_eur": 34930.82,
+          "cuota_acumulada_en_limite_inferior_eur": 5665.8,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 5812000,
+          "limite_superior": 6981000,
+          "amplitud": 1169000,
+          "cuota_acumulada_en_limite_inferior": 1300424,
+          "tipo_marginal_pct": 34,
+          "limite_inferior_eur": 34930.82,
+          "limite_superior_eur": 41956.66,
+          "cuota_acumulada_en_limite_inferior_eur": 7815.71,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 7,
+          "limite_inferior": 6981000,
+          "limite_superior": 8150000,
+          "amplitud": 1169000,
+          "cuota_acumulada_en_limite_inferior": 1697884,
+          "tipo_marginal_pct": 38.25,
+          "limite_inferior_eur": 41956.66,
+          "limite_superior_eur": 48982.49,
+          "cuota_acumulada_en_limite_inferior_eur": 10204.49,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 8,
+          "limite_inferior": 8150000,
+          "limite_superior": 9319000,
+          "amplitud": 1169000,
+          "cuota_acumulada_en_limite_inferior": 2145026,
+          "tipo_marginal_pct": 41.65,
+          "limite_inferior_eur": 48982.49,
+          "limite_superior_eur": 56008.32,
+          "cuota_acumulada_en_limite_inferior_eur": 12891.87,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 9,
+          "limite_inferior": 9319000,
+          "limite_superior": 10488000,
+          "amplitud": 1169000,
+          "cuota_acumulada_en_limite_inferior": 2631915,
+          "tipo_marginal_pct": 45.05,
+          "limite_inferior_eur": 56008.32,
+          "limite_superior_eur": 63034.15,
+          "cuota_acumulada_en_limite_inferior_eur": 15818.13,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 10,
+          "limite_inferior": 10488000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 3158549,
+          "tipo_marginal_pct": 47.6,
+          "limite_inferior_eur": 63034.15,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 18983.26,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "La tabla oficial comienza en un límite inferior superior a cero; la franja previa con cuota cero se conserva aparte y no se inventa como fila oficial.",
+        "Desde este periodo se conserva exclusivamente la escala estatal; la escala autonómica paralela queda fuera de esta serie."
+      ]
+    },
+    {
+      "anio": 1998,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "ESP",
+      "unidad_monetaria_original": "peseta española",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-1997-28052",
+          "titulo": "Ley 65/1997, artículo 56",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-1997-28052"
+        }
+      ],
+      "banda_cuota_cero_implicita": {
+        "limite_inferior": 0,
+        "limite_superior": 467000,
+        "tipo_marginal_pct": 0,
+        "cuota_acumulada_en_limite_inferior": 0,
+        "limite_inferior_eur": 0,
+        "limite_superior_eur": 2806.73,
+        "nota": "Franja implícita deducida del primer límite de la tabla oficial."
+      },
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 467000,
+          "limite_superior": 1161000,
+          "amplitud": 694000,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 17,
+          "limite_inferior_eur": 2806.73,
+          "limite_superior_eur": 6977.75,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 1161000,
+          "limite_superior": 2295000,
+          "amplitud": 1134000,
+          "cuota_acumulada_en_limite_inferior": 117980,
+          "tipo_marginal_pct": 19.55,
+          "limite_inferior_eur": 6977.75,
+          "limite_superior_eur": 13793.23,
+          "cuota_acumulada_en_limite_inferior_eur": 709.07,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 2295000,
+          "limite_superior": 3495000,
+          "amplitud": 1200000,
+          "cuota_acumulada_en_limite_inferior": 339677,
+          "tipo_marginal_pct": 23.8,
+          "limite_inferior_eur": 13793.23,
+          "limite_superior_eur": 21005.37,
+          "cuota_acumulada_en_limite_inferior_eur": 2041.5,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 3495000,
+          "limite_superior": 5095000,
+          "amplitud": 1600000,
+          "cuota_acumulada_en_limite_inferior": 625277,
+          "tipo_marginal_pct": 27.2,
+          "limite_inferior_eur": 21005.37,
+          "limite_superior_eur": 30621.57,
+          "cuota_acumulada_en_limite_inferior_eur": 3757.99,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 5095000,
+          "limite_superior": 6795000,
+          "amplitud": 1700000,
+          "cuota_acumulada_en_limite_inferior": 1060477,
+          "tipo_marginal_pct": 33.15,
+          "limite_inferior_eur": 30621.57,
+          "limite_superior_eur": 40838.77,
+          "cuota_acumulada_en_limite_inferior_eur": 6373.6,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 6795000,
+          "limite_superior": 8625000,
+          "amplitud": 1830000,
+          "cuota_acumulada_en_limite_inferior": 1624027,
+          "tipo_marginal_pct": 38.25,
+          "limite_inferior_eur": 40838.77,
+          "limite_superior_eur": 51837.29,
+          "cuota_acumulada_en_limite_inferior_eur": 9760.6,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 7,
+          "limite_inferior": 8625000,
+          "limite_superior": 10500000,
+          "amplitud": 1875000,
+          "cuota_acumulada_en_limite_inferior": 2324002,
+          "tipo_marginal_pct": 44.2,
+          "limite_inferior_eur": 51837.29,
+          "limite_superior_eur": 63106.27,
+          "cuota_acumulada_en_limite_inferior_eur": 13967.53,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 8,
+          "limite_inferior": 10500000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 3152752,
+          "tipo_marginal_pct": 47.6,
+          "limite_inferior_eur": 63106.27,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 18948.42,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "La tabla oficial comienza en un límite inferior superior a cero; la franja previa con cuota cero se conserva aparte y no se inventa como fila oficial."
+      ]
+    },
+    {
+      "anio": 1999,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "ESP",
+      "unidad_monetaria_original": "peseta española",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-1998-28472",
+          "titulo": "Ley 40/1998, artículo 50",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-1998-28472"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 600000,
+          "amplitud": 600000,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 3606.07,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 600000,
+          "limite_superior": 2100000,
+          "amplitud": 1500000,
+          "cuota_acumulada_en_limite_inferior": 90000,
+          "tipo_marginal_pct": 20.17,
+          "limite_inferior_eur": 3606.07,
+          "limite_superior_eur": 12621.25,
+          "cuota_acumulada_en_limite_inferior_eur": 540.91,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 2100000,
+          "limite_superior": 4100000,
+          "amplitud": 2000000,
+          "cuota_acumulada_en_limite_inferior": 392550,
+          "tipo_marginal_pct": 23.57,
+          "limite_inferior_eur": 12621.25,
+          "limite_superior_eur": 24641.5,
+          "cuota_acumulada_en_limite_inferior_eur": 2359.27,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 4100000,
+          "limite_superior": 6600000,
+          "amplitud": 2500000,
+          "cuota_acumulada_en_limite_inferior": 863950,
+          "tipo_marginal_pct": 31.48,
+          "limite_inferior_eur": 24641.5,
+          "limite_superior_eur": 39666.8,
+          "cuota_acumulada_en_limite_inferior_eur": 5192.44,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 6600000,
+          "limite_superior": 11000000,
+          "amplitud": 4400000,
+          "cuota_acumulada_en_limite_inferior": 1650950,
+          "tipo_marginal_pct": 38.07,
+          "limite_inferior_eur": 39666.8,
+          "limite_superior_eur": 66111.33,
+          "cuota_acumulada_en_limite_inferior_eur": 9922.41,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 11000000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 3326030,
+          "tipo_marginal_pct": 39.6,
+          "limite_inferior_eur": 66111.33,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 19989.84,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2000,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "ESP",
+      "unidad_monetaria_original": "peseta española",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-1999-24785",
+          "titulo": "Ley 54/1999, escala aplicable en 2000",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-1999-24785"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 612000,
+          "amplitud": 612000,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 3678.19,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 612000,
+          "limite_superior": 2142000,
+          "amplitud": 1530000,
+          "cuota_acumulada_en_limite_inferior": 91800,
+          "tipo_marginal_pct": 20.17,
+          "limite_inferior_eur": 3678.19,
+          "limite_superior_eur": 12873.68,
+          "cuota_acumulada_en_limite_inferior_eur": 551.73,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 2142000,
+          "limite_superior": 4182000,
+          "amplitud": 2040000,
+          "cuota_acumulada_en_limite_inferior": 400401,
+          "tipo_marginal_pct": 23.57,
+          "limite_inferior_eur": 12873.68,
+          "limite_superior_eur": 25134.33,
+          "cuota_acumulada_en_limite_inferior_eur": 2406.46,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 4182000,
+          "limite_superior": 6732000,
+          "amplitud": 2550000,
+          "cuota_acumulada_en_limite_inferior": 881229,
+          "tipo_marginal_pct": 31.48,
+          "limite_inferior_eur": 25134.33,
+          "limite_superior_eur": 40460.13,
+          "cuota_acumulada_en_limite_inferior_eur": 5296.29,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 6732000,
+          "limite_superior": 11220000,
+          "amplitud": 4488000,
+          "cuota_acumulada_en_limite_inferior": 1683969,
+          "tipo_marginal_pct": 38.07,
+          "limite_inferior_eur": 40460.13,
+          "limite_superior_eur": 67433.56,
+          "cuota_acumulada_en_limite_inferior_eur": 10120.86,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 11220000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 3392551,
+          "tipo_marginal_pct": 39.6,
+          "limite_inferior_eur": 67433.56,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 20389.64,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2001,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "ESP",
+      "unidad_monetaria_original": "peseta española",
+      "estado_fuente": "prorroga_legal_verificada",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2000-24265",
+          "titulo": "Ley 13/2000, disposición adicional 25.ª",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2000-24265"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 612000,
+          "amplitud": 612000,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 3678.19,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 612000,
+          "limite_superior": 2142000,
+          "amplitud": 1530000,
+          "cuota_acumulada_en_limite_inferior": 91800,
+          "tipo_marginal_pct": 20.17,
+          "limite_inferior_eur": 3678.19,
+          "limite_superior_eur": 12873.68,
+          "cuota_acumulada_en_limite_inferior_eur": 551.73,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 2142000,
+          "limite_superior": 4182000,
+          "amplitud": 2040000,
+          "cuota_acumulada_en_limite_inferior": 400401,
+          "tipo_marginal_pct": 23.57,
+          "limite_inferior_eur": 12873.68,
+          "limite_superior_eur": 25134.33,
+          "cuota_acumulada_en_limite_inferior_eur": 2406.46,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 4182000,
+          "limite_superior": 6732000,
+          "amplitud": 2550000,
+          "cuota_acumulada_en_limite_inferior": 881229,
+          "tipo_marginal_pct": 31.48,
+          "limite_inferior_eur": 25134.33,
+          "limite_superior_eur": 40460.13,
+          "cuota_acumulada_en_limite_inferior_eur": 5296.29,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 6732000,
+          "limite_superior": 11220000,
+          "amplitud": 4488000,
+          "cuota_acumulada_en_limite_inferior": 1683969,
+          "tipo_marginal_pct": 38.07,
+          "limite_inferior_eur": 40460.13,
+          "limite_superior_eur": 67433.56,
+          "cuota_acumulada_en_limite_inferior_eur": 10120.86,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 11220000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 3392551,
+          "tipo_marginal_pct": 39.6,
+          "limite_inferior_eur": 67433.56,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 20389.64,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "La disposición adicional 25.ª de la Ley 13/2000 prorrogó para 2001 las escalas de 2000."
+      ]
+    },
+    {
+      "anio": 2002,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2001-24962",
+          "titulo": "Ley 21/2001, artículo 58",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2001-24962"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 3678.19,
+          "amplitud": 3678.19,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 12.06,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 3678.19,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 3678.19,
+          "limite_superior": 12873.68,
+          "amplitud": 9195.49,
+          "cuota_acumulada_en_limite_inferior": 443.59,
+          "tipo_marginal_pct": 16.08,
+          "limite_inferior_eur": 3678.19,
+          "limite_superior_eur": 12873.68,
+          "cuota_acumulada_en_limite_inferior_eur": 443.59,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 12873.68,
+          "limite_superior": 25134.33,
+          "amplitud": 12260.65,
+          "cuota_acumulada_en_limite_inferior": 1922.22,
+          "tipo_marginal_pct": 18.961,
+          "limite_inferior_eur": 12873.68,
+          "limite_superior_eur": 25134.33,
+          "cuota_acumulada_en_limite_inferior_eur": 1922.22,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 25134.33,
+          "limite_superior": 40460.13,
+          "amplitud": 15325.8,
+          "cuota_acumulada_en_limite_inferior": 4246.96,
+          "tipo_marginal_pct": 24.924,
+          "limite_inferior_eur": 25134.33,
+          "limite_superior_eur": 40460.13,
+          "cuota_acumulada_en_limite_inferior_eur": 4246.96,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 40460.13,
+          "limite_superior": 67433.56,
+          "amplitud": 26973.43,
+          "cuota_acumulada_en_limite_inferior": 8066.76,
+          "tipo_marginal_pct": 30.15,
+          "limite_inferior_eur": 40460.13,
+          "limite_superior_eur": 67433.56,
+          "cuota_acumulada_en_limite_inferior_eur": 8066.76,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 67433.56,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 16199.25,
+          "tipo_marginal_pct": 32.16,
+          "limite_inferior_eur": 67433.56,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 16199.25,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2003,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2002-24711",
+          "titulo": "Ley 46/2002, escala aplicable en 2003",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2002-24711"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 4000,
+          "amplitud": 4000,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.06,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 4000,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 4000,
+          "limite_superior": 13800,
+          "amplitud": 9800,
+          "cuota_acumulada_en_limite_inferior": 362.4,
+          "tipo_marginal_pct": 15.84,
+          "limite_inferior_eur": 4000,
+          "limite_superior_eur": 13800,
+          "cuota_acumulada_en_limite_inferior_eur": 362.4,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 13800,
+          "limite_superior": 25800,
+          "amplitud": 12000,
+          "cuota_acumulada_en_limite_inferior": 1914.72,
+          "tipo_marginal_pct": 18.68,
+          "limite_inferior_eur": 13800,
+          "limite_superior_eur": 25800,
+          "cuota_acumulada_en_limite_inferior_eur": 1914.72,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 25800,
+          "limite_superior": 45000,
+          "amplitud": 19200,
+          "cuota_acumulada_en_limite_inferior": 4156.32,
+          "tipo_marginal_pct": 24.71,
+          "limite_inferior_eur": 25800,
+          "limite_superior_eur": 45000,
+          "cuota_acumulada_en_limite_inferior_eur": 4156.32,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 45000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 8900.64,
+          "tipo_marginal_pct": 29.16,
+          "limite_inferior_eur": 45000,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 8900.64,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2004,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2004-4347",
+          "titulo": "Real Decreto Legislativo 3/2004, artículo 64",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2004-4347"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 4000,
+          "amplitud": 4000,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.06,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 4000,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 4000,
+          "limite_superior": 13800,
+          "amplitud": 9800,
+          "cuota_acumulada_en_limite_inferior": 362.4,
+          "tipo_marginal_pct": 15.84,
+          "limite_inferior_eur": 4000,
+          "limite_superior_eur": 13800,
+          "cuota_acumulada_en_limite_inferior_eur": 362.4,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 13800,
+          "limite_superior": 25800,
+          "amplitud": 12000,
+          "cuota_acumulada_en_limite_inferior": 1914.72,
+          "tipo_marginal_pct": 18.68,
+          "limite_inferior_eur": 13800,
+          "limite_superior_eur": 25800,
+          "cuota_acumulada_en_limite_inferior_eur": 1914.72,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 25800,
+          "limite_superior": 45000,
+          "amplitud": 19200,
+          "cuota_acumulada_en_limite_inferior": 4156.32,
+          "tipo_marginal_pct": 24.71,
+          "limite_inferior_eur": 25800,
+          "limite_superior_eur": 45000,
+          "cuota_acumulada_en_limite_inferior_eur": 4156.32,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 45000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 8900.64,
+          "tipo_marginal_pct": 29.16,
+          "limite_inferior_eur": 45000,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 8900.64,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2005,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_con_normalizacion_documentada",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2004-21688",
+          "titulo": "Ley 2/2004, escala aplicable en 2005",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2004-21688"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 4080,
+          "amplitud": 4080,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.06,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 4080,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 4080,
+          "limite_superior": 14076,
+          "amplitud": 9996,
+          "cuota_acumulada_en_limite_inferior": 369.65,
+          "tipo_marginal_pct": 15.84,
+          "limite_inferior_eur": 4080,
+          "limite_superior_eur": 14076,
+          "cuota_acumulada_en_limite_inferior_eur": 369.65,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 14076,
+          "limite_superior": 26316,
+          "amplitud": 12240,
+          "cuota_acumulada_en_limite_inferior": 1953.02,
+          "tipo_marginal_pct": 18.68,
+          "limite_inferior_eur": 14076,
+          "limite_superior_eur": 26316,
+          "cuota_acumulada_en_limite_inferior_eur": 1953.02,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 26316,
+          "limite_superior": 45900,
+          "amplitud": 19584,
+          "cuota_acumulada_en_limite_inferior": 4239.45,
+          "tipo_marginal_pct": 24.71,
+          "limite_inferior_eur": 26316,
+          "limite_superior_eur": 45900,
+          "cuota_acumulada_en_limite_inferior_eur": 4239.45,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 45900,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 9078.66,
+          "tipo_marginal_pct": 29.16,
+          "limite_inferior_eur": 45900,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 9078.66,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "Normalización documentada: en la tabla estatal publicada el cuarto límite figura como 23.316,00 €, pero se usa 26.316,00 €. Es el valor coherente con 14.076 + 12.240, con la cuota acumulada 4.239,45 €, con el ancho siguiente de 19.584 € y con la tabla autonómica paralela."
+      ]
+    },
+    {
+      "anio": 2006,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2005-21525",
+          "titulo": "Ley 30/2005, escala aplicable en 2006",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2005-21525"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 4161.6,
+          "amplitud": 4161.6,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.06,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 4161.6,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 4161.6,
+          "limite_superior": 14357.52,
+          "amplitud": 10195.92,
+          "cuota_acumulada_en_limite_inferior": 377.04,
+          "tipo_marginal_pct": 15.84,
+          "limite_inferior_eur": 4161.6,
+          "limite_superior_eur": 14357.52,
+          "cuota_acumulada_en_limite_inferior_eur": 377.04,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 14357.52,
+          "limite_superior": 26842.32,
+          "amplitud": 12484.8,
+          "cuota_acumulada_en_limite_inferior": 1992.07,
+          "tipo_marginal_pct": 18.68,
+          "limite_inferior_eur": 14357.52,
+          "limite_superior_eur": 26842.32,
+          "cuota_acumulada_en_limite_inferior_eur": 1992.07,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 26842.32,
+          "limite_superior": 46818,
+          "amplitud": 19975.68,
+          "cuota_acumulada_en_limite_inferior": 4324.23,
+          "tipo_marginal_pct": 24.71,
+          "limite_inferior_eur": 26842.32,
+          "limite_superior_eur": 46818,
+          "cuota_acumulada_en_limite_inferior_eur": 4324.23,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 46818,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 9260.22,
+          "tipo_marginal_pct": 29.16,
+          "limite_inferior_eur": 46818,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 9260.22,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2007,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2006-20764",
+          "titulo": "Ley 35/2006, artículo 63 original",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2006-20764"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 17360,
+          "amplitud": 17360,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 15.66,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 17360,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 17360,
+          "limite_superior": 32360,
+          "amplitud": 15000,
+          "cuota_acumulada_en_limite_inferior": 2718.58,
+          "tipo_marginal_pct": 18.27,
+          "limite_inferior_eur": 17360,
+          "limite_superior_eur": 32360,
+          "cuota_acumulada_en_limite_inferior_eur": 2718.58,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 32360,
+          "limite_superior": 52360,
+          "amplitud": 20000,
+          "cuota_acumulada_en_limite_inferior": 5459.08,
+          "tipo_marginal_pct": 24.14,
+          "limite_inferior_eur": 32360,
+          "limite_superior_eur": 52360,
+          "cuota_acumulada_en_limite_inferior_eur": 5459.08,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 52360,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 10287.08,
+          "tipo_marginal_pct": 27.13,
+          "limite_inferior_eur": 52360,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 10287.08,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "Límites estatales verificados: 0, 17.360, 32.360 y 52.360 €. No se concatenan como tramos sucesivos los tipos autonómicos, que son una escala paralela."
+      ]
+    },
+    {
+      "anio": 2008,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2007-22295",
+          "titulo": "Ley 51/2007, escala aplicable en 2008",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2007-22295"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 17707.2,
+          "amplitud": 17707.2,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 15.66,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 17707.2,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 17707.2,
+          "limite_superior": 33007.2,
+          "amplitud": 15300,
+          "cuota_acumulada_en_limite_inferior": 2772.95,
+          "tipo_marginal_pct": 18.27,
+          "limite_inferior_eur": 17707.2,
+          "limite_superior_eur": 33007.2,
+          "cuota_acumulada_en_limite_inferior_eur": 2772.95,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 33007.2,
+          "limite_superior": 53407.2,
+          "amplitud": 20400,
+          "cuota_acumulada_en_limite_inferior": 5568.26,
+          "tipo_marginal_pct": 24.14,
+          "limite_inferior_eur": 33007.2,
+          "limite_superior_eur": 53407.2,
+          "cuota_acumulada_en_limite_inferior_eur": 5568.26,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 53407.2,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 10492.82,
+          "tipo_marginal_pct": 27.13,
+          "limite_inferior_eur": 53407.2,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 10492.82,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2009,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2008-20744",
+          "titulo": "Ley 2/2008, escala aplicable en 2009",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2008-20744"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 17707.2,
+          "amplitud": 17707.2,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 15.66,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 17707.2,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 17707.2,
+          "limite_superior": 33007.2,
+          "amplitud": 15300,
+          "cuota_acumulada_en_limite_inferior": 2772.95,
+          "tipo_marginal_pct": 18.27,
+          "limite_inferior_eur": 17707.2,
+          "limite_superior_eur": 33007.2,
+          "cuota_acumulada_en_limite_inferior_eur": 2772.95,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 33007.2,
+          "limite_superior": 53407.2,
+          "amplitud": 20400,
+          "cuota_acumulada_en_limite_inferior": 5568.26,
+          "tipo_marginal_pct": 24.14,
+          "limite_inferior_eur": 33007.2,
+          "limite_superior_eur": 53407.2,
+          "cuota_acumulada_en_limite_inferior_eur": 5568.26,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 53407.2,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 10492.82,
+          "tipo_marginal_pct": 27.13,
+          "limite_inferior_eur": 53407.2,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 10492.82,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2010,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2009-20765",
+          "titulo": "Ley 26/2009, escala aplicable en 2010",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2009-20765"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 17707.2,
+          "amplitud": 17707.2,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 15.66,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 17707.2,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 17707.2,
+          "limite_superior": 33007.2,
+          "amplitud": 15300,
+          "cuota_acumulada_en_limite_inferior": 2772.95,
+          "tipo_marginal_pct": 18.27,
+          "limite_inferior_eur": 17707.2,
+          "limite_superior_eur": 33007.2,
+          "cuota_acumulada_en_limite_inferior_eur": 2772.95,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 33007.2,
+          "limite_superior": 53407.2,
+          "amplitud": 20400,
+          "cuota_acumulada_en_limite_inferior": 5568.26,
+          "tipo_marginal_pct": 24.14,
+          "limite_inferior_eur": 33007.2,
+          "limite_superior_eur": 53407.2,
+          "cuota_acumulada_en_limite_inferior_eur": 5568.26,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 53407.2,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 10492.82,
+          "tipo_marginal_pct": 27.13,
+          "limite_inferior_eur": 53407.2,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 10492.82,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2011,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2010-19703",
+          "titulo": "Ley 39/2010, escala aplicable en 2011",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2010-19703"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 17707.2,
+          "amplitud": 17707.2,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 12,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 17707.2,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 17707.2,
+          "limite_superior": 33007.2,
+          "amplitud": 15300,
+          "cuota_acumulada_en_limite_inferior": 2124.86,
+          "tipo_marginal_pct": 14,
+          "limite_inferior_eur": 17707.2,
+          "limite_superior_eur": 33007.2,
+          "cuota_acumulada_en_limite_inferior_eur": 2124.86,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 33007.2,
+          "limite_superior": 53407.2,
+          "amplitud": 20400,
+          "cuota_acumulada_en_limite_inferior": 4266.86,
+          "tipo_marginal_pct": 18.5,
+          "limite_inferior_eur": 33007.2,
+          "limite_superior_eur": 53407.2,
+          "cuota_acumulada_en_limite_inferior_eur": 4266.86,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 53407.2,
+          "limite_superior": 120000.2,
+          "amplitud": 66593,
+          "cuota_acumulada_en_limite_inferior": 8040.86,
+          "tipo_marginal_pct": 21.5,
+          "limite_inferior_eur": 53407.2,
+          "limite_superior_eur": 120000.2,
+          "cuota_acumulada_en_limite_inferior_eur": 8040.86,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 120000.2,
+          "limite_superior": 175000.2,
+          "amplitud": 55000,
+          "cuota_acumulada_en_limite_inferior": 22358.36,
+          "tipo_marginal_pct": 22.5,
+          "limite_inferior_eur": 120000.2,
+          "limite_superior_eur": 175000.2,
+          "cuota_acumulada_en_limite_inferior_eur": 22358.36,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 175000.2,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 34733.36,
+          "tipo_marginal_pct": 23.5,
+          "limite_inferior_eur": 175000.2,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 34733.36,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2012,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "combinacion_de_dos_escalas_estatales_oficiales",
+      "fuentes": [
+        {
+          "organismo": "Agencia Estatal de Administración Tributaria (AEAT)",
+          "referencia": "Manual práctico IRPF 2012",
+          "titulo": "Gravamen estatal de la base liquidable general, ejercicio 2012",
+          "url": "https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/2012/Manual_Renta_2012_es_es.pdf"
+        },
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2011-20638",
+          "titulo": "Real Decreto-ley 20/2011: gravamen complementario 2012-2013",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2011-20638"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 17707.2,
+          "amplitud": 17707.2,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 12.75,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 17707.2,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 17707.2,
+          "limite_superior": 33007.2,
+          "amplitud": 15300,
+          "cuota_acumulada_en_limite_inferior": 2257.66,
+          "tipo_marginal_pct": 16,
+          "limite_inferior_eur": 17707.2,
+          "limite_superior_eur": 33007.2,
+          "cuota_acumulada_en_limite_inferior_eur": 2257.66,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 33007.2,
+          "limite_superior": 53407.2,
+          "amplitud": 20400,
+          "cuota_acumulada_en_limite_inferior": 4705.66,
+          "tipo_marginal_pct": 21.5,
+          "limite_inferior_eur": 33007.2,
+          "limite_superior_eur": 53407.2,
+          "cuota_acumulada_en_limite_inferior_eur": 4705.66,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 53407.2,
+          "limite_superior": 120000.2,
+          "amplitud": 66593,
+          "cuota_acumulada_en_limite_inferior": 9091.66,
+          "tipo_marginal_pct": 25.5,
+          "limite_inferior_eur": 53407.2,
+          "limite_superior_eur": 120000.2,
+          "cuota_acumulada_en_limite_inferior_eur": 9091.66,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 120000.2,
+          "limite_superior": 175000.2,
+          "amplitud": 55000,
+          "cuota_acumulada_en_limite_inferior": 26072.88,
+          "tipo_marginal_pct": 27.5,
+          "limite_inferior_eur": 120000.2,
+          "limite_superior_eur": 175000.2,
+          "cuota_acumulada_en_limite_inferior_eur": 26072.88,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 175000.2,
+          "limite_superior": 300000.2,
+          "amplitud": 125000,
+          "cuota_acumulada_en_limite_inferior": 41197.88,
+          "tipo_marginal_pct": 29.5,
+          "limite_inferior_eur": 175000.2,
+          "limite_superior_eur": 300000.2,
+          "cuota_acumulada_en_limite_inferior_eur": 41197.88,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 7,
+          "limite_inferior": 300000.2,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 78072.88,
+          "tipo_marginal_pct": 30.5,
+          "limite_inferior_eur": 300000.2,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 78072.88,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "La tabla principal suma, en cada intervalo, la escala estatal ordinaria y el gravamen complementario temporal. Ambos componentes se conservan también por separado."
+      ],
+      "componentes_estatales": {
+        "escala_estatal_ordinaria": [
+          {
+            "numero_tramo": 1,
+            "limite_inferior": 0,
+            "limite_superior": 17707.2,
+            "amplitud": 17707.2,
+            "cuota_acumulada_en_limite_inferior": 0,
+            "tipo_marginal_pct": 12,
+            "limite_inferior_eur": 0,
+            "limite_superior_eur": 17707.2,
+            "cuota_acumulada_en_limite_inferior_eur": 0,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 2,
+            "limite_inferior": 17707.2,
+            "limite_superior": 33007.2,
+            "amplitud": 15300,
+            "cuota_acumulada_en_limite_inferior": 2124.86,
+            "tipo_marginal_pct": 14,
+            "limite_inferior_eur": 17707.2,
+            "limite_superior_eur": 33007.2,
+            "cuota_acumulada_en_limite_inferior_eur": 2124.86,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 3,
+            "limite_inferior": 33007.2,
+            "limite_superior": 53407.2,
+            "amplitud": 20400,
+            "cuota_acumulada_en_limite_inferior": 4266.86,
+            "tipo_marginal_pct": 18.5,
+            "limite_inferior_eur": 33007.2,
+            "limite_superior_eur": 53407.2,
+            "cuota_acumulada_en_limite_inferior_eur": 4266.86,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 4,
+            "limite_inferior": 53407.2,
+            "limite_superior": 120000.2,
+            "amplitud": 66593,
+            "cuota_acumulada_en_limite_inferior": 8040.86,
+            "tipo_marginal_pct": 21.5,
+            "limite_inferior_eur": 53407.2,
+            "limite_superior_eur": 120000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 8040.86,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 5,
+            "limite_inferior": 120000.2,
+            "limite_superior": 175000.2,
+            "amplitud": 55000,
+            "cuota_acumulada_en_limite_inferior": 22358.36,
+            "tipo_marginal_pct": 22.5,
+            "limite_inferior_eur": 120000.2,
+            "limite_superior_eur": 175000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 22358.36,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 6,
+            "limite_inferior": 175000.2,
+            "limite_superior": null,
+            "amplitud": null,
+            "cuota_acumulada_en_limite_inferior": 34733.36,
+            "tipo_marginal_pct": 23.5,
+            "limite_inferior_eur": 175000.2,
+            "limite_superior_eur": null,
+            "cuota_acumulada_en_limite_inferior_eur": 34733.36,
+            "abierto_por_arriba": true
+          }
+        ],
+        "gravamen_complementario_temporal": [
+          {
+            "numero_tramo": 1,
+            "limite_inferior": 0,
+            "limite_superior": 17707.2,
+            "amplitud": 17707.2,
+            "cuota_acumulada_en_limite_inferior": 0,
+            "tipo_marginal_pct": 0.75,
+            "limite_inferior_eur": 0,
+            "limite_superior_eur": 17707.2,
+            "cuota_acumulada_en_limite_inferior_eur": 0,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 2,
+            "limite_inferior": 17707.2,
+            "limite_superior": 33007.2,
+            "amplitud": 15300,
+            "cuota_acumulada_en_limite_inferior": 132.8,
+            "tipo_marginal_pct": 2,
+            "limite_inferior_eur": 17707.2,
+            "limite_superior_eur": 33007.2,
+            "cuota_acumulada_en_limite_inferior_eur": 132.8,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 3,
+            "limite_inferior": 33007.2,
+            "limite_superior": 53407.2,
+            "amplitud": 20400,
+            "cuota_acumulada_en_limite_inferior": 438.8,
+            "tipo_marginal_pct": 3,
+            "limite_inferior_eur": 33007.2,
+            "limite_superior_eur": 53407.2,
+            "cuota_acumulada_en_limite_inferior_eur": 438.8,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 4,
+            "limite_inferior": 53407.2,
+            "limite_superior": 120000.2,
+            "amplitud": 66593,
+            "cuota_acumulada_en_limite_inferior": 1050.8,
+            "tipo_marginal_pct": 4,
+            "limite_inferior_eur": 53407.2,
+            "limite_superior_eur": 120000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 1050.8,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 5,
+            "limite_inferior": 120000.2,
+            "limite_superior": 175000.2,
+            "amplitud": 55000,
+            "cuota_acumulada_en_limite_inferior": 3714.52,
+            "tipo_marginal_pct": 5,
+            "limite_inferior_eur": 120000.2,
+            "limite_superior_eur": 175000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 3714.52,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 6,
+            "limite_inferior": 175000.2,
+            "limite_superior": 300000.2,
+            "amplitud": 125000,
+            "cuota_acumulada_en_limite_inferior": 6464.52,
+            "tipo_marginal_pct": 6,
+            "limite_inferior_eur": 175000.2,
+            "limite_superior_eur": 300000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 6464.52,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 7,
+            "limite_inferior": 300000.2,
+            "limite_superior": null,
+            "amplitud": null,
+            "cuota_acumulada_en_limite_inferior": 13964.52,
+            "tipo_marginal_pct": 7,
+            "limite_inferior_eur": 300000.2,
+            "limite_superior_eur": null,
+            "cuota_acumulada_en_limite_inferior_eur": 13964.52,
+            "abierto_por_arriba": true
+          }
+        ]
+      }
+    },
+    {
+      "anio": 2013,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "combinacion_de_dos_escalas_estatales_oficiales",
+      "fuentes": [
+        {
+          "organismo": "Agencia Estatal de Administración Tributaria (AEAT)",
+          "referencia": "Manual práctico IRPF 2013",
+          "titulo": "Gravamen estatal de la base liquidable general, ejercicio 2013",
+          "url": "https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/2013/Manual_Renta_2013_es_es.pdf"
+        },
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2011-20638",
+          "titulo": "Real Decreto-ley 20/2011: gravamen complementario 2012-2013",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2011-20638"
+        },
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2012-8745",
+          "titulo": "Ley 2/2012: escala del gravamen complementario",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2012-8745"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 17707.2,
+          "amplitud": 17707.2,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 12.75,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 17707.2,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 17707.2,
+          "limite_superior": 33007.2,
+          "amplitud": 15300,
+          "cuota_acumulada_en_limite_inferior": 2257.66,
+          "tipo_marginal_pct": 16,
+          "limite_inferior_eur": 17707.2,
+          "limite_superior_eur": 33007.2,
+          "cuota_acumulada_en_limite_inferior_eur": 2257.66,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 33007.2,
+          "limite_superior": 53407.2,
+          "amplitud": 20400,
+          "cuota_acumulada_en_limite_inferior": 4705.66,
+          "tipo_marginal_pct": 21.5,
+          "limite_inferior_eur": 33007.2,
+          "limite_superior_eur": 53407.2,
+          "cuota_acumulada_en_limite_inferior_eur": 4705.66,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 53407.2,
+          "limite_superior": 120000.2,
+          "amplitud": 66593,
+          "cuota_acumulada_en_limite_inferior": 9091.66,
+          "tipo_marginal_pct": 25.5,
+          "limite_inferior_eur": 53407.2,
+          "limite_superior_eur": 120000.2,
+          "cuota_acumulada_en_limite_inferior_eur": 9091.66,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 120000.2,
+          "limite_superior": 175000.2,
+          "amplitud": 55000,
+          "cuota_acumulada_en_limite_inferior": 26072.88,
+          "tipo_marginal_pct": 27.5,
+          "limite_inferior_eur": 120000.2,
+          "limite_superior_eur": 175000.2,
+          "cuota_acumulada_en_limite_inferior_eur": 26072.88,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 175000.2,
+          "limite_superior": 300000.2,
+          "amplitud": 125000,
+          "cuota_acumulada_en_limite_inferior": 41197.88,
+          "tipo_marginal_pct": 29.5,
+          "limite_inferior_eur": 175000.2,
+          "limite_superior_eur": 300000.2,
+          "cuota_acumulada_en_limite_inferior_eur": 41197.88,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 7,
+          "limite_inferior": 300000.2,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 78072.88,
+          "tipo_marginal_pct": 30.5,
+          "limite_inferior_eur": 300000.2,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 78072.88,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "La tabla principal suma, en cada intervalo, la escala estatal ordinaria y el gravamen complementario temporal. Ambos componentes se conservan también por separado."
+      ],
+      "componentes_estatales": {
+        "escala_estatal_ordinaria": [
+          {
+            "numero_tramo": 1,
+            "limite_inferior": 0,
+            "limite_superior": 17707.2,
+            "amplitud": 17707.2,
+            "cuota_acumulada_en_limite_inferior": 0,
+            "tipo_marginal_pct": 12,
+            "limite_inferior_eur": 0,
+            "limite_superior_eur": 17707.2,
+            "cuota_acumulada_en_limite_inferior_eur": 0,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 2,
+            "limite_inferior": 17707.2,
+            "limite_superior": 33007.2,
+            "amplitud": 15300,
+            "cuota_acumulada_en_limite_inferior": 2124.86,
+            "tipo_marginal_pct": 14,
+            "limite_inferior_eur": 17707.2,
+            "limite_superior_eur": 33007.2,
+            "cuota_acumulada_en_limite_inferior_eur": 2124.86,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 3,
+            "limite_inferior": 33007.2,
+            "limite_superior": 53407.2,
+            "amplitud": 20400,
+            "cuota_acumulada_en_limite_inferior": 4266.86,
+            "tipo_marginal_pct": 18.5,
+            "limite_inferior_eur": 33007.2,
+            "limite_superior_eur": 53407.2,
+            "cuota_acumulada_en_limite_inferior_eur": 4266.86,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 4,
+            "limite_inferior": 53407.2,
+            "limite_superior": 120000.2,
+            "amplitud": 66593,
+            "cuota_acumulada_en_limite_inferior": 8040.86,
+            "tipo_marginal_pct": 21.5,
+            "limite_inferior_eur": 53407.2,
+            "limite_superior_eur": 120000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 8040.86,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 5,
+            "limite_inferior": 120000.2,
+            "limite_superior": 175000.2,
+            "amplitud": 55000,
+            "cuota_acumulada_en_limite_inferior": 22358.36,
+            "tipo_marginal_pct": 22.5,
+            "limite_inferior_eur": 120000.2,
+            "limite_superior_eur": 175000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 22358.36,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 6,
+            "limite_inferior": 175000.2,
+            "limite_superior": null,
+            "amplitud": null,
+            "cuota_acumulada_en_limite_inferior": 34733.36,
+            "tipo_marginal_pct": 23.5,
+            "limite_inferior_eur": 175000.2,
+            "limite_superior_eur": null,
+            "cuota_acumulada_en_limite_inferior_eur": 34733.36,
+            "abierto_por_arriba": true
+          }
+        ],
+        "gravamen_complementario_temporal": [
+          {
+            "numero_tramo": 1,
+            "limite_inferior": 0,
+            "limite_superior": 17707.2,
+            "amplitud": 17707.2,
+            "cuota_acumulada_en_limite_inferior": 0,
+            "tipo_marginal_pct": 0.75,
+            "limite_inferior_eur": 0,
+            "limite_superior_eur": 17707.2,
+            "cuota_acumulada_en_limite_inferior_eur": 0,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 2,
+            "limite_inferior": 17707.2,
+            "limite_superior": 33007.2,
+            "amplitud": 15300,
+            "cuota_acumulada_en_limite_inferior": 132.8,
+            "tipo_marginal_pct": 2,
+            "limite_inferior_eur": 17707.2,
+            "limite_superior_eur": 33007.2,
+            "cuota_acumulada_en_limite_inferior_eur": 132.8,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 3,
+            "limite_inferior": 33007.2,
+            "limite_superior": 53407.2,
+            "amplitud": 20400,
+            "cuota_acumulada_en_limite_inferior": 438.8,
+            "tipo_marginal_pct": 3,
+            "limite_inferior_eur": 33007.2,
+            "limite_superior_eur": 53407.2,
+            "cuota_acumulada_en_limite_inferior_eur": 438.8,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 4,
+            "limite_inferior": 53407.2,
+            "limite_superior": 120000.2,
+            "amplitud": 66593,
+            "cuota_acumulada_en_limite_inferior": 1050.8,
+            "tipo_marginal_pct": 4,
+            "limite_inferior_eur": 53407.2,
+            "limite_superior_eur": 120000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 1050.8,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 5,
+            "limite_inferior": 120000.2,
+            "limite_superior": 175000.2,
+            "amplitud": 55000,
+            "cuota_acumulada_en_limite_inferior": 3714.52,
+            "tipo_marginal_pct": 5,
+            "limite_inferior_eur": 120000.2,
+            "limite_superior_eur": 175000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 3714.52,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 6,
+            "limite_inferior": 175000.2,
+            "limite_superior": 300000.2,
+            "amplitud": 125000,
+            "cuota_acumulada_en_limite_inferior": 6464.52,
+            "tipo_marginal_pct": 6,
+            "limite_inferior_eur": 175000.2,
+            "limite_superior_eur": 300000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 6464.52,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 7,
+            "limite_inferior": 300000.2,
+            "limite_superior": null,
+            "amplitud": null,
+            "cuota_acumulada_en_limite_inferior": 13964.52,
+            "tipo_marginal_pct": 7,
+            "limite_inferior_eur": 300000.2,
+            "limite_superior_eur": null,
+            "cuota_acumulada_en_limite_inferior_eur": 13964.52,
+            "abierto_por_arriba": true
+          }
+        ]
+      }
+    },
+    {
+      "anio": 2014,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "combinacion_de_dos_escalas_estatales_oficiales",
+      "fuentes": [
+        {
+          "organismo": "Agencia Estatal de Administración Tributaria (AEAT)",
+          "referencia": "Manual práctico IRPF 2014",
+          "titulo": "Gravamen estatal de la base liquidable general, ejercicio 2014",
+          "url": "https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/2014/Manual_Renta_2014_es_es.pdf"
+        },
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2013-13616",
+          "titulo": "Ley 22/2013: prórroga del gravamen complementario a 2014",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2013-13616"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 17707.2,
+          "amplitud": 17707.2,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 12.75,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 17707.2,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 17707.2,
+          "limite_superior": 33007.2,
+          "amplitud": 15300,
+          "cuota_acumulada_en_limite_inferior": 2257.66,
+          "tipo_marginal_pct": 16,
+          "limite_inferior_eur": 17707.2,
+          "limite_superior_eur": 33007.2,
+          "cuota_acumulada_en_limite_inferior_eur": 2257.66,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 33007.2,
+          "limite_superior": 53407.2,
+          "amplitud": 20400,
+          "cuota_acumulada_en_limite_inferior": 4705.66,
+          "tipo_marginal_pct": 21.5,
+          "limite_inferior_eur": 33007.2,
+          "limite_superior_eur": 53407.2,
+          "cuota_acumulada_en_limite_inferior_eur": 4705.66,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 53407.2,
+          "limite_superior": 120000.2,
+          "amplitud": 66593,
+          "cuota_acumulada_en_limite_inferior": 9091.66,
+          "tipo_marginal_pct": 25.5,
+          "limite_inferior_eur": 53407.2,
+          "limite_superior_eur": 120000.2,
+          "cuota_acumulada_en_limite_inferior_eur": 9091.66,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 120000.2,
+          "limite_superior": 175000.2,
+          "amplitud": 55000,
+          "cuota_acumulada_en_limite_inferior": 26072.88,
+          "tipo_marginal_pct": 27.5,
+          "limite_inferior_eur": 120000.2,
+          "limite_superior_eur": 175000.2,
+          "cuota_acumulada_en_limite_inferior_eur": 26072.88,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 175000.2,
+          "limite_superior": 300000.2,
+          "amplitud": 125000,
+          "cuota_acumulada_en_limite_inferior": 41197.88,
+          "tipo_marginal_pct": 29.5,
+          "limite_inferior_eur": 175000.2,
+          "limite_superior_eur": 300000.2,
+          "cuota_acumulada_en_limite_inferior_eur": 41197.88,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 7,
+          "limite_inferior": 300000.2,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 78072.88,
+          "tipo_marginal_pct": 30.5,
+          "limite_inferior_eur": 300000.2,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 78072.88,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "La tabla principal suma, en cada intervalo, la escala estatal ordinaria y el gravamen complementario temporal. Ambos componentes se conservan también por separado."
+      ],
+      "componentes_estatales": {
+        "escala_estatal_ordinaria": [
+          {
+            "numero_tramo": 1,
+            "limite_inferior": 0,
+            "limite_superior": 17707.2,
+            "amplitud": 17707.2,
+            "cuota_acumulada_en_limite_inferior": 0,
+            "tipo_marginal_pct": 12,
+            "limite_inferior_eur": 0,
+            "limite_superior_eur": 17707.2,
+            "cuota_acumulada_en_limite_inferior_eur": 0,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 2,
+            "limite_inferior": 17707.2,
+            "limite_superior": 33007.2,
+            "amplitud": 15300,
+            "cuota_acumulada_en_limite_inferior": 2124.86,
+            "tipo_marginal_pct": 14,
+            "limite_inferior_eur": 17707.2,
+            "limite_superior_eur": 33007.2,
+            "cuota_acumulada_en_limite_inferior_eur": 2124.86,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 3,
+            "limite_inferior": 33007.2,
+            "limite_superior": 53407.2,
+            "amplitud": 20400,
+            "cuota_acumulada_en_limite_inferior": 4266.86,
+            "tipo_marginal_pct": 18.5,
+            "limite_inferior_eur": 33007.2,
+            "limite_superior_eur": 53407.2,
+            "cuota_acumulada_en_limite_inferior_eur": 4266.86,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 4,
+            "limite_inferior": 53407.2,
+            "limite_superior": 120000.2,
+            "amplitud": 66593,
+            "cuota_acumulada_en_limite_inferior": 8040.86,
+            "tipo_marginal_pct": 21.5,
+            "limite_inferior_eur": 53407.2,
+            "limite_superior_eur": 120000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 8040.86,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 5,
+            "limite_inferior": 120000.2,
+            "limite_superior": 175000.2,
+            "amplitud": 55000,
+            "cuota_acumulada_en_limite_inferior": 22358.36,
+            "tipo_marginal_pct": 22.5,
+            "limite_inferior_eur": 120000.2,
+            "limite_superior_eur": 175000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 22358.36,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 6,
+            "limite_inferior": 175000.2,
+            "limite_superior": null,
+            "amplitud": null,
+            "cuota_acumulada_en_limite_inferior": 34733.36,
+            "tipo_marginal_pct": 23.5,
+            "limite_inferior_eur": 175000.2,
+            "limite_superior_eur": null,
+            "cuota_acumulada_en_limite_inferior_eur": 34733.36,
+            "abierto_por_arriba": true
+          }
+        ],
+        "gravamen_complementario_temporal": [
+          {
+            "numero_tramo": 1,
+            "limite_inferior": 0,
+            "limite_superior": 17707.2,
+            "amplitud": 17707.2,
+            "cuota_acumulada_en_limite_inferior": 0,
+            "tipo_marginal_pct": 0.75,
+            "limite_inferior_eur": 0,
+            "limite_superior_eur": 17707.2,
+            "cuota_acumulada_en_limite_inferior_eur": 0,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 2,
+            "limite_inferior": 17707.2,
+            "limite_superior": 33007.2,
+            "amplitud": 15300,
+            "cuota_acumulada_en_limite_inferior": 132.8,
+            "tipo_marginal_pct": 2,
+            "limite_inferior_eur": 17707.2,
+            "limite_superior_eur": 33007.2,
+            "cuota_acumulada_en_limite_inferior_eur": 132.8,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 3,
+            "limite_inferior": 33007.2,
+            "limite_superior": 53407.2,
+            "amplitud": 20400,
+            "cuota_acumulada_en_limite_inferior": 438.8,
+            "tipo_marginal_pct": 3,
+            "limite_inferior_eur": 33007.2,
+            "limite_superior_eur": 53407.2,
+            "cuota_acumulada_en_limite_inferior_eur": 438.8,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 4,
+            "limite_inferior": 53407.2,
+            "limite_superior": 120000.2,
+            "amplitud": 66593,
+            "cuota_acumulada_en_limite_inferior": 1050.8,
+            "tipo_marginal_pct": 4,
+            "limite_inferior_eur": 53407.2,
+            "limite_superior_eur": 120000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 1050.8,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 5,
+            "limite_inferior": 120000.2,
+            "limite_superior": 175000.2,
+            "amplitud": 55000,
+            "cuota_acumulada_en_limite_inferior": 3714.52,
+            "tipo_marginal_pct": 5,
+            "limite_inferior_eur": 120000.2,
+            "limite_superior_eur": 175000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 3714.52,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 6,
+            "limite_inferior": 175000.2,
+            "limite_superior": 300000.2,
+            "amplitud": 125000,
+            "cuota_acumulada_en_limite_inferior": 6464.52,
+            "tipo_marginal_pct": 6,
+            "limite_inferior_eur": 175000.2,
+            "limite_superior_eur": 300000.2,
+            "cuota_acumulada_en_limite_inferior_eur": 6464.52,
+            "abierto_por_arriba": false
+          },
+          {
+            "numero_tramo": 7,
+            "limite_inferior": 300000.2,
+            "limite_superior": null,
+            "amplitud": null,
+            "cuota_acumulada_en_limite_inferior": 13964.52,
+            "tipo_marginal_pct": 7,
+            "limite_inferior_eur": 300000.2,
+            "limite_superior_eur": null,
+            "cuota_acumulada_en_limite_inferior_eur": 13964.52,
+            "abierto_por_arriba": true
+          }
+        ]
+      }
+    },
+    {
+      "anio": 2015,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Agencia Estatal de Administración Tributaria (AEAT)",
+          "referencia": "Manual práctico IRPF 2015",
+          "titulo": "Gravamen estatal de la base liquidable general, ejercicio 2015",
+          "url": "https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/IRPF-2015/Manual_Renta_2015_es_es.pdf"
+        },
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2015-7765",
+          "titulo": "Real Decreto-ley 9/2015: escala estatal aplicable desde 1 de enero de 2015",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2015-7765"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 12450,
+          "amplitud": 12450,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.5,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 12450,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 12450,
+          "limite_superior": 20200,
+          "amplitud": 7750,
+          "cuota_acumulada_en_limite_inferior": 1182.75,
+          "tipo_marginal_pct": 12,
+          "limite_inferior_eur": 12450,
+          "limite_superior_eur": 20200,
+          "cuota_acumulada_en_limite_inferior_eur": 1182.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 20200,
+          "limite_superior": 34000,
+          "amplitud": 13800,
+          "cuota_acumulada_en_limite_inferior": 2112.75,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 20200,
+          "limite_superior_eur": 34000,
+          "cuota_acumulada_en_limite_inferior_eur": 2112.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 34000,
+          "limite_superior": 60000,
+          "amplitud": 26000,
+          "cuota_acumulada_en_limite_inferior": 4182.75,
+          "tipo_marginal_pct": 18.5,
+          "limite_inferior_eur": 34000,
+          "limite_superior_eur": 60000,
+          "cuota_acumulada_en_limite_inferior_eur": 4182.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 60000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 8992.75,
+          "tipo_marginal_pct": 22.5,
+          "limite_inferior_eur": 60000,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 8992.75,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "Se usa la escala anual definitiva introducida por el Real Decreto-ley 9/2015 con efectos desde el 1 de enero de 2015."
+      ]
+    },
+    {
+      "anio": 2016,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Agencia Estatal de Administración Tributaria (AEAT)",
+          "referencia": "Manual práctico IRPF 2016",
+          "titulo": "Gravamen estatal de la base liquidable general, ejercicio 2016",
+          "url": "https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/IRPF-2016/ManualRentaPatrimonio2016_es_es.pdf"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 12450,
+          "amplitud": 12450,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.5,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 12450,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 12450,
+          "limite_superior": 20200,
+          "amplitud": 7750,
+          "cuota_acumulada_en_limite_inferior": 1182.75,
+          "tipo_marginal_pct": 12,
+          "limite_inferior_eur": 12450,
+          "limite_superior_eur": 20200,
+          "cuota_acumulada_en_limite_inferior_eur": 1182.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 20200,
+          "limite_superior": 35200,
+          "amplitud": 15000,
+          "cuota_acumulada_en_limite_inferior": 2112.75,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 20200,
+          "limite_superior_eur": 35200,
+          "cuota_acumulada_en_limite_inferior_eur": 2112.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 35200,
+          "limite_superior": 60000,
+          "amplitud": 24800,
+          "cuota_acumulada_en_limite_inferior": 4362.75,
+          "tipo_marginal_pct": 18.5,
+          "limite_inferior_eur": 35200,
+          "limite_superior_eur": 60000,
+          "cuota_acumulada_en_limite_inferior_eur": 4362.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 60000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 8950.75,
+          "tipo_marginal_pct": 22.5,
+          "limite_inferior_eur": 60000,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 8950.75,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2017,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Agencia Estatal de Administración Tributaria (AEAT)",
+          "referencia": "Manual práctico IRPF 2017",
+          "titulo": "Gravamen estatal de la base liquidable general, ejercicio 2017",
+          "url": "https://sede.agenciatributaria.gob.es/Sede/manuales/ejercicio-2017/modelo-100/8-cumplimentacion-irpf/8_6-cuota-integra/8_6_1-gravamen-base-liquidable-general/8_6_1_1-cuota-integra-estatal.html"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 12450,
+          "amplitud": 12450,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.5,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 12450,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 12450,
+          "limite_superior": 20200,
+          "amplitud": 7750,
+          "cuota_acumulada_en_limite_inferior": 1182.75,
+          "tipo_marginal_pct": 12,
+          "limite_inferior_eur": 12450,
+          "limite_superior_eur": 20200,
+          "cuota_acumulada_en_limite_inferior_eur": 1182.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 20200,
+          "limite_superior": 35200,
+          "amplitud": 15000,
+          "cuota_acumulada_en_limite_inferior": 2112.75,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 20200,
+          "limite_superior_eur": 35200,
+          "cuota_acumulada_en_limite_inferior_eur": 2112.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 35200,
+          "limite_superior": 60000,
+          "amplitud": 24800,
+          "cuota_acumulada_en_limite_inferior": 4362.75,
+          "tipo_marginal_pct": 18.5,
+          "limite_inferior_eur": 35200,
+          "limite_superior_eur": 60000,
+          "cuota_acumulada_en_limite_inferior_eur": 4362.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 60000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 8950.75,
+          "tipo_marginal_pct": 22.5,
+          "limite_inferior_eur": 60000,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 8950.75,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2018,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Agencia Estatal de Administración Tributaria (AEAT)",
+          "referencia": "Manual práctico IRPF 2018",
+          "titulo": "Gravamen estatal de la base liquidable general, ejercicio 2018",
+          "url": "https://sede.agenciatributaria.gob.es/Sede/manuales/ejercicio-2018/modelo-100/modelo-100/8-cumplimentacion-irpf/8_6-cuota-integra/8_6_1-gravamen-base-liquidable-general/8_6_1_1-cuota-integra-estatal.html"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 12450,
+          "amplitud": 12450,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.5,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 12450,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 12450,
+          "limite_superior": 20200,
+          "amplitud": 7750,
+          "cuota_acumulada_en_limite_inferior": 1182.75,
+          "tipo_marginal_pct": 12,
+          "limite_inferior_eur": 12450,
+          "limite_superior_eur": 20200,
+          "cuota_acumulada_en_limite_inferior_eur": 1182.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 20200,
+          "limite_superior": 35200,
+          "amplitud": 15000,
+          "cuota_acumulada_en_limite_inferior": 2112.75,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 20200,
+          "limite_superior_eur": 35200,
+          "cuota_acumulada_en_limite_inferior_eur": 2112.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 35200,
+          "limite_superior": 60000,
+          "amplitud": 24800,
+          "cuota_acumulada_en_limite_inferior": 4362.75,
+          "tipo_marginal_pct": 18.5,
+          "limite_inferior_eur": 35200,
+          "limite_superior_eur": 60000,
+          "cuota_acumulada_en_limite_inferior_eur": 4362.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 60000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 8950.75,
+          "tipo_marginal_pct": 22.5,
+          "limite_inferior_eur": 60000,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 8950.75,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2019,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Agencia Estatal de Administración Tributaria (AEAT)",
+          "referencia": "Manual práctico IRPF 2019",
+          "titulo": "Gravamen estatal de la base liquidable general, ejercicio 2019",
+          "url": "https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/IRPF-2019/ManualRenta2019_es_es.pdf"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 12450,
+          "amplitud": 12450,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.5,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 12450,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 12450,
+          "limite_superior": 20200,
+          "amplitud": 7750,
+          "cuota_acumulada_en_limite_inferior": 1182.75,
+          "tipo_marginal_pct": 12,
+          "limite_inferior_eur": 12450,
+          "limite_superior_eur": 20200,
+          "cuota_acumulada_en_limite_inferior_eur": 1182.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 20200,
+          "limite_superior": 35200,
+          "amplitud": 15000,
+          "cuota_acumulada_en_limite_inferior": 2112.75,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 20200,
+          "limite_superior_eur": 35200,
+          "cuota_acumulada_en_limite_inferior_eur": 2112.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 35200,
+          "limite_superior": 60000,
+          "amplitud": 24800,
+          "cuota_acumulada_en_limite_inferior": 4362.75,
+          "tipo_marginal_pct": 18.5,
+          "limite_inferior_eur": 35200,
+          "limite_superior_eur": 60000,
+          "cuota_acumulada_en_limite_inferior_eur": 4362.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 60000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 8950.75,
+          "tipo_marginal_pct": 22.5,
+          "limite_inferior_eur": 60000,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 8950.75,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2020,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Agencia Estatal de Administración Tributaria (AEAT)",
+          "referencia": "Manual práctico IRPF 2020",
+          "titulo": "Gravamen estatal de la base liquidable general, ejercicio 2020",
+          "url": "https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/IRPF-2020/ManualRenta2020_es_es.pdf"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 12450,
+          "amplitud": 12450,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.5,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 12450,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 12450,
+          "limite_superior": 20200,
+          "amplitud": 7750,
+          "cuota_acumulada_en_limite_inferior": 1182.75,
+          "tipo_marginal_pct": 12,
+          "limite_inferior_eur": 12450,
+          "limite_superior_eur": 20200,
+          "cuota_acumulada_en_limite_inferior_eur": 1182.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 20200,
+          "limite_superior": 35200,
+          "amplitud": 15000,
+          "cuota_acumulada_en_limite_inferior": 2112.75,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 20200,
+          "limite_superior_eur": 35200,
+          "cuota_acumulada_en_limite_inferior_eur": 2112.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 35200,
+          "limite_superior": 60000,
+          "amplitud": 24800,
+          "cuota_acumulada_en_limite_inferior": 4362.75,
+          "tipo_marginal_pct": 18.5,
+          "limite_inferior_eur": 35200,
+          "limite_superior_eur": 60000,
+          "cuota_acumulada_en_limite_inferior_eur": 4362.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 60000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 8950.75,
+          "tipo_marginal_pct": 22.5,
+          "limite_inferior_eur": 60000,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 8950.75,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2021,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Agencia Estatal de Administración Tributaria (AEAT)",
+          "referencia": "Manual práctico IRPF 2021",
+          "titulo": "Gravamen estatal de la base liquidable general, ejercicio 2021",
+          "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2021/capitulo-15-calculo-impuesto-determinacion-integras/gravamen-base-liquidable-general/gravamen-estatal.html"
+        },
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2020-17339",
+          "titulo": "Ley 11/2020: nuevo tramo estatal superior desde 2021",
+          "url": "https://www.boe.es/buscar/doc.php?id=BOE-A-2020-17339"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 12450,
+          "amplitud": 12450,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.5,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 12450,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 12450,
+          "limite_superior": 20200,
+          "amplitud": 7750,
+          "cuota_acumulada_en_limite_inferior": 1182.75,
+          "tipo_marginal_pct": 12,
+          "limite_inferior_eur": 12450,
+          "limite_superior_eur": 20200,
+          "cuota_acumulada_en_limite_inferior_eur": 1182.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 20200,
+          "limite_superior": 35200,
+          "amplitud": 15000,
+          "cuota_acumulada_en_limite_inferior": 2112.75,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 20200,
+          "limite_superior_eur": 35200,
+          "cuota_acumulada_en_limite_inferior_eur": 2112.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 35200,
+          "limite_superior": 60000,
+          "amplitud": 24800,
+          "cuota_acumulada_en_limite_inferior": 4362.75,
+          "tipo_marginal_pct": 18.5,
+          "limite_inferior_eur": 35200,
+          "limite_superior_eur": 60000,
+          "cuota_acumulada_en_limite_inferior_eur": 4362.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 60000,
+          "limite_superior": 300000,
+          "amplitud": 240000,
+          "cuota_acumulada_en_limite_inferior": 8950.75,
+          "tipo_marginal_pct": 22.5,
+          "limite_inferior_eur": 60000,
+          "limite_superior_eur": 300000,
+          "cuota_acumulada_en_limite_inferior_eur": 8950.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 300000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 62950.75,
+          "tipo_marginal_pct": 24.5,
+          "limite_inferior_eur": 300000,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 62950.75,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "Se incorpora el tramo estatal adicional desde 300.000 €, con tipo marginal estatal del 24,5 %."
+      ]
+    },
+    {
+      "anio": 2022,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Agencia Estatal de Administración Tributaria (AEAT)",
+          "referencia": "Manual práctico IRPF 2022",
+          "titulo": "Gravamen estatal de la base liquidable general, ejercicio 2022",
+          "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2022/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-estatal.html"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 12450,
+          "amplitud": 12450,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.5,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 12450,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 12450,
+          "limite_superior": 20200,
+          "amplitud": 7750,
+          "cuota_acumulada_en_limite_inferior": 1182.75,
+          "tipo_marginal_pct": 12,
+          "limite_inferior_eur": 12450,
+          "limite_superior_eur": 20200,
+          "cuota_acumulada_en_limite_inferior_eur": 1182.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 20200,
+          "limite_superior": 35200,
+          "amplitud": 15000,
+          "cuota_acumulada_en_limite_inferior": 2112.75,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 20200,
+          "limite_superior_eur": 35200,
+          "cuota_acumulada_en_limite_inferior_eur": 2112.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 35200,
+          "limite_superior": 60000,
+          "amplitud": 24800,
+          "cuota_acumulada_en_limite_inferior": 4362.75,
+          "tipo_marginal_pct": 18.5,
+          "limite_inferior_eur": 35200,
+          "limite_superior_eur": 60000,
+          "cuota_acumulada_en_limite_inferior_eur": 4362.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 60000,
+          "limite_superior": 300000,
+          "amplitud": 240000,
+          "cuota_acumulada_en_limite_inferior": 8950.75,
+          "tipo_marginal_pct": 22.5,
+          "limite_inferior_eur": 60000,
+          "limite_superior_eur": 300000,
+          "cuota_acumulada_en_limite_inferior_eur": 8950.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 300000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 62950.75,
+          "tipo_marginal_pct": 24.5,
+          "limite_inferior_eur": 300000,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 62950.75,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2023,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Agencia Estatal de Administración Tributaria (AEAT)",
+          "referencia": "Manual práctico IRPF 2023",
+          "titulo": "Gravamen estatal de la base liquidable general, ejercicio 2023",
+          "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2023/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-estatal.html"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 12450,
+          "amplitud": 12450,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.5,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 12450,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 12450,
+          "limite_superior": 20200,
+          "amplitud": 7750,
+          "cuota_acumulada_en_limite_inferior": 1182.75,
+          "tipo_marginal_pct": 12,
+          "limite_inferior_eur": 12450,
+          "limite_superior_eur": 20200,
+          "cuota_acumulada_en_limite_inferior_eur": 1182.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 20200,
+          "limite_superior": 35200,
+          "amplitud": 15000,
+          "cuota_acumulada_en_limite_inferior": 2112.75,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 20200,
+          "limite_superior_eur": 35200,
+          "cuota_acumulada_en_limite_inferior_eur": 2112.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 35200,
+          "limite_superior": 60000,
+          "amplitud": 24800,
+          "cuota_acumulada_en_limite_inferior": 4362.75,
+          "tipo_marginal_pct": 18.5,
+          "limite_inferior_eur": 35200,
+          "limite_superior_eur": 60000,
+          "cuota_acumulada_en_limite_inferior_eur": 4362.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 60000,
+          "limite_superior": 300000,
+          "amplitud": 240000,
+          "cuota_acumulada_en_limite_inferior": 8950.75,
+          "tipo_marginal_pct": 22.5,
+          "limite_inferior_eur": 60000,
+          "limite_superior_eur": 300000,
+          "cuota_acumulada_en_limite_inferior_eur": 8950.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 300000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 62950.75,
+          "tipo_marginal_pct": 24.5,
+          "limite_inferior_eur": 300000,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 62950.75,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2024,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Agencia Estatal de Administración Tributaria (AEAT)",
+          "referencia": "Manual práctico IRPF 2024",
+          "titulo": "Gravamen estatal de la base liquidable general, ejercicio 2024",
+          "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2024/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-estatal.html"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 12450,
+          "amplitud": 12450,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.5,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 12450,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 12450,
+          "limite_superior": 20200,
+          "amplitud": 7750,
+          "cuota_acumulada_en_limite_inferior": 1182.75,
+          "tipo_marginal_pct": 12,
+          "limite_inferior_eur": 12450,
+          "limite_superior_eur": 20200,
+          "cuota_acumulada_en_limite_inferior_eur": 1182.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 20200,
+          "limite_superior": 35200,
+          "amplitud": 15000,
+          "cuota_acumulada_en_limite_inferior": 2112.75,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 20200,
+          "limite_superior_eur": 35200,
+          "cuota_acumulada_en_limite_inferior_eur": 2112.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 35200,
+          "limite_superior": 60000,
+          "amplitud": 24800,
+          "cuota_acumulada_en_limite_inferior": 4362.75,
+          "tipo_marginal_pct": 18.5,
+          "limite_inferior_eur": 35200,
+          "limite_superior_eur": 60000,
+          "cuota_acumulada_en_limite_inferior_eur": 4362.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 60000,
+          "limite_superior": 300000,
+          "amplitud": 240000,
+          "cuota_acumulada_en_limite_inferior": 8950.75,
+          "tipo_marginal_pct": 22.5,
+          "limite_inferior_eur": 60000,
+          "limite_superior_eur": 300000,
+          "cuota_acumulada_en_limite_inferior_eur": 8950.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 300000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 62950.75,
+          "tipo_marginal_pct": 24.5,
+          "limite_inferior_eur": 300000,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 62950.75,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2025,
+      "estado_ejercicio": "cerrado",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "tabla_oficial_directa",
+      "fuentes": [
+        {
+          "organismo": "Agencia Estatal de Administración Tributaria (AEAT)",
+          "referencia": "Manual práctico IRPF 2025",
+          "titulo": "Gravamen estatal de la base liquidable general, ejercicio 2025",
+          "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-estatal.html"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 12450,
+          "amplitud": 12450,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.5,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 12450,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 12450,
+          "limite_superior": 20200,
+          "amplitud": 7750,
+          "cuota_acumulada_en_limite_inferior": 1182.75,
+          "tipo_marginal_pct": 12,
+          "limite_inferior_eur": 12450,
+          "limite_superior_eur": 20200,
+          "cuota_acumulada_en_limite_inferior_eur": 1182.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 20200,
+          "limite_superior": 35200,
+          "amplitud": 15000,
+          "cuota_acumulada_en_limite_inferior": 2112.75,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 20200,
+          "limite_superior_eur": 35200,
+          "cuota_acumulada_en_limite_inferior_eur": 2112.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 35200,
+          "limite_superior": 60000,
+          "amplitud": 24800,
+          "cuota_acumulada_en_limite_inferior": 4362.75,
+          "tipo_marginal_pct": 18.5,
+          "limite_inferior_eur": 35200,
+          "limite_superior_eur": 60000,
+          "cuota_acumulada_en_limite_inferior_eur": 4362.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 60000,
+          "limite_superior": 300000,
+          "amplitud": 240000,
+          "cuota_acumulada_en_limite_inferior": 8950.75,
+          "tipo_marginal_pct": 22.5,
+          "limite_inferior_eur": 60000,
+          "limite_superior_eur": 300000,
+          "cuota_acumulada_en_limite_inferior_eur": 8950.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 300000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 62950.75,
+          "tipo_marginal_pct": 24.5,
+          "limite_inferior_eur": 300000,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 62950.75,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": []
+    },
+    {
+      "anio": 2026,
+      "estado_ejercicio": "vigente_a_2026-07-28",
+      "ambito_legal": "escala_estatal_general",
+      "moneda_original": "EUR",
+      "unidad_monetaria_original": "euro",
+      "estado_fuente": "norma_consolidada_vigente_a_fecha_de_corte",
+      "fuentes": [
+        {
+          "organismo": "Boletín Oficial del Estado (BOE)",
+          "referencia": "BOE-A-2006-20764",
+          "titulo": "Ley 35/2006, artículo 63, texto consolidado vigente a 2026-07-28",
+          "url": "https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764"
+        }
+      ],
+      "banda_cuota_cero_implicita": null,
+      "tramos": [
+        {
+          "numero_tramo": 1,
+          "limite_inferior": 0,
+          "limite_superior": 12450,
+          "amplitud": 12450,
+          "cuota_acumulada_en_limite_inferior": 0,
+          "tipo_marginal_pct": 9.5,
+          "limite_inferior_eur": 0,
+          "limite_superior_eur": 12450,
+          "cuota_acumulada_en_limite_inferior_eur": 0,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 2,
+          "limite_inferior": 12450,
+          "limite_superior": 20200,
+          "amplitud": 7750,
+          "cuota_acumulada_en_limite_inferior": 1182.75,
+          "tipo_marginal_pct": 12,
+          "limite_inferior_eur": 12450,
+          "limite_superior_eur": 20200,
+          "cuota_acumulada_en_limite_inferior_eur": 1182.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 3,
+          "limite_inferior": 20200,
+          "limite_superior": 35200,
+          "amplitud": 15000,
+          "cuota_acumulada_en_limite_inferior": 2112.75,
+          "tipo_marginal_pct": 15,
+          "limite_inferior_eur": 20200,
+          "limite_superior_eur": 35200,
+          "cuota_acumulada_en_limite_inferior_eur": 2112.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 4,
+          "limite_inferior": 35200,
+          "limite_superior": 60000,
+          "amplitud": 24800,
+          "cuota_acumulada_en_limite_inferior": 4362.75,
+          "tipo_marginal_pct": 18.5,
+          "limite_inferior_eur": 35200,
+          "limite_superior_eur": 60000,
+          "cuota_acumulada_en_limite_inferior_eur": 4362.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 5,
+          "limite_inferior": 60000,
+          "limite_superior": 300000,
+          "amplitud": 240000,
+          "cuota_acumulada_en_limite_inferior": 8950.75,
+          "tipo_marginal_pct": 22.5,
+          "limite_inferior_eur": 60000,
+          "limite_superior_eur": 300000,
+          "cuota_acumulada_en_limite_inferior_eur": 8950.75,
+          "abierto_por_arriba": false
+        },
+        {
+          "numero_tramo": 6,
+          "limite_inferior": 300000,
+          "limite_superior": null,
+          "amplitud": null,
+          "cuota_acumulada_en_limite_inferior": 62950.75,
+          "tipo_marginal_pct": 24.5,
+          "limite_inferior_eur": 300000,
+          "limite_superior_eur": null,
+          "cuota_acumulada_en_limite_inferior_eur": 62950.75,
+          "abierto_por_arriba": true
+        }
+      ],
+      "notas": [
+        "Ejercicio en curso: escala vigente según el texto consolidado de la Ley 35/2006 a 2026-07-28; puede cambiar si una norma posterior produce efectos en 2026."
+      ]
+    }
+  ],
+  "validacion": {
+    "estado": "correcto",
+    "comprobaciones_ejecutadas": 153,
+    "anios_validados": 37,
+    "tramos_principales_validados": 290,
+    "errores": [],
+    "avisos": [
+      "Las cuotas históricas publicadas pueden reflejar redondeos de hasta una peseta o dos céntimos.",
+      "La conversión de pesetas a euros es informativa; las cifras originales siguen siendo las jurídicamente publicadas."
+    ]
+  }
+}

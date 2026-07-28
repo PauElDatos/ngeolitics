@@ -624,10 +624,26 @@
   <script>
 
     const DATASETS = window.IRPF_CHART_DATASETS;
-    if (!DATASETS || !Array.isArray(DATASETS.original) || !Array.isArray(DATASETS.complete)) {
+    if (!DATASETS || !Array.isArray(DATASETS.original) || !Array.isArray(DATASETS.complete) || !Array.isArray(DATASETS.verified2026)) {
       throw new Error('No se pudo cargar el dataset auditado del IRPF.');
     }
     let DATA = DATASETS.original;
+
+    const DATASET_DEFS = {
+      original: {
+        label: `Original · ${DATASETS.original.length} años`,
+        source: 'IRPF_tablas_1990-2023_completo.json',
+      },
+      complete: {
+        label: `Completa · ${DATASETS.complete.length} años`,
+        source: 'IRPF_tablas_1990-2023_completo.json',
+      },
+      verified2026: {
+        label: `Verificada · ${DATASETS.verified2026.length} años`,
+        source: 'IRPF_tramos_estatales_1990-2026_verificado.json',
+        csvSource: 'IRPF_tramos_estatales_1990-2026.csv',
+      },
+    };
 
     const INCOME_DISTRIBUTION = Array.isArray(window.IRPF_INCOME_DISTRIBUTION)
       ? window.IRPF_INCOME_DISTRIBUTION
@@ -731,11 +747,14 @@
     }
 
     function dataSequenceLabel() {
-      return state.dataSequence === 'complete' ? 'Completa' : 'Original';
+      return DATASET_DEFS[state.dataSequence].label;
     }
 
-    function dataSequenceFilename() {
-      return 'IRPF_tablas_1990-2023_completo.json';
+    function dataSequenceSourceLinks() {
+      const definition = DATASET_DEFS[state.dataSequence];
+      const jsonLink = `<a class="sourceLink" href="${definition.source}">${definition.source}</a>`;
+      if (!definition.csvSource) return jsonLink;
+      return `${jsonLink} + <a class="sourceLink" href="${definition.csvSource}">${definition.csvSource}</a>`;
     }
 
     function getColor(index) {
@@ -994,8 +1013,10 @@
       });
 
       buildSegmentedButtons('dataSequenceButtons', [
-        { key: 'original', label: `Original · ${DATASETS.original.length} años` },
-        { key: 'complete', label: `Completa · ${DATASETS.complete.length} años` },
+        ...Object.entries(DATASET_DEFS).map(([key, definition]) => ({
+          key,
+          label: definition.label,
+        })),
       ], state.dataSequence, setDataSequence);
     }
 
@@ -1347,7 +1368,13 @@
       svg.innerHTML = out;
 
       chartMeta.textContent = `${state.mode === 'real1990' ? 'Euros constantes de 1990' : 'Euros corrientes'} · Escala ${state.scaleMode === 'log' ? 'logarítmica' : 'lineal'} · Secuencia ${dataSequenceLabel().toLowerCase()}`;
-      lineSummary.textContent = `${visible.length} tramos + PIB per cápita · ${YEARS.length} años · Tipo marginal estatal: mapa de calor · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}`;
+      const missingRealYears = state.mode === 'real1990'
+        ? DATA.filter(record => record.brackets.some(bracket => bracket.upper_nominal_eur !== null && bracket.upper_real_eur_1990 === null)).map(record => record.year)
+        : [];
+      const realDataNote = missingRealYears.length
+        ? ` · Sin deflactor disponible: ${missingRealYears.join(', ')}`
+        : '';
+      lineSummary.textContent = `${visible.length} tramos + PIB per cápita · ${YEARS.length} años · Tipo marginal estatal: mapa de calor · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}${realDataNote}`;
       rateEncodingNote.innerHTML = `Línea blanca discontinua: <strong>PIB per cápita</strong> · Mapa de calor: <strong>tipo marginal estatal (${RATE_EXTENT.min.toLocaleString('es-ES')}%–${RATE_EXTENT.max.toLocaleString('es-ES')}%)</strong>`;
       topMeta.textContent = `${Math.min(...YEARS)}–${Math.max(...YEARS)} · ${YEARS.length} años`;
     }
@@ -1510,17 +1537,19 @@
 
     function renderContextText() {
       if (state.chartMode === 'limits') {
-        sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> (escala estatal del IRPF), <a class="sourceLink" href="${dataSequenceFilename()}">dataset auditado</a>, BM (PIB/deflactor) · <span style="opacity:.9;">N.Geolitics</span>`;
+        sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> (escala estatal del IRPF), ${dataSequenceSourceLinks()}, BM (PIB/deflactor) · <span style="opacity:.9;">N.Geolitics</span>`;
         explanationContent.innerHTML = `
           <p>Cada serie representa la evolución del <strong>límite superior</strong> de un tramo de la escala estatal del IRPF. Un tramo abierto no tiene límite superior: la línea se interrumpe, aunque su tipo marginal estatal sigue apareciendo en el mapa de calor.</p>
           <p>La vista permite comparar euros corrientes con <strong>euros constantes de 1990</strong>. El PIB per cápita utiliza la misma unidad seleccionada para que ambas magnitudes sean comparables.</p>
           <p>La gráfica muestra el <strong>tipo marginal estatal</strong>. El tipo total soportado incluye el tramo autonómico y varía según la comunidad autónoma; no se calcula aquí un tipo total nacional único. Las bandas de fondo identifican el Gobierno de cada periodo.</p>`;
         return;
       }
-      sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta y población adulta), <a class="sourceLink" href="${dataSequenceFilename()}">${dataSequenceFilename()}</a> · <span style="opacity:.9;">N.Geolitics</span>`;
-      const scheduleMethod = state.dataSequence === 'complete'
-        ? 'La secuencia completa aporta una escala estatal para cada año del periodo.'
-        : 'Los años sin una nueva escala fiscal conservan la <strong>última escala disponible</strong>.';
+      sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta y población adulta), ${dataSequenceSourceLinks()} · <span style="opacity:.9;">N.Geolitics</span>`;
+        const scheduleMethod = state.dataSequence === 'verified2026'
+          ? 'La secuencia verificada aporta la escala estatal año a año hasta 2026; la población disponible llega hasta 2023.'
+          : state.dataSequence === 'complete'
+          ? 'La secuencia completa aporta una escala estatal para cada año del periodo.'
+          : 'Los años sin una nueva escala fiscal conservan la <strong>última escala disponible</strong>.';
       explanationContent.innerHTML = `
         <p>La población se distribuye entre los límites legales del IRPF mediante los <strong>umbrales anuales de renta WID</strong> para P20, P40, P60, P80, P90 y P99.</p>
         <p>La estimación interpola la distribución entre esos percentiles y aplica una cola de Pareto por encima de P99. ${scheduleMethod}</p>

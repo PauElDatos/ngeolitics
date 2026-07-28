@@ -53,6 +53,8 @@ def main() -> None:
     assert generated == datasets, "Generated browser asset is stale; run the generator"
     assert len(datasets["original"]) == 26
     assert len(datasets["complete"]) == 34
+    assert len(datasets["verified2026"]) == 37
+    assert [record["year"] for record in datasets["verified2026"]] == list(range(1990, 2027))
 
     for name, records in datasets.items():
         validate_sequence(name, records)
@@ -79,6 +81,8 @@ def main() -> None:
     master = json.loads(AUDITED_MASTER_PATH.read_text(encoding="utf-8"))
     master_2007 = next(record for record in master["years"] if record["year"] == 2007)
     assert master_2007["source_url"] == EXPECTED_2007_SOURCE
+    verified_2026 = next(record for record in datasets["verified2026"] if record["year"] == 2026)
+    assert verified_2026["source_url"].startswith("https://www.boe.es/")
     print("IRPF dataset validation passed (10 data/model checks).")
 
 
