@@ -944,7 +944,6 @@
       let previous = null;
       points.forEach(point => {
         if (!Number.isFinite(point.value)) {
-          previous = null;
           return;
         }
         if (!previous) {

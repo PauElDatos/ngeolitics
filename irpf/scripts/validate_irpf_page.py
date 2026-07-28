@@ -64,8 +64,8 @@ def check_sequence(page: Page, sequence: str) -> None:
 
     t4_path = page.locator('.limitSeries[data-tramo="4"]').get_attribute("d") or ""
     t5_path = page.locator('.limitSeries[data-tramo="5"]').get_attribute("d") or ""
-    assert t4_path.count("M") >= 2, f"{sequence}: T4 path was not split"
-    assert t5_path.count("M") >= 3, f"{sequence}: T5 path was not split twice"
+    assert t4_path.count("M") == 1, f"{sequence}: T4 path is not continuous"
+    assert t5_path.count("M") == 1, f"{sequence}: T5 path is not continuous"
 
     tooltip = normalized_text(
         page.evaluate("() => window.IRPF_TEST_API.showLimitsTooltip(2007)")
