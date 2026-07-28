@@ -95,6 +95,28 @@ def check_layout(page: Page) -> None:
     assert metrics["svgWidth"] > 250 and metrics["heatCells"] > 0, metrics
 
 
+def check_all_visual_modes(page: Page) -> None:
+    page.locator('#modeButtons button[data-key="real1990"]').click()
+    page.wait_for_timeout(50)
+    assert page.locator(".rateHeatCell").count() > 0
+    assert page.locator('.limitSeries[data-tramo="4"]').count() == 1
+
+    page.locator('#scaleButtons button[data-key="linear"]').click()
+    page.wait_for_timeout(50)
+    assert page.locator(".rateHeatCell").count() > 0
+    page.locator('#scaleButtons button[data-key="log"]').click()
+
+    page.locator("#btnChartPopulation").click()
+    page.wait_for_timeout(50)
+    assert "población adulta" in (page.locator("#chart").get_attribute("aria-label") or "")
+    assert page.locator("#chart").bounding_box()["width"] > 250
+
+    page.locator("#btnChartLimits").click()
+    page.locator('#modeButtons button[data-key="nominal"]').click()
+    page.wait_for_timeout(50)
+    assert page.locator(".rateHeatCell").count() > 0
+
+
 def main() -> None:
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
     server, url = serve_repo()
@@ -113,6 +135,8 @@ def main() -> None:
             assert "Escala estatal del IRPF" in desktop.locator("h1").inner_text()
             check_sequence(desktop, "original")
             check_sequence(desktop, "complete")
+            check_sequence(desktop, "verified2026")
+            check_all_visual_modes(desktop)
             check_layout(desktop)
             desktop.locator("#chartBox").dispatch_event("mouseleave")
             desktop.screenshot(
@@ -125,6 +149,8 @@ def main() -> None:
             mobile.locator('.limitSeries[data-tramo="4"]').wait_for()
             check_sequence(mobile, "original")
             check_sequence(mobile, "complete")
+            check_sequence(mobile, "verified2026")
+            check_all_visual_modes(mobile)
             check_layout(mobile)
             mobile.locator("#chartBox").dispatch_event("mouseleave")
             mobile.screenshot(
