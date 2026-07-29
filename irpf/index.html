@@ -422,11 +422,20 @@
       background: linear-gradient(90deg, rgb(37,48,71), rgb(0,213,255), rgb(254,247,2));
     }
     .rateLegendScale {
-      display: flex;
-      justify-content: space-between;
+      position: relative;
+      height: 17px;
       color: var(--muted);
       font-size: calc(10px * var(--uiScale));
     }
+    .rateLegendTick {
+      position: absolute;
+      top: 0;
+      transform: translateX(-50%);
+      white-space: nowrap;
+    }
+    .rateLegendTick.isStart { transform: none; }
+    .rateLegendTick.isMidpoint { transform: translateX(-100%); }
+    .rateLegendTick.isEnd { transform: translateX(-100%); }
     .chartContent {
       min-height: 0;
       padding: 12px;
@@ -932,7 +941,9 @@
     function rateRatio(rate) {
       const { min, max } = RATE_EXTENT;
       if (!Number.isFinite(rate) || max <= min) return 0;
-      return Math.max(0, Math.min(1, (rate - min) / (max - min)));
+      const shifted = Math.max(0, Math.min(max - min, rate - min));
+      // log1p preserves the 0% endpoint while expanding differences among low rates.
+      return Math.log1p(shifted) / Math.log1p(max - min);
     }
 
     function mixRgb(from, to, amount) {
@@ -1019,14 +1030,15 @@
     function renderLegend() {
       if (state.chartMode === 'limits') {
         const midpoint = RATE_EXTENT.min + ((RATE_EXTENT.max - RATE_EXTENT.min) / 2);
+        const midpointPosition = rateRatio(midpoint) * 100;
         seriesLegend.innerHTML = `
           <div class="rateLegend">
-            <div class="rateLegendTitle">Tipo marginal estatal</div>
-            <div class="rateLegendGradient" aria-hidden="true"></div>
+            <div class="rateLegendTitle">Tipo marginal estatal · escala logarítmica</div>
+            <div class="rateLegendGradient" data-scale="logarithmic" aria-hidden="true"></div>
             <div class="rateLegendScale">
-              <span>${pct(RATE_EXTENT.min)}</span>
-              <span>${pct(midpoint)}</span>
-              <span>${pct(RATE_EXTENT.max)}</span>
+              <span class="rateLegendTick isStart" data-rate="${RATE_EXTENT.min}" style="left:0%">${pct(RATE_EXTENT.min)}</span>
+              <span class="rateLegendTick isMidpoint" data-rate="${midpoint}" style="left:${midpointPosition}%">${pct(midpoint)}</span>
+              <span class="rateLegendTick isEnd" data-rate="${RATE_EXTENT.max}" style="left:100%">${pct(RATE_EXTENT.max)}</span>
             </div>
           </div>
           <div class="legendItem">
@@ -1325,7 +1337,7 @@
         ? ` · Sin deflactor disponible: ${missingRealYears.join(', ')}`
         : '';
       lineSummary.textContent = `${YEARS.length} columnas anuales · Todos los intervalos fiscales · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}${realDataNote}`;
-      rateEncodingNote.innerHTML = `Color: <strong>tipo marginal estatal (${RATE_EXTENT.min.toLocaleString('es-ES')}%–${RATE_EXTENT.max.toLocaleString('es-ES')}%)</strong> · Línea blanca: <strong>PIB per cápita</strong>`;
+      rateEncodingNote.innerHTML = `Color logarítmico: <strong>tipo marginal estatal (${RATE_EXTENT.min.toLocaleString('es-ES')}%–${RATE_EXTENT.max.toLocaleString('es-ES')}%)</strong> · Línea blanca: <strong>PIB per cápita</strong>`;
       topMeta.textContent = `${Math.min(...YEARS)}–${Math.max(...YEARS)} · ${YEARS.length} años`;
     }
 
@@ -1560,6 +1572,7 @@
       getLimitSeries: index => getLimitSeries(index),
       getRateSeries: index => getRateSeries(index),
       getRateExtent: () => ({ ...RATE_EXTENT }),
+      getRateRatio: rate => rateRatio(rate),
       showLimitsTooltip(year) {
         const rect = chartBox.getBoundingClientRect();
         state.chartMode = 'limits';

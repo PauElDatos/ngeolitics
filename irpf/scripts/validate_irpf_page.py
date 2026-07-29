@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import functools
 import http.server
+import math
 import re
 import tempfile
 import threading
@@ -43,6 +44,8 @@ def check_dataset(page: Page) -> None:
           t5: window.IRPF_TEST_API.getLimitSeries(5),
           rate4: window.IRPF_TEST_API.getRateSeries(4),
           extent: window.IRPF_TEST_API.getRateExtent(),
+          rateRatios: [0, 9.5, 12, 28, 53.5, 56].map(rate => window.IRPF_TEST_API.getRateRatio(rate)),
+          legendMidpointPosition: Number.parseFloat(document.querySelector('.rateLegendTick[data-rate="28"]').style.left),
         })
         """
     )
@@ -62,6 +65,23 @@ def check_dataset(page: Page) -> None:
     assert rate4_by_year[2007]["exists"]
     assert rate4_by_year[2007]["rate"] == 27.13
     assert model["extent"] == {"min": 0, "max": 56}
+    expected_ratios = [math.log1p(rate) / math.log1p(56) for rate in (0, 9.5, 12, 28, 53.5, 56)]
+    assert all(abs(actual - expected) < 1e-12 for actual, expected in zip(model["rateRatios"], expected_ratios))
+    assert model["rateRatios"][2] - model["rateRatios"][1] > 4 * (
+        model["rateRatios"][5] - model["rateRatios"][4]
+    )
+    assert abs(model["legendMidpointPosition"] - (model["rateRatios"][3] * 100)) < 1e-4
+    assert page.locator('.rateLegendGradient[data-scale="logarithmic"]').count() == 1
+    legend_label_gap = page.evaluate(
+        """
+        () => {
+          const midpoint = document.querySelector('.rateLegendTick[data-rate="28"]').getBoundingClientRect();
+          const maximum = document.querySelector('.rateLegendTick[data-rate="56"]').getBoundingClientRect();
+          return maximum.left - midpoint.right;
+        }
+        """
+    )
+    assert legend_label_gap >= 2
 
     assert page.locator('.fiscalSurfaceCell[data-year="2007"][data-tramo="4"]').count() == 1
     assert page.locator('.fiscalSurfaceCell[data-year="2007"][data-tramo="5"]').count() == 0
