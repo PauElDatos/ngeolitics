@@ -63,33 +63,57 @@ def check_dataset(page: Page) -> None:
     assert rate4_by_year[2007]["rate"] == 27.13
     assert model["extent"] == {"min": 0, "max": 56}
 
-    assert page.locator('.rateHeatCell[data-year="2007"][data-tramo="4"]').count() == 1
-    assert page.locator('.rateHeatCell[data-year="2007"][data-tramo="5"]').count() == 0
-    assert page.locator(".rateHeatCell").count() > 0
-    assert page.locator('.rateHeatCell[data-year="2013"][data-tramo="7"]').count() == 1
-    assert page.locator('.rateHeatCell[data-year="1995"][data-tramo="18"]').count() == 1
-    heatmap_tramos = page.locator(".rateHeatCell").evaluate_all(
+    assert page.locator('.fiscalSurfaceCell[data-year="2007"][data-tramo="4"]').count() == 1
+    assert page.locator('.fiscalSurfaceCell[data-year="2007"][data-tramo="5"]').count() == 0
+    assert page.locator(".fiscalSurfaceCell").count() > 0
+    assert page.locator('.fiscalSurfaceCell[data-year="2013"][data-tramo="7"]').count() == 1
+    assert page.locator('.fiscalSurfaceCell[data-year="1995"][data-tramo="18"]').count() == 1
+    surface_tramos = page.locator(".fiscalSurfaceCell").evaluate_all(
         "nodes => [...new Set(nodes.map(node => Number(node.dataset.tramo)))].sort((a, b) => a - b)"
     )
-    assert heatmap_tramos == list(range(1, 19))
-    assert page.locator(".openBracketPoint").count() == 0
-    finite_limit_series = page.locator(".limitSeries").evaluate_all(
-        "nodes => [...new Set(nodes.map(node => Number(node.dataset.tramo)))].sort((a, b) => a - b)"
+    assert surface_tramos == list(range(1, 19))
+    assert page.locator(".limitSeries, .rateHeatCell, .openBracketPoint").count() == 0
+    assert page.locator('.fiscalSurfaceCell[data-open="true"]').count() == 36
+    annual_structure = page.evaluate(
+        """
+        () => [...new Set([...document.querySelectorAll('.fiscalSurfaceCell')].map(node => node.dataset.year))]
+          .map(year => ({
+            year: Number(year),
+            cells: document.querySelectorAll(`.fiscalSurfaceCell[data-year="${year}"]`).length,
+            boundaries: document.querySelectorAll(`.taxBoundary[data-year="${year}"]`).length,
+            open: document.querySelectorAll(`.fiscalSurfaceCell[data-year="${year}"][data-open="true"]`).length,
+          }))
+        """
     )
-    assert finite_limit_series == list(range(1, 18))
-    assert "Una escala de N tramos tiene N−1 límites" in page.locator("#explanationContent").inner_text()
+    assert all(row["boundaries"] == row["cells"] - 1 for row in annual_structure)
+    assert all(row["open"] == 1 for row in annual_structure)
+    assert page.locator('.fiscalSurfaceCell[data-year="2008"]').count() == 4
+    assert page.locator('.taxBoundary[data-year="2008"]').count() == 3
+    open_2008 = page.locator('.fiscalSurfaceCell[data-year="2008"][data-tramo="4"]')
+    assert open_2008.get_attribute("data-open") == "true"
+    assert float(open_2008.get_attribute("data-lower")) == 53407.2
+    adjacency_2008 = page.evaluate(
+        """
+        () => {
+          const t3 = document.querySelector('.fiscalSurfaceCell[data-year="2008"][data-tramo="3"]');
+          const t4 = document.querySelector('.fiscalSurfaceCell[data-year="2008"][data-tramo="4"]');
+          const t3Top = Number(t3.getAttribute('y'));
+          const t4Top = Number(t4.getAttribute('y'));
+          const t4Bottom = t4Top + Number(t4.getAttribute('height'));
+          return { t3Top, t4Top, t4Bottom };
+        }
+        """
+    )
+    assert adjacency_2008["t4Top"] < adjacency_2008["t3Top"]
+    assert abs(adjacency_2008["t4Bottom"] - adjacency_2008["t3Top"]) < 0.01
+    assert "Cada columna se calcula de forma independiente" in page.locator("#explanationContent").inner_text()
     assert page.locator("#countButtons").count() == 0
-
-    t4_path = page.locator('.limitSeries[data-tramo="4"]').get_attribute("d") or ""
-    t5_path = page.locator('.limitSeries[data-tramo="5"]').get_attribute("d") or ""
-    assert t4_path.count("M") == 1, "T4 path is not continuous"
-    assert t5_path.count("M") == 1, "T5 path is not continuous"
 
     tooltip = normalized_text(
         page.evaluate("() => window.IRPF_TEST_API.showLimitsTooltip(2007)")
     )
     assert tooltip.count("Tramo ") == 4
-    assert "Tramo 4 · desde 52.360 € · tipo marginal estatal 27,13 %" in tooltip
+    assert "Tramo 4 · desde 52.360 € en adelante · tipo marginal estatal 27,13 %" in tooltip
     assert "Tramo 5" not in tooltip
 
     gdp_tooltip = normalized_text(
@@ -116,25 +140,25 @@ def check_layout(page: Page) -> None:
             chartWidth: chart.width,
             chartHeight: chart.height,
             svgWidth: document.querySelector('#chart').getBoundingClientRect().width,
-            heatCells: document.querySelectorAll('.rateHeatCell').length,
+            surfaceCells: document.querySelectorAll('.fiscalSurfaceCell').length,
           };
         }
         """
     )
     assert metrics["overflow"] <= 1, metrics
     assert metrics["chartWidth"] > 250 and metrics["chartHeight"] > 300, metrics
-    assert metrics["svgWidth"] > 250 and metrics["heatCells"] > 0, metrics
+    assert metrics["svgWidth"] > 250 and metrics["surfaceCells"] > 0, metrics
 
 
 def check_all_visual_modes(page: Page) -> None:
     page.locator('#modeButtons button[data-key="real1990"]').click()
     page.wait_for_timeout(50)
-    assert page.locator(".rateHeatCell").count() > 0
-    assert page.locator('.limitSeries[data-tramo="4"]').count() == 1
+    assert page.locator(".fiscalSurfaceCell").count() > 0
+    assert page.locator('.fiscalSurfaceCell[data-year="2008"][data-tramo="4"]').count() == 1
 
     page.locator('#scaleButtons button[data-key="linear"]').click()
     page.wait_for_timeout(50)
-    assert page.locator(".rateHeatCell").count() > 0
+    assert page.locator(".fiscalSurfaceCell").count() > 0
     page.locator('#scaleButtons button[data-key="log"]').click()
 
     page.locator("#btnChartPopulation").click()
@@ -145,7 +169,7 @@ def check_all_visual_modes(page: Page) -> None:
     page.locator("#btnChartLimits").click()
     page.locator('#modeButtons button[data-key="nominal"]').click()
     page.wait_for_timeout(50)
-    assert page.locator(".rateHeatCell").count() > 0
+    assert page.locator(".fiscalSurfaceCell").count() > 0
 
 
 def main() -> None:
@@ -162,7 +186,7 @@ def main() -> None:
             desktop = browser.new_page(viewport={"width": 1440, "height": 1000})
             desktop.on("pageerror", lambda error: errors.append(str(error)))
             desktop.goto(url, wait_until="networkidle")
-            desktop.locator('.limitSeries[data-tramo="4"]').wait_for()
+            desktop.locator('.fiscalSurfaceCell[data-year="2008"][data-tramo="4"]').wait_for()
             assert "Escala estatal del IRPF" in desktop.locator("h1").inner_text()
             assert desktop.get_by_text("Secuencia de datos", exact=True).count() == 0
             assert desktop.locator('a[href="irpf_escala_estatal_1990-2025.xml"]').count() == 1
@@ -177,7 +201,7 @@ def main() -> None:
             mobile = browser.new_page(viewport={"width": 390, "height": 844})
             mobile.on("pageerror", lambda error: errors.append(str(error)))
             mobile.goto(url, wait_until="networkidle")
-            mobile.locator('.limitSeries[data-tramo="4"]').wait_for()
+            mobile.locator('.fiscalSurfaceCell[data-year="2008"][data-tramo="4"]').wait_for()
             assert mobile.get_by_text("Secuencia de datos", exact=True).count() == 0
             check_dataset(mobile)
             check_all_visual_modes(mobile)
