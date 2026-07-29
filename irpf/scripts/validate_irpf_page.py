@@ -72,13 +72,12 @@ def check_dataset(page: Page) -> None:
         "nodes => [...new Set(nodes.map(node => Number(node.dataset.tramo)))].sort((a, b) => a - b)"
     )
     assert heatmap_tramos == list(range(1, 19))
-    assert page.locator('.openBracketPoint[data-year="2013"][data-tramo="7"]').count() == 1
-    assert page.locator('.openBracketPoint[data-year="2009"][data-tramo="4"]').count() == 1
-    assert page.locator('.openBracketPoint[data-year="1995"][data-tramo="18"]').count() == 1
-    represented_tramos = page.locator(".limitSeries, .openBracketPoint").evaluate_all(
+    assert page.locator(".openBracketPoint").count() == 0
+    finite_limit_series = page.locator(".limitSeries").evaluate_all(
         "nodes => [...new Set(nodes.map(node => Number(node.dataset.tramo)))].sort((a, b) => a - b)"
     )
-    assert represented_tramos == list(range(1, 19))
+    assert finite_limit_series == list(range(1, 18))
+    assert "Una escala de N tramos tiene N−1 límites" in page.locator("#explanationContent").inner_text()
     assert page.locator("#countButtons").count() == 0
 
     t4_path = page.locator('.limitSeries[data-tramo="4"]').get_attribute("d") or ""

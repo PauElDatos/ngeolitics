@@ -866,9 +866,7 @@
         return {
           year: rec.year,
           value: Number.isFinite(value) ? value : null,
-          lower: bracket ? getBracketValue(bracket, 'lower') : null,
           exists: Boolean(bracket),
-          isOpen: Boolean(bracket && bracket.is_open),
         };
       });
     }
@@ -1330,12 +1328,6 @@
         series.limitPoints.filter(p => Number.isFinite(p.value)).forEach(p => {
           out += pointMarkerSvg(x(p.year), y(p.value), series.color, state.hoverYear === p.year, compact);
         });
-        series.limitPoints.filter(p => p.isOpen && Number.isFinite(p.lower)).forEach(p => {
-          const cx = x(p.year);
-          const cy = y(p.lower);
-          const radius = state.hoverYear === p.year ? (compact ? 9 : 7) : (compact ? 7.5 : 5.5);
-          out += `<path class="openBracketPoint" data-year="${p.year}" data-tramo="${series.tramo}" d="M${cx},${cy - radius} L${cx + radius},${cy} L${cx},${cy + radius} L${cx - radius},${cy} Z" fill="#232323" stroke="${series.color}" stroke-width="${compact ? 3 : 2.2}"><title>Tramo ${series.tramo} abierto desde ${money(p.lower, 0)}</title></path>`;
-        });
       });
 
       if (gdpSeries.length) {
@@ -1360,7 +1352,7 @@
       const realDataNote = missingRealYears.length
         ? ` · Sin deflactor disponible: ${missingRealYears.join(', ')}`
         : '';
-      lineSummary.textContent = `${visible.length} tramos + PIB per cápita · ${YEARS.length} años · Tipo marginal estatal: mapa de calor · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}${realDataNote}`;
+      lineSummary.textContent = `Fronteras entre tramos + PIB per cápita · ${YEARS.length} años · Todos los tramos: mapa de calor · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}${realDataNote}`;
       rateEncodingNote.innerHTML = `Línea blanca discontinua: <strong>PIB per cápita</strong> · Mapa de calor: <strong>tipo marginal estatal (${RATE_EXTENT.min.toLocaleString('es-ES')}%–${RATE_EXTENT.max.toLocaleString('es-ES')}%)</strong>`;
       topMeta.textContent = `${Math.min(...YEARS)}–${Math.max(...YEARS)} · ${YEARS.length} años`;
     }
@@ -1532,7 +1524,7 @@
       if (state.chartMode === 'limits') {
         sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> y AEAT (escala estatal del IRPF), ${xmlSource}, BM (serie histórica) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (PIB 2025) · <span style="opacity:.9;">N.Geolitics</span>`;
         explanationContent.innerHTML = `
-          <p>Cada serie representa la evolución del <strong>límite superior</strong> de un tramo de la escala estatal del IRPF. Todos los tramos existentes se muestran: cuando el último tramo es abierto, un rombo marca su límite inferior sin atribuirle un techo inexistente. Las líneas conectan los ejercicios con límites superiores válidos y el mapa de calor conserva todos los tipos marginales.</p>
+          <p>Cada serie representa la evolución de una <strong>frontera fiscal única</strong> entre dos tramos de la escala estatal del IRPF. Una escala de N tramos tiene N−1 límites: el tramo final es abierto y comienza exactamente donde termina el anterior, por lo que esa frontera se dibuja una sola vez. Las líneas conectan los ejercicios con límites superiores válidos; el mapa de calor y el detalle anual conservan todos los tramos y tipos marginales.</p>
           <p>La vista permite comparar euros corrientes con <strong>euros constantes de 1990</strong>. El PIB per cápita utiliza la misma unidad seleccionada; el valor de 2025 procede de AMECO.</p>
           <p>La gráfica muestra el <strong>tipo marginal estatal</strong>. El tipo total soportado incluye el tramo autonómico y varía según la comunidad autónoma; no se calcula aquí un tipo total nacional único. Las bandas de fondo identifican el Gobierno de cada periodo.</p>`;
         return;
