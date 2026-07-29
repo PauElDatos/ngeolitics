@@ -1,0 +1,729 @@
+<?xml version="1.0" encoding="utf-8"?>
+<irpfDataset schemaVersion="1.0.0" cutoffDate="2026-07-29" startYear="1990" endYear="2026" yearCount="37" scope="state-general-income-tax-scale">
+  <metadata>
+    <title>Tramos nacionales/estatales del IRPF sobre la base liquidable general (España), 1990-2026</title>
+    <seriesDefinition>Escala general nacional unificada en 1990-1996 y escala estatal de la base liquidable general desde 1997.</seriesDefinition>
+    <comparability>Desde la cesión del impuesto no existe una única escala total para toda España: el tipo total depende de la comunidad autónoma. Esta serie evita esa ambigüedad mostrando solo la parte estatal comparable.</comparability>
+    <temporaryLevyMethod>Se suma el gravamen complementario temporal a la escala estatal ordinaria para obtener el tipo estatal marginal aplicable de cada intervalo.</temporaryLevyMethod>
+    <currencyConversion from="ESP" to="EUR" pesetasPerEuro="166.386">Conversión informativa; los importes jurídicos originales se conservan.</currencyConversion>
+    <realValueMethod baseYear="1990" baseDeflatorTo1986="0.8">importe_real_1990 = importe_nominal_eur × (deflactor_hasta_1986_del_año / deflactor_hasta_1986_de_1990)</realValueMethod>
+    <gdpMethod>PIB per cápita nominal en euros. Para 2025 y 2026 se usa AMECO, previsión de primavera de 2026 de la Comisión Europea; 2026 es una previsión, no un cierre estadístico.</gdpMethod>
+    <rawOrigin>Serie iniciada a partir de raw_irpf.rtf; huecos, extracciones defectuosas y errores materiales se corrigieron con BOE y AEAT antes de consolidar este XML.</rawOrigin>
+    <exclusions>
+      <exclusion>Escalas autonómicas o complementarias de las comunidades autónomas.</exclusion>
+      <exclusion>Escala de la base liquidable del ahorro.</exclusion>
+      <exclusion>Escalas de retenciones e ingresos a cuenta.</exclusion>
+      <exclusion>Mínimos personales y familiares, reducciones, deducciones y cotizaciones.</exclusion>
+      <exclusion>Navarra y País Vasco, por sus regímenes forales propios.</exclusion>
+    </exclusions>
+  </metadata>
+  <years>
+    <year value="1990" exerciseStatus="cerrado" legalScope="escala_general_nacional_unificada" sourceStatus="tabla_oficial_directa" originalCurrency="ESP" originalCurrencyName="peseta española" deflatorTo1986="0.8" deflatorTo1990="1" gdpPerCapitaNominalEur="8450.83" gdpPerCapitaRealEur1990="8450.83">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-1989-30591" url="https://www.boe.es/buscar/doc.php?id=BOE-A-1989-30591">Real Decreto-ley 7/1989, escala aplicable en 1990</source>
+      </sources>
+      <implicitZeroBand marginalRatePct="0" lowerOriginal="0" upperOriginal="648900" lowerNominalEur="0" upperNominalEur="3899.97">
+        <note>Franja implícita deducida del primer límite de la tabla oficial.</note>
+      </implicitZeroBand>
+      <brackets count="16">
+        <bracket index="1" marginalRatePct="25" openUpper="false" lowerOriginal="648900" upperOriginal="1081500" widthOriginal="432600" quotaAtLowerOriginal="0" lowerNominalEur="3899.97" upperNominalEur="6499.95" quotaAtLowerEur="0" lowerRealEur1990="3899.97" upperRealEur1990="6499.95"/>
+        <bracket index="2" marginalRatePct="26" openUpper="false" lowerOriginal="1081500" upperOriginal="1622250" widthOriginal="540750" quotaAtLowerOriginal="108150" lowerNominalEur="6499.95" upperNominalEur="9749.92" quotaAtLowerEur="649.99" lowerRealEur1990="6499.95" upperRealEur1990="9749.92"/>
+        <bracket index="3" marginalRatePct="27" openUpper="false" lowerOriginal="1622250" upperOriginal="2163000" widthOriginal="540750" quotaAtLowerOriginal="248745" lowerNominalEur="9749.92" upperNominalEur="12999.89" quotaAtLowerEur="1494.99" lowerRealEur1990="9749.92" upperRealEur1990="12999.89"/>
+        <bracket index="4" marginalRatePct="28" openUpper="false" lowerOriginal="2163000" upperOriginal="2703750" widthOriginal="540750" quotaAtLowerOriginal="394748" lowerNominalEur="12999.89" upperNominalEur="16249.86" quotaAtLowerEur="2372.48" lowerRealEur1990="12999.89" upperRealEur1990="16249.86"/>
+        <bracket index="5" marginalRatePct="30" openUpper="false" lowerOriginal="2703750" upperOriginal="3244500" widthOriginal="540750" quotaAtLowerOriginal="546158" lowerNominalEur="16249.86" upperNominalEur="19499.84" quotaAtLowerEur="3282.48" lowerRealEur1990="16249.86" upperRealEur1990="19499.84"/>
+        <bracket index="6" marginalRatePct="32" openUpper="false" lowerOriginal="3244500" upperOriginal="3785250" widthOriginal="540750" quotaAtLowerOriginal="708383" lowerNominalEur="19499.84" upperNominalEur="22749.81" quotaAtLowerEur="4257.47" lowerRealEur1990="19499.84" upperRealEur1990="22749.81"/>
+        <bracket index="7" marginalRatePct="34" openUpper="false" lowerOriginal="3785250" upperOriginal="4326000" widthOriginal="540750" quotaAtLowerOriginal="881423" lowerNominalEur="22749.81" upperNominalEur="25999.78" quotaAtLowerEur="5297.46" lowerRealEur1990="22749.81" upperRealEur1990="25999.78"/>
+        <bracket index="8" marginalRatePct="36" openUpper="false" lowerOriginal="4326000" upperOriginal="4866750" widthOriginal="540750" quotaAtLowerOriginal="1065278" lowerNominalEur="25999.78" upperNominalEur="29249.76" quotaAtLowerEur="6402.45" lowerRealEur1990="25999.78" upperRealEur1990="29249.76"/>
+        <bracket index="9" marginalRatePct="38.5" openUpper="false" lowerOriginal="4866750" upperOriginal="5407500" widthOriginal="540750" quotaAtLowerOriginal="1259948" lowerNominalEur="29249.76" upperNominalEur="32499.73" quotaAtLowerEur="7572.44" lowerRealEur1990="29249.76" upperRealEur1990="32499.73"/>
+        <bracket index="10" marginalRatePct="41" openUpper="false" lowerOriginal="5407500" upperOriginal="5948250" widthOriginal="540750" quotaAtLowerOriginal="1468136" lowerNominalEur="32499.73" upperNominalEur="35749.7" quotaAtLowerEur="8823.68" lowerRealEur1990="32499.73" upperRealEur1990="35749.7"/>
+        <bracket index="11" marginalRatePct="43.5" openUpper="false" lowerOriginal="5948250" upperOriginal="6489000" widthOriginal="540750" quotaAtLowerOriginal="1689844" lowerNominalEur="35749.7" upperNominalEur="38999.68" quotaAtLowerEur="10156.17" lowerRealEur1990="35749.7" upperRealEur1990="38999.68"/>
+        <bracket index="12" marginalRatePct="46" openUpper="false" lowerOriginal="6489000" upperOriginal="7029750" widthOriginal="540750" quotaAtLowerOriginal="1925070" lowerNominalEur="38999.68" upperNominalEur="42249.65" quotaAtLowerEur="11569.9" lowerRealEur1990="38999.68" upperRealEur1990="42249.65"/>
+        <bracket index="13" marginalRatePct="48.5" openUpper="false" lowerOriginal="7029750" upperOriginal="7570500" widthOriginal="540750" quotaAtLowerOriginal="2173815" lowerNominalEur="42249.65" upperNominalEur="45499.62" quotaAtLowerEur="13064.89" lowerRealEur1990="42249.65" upperRealEur1990="45499.62"/>
+        <bracket index="14" marginalRatePct="51" openUpper="false" lowerOriginal="7570500" upperOriginal="8111250" widthOriginal="540750" quotaAtLowerOriginal="2436079" lowerNominalEur="45499.62" upperNominalEur="48749.59" quotaAtLowerEur="14641.13" lowerRealEur1990="45499.62" upperRealEur1990="48749.59"/>
+        <bracket index="15" marginalRatePct="53.5" openUpper="false" lowerOriginal="8111250" upperOriginal="8652000" widthOriginal="540750" quotaAtLowerOriginal="2711861" lowerNominalEur="48749.59" upperNominalEur="51999.57" quotaAtLowerEur="16298.61" lowerRealEur1990="48749.59" upperRealEur1990="51999.57"/>
+        <bracket index="16" marginalRatePct="56" openUpper="true" lowerOriginal="8652000" quotaAtLowerOriginal="3001163" lowerNominalEur="51999.57" quotaAtLowerEur="18037.35" lowerRealEur1990="51999.57"/>
+      </brackets>
+      <notes>
+        <note>La tabla oficial comienza en un límite inferior superior a cero; la franja previa con cuota cero se conserva aparte y no se inventa como fila oficial.</note>
+      </notes>
+    </year>
+    <year value="1991" exerciseStatus="cerrado" legalScope="escala_general_nacional_unificada" sourceStatus="prorroga_legal_verificada" originalCurrency="ESP" originalCurrencyName="peseta española" deflatorTo1986="0.75" deflatorTo1990="0.9375" gdpPerCapitaNominalEur="9243.43" gdpPerCapitaRealEur1990="8665.715625">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-1990-31180" url="https://www.boe.es/buscar/doc.php?id=BOE-A-1990-31180">Ley 31/1990, escala aplicable en 1991</source>
+      </sources>
+      <implicitZeroBand marginalRatePct="0" lowerOriginal="0" upperOriginal="648900" lowerNominalEur="0" upperNominalEur="3899.97">
+        <note>Franja implícita deducida del primer límite de la tabla oficial.</note>
+      </implicitZeroBand>
+      <brackets count="16">
+        <bracket index="1" marginalRatePct="25" openUpper="false" lowerOriginal="648900" upperOriginal="1081500" widthOriginal="432600" quotaAtLowerOriginal="0" lowerNominalEur="3899.97" upperNominalEur="6499.95" quotaAtLowerEur="0" lowerRealEur1990="3656.221875" upperRealEur1990="6093.703125"/>
+        <bracket index="2" marginalRatePct="26" openUpper="false" lowerOriginal="1081500" upperOriginal="1622250" widthOriginal="540750" quotaAtLowerOriginal="108150" lowerNominalEur="6499.95" upperNominalEur="9749.92" quotaAtLowerEur="649.99" lowerRealEur1990="6093.703125" upperRealEur1990="9140.55"/>
+        <bracket index="3" marginalRatePct="27" openUpper="false" lowerOriginal="1622250" upperOriginal="2163000" widthOriginal="540750" quotaAtLowerOriginal="248745" lowerNominalEur="9749.92" upperNominalEur="12999.89" quotaAtLowerEur="1494.99" lowerRealEur1990="9140.55" upperRealEur1990="12187.396875"/>
+        <bracket index="4" marginalRatePct="28" openUpper="false" lowerOriginal="2163000" upperOriginal="2703750" widthOriginal="540750" quotaAtLowerOriginal="394748" lowerNominalEur="12999.89" upperNominalEur="16249.86" quotaAtLowerEur="2372.48" lowerRealEur1990="12187.396875" upperRealEur1990="15234.24375"/>
+        <bracket index="5" marginalRatePct="30" openUpper="false" lowerOriginal="2703750" upperOriginal="3244500" widthOriginal="540750" quotaAtLowerOriginal="546158" lowerNominalEur="16249.86" upperNominalEur="19499.84" quotaAtLowerEur="3282.48" lowerRealEur1990="15234.24375" upperRealEur1990="18281.1"/>
+        <bracket index="6" marginalRatePct="32" openUpper="false" lowerOriginal="3244500" upperOriginal="3785250" widthOriginal="540750" quotaAtLowerOriginal="708383" lowerNominalEur="19499.84" upperNominalEur="22749.81" quotaAtLowerEur="4257.47" lowerRealEur1990="18281.1" upperRealEur1990="21327.946875"/>
+        <bracket index="7" marginalRatePct="34" openUpper="false" lowerOriginal="3785250" upperOriginal="4326000" widthOriginal="540750" quotaAtLowerOriginal="881423" lowerNominalEur="22749.81" upperNominalEur="25999.78" quotaAtLowerEur="5297.46" lowerRealEur1990="21327.946875" upperRealEur1990="24374.79375"/>
+        <bracket index="8" marginalRatePct="36" openUpper="false" lowerOriginal="4326000" upperOriginal="4866750" widthOriginal="540750" quotaAtLowerOriginal="1065278" lowerNominalEur="25999.78" upperNominalEur="29249.76" quotaAtLowerEur="6402.45" lowerRealEur1990="24374.79375" upperRealEur1990="27421.65"/>
+        <bracket index="9" marginalRatePct="38.5" openUpper="false" lowerOriginal="4866750" upperOriginal="5407500" widthOriginal="540750" quotaAtLowerOriginal="1259948" lowerNominalEur="29249.76" upperNominalEur="32499.73" quotaAtLowerEur="7572.44" lowerRealEur1990="27421.65" upperRealEur1990="30468.496875"/>
+        <bracket index="10" marginalRatePct="41" openUpper="false" lowerOriginal="5407500" upperOriginal="5948250" widthOriginal="540750" quotaAtLowerOriginal="1468136" lowerNominalEur="32499.73" upperNominalEur="35749.7" quotaAtLowerEur="8823.68" lowerRealEur1990="30468.496875" upperRealEur1990="33515.34375"/>
+        <bracket index="11" marginalRatePct="43.5" openUpper="false" lowerOriginal="5948250" upperOriginal="6489000" widthOriginal="540750" quotaAtLowerOriginal="1689844" lowerNominalEur="35749.7" upperNominalEur="38999.68" quotaAtLowerEur="10156.17" lowerRealEur1990="33515.34375" upperRealEur1990="36562.2"/>
+        <bracket index="12" marginalRatePct="46" openUpper="false" lowerOriginal="6489000" upperOriginal="7029750" widthOriginal="540750" quotaAtLowerOriginal="1925070" lowerNominalEur="38999.68" upperNominalEur="42249.65" quotaAtLowerEur="11569.9" lowerRealEur1990="36562.2" upperRealEur1990="39609.046875"/>
+        <bracket index="13" marginalRatePct="48.5" openUpper="false" lowerOriginal="7029750" upperOriginal="7570500" widthOriginal="540750" quotaAtLowerOriginal="2173815" lowerNominalEur="42249.65" upperNominalEur="45499.62" quotaAtLowerEur="13064.89" lowerRealEur1990="39609.046875" upperRealEur1990="42655.89375"/>
+        <bracket index="14" marginalRatePct="51" openUpper="false" lowerOriginal="7570500" upperOriginal="8111250" widthOriginal="540750" quotaAtLowerOriginal="2436079" lowerNominalEur="45499.62" upperNominalEur="48749.59" quotaAtLowerEur="14641.13" lowerRealEur1990="42655.89375" upperRealEur1990="45702.740625"/>
+        <bracket index="15" marginalRatePct="53.5" openUpper="false" lowerOriginal="8111250" upperOriginal="8652000" widthOriginal="540750" quotaAtLowerOriginal="2711861" lowerNominalEur="48749.59" upperNominalEur="51999.57" quotaAtLowerEur="16298.61" lowerRealEur1990="45702.740625" upperRealEur1990="48749.596875"/>
+        <bracket index="16" marginalRatePct="56" openUpper="true" lowerOriginal="8652000" quotaAtLowerOriginal="3001163" lowerNominalEur="51999.57" quotaAtLowerEur="18037.35" lowerRealEur1990="48749.596875"/>
+      </brackets>
+      <notes>
+        <note>La tabla oficial comienza en un límite inferior superior a cero; la franja previa con cuota cero se conserva aparte y no se inventa como fila oficial.</note>
+        <note>La escala de 1990 se mantuvo sin cambios para 1991.</note>
+      </notes>
+    </year>
+    <year value="1992" exerciseStatus="cerrado" legalScope="escala_general_nacional_unificada" sourceStatus="tabla_oficial_directa" originalCurrency="ESP" originalCurrencyName="peseta española" deflatorTo1986="0.71" deflatorTo1990="0.8875" gdpPerCapitaNominalEur="9906.75" gdpPerCapitaRealEur1990="8792.240625">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-1991-14391" url="https://www.boe.es/buscar/doc.php?id=BOE-A-1991-14391">Ley 18/1991, artículo 74</source>
+      </sources>
+      <implicitZeroBand marginalRatePct="0" lowerOriginal="0" upperOriginal="400000" lowerNominalEur="0" upperNominalEur="2404.05">
+        <note>Franja implícita deducida del primer límite de la tabla oficial.</note>
+      </implicitZeroBand>
+      <brackets count="17">
+        <bracket index="1" marginalRatePct="20" openUpper="false" lowerOriginal="400000" upperOriginal="1000000" widthOriginal="600000" quotaAtLowerOriginal="0" lowerNominalEur="2404.05" upperNominalEur="6010.12" quotaAtLowerEur="0" lowerRealEur1990="2133.594375" upperRealEur1990="5333.9815"/>
+        <bracket index="2" marginalRatePct="22" openUpper="false" lowerOriginal="1000000" upperOriginal="1570000" widthOriginal="570000" quotaAtLowerOriginal="120000" lowerNominalEur="6010.12" upperNominalEur="9435.89" quotaAtLowerEur="721.21" lowerRealEur1990="5333.9815" upperRealEur1990="8374.352375"/>
+        <bracket index="3" marginalRatePct="24" openUpper="false" lowerOriginal="1570000" upperOriginal="2140000" widthOriginal="570000" quotaAtLowerOriginal="245400" lowerNominalEur="9435.89" upperNominalEur="12861.66" quotaAtLowerEur="1474.88" lowerRealEur1990="8374.352375" upperRealEur1990="11414.72325"/>
+        <bracket index="4" marginalRatePct="26" openUpper="false" lowerOriginal="2140000" upperOriginal="2710000" widthOriginal="570000" quotaAtLowerOriginal="382200" lowerNominalEur="12861.66" upperNominalEur="16287.43" quotaAtLowerEur="2297.07" lowerRealEur1990="11414.72325" upperRealEur1990="14455.094125"/>
+        <bracket index="5" marginalRatePct="28" openUpper="false" lowerOriginal="2710000" upperOriginal="3280000" widthOriginal="570000" quotaAtLowerOriginal="530400" lowerNominalEur="16287.43" upperNominalEur="19713.2" quotaAtLowerEur="3187.77" lowerRealEur1990="14455.094125" upperRealEur1990="17495.465"/>
+        <bracket index="6" marginalRatePct="30" openUpper="false" lowerOriginal="3280000" upperOriginal="3850000" widthOriginal="570000" quotaAtLowerOriginal="690000" lowerNominalEur="19713.2" upperNominalEur="23138.97" quotaAtLowerEur="4146.98" lowerRealEur1990="17495.465" upperRealEur1990="20535.835875"/>
+        <bracket index="7" marginalRatePct="32" openUpper="false" lowerOriginal="3850000" upperOriginal="4420000" widthOriginal="570000" quotaAtLowerOriginal="861000" lowerNominalEur="23138.97" upperNominalEur="26564.74" quotaAtLowerEur="5174.71" lowerRealEur1990="20535.835875" upperRealEur1990="23576.20675"/>
+        <bracket index="8" marginalRatePct="34" openUpper="false" lowerOriginal="4420000" upperOriginal="4990000" widthOriginal="570000" quotaAtLowerOriginal="1043400" lowerNominalEur="26564.74" upperNominalEur="29990.5" quotaAtLowerEur="6270.96" lowerRealEur1990="23576.20675" upperRealEur1990="26616.56875"/>
+        <bracket index="9" marginalRatePct="36" openUpper="false" lowerOriginal="4990000" upperOriginal="5560000" widthOriginal="570000" quotaAtLowerOriginal="1237200" lowerNominalEur="29990.5" upperNominalEur="33416.27" quotaAtLowerEur="7435.72" lowerRealEur1990="26616.56875" upperRealEur1990="29656.939625"/>
+        <bracket index="10" marginalRatePct="38" openUpper="false" lowerOriginal="5560000" upperOriginal="6130000" widthOriginal="570000" quotaAtLowerOriginal="1442400" lowerNominalEur="33416.27" upperNominalEur="36842.04" quotaAtLowerEur="8669" lowerRealEur1990="29656.939625" upperRealEur1990="32697.3105"/>
+        <bracket index="11" marginalRatePct="40" openUpper="false" lowerOriginal="6130000" upperOriginal="6700000" widthOriginal="570000" quotaAtLowerOriginal="1659000" lowerNominalEur="36842.04" upperNominalEur="40267.81" quotaAtLowerEur="9970.79" lowerRealEur1990="32697.3105" upperRealEur1990="35737.681375"/>
+        <bracket index="12" marginalRatePct="42" openUpper="false" lowerOriginal="6700000" upperOriginal="7270000" widthOriginal="570000" quotaAtLowerOriginal="1887000" lowerNominalEur="40267.81" upperNominalEur="43693.58" quotaAtLowerEur="11341.1" lowerRealEur1990="35737.681375" upperRealEur1990="38778.05225"/>
+        <bracket index="13" marginalRatePct="44" openUpper="false" lowerOriginal="7270000" upperOriginal="7840000" widthOriginal="570000" quotaAtLowerOriginal="2126400" lowerNominalEur="43693.58" upperNominalEur="47119.35" quotaAtLowerEur="12779.92" lowerRealEur1990="38778.05225" upperRealEur1990="41818.423125"/>
+        <bracket index="14" marginalRatePct="46" openUpper="false" lowerOriginal="7840000" upperOriginal="8410000" widthOriginal="570000" quotaAtLowerOriginal="2377200" lowerNominalEur="47119.35" upperNominalEur="50545.12" quotaAtLowerEur="14287.26" lowerRealEur1990="41818.423125" upperRealEur1990="44858.794"/>
+        <bracket index="15" marginalRatePct="48" openUpper="false" lowerOriginal="8410000" upperOriginal="8980000" widthOriginal="570000" quotaAtLowerOriginal="2639400" lowerNominalEur="50545.12" upperNominalEur="53970.89" quotaAtLowerEur="15863.11" lowerRealEur1990="44858.794" upperRealEur1990="47899.164875"/>
+        <bracket index="16" marginalRatePct="50.5" openUpper="false" lowerOriginal="8980000" upperOriginal="9550000" widthOriginal="570000" quotaAtLowerOriginal="2913000" lowerNominalEur="53970.89" upperNominalEur="57396.66" quotaAtLowerEur="17507.48" lowerRealEur1990="47899.164875" upperRealEur1990="50939.53575"/>
+        <bracket index="17" marginalRatePct="53" openUpper="true" lowerOriginal="9550000" quotaAtLowerOriginal="3200850" lowerNominalEur="57396.66" quotaAtLowerEur="19237.5" lowerRealEur1990="50939.53575"/>
+      </brackets>
+      <notes>
+        <note>La tabla oficial comienza en un límite inferior superior a cero; la franja previa con cuota cero se conserva aparte y no se inventa como fila oficial.</note>
+      </notes>
+    </year>
+    <year value="1993" exerciseStatus="cerrado" legalScope="escala_general_nacional_unificada" sourceStatus="tabla_oficial_directa" originalCurrency="ESP" originalCurrencyName="peseta española" deflatorTo1986="0.68" deflatorTo1990="0.85" gdpPerCapitaNominalEur="10196.41" gdpPerCapitaRealEur1990="8666.9485">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-1992-28826" url="https://www.boe.es/buscar/doc.php?id=BOE-A-1992-28826">Ley 39/1992, artículo 66</source>
+      </sources>
+      <implicitZeroBand marginalRatePct="0" lowerOriginal="0" upperOriginal="400000" lowerNominalEur="0" upperNominalEur="2404.05">
+        <note>Franja implícita deducida del primer límite de la tabla oficial.</note>
+      </implicitZeroBand>
+      <brackets count="17">
+        <bracket index="1" marginalRatePct="20" openUpper="false" lowerOriginal="400000" upperOriginal="1000000" widthOriginal="600000" quotaAtLowerOriginal="0" lowerNominalEur="2404.05" upperNominalEur="6010.12" quotaAtLowerEur="0" lowerRealEur1990="2043.4425" upperRealEur1990="5108.602"/>
+        <bracket index="2" marginalRatePct="22" openUpper="false" lowerOriginal="1000000" upperOriginal="1570000" widthOriginal="570000" quotaAtLowerOriginal="120000" lowerNominalEur="6010.12" upperNominalEur="9435.89" quotaAtLowerEur="721.21" lowerRealEur1990="5108.602" upperRealEur1990="8020.5065"/>
+        <bracket index="3" marginalRatePct="24.5" openUpper="false" lowerOriginal="1570000" upperOriginal="2140000" widthOriginal="570000" quotaAtLowerOriginal="245400" lowerNominalEur="9435.89" upperNominalEur="12861.66" quotaAtLowerEur="1474.88" lowerRealEur1990="8020.5065" upperRealEur1990="10932.411"/>
+        <bracket index="4" marginalRatePct="27" openUpper="false" lowerOriginal="2140000" upperOriginal="2710000" widthOriginal="570000" quotaAtLowerOriginal="385050" lowerNominalEur="12861.66" upperNominalEur="16287.43" quotaAtLowerEur="2314.2" lowerRealEur1990="10932.411" upperRealEur1990="13844.3155"/>
+        <bracket index="5" marginalRatePct="30" openUpper="false" lowerOriginal="2710000" upperOriginal="3280000" widthOriginal="570000" quotaAtLowerOriginal="538950" lowerNominalEur="16287.43" upperNominalEur="19713.2" quotaAtLowerEur="3239.15" lowerRealEur1990="13844.3155" upperRealEur1990="16756.22"/>
+        <bracket index="6" marginalRatePct="32" openUpper="false" lowerOriginal="3280000" upperOriginal="3850000" widthOriginal="570000" quotaAtLowerOriginal="709950" lowerNominalEur="19713.2" upperNominalEur="23138.97" quotaAtLowerEur="4266.89" lowerRealEur1990="16756.22" upperRealEur1990="19668.1245"/>
+        <bracket index="7" marginalRatePct="34" openUpper="false" lowerOriginal="3850000" upperOriginal="4420000" widthOriginal="570000" quotaAtLowerOriginal="892350" lowerNominalEur="23138.97" upperNominalEur="26564.74" quotaAtLowerEur="5363.13" lowerRealEur1990="19668.1245" upperRealEur1990="22580.029"/>
+        <bracket index="8" marginalRatePct="36" openUpper="false" lowerOriginal="4420000" upperOriginal="4990000" widthOriginal="570000" quotaAtLowerOriginal="1086150" lowerNominalEur="26564.74" upperNominalEur="29990.5" quotaAtLowerEur="6527.89" lowerRealEur1990="22580.029" upperRealEur1990="25491.925"/>
+        <bracket index="9" marginalRatePct="38" openUpper="false" lowerOriginal="4990000" upperOriginal="5560000" widthOriginal="570000" quotaAtLowerOriginal="1291350" lowerNominalEur="29990.5" upperNominalEur="33416.27" quotaAtLowerEur="7761.17" lowerRealEur1990="25491.925" upperRealEur1990="28403.8295"/>
+        <bracket index="10" marginalRatePct="40" openUpper="false" lowerOriginal="5560000" upperOriginal="6130000" widthOriginal="570000" quotaAtLowerOriginal="1507950" lowerNominalEur="33416.27" upperNominalEur="36842.04" quotaAtLowerEur="9062.96" lowerRealEur1990="28403.8295" upperRealEur1990="31315.734"/>
+        <bracket index="11" marginalRatePct="42.5" openUpper="false" lowerOriginal="6130000" upperOriginal="6700000" widthOriginal="570000" quotaAtLowerOriginal="1735950" lowerNominalEur="36842.04" upperNominalEur="40267.81" quotaAtLowerEur="10433.27" lowerRealEur1990="31315.734" upperRealEur1990="34227.6385"/>
+        <bracket index="12" marginalRatePct="45" openUpper="false" lowerOriginal="6700000" upperOriginal="7270000" widthOriginal="570000" quotaAtLowerOriginal="1978200" lowerNominalEur="40267.81" upperNominalEur="43693.58" quotaAtLowerEur="11889.22" lowerRealEur1990="34227.6385" upperRealEur1990="37139.543"/>
+        <bracket index="13" marginalRatePct="47" openUpper="false" lowerOriginal="7270000" upperOriginal="7840000" widthOriginal="570000" quotaAtLowerOriginal="2234700" lowerNominalEur="43693.58" upperNominalEur="47119.35" quotaAtLowerEur="13430.82" lowerRealEur1990="37139.543" upperRealEur1990="40051.4475"/>
+        <bracket index="14" marginalRatePct="49" openUpper="false" lowerOriginal="7840000" upperOriginal="8410000" widthOriginal="570000" quotaAtLowerOriginal="2502600" lowerNominalEur="47119.35" upperNominalEur="50545.12" quotaAtLowerEur="15040.93" lowerRealEur1990="40051.4475" upperRealEur1990="42963.352"/>
+        <bracket index="15" marginalRatePct="51" openUpper="false" lowerOriginal="8410000" upperOriginal="8980000" widthOriginal="570000" quotaAtLowerOriginal="2781900" lowerNominalEur="50545.12" upperNominalEur="53970.89" quotaAtLowerEur="16719.56" lowerRealEur1990="42963.352" upperRealEur1990="45875.2565"/>
+        <bracket index="16" marginalRatePct="53.5" openUpper="false" lowerOriginal="8980000" upperOriginal="9550000" widthOriginal="570000" quotaAtLowerOriginal="3072600" lowerNominalEur="53970.89" upperNominalEur="57396.66" quotaAtLowerEur="18466.7" lowerRealEur1990="45875.2565" upperRealEur1990="48787.161"/>
+        <bracket index="17" marginalRatePct="56" openUpper="true" lowerOriginal="9550000" quotaAtLowerOriginal="3377550" lowerNominalEur="57396.66" quotaAtLowerEur="20299.48" lowerRealEur1990="48787.161"/>
+      </brackets>
+      <notes>
+        <note>La tabla oficial comienza en un límite inferior superior a cero; la franja previa con cuota cero se conserva aparte y no se inventa como fila oficial.</note>
+      </notes>
+    </year>
+    <year value="1994" exerciseStatus="cerrado" legalScope="escala_general_nacional_unificada" sourceStatus="tabla_oficial_directa" originalCurrency="ESP" originalCurrencyName="peseta española" deflatorTo1986="0.65" deflatorTo1990="0.8125" gdpPerCapitaNominalEur="10792.93" gdpPerCapitaRealEur1990="8769.255625">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-1993-31087" url="https://www.boe.es/buscar/doc.php?id=BOE-A-1993-31087">Ley 21/1993, artículo 64</source>
+      </sources>
+      <implicitZeroBand marginalRatePct="0" lowerOriginal="0" upperOriginal="400000" lowerNominalEur="0" upperNominalEur="2404.05">
+        <note>Franja implícita deducida del primer límite de la tabla oficial.</note>
+      </implicitZeroBand>
+      <brackets count="17">
+        <bracket index="1" marginalRatePct="20" openUpper="false" lowerOriginal="400000" upperOriginal="1000000" widthOriginal="600000" quotaAtLowerOriginal="0" lowerNominalEur="2404.05" upperNominalEur="6010.12" quotaAtLowerEur="0" lowerRealEur1990="1953.290625" upperRealEur1990="4883.2225"/>
+        <bracket index="2" marginalRatePct="22" openUpper="false" lowerOriginal="1000000" upperOriginal="1570000" widthOriginal="570000" quotaAtLowerOriginal="120000" lowerNominalEur="6010.12" upperNominalEur="9435.89" quotaAtLowerEur="721.21" lowerRealEur1990="4883.2225" upperRealEur1990="7666.660625"/>
+        <bracket index="3" marginalRatePct="24.5" openUpper="false" lowerOriginal="1570000" upperOriginal="2140000" widthOriginal="570000" quotaAtLowerOriginal="245400" lowerNominalEur="9435.89" upperNominalEur="12861.66" quotaAtLowerEur="1474.88" lowerRealEur1990="7666.660625" upperRealEur1990="10450.09875"/>
+        <bracket index="4" marginalRatePct="27" openUpper="false" lowerOriginal="2140000" upperOriginal="2710000" widthOriginal="570000" quotaAtLowerOriginal="385050" lowerNominalEur="12861.66" upperNominalEur="16287.43" quotaAtLowerEur="2314.2" lowerRealEur1990="10450.09875" upperRealEur1990="13233.536875"/>
+        <bracket index="5" marginalRatePct="30" openUpper="false" lowerOriginal="2710000" upperOriginal="3280000" widthOriginal="570000" quotaAtLowerOriginal="538950" lowerNominalEur="16287.43" upperNominalEur="19713.2" quotaAtLowerEur="3239.15" lowerRealEur1990="13233.536875" upperRealEur1990="16016.975"/>
+        <bracket index="6" marginalRatePct="32" openUpper="false" lowerOriginal="3280000" upperOriginal="3850000" widthOriginal="570000" quotaAtLowerOriginal="709950" lowerNominalEur="19713.2" upperNominalEur="23138.97" quotaAtLowerEur="4266.89" lowerRealEur1990="16016.975" upperRealEur1990="18800.413125"/>
+        <bracket index="7" marginalRatePct="34" openUpper="false" lowerOriginal="3850000" upperOriginal="4420000" widthOriginal="570000" quotaAtLowerOriginal="892350" lowerNominalEur="23138.97" upperNominalEur="26564.74" quotaAtLowerEur="5363.13" lowerRealEur1990="18800.413125" upperRealEur1990="21583.85125"/>
+        <bracket index="8" marginalRatePct="36" openUpper="false" lowerOriginal="4420000" upperOriginal="4990000" widthOriginal="570000" quotaAtLowerOriginal="1086150" lowerNominalEur="26564.74" upperNominalEur="29990.5" quotaAtLowerEur="6527.89" lowerRealEur1990="21583.85125" upperRealEur1990="24367.28125"/>
+        <bracket index="9" marginalRatePct="38" openUpper="false" lowerOriginal="4990000" upperOriginal="5560000" widthOriginal="570000" quotaAtLowerOriginal="1291350" lowerNominalEur="29990.5" upperNominalEur="33416.27" quotaAtLowerEur="7761.17" lowerRealEur1990="24367.28125" upperRealEur1990="27150.719375"/>
+        <bracket index="10" marginalRatePct="40" openUpper="false" lowerOriginal="5560000" upperOriginal="6130000" widthOriginal="570000" quotaAtLowerOriginal="1507950" lowerNominalEur="33416.27" upperNominalEur="36842.04" quotaAtLowerEur="9062.96" lowerRealEur1990="27150.719375" upperRealEur1990="29934.1575"/>
+        <bracket index="11" marginalRatePct="42.5" openUpper="false" lowerOriginal="6130000" upperOriginal="6700000" widthOriginal="570000" quotaAtLowerOriginal="1735950" lowerNominalEur="36842.04" upperNominalEur="40267.81" quotaAtLowerEur="10433.27" lowerRealEur1990="29934.1575" upperRealEur1990="32717.595625"/>
+        <bracket index="12" marginalRatePct="45" openUpper="false" lowerOriginal="6700000" upperOriginal="7270000" widthOriginal="570000" quotaAtLowerOriginal="1978200" lowerNominalEur="40267.81" upperNominalEur="43693.58" quotaAtLowerEur="11889.22" lowerRealEur1990="32717.595625" upperRealEur1990="35501.03375"/>
+        <bracket index="13" marginalRatePct="47" openUpper="false" lowerOriginal="7270000" upperOriginal="7840000" widthOriginal="570000" quotaAtLowerOriginal="2234700" lowerNominalEur="43693.58" upperNominalEur="47119.35" quotaAtLowerEur="13430.82" lowerRealEur1990="35501.03375" upperRealEur1990="38284.471875"/>
+        <bracket index="14" marginalRatePct="49" openUpper="false" lowerOriginal="7840000" upperOriginal="8410000" widthOriginal="570000" quotaAtLowerOriginal="2502600" lowerNominalEur="47119.35" upperNominalEur="50545.12" quotaAtLowerEur="15040.93" lowerRealEur1990="38284.471875" upperRealEur1990="41067.91"/>
+        <bracket index="15" marginalRatePct="51" openUpper="false" lowerOriginal="8410000" upperOriginal="8980000" widthOriginal="570000" quotaAtLowerOriginal="2781900" lowerNominalEur="50545.12" upperNominalEur="53970.89" quotaAtLowerEur="16719.56" lowerRealEur1990="41067.91" upperRealEur1990="43851.348125"/>
+        <bracket index="16" marginalRatePct="53.5" openUpper="false" lowerOriginal="8980000" upperOriginal="9550000" widthOriginal="570000" quotaAtLowerOriginal="3072600" lowerNominalEur="53970.89" upperNominalEur="57396.66" quotaAtLowerEur="18466.7" lowerRealEur1990="43851.348125" upperRealEur1990="46634.78625"/>
+        <bracket index="17" marginalRatePct="56" openUpper="true" lowerOriginal="9550000" quotaAtLowerOriginal="3377550" lowerNominalEur="57396.66" quotaAtLowerEur="20299.48" lowerRealEur1990="46634.78625"/>
+      </brackets>
+      <notes>
+        <note>La tabla oficial comienza en un límite inferior superior a cero; la franja previa con cuota cero se conserva aparte y no se inventa como fila oficial.</note>
+      </notes>
+    </year>
+    <year value="1995" exerciseStatus="cerrado" legalScope="escala_general_nacional_unificada" sourceStatus="tabla_oficial_directa" originalCurrency="ESP" originalCurrencyName="peseta española" deflatorTo1986="0.62" deflatorTo1990="0.775" gdpPerCapitaNominalEur="11586.41" gdpPerCapitaRealEur1990="8979.46775">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-1994-28967" url="https://www.boe.es/buscar/doc.php?id=BOE-A-1994-28967">Ley 41/1994, artículo 59</source>
+      </sources>
+      <brackets count="18">
+        <bracket index="1" marginalRatePct="0" openUpper="false" lowerOriginal="0" upperOriginal="415000" widthOriginal="415000" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="2494.2" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="1933.005"/>
+        <bracket index="2" marginalRatePct="20" openUpper="false" lowerOriginal="415000" upperOriginal="1035000" widthOriginal="620000" quotaAtLowerOriginal="0" lowerNominalEur="2494.2" upperNominalEur="6220.48" quotaAtLowerEur="0" lowerRealEur1990="1933.005" upperRealEur1990="4820.872"/>
+        <bracket index="3" marginalRatePct="22" openUpper="false" lowerOriginal="1035000" upperOriginal="1625000" widthOriginal="590000" quotaAtLowerOriginal="124000" lowerNominalEur="6220.48" upperNominalEur="9766.45" quotaAtLowerEur="745.26" lowerRealEur1990="4820.872" upperRealEur1990="7568.99875"/>
+        <bracket index="4" marginalRatePct="24.5" openUpper="false" lowerOriginal="1625000" upperOriginal="2215000" widthOriginal="590000" quotaAtLowerOriginal="253800" lowerNominalEur="9766.45" upperNominalEur="13312.42" quotaAtLowerEur="1525.37" lowerRealEur1990="7568.99875" upperRealEur1990="10317.1255"/>
+        <bracket index="5" marginalRatePct="27" openUpper="false" lowerOriginal="2215000" upperOriginal="2805000" widthOriginal="590000" quotaAtLowerOriginal="398350" lowerNominalEur="13312.42" upperNominalEur="16858.39" quotaAtLowerEur="2394.13" lowerRealEur1990="10317.1255" upperRealEur1990="13065.25225"/>
+        <bracket index="6" marginalRatePct="30" openUpper="false" lowerOriginal="2805000" upperOriginal="3395000" widthOriginal="590000" quotaAtLowerOriginal="557650" lowerNominalEur="16858.39" upperNominalEur="20404.36" quotaAtLowerEur="3351.54" lowerRealEur1990="13065.25225" upperRealEur1990="15813.379"/>
+        <bracket index="7" marginalRatePct="32" openUpper="false" lowerOriginal="3395000" upperOriginal="3985000" widthOriginal="590000" quotaAtLowerOriginal="734650" lowerNominalEur="20404.36" upperNominalEur="23950.33" quotaAtLowerEur="4415.34" lowerRealEur1990="15813.379" upperRealEur1990="18561.50575"/>
+        <bracket index="8" marginalRatePct="34" openUpper="false" lowerOriginal="3985000" upperOriginal="4575000" widthOriginal="590000" quotaAtLowerOriginal="923450" lowerNominalEur="23950.33" upperNominalEur="27496.3" quotaAtLowerEur="5550.05" lowerRealEur1990="18561.50575" upperRealEur1990="21309.6325"/>
+        <bracket index="9" marginalRatePct="36" openUpper="false" lowerOriginal="4575000" upperOriginal="5165000" widthOriginal="590000" quotaAtLowerOriginal="1124050" lowerNominalEur="27496.3" upperNominalEur="31042.28" quotaAtLowerEur="6755.68" lowerRealEur1990="21309.6325" upperRealEur1990="24057.767"/>
+        <bracket index="10" marginalRatePct="38" openUpper="false" lowerOriginal="5165000" upperOriginal="5755000" widthOriginal="590000" quotaAtLowerOriginal="1336450" lowerNominalEur="31042.28" upperNominalEur="34588.25" quotaAtLowerEur="8032.23" lowerRealEur1990="24057.767" upperRealEur1990="26805.89375"/>
+        <bracket index="11" marginalRatePct="40" openUpper="false" lowerOriginal="5755000" upperOriginal="6345000" widthOriginal="590000" quotaAtLowerOriginal="1560650" lowerNominalEur="34588.25" upperNominalEur="38134.22" quotaAtLowerEur="9379.7" lowerRealEur1990="26805.89375" upperRealEur1990="29554.0205"/>
+        <bracket index="12" marginalRatePct="42.5" openUpper="false" lowerOriginal="6345000" upperOriginal="6935000" widthOriginal="590000" quotaAtLowerOriginal="1796650" lowerNominalEur="38134.22" upperNominalEur="41680.19" quotaAtLowerEur="10798.08" lowerRealEur1990="29554.0205" upperRealEur1990="32302.14725"/>
+        <bracket index="13" marginalRatePct="45" openUpper="false" lowerOriginal="6935000" upperOriginal="7525000" widthOriginal="590000" quotaAtLowerOriginal="2047400" lowerNominalEur="41680.19" upperNominalEur="45226.16" quotaAtLowerEur="12305.12" lowerRealEur1990="32302.14725" upperRealEur1990="35050.274"/>
+        <bracket index="14" marginalRatePct="47" openUpper="false" lowerOriginal="7525000" upperOriginal="8115000" widthOriginal="590000" quotaAtLowerOriginal="2312900" lowerNominalEur="45226.16" upperNominalEur="48772.13" quotaAtLowerEur="13900.81" lowerRealEur1990="35050.274" upperRealEur1990="37798.40075"/>
+        <bracket index="15" marginalRatePct="49" openUpper="false" lowerOriginal="8115000" upperOriginal="8705000" widthOriginal="590000" quotaAtLowerOriginal="2590200" lowerNominalEur="48772.13" upperNominalEur="52318.1" quotaAtLowerEur="15567.42" lowerRealEur1990="37798.40075" upperRealEur1990="40546.5275"/>
+        <bracket index="16" marginalRatePct="51" openUpper="false" lowerOriginal="8705000" upperOriginal="9295000" widthOriginal="590000" quotaAtLowerOriginal="2879300" lowerNominalEur="52318.1" upperNominalEur="55864.08" quotaAtLowerEur="17304.94" lowerRealEur1990="40546.5275" upperRealEur1990="43294.662"/>
+        <bracket index="17" marginalRatePct="53.5" openUpper="false" lowerOriginal="9295000" upperOriginal="9885000" widthOriginal="590000" quotaAtLowerOriginal="3180200" lowerNominalEur="55864.08" upperNominalEur="59410.05" quotaAtLowerEur="19113.39" lowerRealEur1990="43294.662" upperRealEur1990="46042.78875"/>
+        <bracket index="18" marginalRatePct="56" openUpper="true" lowerOriginal="9885000" quotaAtLowerOriginal="3495850" lowerNominalEur="59410.05" quotaAtLowerEur="21010.48" lowerRealEur1990="46042.78875"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="1996" exerciseStatus="cerrado" legalScope="escala_general_nacional_unificada" sourceStatus="tabla_oficial_directa" originalCurrency="ESP" originalCurrencyName="peseta española" deflatorTo1986="0.6" deflatorTo1990="0.75" gdpPerCapitaNominalEur="12257.4" gdpPerCapitaRealEur1990="9193.05">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-1995-27964" url="https://www.boe.es/buscar/doc.php?id=BOE-A-1995-27964">Real Decreto-ley 12/1995, artículo 16</source>
+      </sources>
+      <brackets count="18">
+        <bracket index="1" marginalRatePct="0" openUpper="false" lowerOriginal="0" upperOriginal="430000" widthOriginal="430000" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="2584.35" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="1938.2625"/>
+        <bracket index="2" marginalRatePct="20" openUpper="false" lowerOriginal="430000" upperOriginal="1072000" widthOriginal="642000" quotaAtLowerOriginal="0" lowerNominalEur="2584.35" upperNominalEur="6442.85" quotaAtLowerEur="0" lowerRealEur1990="1938.2625" upperRealEur1990="4832.1375"/>
+        <bracket index="3" marginalRatePct="22" openUpper="false" lowerOriginal="1072000" upperOriginal="1682000" widthOriginal="610000" quotaAtLowerOriginal="128400" lowerNominalEur="6442.85" upperNominalEur="10109.02" quotaAtLowerEur="771.7" lowerRealEur1990="4832.1375" upperRealEur1990="7581.765"/>
+        <bracket index="4" marginalRatePct="24.5" openUpper="false" lowerOriginal="1682000" upperOriginal="2292000" widthOriginal="610000" quotaAtLowerOriginal="262600" lowerNominalEur="10109.02" upperNominalEur="13775.2" quotaAtLowerEur="1578.26" lowerRealEur1990="7581.765" upperRealEur1990="10331.4"/>
+        <bracket index="5" marginalRatePct="27" openUpper="false" lowerOriginal="2292000" upperOriginal="2902000" widthOriginal="610000" quotaAtLowerOriginal="412050" lowerNominalEur="13775.2" upperNominalEur="17441.37" quotaAtLowerEur="2476.47" lowerRealEur1990="10331.4" upperRealEur1990="13081.0275"/>
+        <bracket index="6" marginalRatePct="30" openUpper="false" lowerOriginal="2902000" upperOriginal="3512000" widthOriginal="610000" quotaAtLowerOriginal="576750" lowerNominalEur="17441.37" upperNominalEur="21107.55" quotaAtLowerEur="3466.34" lowerRealEur1990="13081.0275" upperRealEur1990="15830.6625"/>
+        <bracket index="7" marginalRatePct="32" openUpper="false" lowerOriginal="3512000" upperOriginal="4122000" widthOriginal="610000" quotaAtLowerOriginal="759750" lowerNominalEur="21107.55" upperNominalEur="24773.72" quotaAtLowerEur="4566.19" lowerRealEur1990="15830.6625" upperRealEur1990="18580.29"/>
+        <bracket index="8" marginalRatePct="34" openUpper="false" lowerOriginal="4122000" upperOriginal="4732000" widthOriginal="610000" quotaAtLowerOriginal="954950" lowerNominalEur="24773.72" upperNominalEur="28439.89" quotaAtLowerEur="5739.37" lowerRealEur1990="18580.29" upperRealEur1990="21329.9175"/>
+        <bracket index="9" marginalRatePct="36" openUpper="false" lowerOriginal="4732000" upperOriginal="5342000" widthOriginal="610000" quotaAtLowerOriginal="1162350" lowerNominalEur="28439.89" upperNominalEur="32106.07" quotaAtLowerEur="6985.86" lowerRealEur1990="21329.9175" upperRealEur1990="24079.5525"/>
+        <bracket index="10" marginalRatePct="38" openUpper="false" lowerOriginal="5342000" upperOriginal="5952000" widthOriginal="610000" quotaAtLowerOriginal="1381950" lowerNominalEur="32106.07" upperNominalEur="35772.24" quotaAtLowerEur="8305.69" lowerRealEur1990="24079.5525" upperRealEur1990="26829.18"/>
+        <bracket index="11" marginalRatePct="40" openUpper="false" lowerOriginal="5952000" upperOriginal="6562000" widthOriginal="610000" quotaAtLowerOriginal="1613750" lowerNominalEur="35772.24" upperNominalEur="39438.41" quotaAtLowerEur="9698.83" lowerRealEur1990="26829.18" upperRealEur1990="29578.8075"/>
+        <bracket index="12" marginalRatePct="42.5" openUpper="false" lowerOriginal="6562000" upperOriginal="7172000" widthOriginal="610000" quotaAtLowerOriginal="1857750" lowerNominalEur="39438.41" upperNominalEur="43104.59" quotaAtLowerEur="11165.3" lowerRealEur1990="29578.8075" upperRealEur1990="32328.4425"/>
+        <bracket index="13" marginalRatePct="45" openUpper="false" lowerOriginal="7172000" upperOriginal="7782000" widthOriginal="610000" quotaAtLowerOriginal="2117000" lowerNominalEur="43104.59" upperNominalEur="46770.76" quotaAtLowerEur="12723.43" lowerRealEur1990="32328.4425" upperRealEur1990="35078.07"/>
+        <bracket index="14" marginalRatePct="47" openUpper="false" lowerOriginal="7782000" upperOriginal="8392000" widthOriginal="610000" quotaAtLowerOriginal="2391500" lowerNominalEur="46770.76" upperNominalEur="50436.94" quotaAtLowerEur="14373.2" lowerRealEur1990="35078.07" upperRealEur1990="37827.705"/>
+        <bracket index="15" marginalRatePct="49" openUpper="false" lowerOriginal="8392000" upperOriginal="9002000" widthOriginal="610000" quotaAtLowerOriginal="2678200" lowerNominalEur="50436.94" upperNominalEur="54103.11" quotaAtLowerEur="16096.31" lowerRealEur1990="37827.705" upperRealEur1990="40577.3325"/>
+        <bracket index="16" marginalRatePct="51" openUpper="false" lowerOriginal="9002000" upperOriginal="9612000" widthOriginal="610000" quotaAtLowerOriginal="2977100" lowerNominalEur="54103.11" upperNominalEur="57769.28" quotaAtLowerEur="17892.73" lowerRealEur1990="40577.3325" upperRealEur1990="43326.96"/>
+        <bracket index="17" marginalRatePct="53.5" openUpper="false" lowerOriginal="9612000" upperOriginal="10222000" widthOriginal="610000" quotaAtLowerOriginal="3288200" lowerNominalEur="57769.28" upperNominalEur="61435.46" quotaAtLowerEur="19762.48" lowerRealEur1990="43326.96" upperRealEur1990="46076.595"/>
+        <bracket index="18" marginalRatePct="56" openUpper="true" lowerOriginal="10222000" quotaAtLowerOriginal="3614550" lowerNominalEur="61435.46" quotaAtLowerEur="21723.88" lowerRealEur1990="46076.595"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="1997" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="ESP" originalCurrencyName="peseta española" deflatorTo1986="0.59" deflatorTo1990="0.7375" gdpPerCapitaNominalEur="12955.69" gdpPerCapitaRealEur1990="9554.821375">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-1996-29118" url="https://www.boe.es/buscar/doc.php?id=BOE-A-1996-29118">Ley 14/1996, escala estatal aplicable en 1997</source>
+      </sources>
+      <implicitZeroBand marginalRatePct="0" lowerOriginal="0" upperOriginal="442000" lowerNominalEur="0" upperNominalEur="2656.47">
+        <note>Franja implícita deducida del primer límite de la tabla oficial.</note>
+      </implicitZeroBand>
+      <brackets count="10">
+        <bracket index="1" marginalRatePct="17" openUpper="false" lowerOriginal="442000" upperOriginal="1136000" widthOriginal="694000" quotaAtLowerOriginal="0" lowerNominalEur="2656.47" upperNominalEur="6827.5" quotaAtLowerEur="0" lowerRealEur1990="1959.146625" upperRealEur1990="5035.28125"/>
+        <bracket index="2" marginalRatePct="19.55" openUpper="false" lowerOriginal="1136000" upperOriginal="2305000" widthOriginal="1169000" quotaAtLowerOriginal="117980" lowerNominalEur="6827.5" upperNominalEur="13853.33" quotaAtLowerEur="709.07" lowerRealEur1990="5035.28125" upperRealEur1990="10216.830875"/>
+        <bracket index="3" marginalRatePct="23.8" openUpper="false" lowerOriginal="2305000" upperOriginal="3474000" widthOriginal="1169000" quotaAtLowerOriginal="346520" lowerNominalEur="13853.33" upperNominalEur="20879.16" quotaAtLowerEur="2082.63" lowerRealEur1990="10216.830875" upperRealEur1990="15398.3805"/>
+        <bracket index="4" marginalRatePct="27.2" openUpper="false" lowerOriginal="3474000" upperOriginal="4643000" widthOriginal="1169000" quotaAtLowerOriginal="624742" lowerNominalEur="20879.16" upperNominalEur="27904.99" quotaAtLowerEur="3754.78" lowerRealEur1990="15398.3805" upperRealEur1990="20579.930125"/>
+        <bracket index="5" marginalRatePct="30.6" openUpper="false" lowerOriginal="4643000" upperOriginal="5812000" widthOriginal="1169000" quotaAtLowerOriginal="942710" lowerNominalEur="27904.99" upperNominalEur="34930.82" quotaAtLowerEur="5665.8" lowerRealEur1990="20579.930125" upperRealEur1990="25761.47975"/>
+        <bracket index="6" marginalRatePct="34" openUpper="false" lowerOriginal="5812000" upperOriginal="6981000" widthOriginal="1169000" quotaAtLowerOriginal="1300424" lowerNominalEur="34930.82" upperNominalEur="41956.66" quotaAtLowerEur="7815.71" lowerRealEur1990="25761.47975" upperRealEur1990="30943.03675"/>
+        <bracket index="7" marginalRatePct="38.25" openUpper="false" lowerOriginal="6981000" upperOriginal="8150000" widthOriginal="1169000" quotaAtLowerOriginal="1697884" lowerNominalEur="41956.66" upperNominalEur="48982.49" quotaAtLowerEur="10204.49" lowerRealEur1990="30943.03675" upperRealEur1990="36124.586375"/>
+        <bracket index="8" marginalRatePct="41.65" openUpper="false" lowerOriginal="8150000" upperOriginal="9319000" widthOriginal="1169000" quotaAtLowerOriginal="2145026" lowerNominalEur="48982.49" upperNominalEur="56008.32" quotaAtLowerEur="12891.87" lowerRealEur1990="36124.586375" upperRealEur1990="41306.136"/>
+        <bracket index="9" marginalRatePct="45.05" openUpper="false" lowerOriginal="9319000" upperOriginal="10488000" widthOriginal="1169000" quotaAtLowerOriginal="2631915" lowerNominalEur="56008.32" upperNominalEur="63034.15" quotaAtLowerEur="15818.13" lowerRealEur1990="41306.136" upperRealEur1990="46487.685625"/>
+        <bracket index="10" marginalRatePct="47.6" openUpper="true" lowerOriginal="10488000" quotaAtLowerOriginal="3158549" lowerNominalEur="63034.15" quotaAtLowerEur="18983.26" lowerRealEur1990="46487.685625"/>
+      </brackets>
+      <notes>
+        <note>La tabla oficial comienza en un límite inferior superior a cero; la franja previa con cuota cero se conserva aparte y no se inventa como fila oficial.</note>
+        <note>Desde este periodo se conserva exclusivamente la escala estatal; la escala autonómica paralela queda fuera de esta serie.</note>
+      </notes>
+    </year>
+    <year value="1998" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="ESP" originalCurrencyName="peseta española" deflatorTo1986="0.57" deflatorTo1990="0.7125" gdpPerCapitaNominalEur="13811.8" gdpPerCapitaRealEur1990="9840.9075">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-1997-28052" url="https://www.boe.es/buscar/doc.php?id=BOE-A-1997-28052">Ley 65/1997, artículo 56</source>
+      </sources>
+      <implicitZeroBand marginalRatePct="0" lowerOriginal="0" upperOriginal="467000" lowerNominalEur="0" upperNominalEur="2806.73">
+        <note>Franja implícita deducida del primer límite de la tabla oficial.</note>
+      </implicitZeroBand>
+      <brackets count="8">
+        <bracket index="1" marginalRatePct="17" openUpper="false" lowerOriginal="467000" upperOriginal="1161000" widthOriginal="694000" quotaAtLowerOriginal="0" lowerNominalEur="2806.73" upperNominalEur="6977.75" quotaAtLowerEur="0" lowerRealEur1990="1999.795125" upperRealEur1990="4971.646875"/>
+        <bracket index="2" marginalRatePct="19.55" openUpper="false" lowerOriginal="1161000" upperOriginal="2295000" widthOriginal="1134000" quotaAtLowerOriginal="117980" lowerNominalEur="6977.75" upperNominalEur="13793.23" quotaAtLowerEur="709.07" lowerRealEur1990="4971.646875" upperRealEur1990="9827.676375"/>
+        <bracket index="3" marginalRatePct="23.8" openUpper="false" lowerOriginal="2295000" upperOriginal="3495000" widthOriginal="1200000" quotaAtLowerOriginal="339677" lowerNominalEur="13793.23" upperNominalEur="21005.37" quotaAtLowerEur="2041.5" lowerRealEur1990="9827.676375" upperRealEur1990="14966.326125"/>
+        <bracket index="4" marginalRatePct="27.2" openUpper="false" lowerOriginal="3495000" upperOriginal="5095000" widthOriginal="1600000" quotaAtLowerOriginal="625277" lowerNominalEur="21005.37" upperNominalEur="30621.57" quotaAtLowerEur="3757.99" lowerRealEur1990="14966.326125" upperRealEur1990="21817.868625"/>
+        <bracket index="5" marginalRatePct="33.15" openUpper="false" lowerOriginal="5095000" upperOriginal="6795000" widthOriginal="1700000" quotaAtLowerOriginal="1060477" lowerNominalEur="30621.57" upperNominalEur="40838.77" quotaAtLowerEur="6373.6" lowerRealEur1990="21817.868625" upperRealEur1990="29097.623625"/>
+        <bracket index="6" marginalRatePct="38.25" openUpper="false" lowerOriginal="6795000" upperOriginal="8625000" widthOriginal="1830000" quotaAtLowerOriginal="1624027" lowerNominalEur="40838.77" upperNominalEur="51837.29" quotaAtLowerEur="9760.6" lowerRealEur1990="29097.623625" upperRealEur1990="36934.069125"/>
+        <bracket index="7" marginalRatePct="44.2" openUpper="false" lowerOriginal="8625000" upperOriginal="10500000" widthOriginal="1875000" quotaAtLowerOriginal="2324002" lowerNominalEur="51837.29" upperNominalEur="63106.27" quotaAtLowerEur="13967.53" lowerRealEur1990="36934.069125" upperRealEur1990="44963.217375"/>
+        <bracket index="8" marginalRatePct="47.6" openUpper="true" lowerOriginal="10500000" quotaAtLowerOriginal="3152752" lowerNominalEur="63106.27" quotaAtLowerEur="18948.42" lowerRealEur1990="44963.217375"/>
+      </brackets>
+      <notes>
+        <note>La tabla oficial comienza en un límite inferior superior a cero; la franja previa con cuota cero se conserva aparte y no se inventa como fila oficial.</note>
+      </notes>
+    </year>
+    <year value="1999" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="ESP" originalCurrencyName="peseta española" deflatorTo1986="0.56" deflatorTo1990="0.7" gdpPerCapitaNominalEur="14738.5" gdpPerCapitaRealEur1990="10316.95">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-1998-28472" url="https://www.boe.es/buscar/doc.php?id=BOE-A-1998-28472">Ley 40/1998, artículo 50</source>
+      </sources>
+      <brackets count="6">
+        <bracket index="1" marginalRatePct="15" openUpper="false" lowerOriginal="0" upperOriginal="600000" widthOriginal="600000" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="3606.07" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="2524.249"/>
+        <bracket index="2" marginalRatePct="20.17" openUpper="false" lowerOriginal="600000" upperOriginal="2100000" widthOriginal="1500000" quotaAtLowerOriginal="90000" lowerNominalEur="3606.07" upperNominalEur="12621.25" quotaAtLowerEur="540.91" lowerRealEur1990="2524.249" upperRealEur1990="8834.875"/>
+        <bracket index="3" marginalRatePct="23.57" openUpper="false" lowerOriginal="2100000" upperOriginal="4100000" widthOriginal="2000000" quotaAtLowerOriginal="392550" lowerNominalEur="12621.25" upperNominalEur="24641.5" quotaAtLowerEur="2359.27" lowerRealEur1990="8834.875" upperRealEur1990="17249.05"/>
+        <bracket index="4" marginalRatePct="31.48" openUpper="false" lowerOriginal="4100000" upperOriginal="6600000" widthOriginal="2500000" quotaAtLowerOriginal="863950" lowerNominalEur="24641.5" upperNominalEur="39666.8" quotaAtLowerEur="5192.44" lowerRealEur1990="17249.05" upperRealEur1990="27766.76"/>
+        <bracket index="5" marginalRatePct="38.07" openUpper="false" lowerOriginal="6600000" upperOriginal="11000000" widthOriginal="4400000" quotaAtLowerOriginal="1650950" lowerNominalEur="39666.8" upperNominalEur="66111.33" quotaAtLowerEur="9922.41" lowerRealEur1990="27766.76" upperRealEur1990="46277.931"/>
+        <bracket index="6" marginalRatePct="39.6" openUpper="true" lowerOriginal="11000000" quotaAtLowerOriginal="3326030" lowerNominalEur="66111.33" quotaAtLowerEur="19989.84" lowerRealEur1990="46277.931"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2000" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="ESP" originalCurrencyName="peseta española" deflatorTo1986="0.54" deflatorTo1990="0.675" gdpPerCapitaNominalEur="15962.61" gdpPerCapitaRealEur1990="10774.76175">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-1999-24785" url="https://www.boe.es/buscar/doc.php?id=BOE-A-1999-24785">Ley 54/1999, escala aplicable en 2000</source>
+      </sources>
+      <brackets count="6">
+        <bracket index="1" marginalRatePct="15" openUpper="false" lowerOriginal="0" upperOriginal="612000" widthOriginal="612000" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="3678.19" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="2482.77825"/>
+        <bracket index="2" marginalRatePct="20.17" openUpper="false" lowerOriginal="612000" upperOriginal="2142000" widthOriginal="1530000" quotaAtLowerOriginal="91800" lowerNominalEur="3678.19" upperNominalEur="12873.68" quotaAtLowerEur="551.73" lowerRealEur1990="2482.77825" upperRealEur1990="8689.734"/>
+        <bracket index="3" marginalRatePct="23.57" openUpper="false" lowerOriginal="2142000" upperOriginal="4182000" widthOriginal="2040000" quotaAtLowerOriginal="400401" lowerNominalEur="12873.68" upperNominalEur="25134.33" quotaAtLowerEur="2406.46" lowerRealEur1990="8689.734" upperRealEur1990="16965.67275"/>
+        <bracket index="4" marginalRatePct="31.48" openUpper="false" lowerOriginal="4182000" upperOriginal="6732000" widthOriginal="2550000" quotaAtLowerOriginal="881229" lowerNominalEur="25134.33" upperNominalEur="40460.13" quotaAtLowerEur="5296.29" lowerRealEur1990="16965.67275" upperRealEur1990="27310.58775"/>
+        <bracket index="5" marginalRatePct="38.07" openUpper="false" lowerOriginal="6732000" upperOriginal="11220000" widthOriginal="4488000" quotaAtLowerOriginal="1683969" lowerNominalEur="40460.13" upperNominalEur="67433.56" quotaAtLowerEur="10120.86" lowerRealEur1990="27310.58775" upperRealEur1990="45517.653"/>
+        <bracket index="6" marginalRatePct="39.6" openUpper="true" lowerOriginal="11220000" quotaAtLowerOriginal="3392551" lowerNominalEur="67433.56" quotaAtLowerEur="20389.64" lowerRealEur1990="45517.653"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2001" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="prorroga_legal_verificada" originalCurrency="ESP" originalCurrencyName="peseta española" deflatorTo1986="0.52" deflatorTo1990="0.65" gdpPerCapitaNominalEur="17159.14" gdpPerCapitaRealEur1990="11153.441">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2000-24265" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2000-24265">Ley 13/2000, disposición adicional 25.ª</source>
+      </sources>
+      <brackets count="6">
+        <bracket index="1" marginalRatePct="15" openUpper="false" lowerOriginal="0" upperOriginal="612000" widthOriginal="612000" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="3678.19" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="2390.8235"/>
+        <bracket index="2" marginalRatePct="20.17" openUpper="false" lowerOriginal="612000" upperOriginal="2142000" widthOriginal="1530000" quotaAtLowerOriginal="91800" lowerNominalEur="3678.19" upperNominalEur="12873.68" quotaAtLowerEur="551.73" lowerRealEur1990="2390.8235" upperRealEur1990="8367.892"/>
+        <bracket index="3" marginalRatePct="23.57" openUpper="false" lowerOriginal="2142000" upperOriginal="4182000" widthOriginal="2040000" quotaAtLowerOriginal="400401" lowerNominalEur="12873.68" upperNominalEur="25134.33" quotaAtLowerEur="2406.46" lowerRealEur1990="8367.892" upperRealEur1990="16337.3145"/>
+        <bracket index="4" marginalRatePct="31.48" openUpper="false" lowerOriginal="4182000" upperOriginal="6732000" widthOriginal="2550000" quotaAtLowerOriginal="881229" lowerNominalEur="25134.33" upperNominalEur="40460.13" quotaAtLowerEur="5296.29" lowerRealEur1990="16337.3145" upperRealEur1990="26299.0845"/>
+        <bracket index="5" marginalRatePct="38.07" openUpper="false" lowerOriginal="6732000" upperOriginal="11220000" widthOriginal="4488000" quotaAtLowerOriginal="1683969" lowerNominalEur="40460.13" upperNominalEur="67433.56" quotaAtLowerEur="10120.86" lowerRealEur1990="26299.0845" upperRealEur1990="43831.814"/>
+        <bracket index="6" marginalRatePct="39.6" openUpper="true" lowerOriginal="11220000" quotaAtLowerOriginal="3392551" lowerNominalEur="67433.56" quotaAtLowerEur="20389.64" lowerRealEur1990="43831.814"/>
+      </brackets>
+      <notes>
+        <note>La disposición adicional 25.ª de la Ley 13/2000 prorrogó para 2001 las escalas de 2000.</note>
+      </notes>
+    </year>
+    <year value="2002" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.51" deflatorTo1990="0.6375" gdpPerCapitaNominalEur="18095.96" gdpPerCapitaRealEur1990="11536.1745">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2001-24962" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2001-24962">Ley 21/2001, artículo 58</source>
+      </sources>
+      <brackets count="6">
+        <bracket index="1" marginalRatePct="12.06" openUpper="false" lowerOriginal="0" upperOriginal="3678.19" widthOriginal="3678.19" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="3678.19" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="2344.846125"/>
+        <bracket index="2" marginalRatePct="16.08" openUpper="false" lowerOriginal="3678.19" upperOriginal="12873.68" widthOriginal="9195.49" quotaAtLowerOriginal="443.59" lowerNominalEur="3678.19" upperNominalEur="12873.68" quotaAtLowerEur="443.59" lowerRealEur1990="2344.846125" upperRealEur1990="8206.971"/>
+        <bracket index="3" marginalRatePct="18.961" openUpper="false" lowerOriginal="12873.68" upperOriginal="25134.33" widthOriginal="12260.65" quotaAtLowerOriginal="1922.22" lowerNominalEur="12873.68" upperNominalEur="25134.33" quotaAtLowerEur="1922.22" lowerRealEur1990="8206.971" upperRealEur1990="16023.135375"/>
+        <bracket index="4" marginalRatePct="24.924" openUpper="false" lowerOriginal="25134.33" upperOriginal="40460.13" widthOriginal="15325.8" quotaAtLowerOriginal="4246.96" lowerNominalEur="25134.33" upperNominalEur="40460.13" quotaAtLowerEur="4246.96" lowerRealEur1990="16023.135375" upperRealEur1990="25793.332875"/>
+        <bracket index="5" marginalRatePct="30.15" openUpper="false" lowerOriginal="40460.13" upperOriginal="67433.56" widthOriginal="26973.43" quotaAtLowerOriginal="8066.76" lowerNominalEur="40460.13" upperNominalEur="67433.56" quotaAtLowerEur="8066.76" lowerRealEur1990="25793.332875" upperRealEur1990="42988.8945"/>
+        <bracket index="6" marginalRatePct="32.16" openUpper="true" lowerOriginal="67433.56" quotaAtLowerOriginal="16199.25" lowerNominalEur="67433.56" quotaAtLowerEur="16199.25" lowerRealEur1990="42988.8945"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2003" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.49" deflatorTo1990="0.6125" gdpPerCapitaNominalEur="19026.49" gdpPerCapitaRealEur1990="11653.725125">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2002-24711" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2002-24711">Ley 46/2002, escala aplicable en 2003</source>
+      </sources>
+      <brackets count="5">
+        <bracket index="1" marginalRatePct="9.06" openUpper="false" lowerOriginal="0" upperOriginal="4000" widthOriginal="4000" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="4000" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="2450"/>
+        <bracket index="2" marginalRatePct="15.84" openUpper="false" lowerOriginal="4000" upperOriginal="13800" widthOriginal="9800" quotaAtLowerOriginal="362.4" lowerNominalEur="4000" upperNominalEur="13800" quotaAtLowerEur="362.4" lowerRealEur1990="2450" upperRealEur1990="8452.5"/>
+        <bracket index="3" marginalRatePct="18.68" openUpper="false" lowerOriginal="13800" upperOriginal="25800" widthOriginal="12000" quotaAtLowerOriginal="1914.72" lowerNominalEur="13800" upperNominalEur="25800" quotaAtLowerEur="1914.72" lowerRealEur1990="8452.5" upperRealEur1990="15802.5"/>
+        <bracket index="4" marginalRatePct="24.71" openUpper="false" lowerOriginal="25800" upperOriginal="45000" widthOriginal="19200" quotaAtLowerOriginal="4156.32" lowerNominalEur="25800" upperNominalEur="45000" quotaAtLowerEur="4156.32" lowerRealEur1990="15802.5" upperRealEur1990="27562.5"/>
+        <bracket index="5" marginalRatePct="29.16" openUpper="true" lowerOriginal="45000" quotaAtLowerOriginal="8900.64" lowerNominalEur="45000" quotaAtLowerEur="8900.64" lowerRealEur1990="27562.5"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2004" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.48" deflatorTo1990="0.6" gdpPerCapitaNominalEur="20037.77" gdpPerCapitaRealEur1990="12022.662">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2004-4347" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2004-4347">Real Decreto Legislativo 3/2004, artículo 64</source>
+      </sources>
+      <brackets count="5">
+        <bracket index="1" marginalRatePct="9.06" openUpper="false" lowerOriginal="0" upperOriginal="4000" widthOriginal="4000" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="4000" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="2400"/>
+        <bracket index="2" marginalRatePct="15.84" openUpper="false" lowerOriginal="4000" upperOriginal="13800" widthOriginal="9800" quotaAtLowerOriginal="362.4" lowerNominalEur="4000" upperNominalEur="13800" quotaAtLowerEur="362.4" lowerRealEur1990="2400" upperRealEur1990="8280"/>
+        <bracket index="3" marginalRatePct="18.68" openUpper="false" lowerOriginal="13800" upperOriginal="25800" widthOriginal="12000" quotaAtLowerOriginal="1914.72" lowerNominalEur="13800" upperNominalEur="25800" quotaAtLowerEur="1914.72" lowerRealEur1990="8280" upperRealEur1990="15480"/>
+        <bracket index="4" marginalRatePct="24.71" openUpper="false" lowerOriginal="25800" upperOriginal="45000" widthOriginal="19200" quotaAtLowerOriginal="4156.32" lowerNominalEur="25800" upperNominalEur="45000" quotaAtLowerEur="4156.32" lowerRealEur1990="15480" upperRealEur1990="27000"/>
+        <bracket index="5" marginalRatePct="29.16" openUpper="true" lowerOriginal="45000" quotaAtLowerOriginal="8900.64" lowerNominalEur="45000" quotaAtLowerEur="8900.64" lowerRealEur1990="27000"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2005" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_con_normalizacion_documentada" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.46" deflatorTo1990="0.575" gdpPerCapitaNominalEur="21261.28" gdpPerCapitaRealEur1990="12225.236">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2004-21688" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2004-21688">Ley 2/2004, escala aplicable en 2005</source>
+      </sources>
+      <brackets count="5">
+        <bracket index="1" marginalRatePct="9.06" openUpper="false" lowerOriginal="0" upperOriginal="4080" widthOriginal="4080" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="4080" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="2346"/>
+        <bracket index="2" marginalRatePct="15.84" openUpper="false" lowerOriginal="4080" upperOriginal="14076" widthOriginal="9996" quotaAtLowerOriginal="369.65" lowerNominalEur="4080" upperNominalEur="14076" quotaAtLowerEur="369.65" lowerRealEur1990="2346" upperRealEur1990="8093.7"/>
+        <bracket index="3" marginalRatePct="18.68" openUpper="false" lowerOriginal="14076" upperOriginal="26316" widthOriginal="12240" quotaAtLowerOriginal="1953.02" lowerNominalEur="14076" upperNominalEur="26316" quotaAtLowerEur="1953.02" lowerRealEur1990="8093.7" upperRealEur1990="15131.7"/>
+        <bracket index="4" marginalRatePct="24.71" openUpper="false" lowerOriginal="26316" upperOriginal="45900" widthOriginal="19584" quotaAtLowerOriginal="4239.45" lowerNominalEur="26316" upperNominalEur="45900" quotaAtLowerEur="4239.45" lowerRealEur1990="15131.7" upperRealEur1990="26392.5"/>
+        <bracket index="5" marginalRatePct="29.16" openUpper="true" lowerOriginal="45900" quotaAtLowerOriginal="9078.66" lowerNominalEur="45900" quotaAtLowerEur="9078.66" lowerRealEur1990="26392.5"/>
+      </brackets>
+      <notes>
+        <note>Normalización documentada: en la tabla estatal publicada el cuarto límite figura como 23.316,00 €, pero se usa 26.316,00 €. Es el valor coherente con 14.076 + 12.240, con la cuota acumulada 4.239,45 €, con el ancho siguiente de 19.584 € y con la tabla autonómica paralela.</note>
+      </notes>
+    </year>
+    <year value="2006" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.45" deflatorTo1990="0.5625" gdpPerCapitaNominalEur="22635.96" gdpPerCapitaRealEur1990="12732.7275">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2005-21525" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2005-21525">Ley 30/2005, escala aplicable en 2006</source>
+      </sources>
+      <brackets count="5">
+        <bracket index="1" marginalRatePct="9.06" openUpper="false" lowerOriginal="0" upperOriginal="4161.6" widthOriginal="4161.6" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="4161.6" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="2340.9"/>
+        <bracket index="2" marginalRatePct="15.84" openUpper="false" lowerOriginal="4161.6" upperOriginal="14357.52" widthOriginal="10195.92" quotaAtLowerOriginal="377.04" lowerNominalEur="4161.6" upperNominalEur="14357.52" quotaAtLowerEur="377.04" lowerRealEur1990="2340.9" upperRealEur1990="8076.105"/>
+        <bracket index="3" marginalRatePct="18.68" openUpper="false" lowerOriginal="14357.52" upperOriginal="26842.32" widthOriginal="12484.8" quotaAtLowerOriginal="1992.07" lowerNominalEur="14357.52" upperNominalEur="26842.32" quotaAtLowerEur="1992.07" lowerRealEur1990="8076.105" upperRealEur1990="15098.805"/>
+        <bracket index="4" marginalRatePct="24.71" openUpper="false" lowerOriginal="26842.32" upperOriginal="46818" widthOriginal="19975.68" quotaAtLowerOriginal="4324.23" lowerNominalEur="26842.32" upperNominalEur="46818" quotaAtLowerEur="4324.23" lowerRealEur1990="15098.805" upperRealEur1990="26335.125"/>
+        <bracket index="5" marginalRatePct="29.16" openUpper="true" lowerOriginal="46818" quotaAtLowerOriginal="9260.22" lowerNominalEur="46818" quotaAtLowerEur="9260.22" lowerRealEur1990="26335.125"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2007" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.44" deflatorTo1990="0.55" gdpPerCapitaNominalEur="23825.27" gdpPerCapitaRealEur1990="13103.8985">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2006-20764" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2006-20764">Ley 35/2006, artículo 63 original</source>
+      </sources>
+      <brackets count="4">
+        <bracket index="1" marginalRatePct="15.66" openUpper="false" lowerOriginal="0" upperOriginal="17360" widthOriginal="17360" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17360" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="9548"/>
+        <bracket index="2" marginalRatePct="18.27" openUpper="false" lowerOriginal="17360" upperOriginal="32360" widthOriginal="15000" quotaAtLowerOriginal="2718.58" lowerNominalEur="17360" upperNominalEur="32360" quotaAtLowerEur="2718.58" lowerRealEur1990="9548" upperRealEur1990="17798"/>
+        <bracket index="3" marginalRatePct="24.14" openUpper="false" lowerOriginal="32360" upperOriginal="52360" widthOriginal="20000" quotaAtLowerOriginal="5459.08" lowerNominalEur="32360" upperNominalEur="52360" quotaAtLowerEur="5459.08" lowerRealEur1990="17798" upperRealEur1990="28798"/>
+        <bracket index="4" marginalRatePct="27.13" openUpper="true" lowerOriginal="52360" quotaAtLowerOriginal="10287.08" lowerNominalEur="52360" quotaAtLowerEur="10287.08" lowerRealEur1990="28798"/>
+      </brackets>
+      <notes>
+        <note>Límites estatales verificados: 0, 17.360, 32.360 y 52.360 €. No se concatenan como tramos sucesivos los tipos autonómicos, que son una escala paralela.</note>
+      </notes>
+    </year>
+    <year value="2008" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.42" deflatorTo1990="0.525" gdpPerCapitaNominalEur="24207.46" gdpPerCapitaRealEur1990="12708.9165">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2007-22295" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2007-22295">Ley 51/2007, escala aplicable en 2008</source>
+      </sources>
+      <brackets count="4">
+        <bracket index="1" marginalRatePct="15.66" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="9296.28"/>
+        <bracket index="2" marginalRatePct="18.27" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="2772.95" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="2772.95" lowerRealEur1990="9296.28" upperRealEur1990="17328.78"/>
+        <bracket index="3" marginalRatePct="24.14" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="5568.26" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="5568.26" lowerRealEur1990="17328.78" upperRealEur1990="28038.78"/>
+        <bracket index="4" marginalRatePct="27.13" openUpper="true" lowerOriginal="53407.2" quotaAtLowerOriginal="10492.82" lowerNominalEur="53407.2" quotaAtLowerEur="10492.82" lowerRealEur1990="28038.78"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2009" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.42" deflatorTo1990="0.525" gdpPerCapitaNominalEur="23143.27" gdpPerCapitaRealEur1990="12150.21675">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2008-20744" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2008-20744">Ley 2/2008, escala aplicable en 2009</source>
+      </sources>
+      <brackets count="4">
+        <bracket index="1" marginalRatePct="15.66" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="9296.28"/>
+        <bracket index="2" marginalRatePct="18.27" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="2772.95" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="2772.95" lowerRealEur1990="9296.28" upperRealEur1990="17328.78"/>
+        <bracket index="3" marginalRatePct="24.14" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="5568.26" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="5568.26" lowerRealEur1990="17328.78" upperRealEur1990="28038.78"/>
+        <bracket index="4" marginalRatePct="27.13" openUpper="true" lowerOriginal="53407.2" quotaAtLowerOriginal="10492.82" lowerNominalEur="53407.2" quotaAtLowerEur="10492.82" lowerRealEur1990="28038.78"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2010" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.41" deflatorTo1990="0.5125" gdpPerCapitaNominalEur="23126.16" gdpPerCapitaRealEur1990="11852.157">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2009-20765" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2009-20765">Ley 26/2009, escala aplicable en 2010</source>
+      </sources>
+      <brackets count="4">
+        <bracket index="1" marginalRatePct="15.66" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="9074.94"/>
+        <bracket index="2" marginalRatePct="18.27" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="2772.95" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="2772.95" lowerRealEur1990="9074.94" upperRealEur1990="16916.19"/>
+        <bracket index="3" marginalRatePct="24.14" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="5568.26" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="5568.26" lowerRealEur1990="16916.19" upperRealEur1990="27371.19"/>
+        <bracket index="4" marginalRatePct="27.13" openUpper="true" lowerOriginal="53407.2" quotaAtLowerOriginal="10492.82" lowerNominalEur="53407.2" quotaAtLowerEur="10492.82" lowerRealEur1990="27371.19"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2011" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.4" deflatorTo1990="0.5" gdpPerCapitaNominalEur="22863.25" gdpPerCapitaRealEur1990="11431.625">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2010-19703" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2010-19703">Ley 39/2010, escala aplicable en 2011</source>
+      </sources>
+      <brackets count="6">
+        <bracket index="1" marginalRatePct="12" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="8853.6"/>
+        <bracket index="2" marginalRatePct="14" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="2124.86" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="2124.86" lowerRealEur1990="8853.6" upperRealEur1990="16503.6"/>
+        <bracket index="3" marginalRatePct="18.5" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="4266.86" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="4266.86" lowerRealEur1990="16503.6" upperRealEur1990="26703.6"/>
+        <bracket index="4" marginalRatePct="21.5" openUpper="false" lowerOriginal="53407.2" upperOriginal="120000.2" widthOriginal="66593" quotaAtLowerOriginal="8040.86" lowerNominalEur="53407.2" upperNominalEur="120000.2" quotaAtLowerEur="8040.86" lowerRealEur1990="26703.6" upperRealEur1990="60000.1"/>
+        <bracket index="5" marginalRatePct="22.5" openUpper="false" lowerOriginal="120000.2" upperOriginal="175000.2" widthOriginal="55000" quotaAtLowerOriginal="22358.36" lowerNominalEur="120000.2" upperNominalEur="175000.2" quotaAtLowerEur="22358.36" lowerRealEur1990="60000.1" upperRealEur1990="87500.1"/>
+        <bracket index="6" marginalRatePct="23.5" openUpper="true" lowerOriginal="175000.2" quotaAtLowerOriginal="34733.36" lowerNominalEur="175000.2" quotaAtLowerEur="34733.36" lowerRealEur1990="87500.1"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2012" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="combinacion_de_dos_escalas_estatales_oficiales" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.39" deflatorTo1990="0.4875" gdpPerCapitaNominalEur="22148.73" gdpPerCapitaRealEur1990="10797.505875">
+      <sources>
+        <source organization="Agencia Estatal de Administración Tributaria (AEAT)" reference="Manual práctico IRPF 2012" url="https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/2012/Manual_Renta_2012_es_es.pdf">Gravamen estatal de la base liquidable general, ejercicio 2012</source>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2011-20638" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2011-20638">Real Decreto-ley 20/2011: gravamen complementario 2012-2013</source>
+      </sources>
+      <brackets count="7">
+        <bracket index="1" marginalRatePct="12.75" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="8632.26"/>
+        <bracket index="2" marginalRatePct="16" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="2257.66" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="2257.66" lowerRealEur1990="8632.26" upperRealEur1990="16091.01"/>
+        <bracket index="3" marginalRatePct="21.5" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="4705.66" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="4705.66" lowerRealEur1990="16091.01" upperRealEur1990="26036.01"/>
+        <bracket index="4" marginalRatePct="25.5" openUpper="false" lowerOriginal="53407.2" upperOriginal="120000.2" widthOriginal="66593" quotaAtLowerOriginal="9091.66" lowerNominalEur="53407.2" upperNominalEur="120000.2" quotaAtLowerEur="9091.66" lowerRealEur1990="26036.01" upperRealEur1990="58500.0975"/>
+        <bracket index="5" marginalRatePct="27.5" openUpper="false" lowerOriginal="120000.2" upperOriginal="175000.2" widthOriginal="55000" quotaAtLowerOriginal="26072.88" lowerNominalEur="120000.2" upperNominalEur="175000.2" quotaAtLowerEur="26072.88" lowerRealEur1990="58500.0975" upperRealEur1990="85312.5975"/>
+        <bracket index="6" marginalRatePct="29.5" openUpper="false" lowerOriginal="175000.2" upperOriginal="300000.2" widthOriginal="125000" quotaAtLowerOriginal="41197.88" lowerNominalEur="175000.2" upperNominalEur="300000.2" quotaAtLowerEur="41197.88" lowerRealEur1990="85312.5975" upperRealEur1990="146250.0975"/>
+        <bracket index="7" marginalRatePct="30.5" openUpper="true" lowerOriginal="300000.2" quotaAtLowerOriginal="78072.88" lowerNominalEur="300000.2" quotaAtLowerEur="78072.88" lowerRealEur1990="146250.0975"/>
+      </brackets>
+      <stateComponents>
+        <component name="escala_estatal_ordinaria" count="6">
+          <bracket index="1" marginalRatePct="12" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0"/>
+          <bracket index="2" marginalRatePct="14" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="2124.86" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="2124.86"/>
+          <bracket index="3" marginalRatePct="18.5" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="4266.86" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="4266.86"/>
+          <bracket index="4" marginalRatePct="21.5" openUpper="false" lowerOriginal="53407.2" upperOriginal="120000.2" widthOriginal="66593" quotaAtLowerOriginal="8040.86" lowerNominalEur="53407.2" upperNominalEur="120000.2" quotaAtLowerEur="8040.86"/>
+          <bracket index="5" marginalRatePct="22.5" openUpper="false" lowerOriginal="120000.2" upperOriginal="175000.2" widthOriginal="55000" quotaAtLowerOriginal="22358.36" lowerNominalEur="120000.2" upperNominalEur="175000.2" quotaAtLowerEur="22358.36"/>
+          <bracket index="6" marginalRatePct="23.5" openUpper="true" lowerOriginal="175000.2" quotaAtLowerOriginal="34733.36" lowerNominalEur="175000.2" quotaAtLowerEur="34733.36"/>
+        </component>
+        <component name="gravamen_complementario_temporal" count="7">
+          <bracket index="1" marginalRatePct="0.75" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0"/>
+          <bracket index="2" marginalRatePct="2" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="132.8" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="132.8"/>
+          <bracket index="3" marginalRatePct="3" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="438.8" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="438.8"/>
+          <bracket index="4" marginalRatePct="4" openUpper="false" lowerOriginal="53407.2" upperOriginal="120000.2" widthOriginal="66593" quotaAtLowerOriginal="1050.8" lowerNominalEur="53407.2" upperNominalEur="120000.2" quotaAtLowerEur="1050.8"/>
+          <bracket index="5" marginalRatePct="5" openUpper="false" lowerOriginal="120000.2" upperOriginal="175000.2" widthOriginal="55000" quotaAtLowerOriginal="3714.52" lowerNominalEur="120000.2" upperNominalEur="175000.2" quotaAtLowerEur="3714.52"/>
+          <bracket index="6" marginalRatePct="6" openUpper="false" lowerOriginal="175000.2" upperOriginal="300000.2" widthOriginal="125000" quotaAtLowerOriginal="6464.52" lowerNominalEur="175000.2" upperNominalEur="300000.2" quotaAtLowerEur="6464.52"/>
+          <bracket index="7" marginalRatePct="7" openUpper="true" lowerOriginal="300000.2" quotaAtLowerOriginal="13964.52" lowerNominalEur="300000.2" quotaAtLowerEur="13964.52"/>
+        </component>
+      </stateComponents>
+      <notes>
+        <note>La tabla principal suma, en cada intervalo, la escala estatal ordinaria y el gravamen complementario temporal. Ambos componentes se conservan también por separado.</note>
+      </notes>
+    </year>
+    <year value="2013" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="combinacion_de_dos_escalas_estatales_oficiales" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.38" deflatorTo1990="0.475" gdpPerCapitaNominalEur="22007.72" gdpPerCapitaRealEur1990="10453.667">
+      <sources>
+        <source organization="Agencia Estatal de Administración Tributaria (AEAT)" reference="Manual práctico IRPF 2013" url="https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/2013/Manual_Renta_2013_es_es.pdf">Gravamen estatal de la base liquidable general, ejercicio 2013</source>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2011-20638" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2011-20638">Real Decreto-ley 20/2011: gravamen complementario 2012-2013</source>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2012-8745" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2012-8745">Ley 2/2012: escala del gravamen complementario</source>
+      </sources>
+      <brackets count="7">
+        <bracket index="1" marginalRatePct="12.75" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="8410.92"/>
+        <bracket index="2" marginalRatePct="16" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="2257.66" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="2257.66" lowerRealEur1990="8410.92" upperRealEur1990="15678.42"/>
+        <bracket index="3" marginalRatePct="21.5" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="4705.66" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="4705.66" lowerRealEur1990="15678.42" upperRealEur1990="25368.42"/>
+        <bracket index="4" marginalRatePct="25.5" openUpper="false" lowerOriginal="53407.2" upperOriginal="120000.2" widthOriginal="66593" quotaAtLowerOriginal="9091.66" lowerNominalEur="53407.2" upperNominalEur="120000.2" quotaAtLowerEur="9091.66" lowerRealEur1990="25368.42" upperRealEur1990="57000.095"/>
+        <bracket index="5" marginalRatePct="27.5" openUpper="false" lowerOriginal="120000.2" upperOriginal="175000.2" widthOriginal="55000" quotaAtLowerOriginal="26072.88" lowerNominalEur="120000.2" upperNominalEur="175000.2" quotaAtLowerEur="26072.88" lowerRealEur1990="57000.095" upperRealEur1990="83125.095"/>
+        <bracket index="6" marginalRatePct="29.5" openUpper="false" lowerOriginal="175000.2" upperOriginal="300000.2" widthOriginal="125000" quotaAtLowerOriginal="41197.88" lowerNominalEur="175000.2" upperNominalEur="300000.2" quotaAtLowerEur="41197.88" lowerRealEur1990="83125.095" upperRealEur1990="142500.095"/>
+        <bracket index="7" marginalRatePct="30.5" openUpper="true" lowerOriginal="300000.2" quotaAtLowerOriginal="78072.88" lowerNominalEur="300000.2" quotaAtLowerEur="78072.88" lowerRealEur1990="142500.095"/>
+      </brackets>
+      <stateComponents>
+        <component name="escala_estatal_ordinaria" count="6">
+          <bracket index="1" marginalRatePct="12" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0"/>
+          <bracket index="2" marginalRatePct="14" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="2124.86" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="2124.86"/>
+          <bracket index="3" marginalRatePct="18.5" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="4266.86" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="4266.86"/>
+          <bracket index="4" marginalRatePct="21.5" openUpper="false" lowerOriginal="53407.2" upperOriginal="120000.2" widthOriginal="66593" quotaAtLowerOriginal="8040.86" lowerNominalEur="53407.2" upperNominalEur="120000.2" quotaAtLowerEur="8040.86"/>
+          <bracket index="5" marginalRatePct="22.5" openUpper="false" lowerOriginal="120000.2" upperOriginal="175000.2" widthOriginal="55000" quotaAtLowerOriginal="22358.36" lowerNominalEur="120000.2" upperNominalEur="175000.2" quotaAtLowerEur="22358.36"/>
+          <bracket index="6" marginalRatePct="23.5" openUpper="true" lowerOriginal="175000.2" quotaAtLowerOriginal="34733.36" lowerNominalEur="175000.2" quotaAtLowerEur="34733.36"/>
+        </component>
+        <component name="gravamen_complementario_temporal" count="7">
+          <bracket index="1" marginalRatePct="0.75" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0"/>
+          <bracket index="2" marginalRatePct="2" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="132.8" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="132.8"/>
+          <bracket index="3" marginalRatePct="3" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="438.8" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="438.8"/>
+          <bracket index="4" marginalRatePct="4" openUpper="false" lowerOriginal="53407.2" upperOriginal="120000.2" widthOriginal="66593" quotaAtLowerOriginal="1050.8" lowerNominalEur="53407.2" upperNominalEur="120000.2" quotaAtLowerEur="1050.8"/>
+          <bracket index="5" marginalRatePct="5" openUpper="false" lowerOriginal="120000.2" upperOriginal="175000.2" widthOriginal="55000" quotaAtLowerOriginal="3714.52" lowerNominalEur="120000.2" upperNominalEur="175000.2" quotaAtLowerEur="3714.52"/>
+          <bracket index="6" marginalRatePct="6" openUpper="false" lowerOriginal="175000.2" upperOriginal="300000.2" widthOriginal="125000" quotaAtLowerOriginal="6464.52" lowerNominalEur="175000.2" upperNominalEur="300000.2" quotaAtLowerEur="6464.52"/>
+          <bracket index="7" marginalRatePct="7" openUpper="true" lowerOriginal="300000.2" quotaAtLowerOriginal="13964.52" lowerNominalEur="300000.2" quotaAtLowerEur="13964.52"/>
+        </component>
+      </stateComponents>
+      <notes>
+        <note>La tabla principal suma, en cada intervalo, la escala estatal ordinaria y el gravamen complementario temporal. Ambos componentes se conservan también por separado.</note>
+      </notes>
+    </year>
+    <year value="2014" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="combinacion_de_dos_escalas_estatales_oficiales" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.39" deflatorTo1990="0.4875" gdpPerCapitaNominalEur="22361.87" gdpPerCapitaRealEur1990="10901.411625">
+      <sources>
+        <source organization="Agencia Estatal de Administración Tributaria (AEAT)" reference="Manual práctico IRPF 2014" url="https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/2014/Manual_Renta_2014_es_es.pdf">Gravamen estatal de la base liquidable general, ejercicio 2014</source>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2013-13616" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2013-13616">Ley 22/2013: prórroga del gravamen complementario a 2014</source>
+      </sources>
+      <brackets count="7">
+        <bracket index="1" marginalRatePct="12.75" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="8632.26"/>
+        <bracket index="2" marginalRatePct="16" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="2257.66" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="2257.66" lowerRealEur1990="8632.26" upperRealEur1990="16091.01"/>
+        <bracket index="3" marginalRatePct="21.5" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="4705.66" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="4705.66" lowerRealEur1990="16091.01" upperRealEur1990="26036.01"/>
+        <bracket index="4" marginalRatePct="25.5" openUpper="false" lowerOriginal="53407.2" upperOriginal="120000.2" widthOriginal="66593" quotaAtLowerOriginal="9091.66" lowerNominalEur="53407.2" upperNominalEur="120000.2" quotaAtLowerEur="9091.66" lowerRealEur1990="26036.01" upperRealEur1990="58500.0975"/>
+        <bracket index="5" marginalRatePct="27.5" openUpper="false" lowerOriginal="120000.2" upperOriginal="175000.2" widthOriginal="55000" quotaAtLowerOriginal="26072.88" lowerNominalEur="120000.2" upperNominalEur="175000.2" quotaAtLowerEur="26072.88" lowerRealEur1990="58500.0975" upperRealEur1990="85312.5975"/>
+        <bracket index="6" marginalRatePct="29.5" openUpper="false" lowerOriginal="175000.2" upperOriginal="300000.2" widthOriginal="125000" quotaAtLowerOriginal="41197.88" lowerNominalEur="175000.2" upperNominalEur="300000.2" quotaAtLowerEur="41197.88" lowerRealEur1990="85312.5975" upperRealEur1990="146250.0975"/>
+        <bracket index="7" marginalRatePct="30.5" openUpper="true" lowerOriginal="300000.2" quotaAtLowerOriginal="78072.88" lowerNominalEur="300000.2" quotaAtLowerEur="78072.88" lowerRealEur1990="146250.0975"/>
+      </brackets>
+      <stateComponents>
+        <component name="escala_estatal_ordinaria" count="6">
+          <bracket index="1" marginalRatePct="12" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0"/>
+          <bracket index="2" marginalRatePct="14" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="2124.86" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="2124.86"/>
+          <bracket index="3" marginalRatePct="18.5" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="4266.86" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="4266.86"/>
+          <bracket index="4" marginalRatePct="21.5" openUpper="false" lowerOriginal="53407.2" upperOriginal="120000.2" widthOriginal="66593" quotaAtLowerOriginal="8040.86" lowerNominalEur="53407.2" upperNominalEur="120000.2" quotaAtLowerEur="8040.86"/>
+          <bracket index="5" marginalRatePct="22.5" openUpper="false" lowerOriginal="120000.2" upperOriginal="175000.2" widthOriginal="55000" quotaAtLowerOriginal="22358.36" lowerNominalEur="120000.2" upperNominalEur="175000.2" quotaAtLowerEur="22358.36"/>
+          <bracket index="6" marginalRatePct="23.5" openUpper="true" lowerOriginal="175000.2" quotaAtLowerOriginal="34733.36" lowerNominalEur="175000.2" quotaAtLowerEur="34733.36"/>
+        </component>
+        <component name="gravamen_complementario_temporal" count="7">
+          <bracket index="1" marginalRatePct="0.75" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0"/>
+          <bracket index="2" marginalRatePct="2" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="132.8" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="132.8"/>
+          <bracket index="3" marginalRatePct="3" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="438.8" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="438.8"/>
+          <bracket index="4" marginalRatePct="4" openUpper="false" lowerOriginal="53407.2" upperOriginal="120000.2" widthOriginal="66593" quotaAtLowerOriginal="1050.8" lowerNominalEur="53407.2" upperNominalEur="120000.2" quotaAtLowerEur="1050.8"/>
+          <bracket index="5" marginalRatePct="5" openUpper="false" lowerOriginal="120000.2" upperOriginal="175000.2" widthOriginal="55000" quotaAtLowerOriginal="3714.52" lowerNominalEur="120000.2" upperNominalEur="175000.2" quotaAtLowerEur="3714.52"/>
+          <bracket index="6" marginalRatePct="6" openUpper="false" lowerOriginal="175000.2" upperOriginal="300000.2" widthOriginal="125000" quotaAtLowerOriginal="6464.52" lowerNominalEur="175000.2" upperNominalEur="300000.2" quotaAtLowerEur="6464.52"/>
+          <bracket index="7" marginalRatePct="7" openUpper="true" lowerOriginal="300000.2" quotaAtLowerOriginal="13964.52" lowerNominalEur="300000.2" quotaAtLowerEur="13964.52"/>
+        </component>
+      </stateComponents>
+      <notes>
+        <note>La tabla principal suma, en cada intervalo, la escala estatal ordinaria y el gravamen complementario temporal. Ambos componentes se conservan también por separado.</note>
+      </notes>
+    </year>
+    <year value="2015" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.39" deflatorTo1990="0.4875" gdpPerCapitaNominalEur="23417.88" gdpPerCapitaRealEur1990="11416.2165">
+      <sources>
+        <source organization="Agencia Estatal de Administración Tributaria (AEAT)" reference="Manual práctico IRPF 2015" url="https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/IRPF-2015/Manual_Renta_2015_es_es.pdf">Gravamen estatal de la base liquidable general, ejercicio 2015</source>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2015-7765" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2015-7765">Real Decreto-ley 9/2015: escala estatal aplicable desde 1 de enero de 2015</source>
+      </sources>
+      <brackets count="5">
+        <bracket index="1" marginalRatePct="9.5" openUpper="false" lowerOriginal="0" upperOriginal="12450" widthOriginal="12450" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="12450" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="6069.375"/>
+        <bracket index="2" marginalRatePct="12" openUpper="false" lowerOriginal="12450" upperOriginal="20200" widthOriginal="7750" quotaAtLowerOriginal="1182.75" lowerNominalEur="12450" upperNominalEur="20200" quotaAtLowerEur="1182.75" lowerRealEur1990="6069.375" upperRealEur1990="9847.5"/>
+        <bracket index="3" marginalRatePct="15" openUpper="false" lowerOriginal="20200" upperOriginal="34000" widthOriginal="13800" quotaAtLowerOriginal="2112.75" lowerNominalEur="20200" upperNominalEur="34000" quotaAtLowerEur="2112.75" lowerRealEur1990="9847.5" upperRealEur1990="16575"/>
+        <bracket index="4" marginalRatePct="18.5" openUpper="false" lowerOriginal="34000" upperOriginal="60000" widthOriginal="26000" quotaAtLowerOriginal="4182.75" lowerNominalEur="34000" upperNominalEur="60000" quotaAtLowerEur="4182.75" lowerRealEur1990="16575" upperRealEur1990="29250"/>
+        <bracket index="5" marginalRatePct="22.5" openUpper="true" lowerOriginal="60000" quotaAtLowerOriginal="8992.75" lowerNominalEur="60000" quotaAtLowerEur="8992.75" lowerRealEur1990="29250"/>
+      </brackets>
+      <notes>
+        <note>Se usa la escala anual definitiva introducida por el Real Decreto-ley 9/2015 con efectos desde el 1 de enero de 2015.</note>
+      </notes>
+    </year>
+    <year value="2016" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.39" deflatorTo1990="0.4875" gdpPerCapitaNominalEur="24171.59" gdpPerCapitaRealEur1990="11783.650125">
+      <sources>
+        <source organization="Agencia Estatal de Administración Tributaria (AEAT)" reference="Manual práctico IRPF 2016" url="https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/IRPF-2016/ManualRentaPatrimonio2016_es_es.pdf">Gravamen estatal de la base liquidable general, ejercicio 2016</source>
+      </sources>
+      <brackets count="5">
+        <bracket index="1" marginalRatePct="9.5" openUpper="false" lowerOriginal="0" upperOriginal="12450" widthOriginal="12450" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="12450" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="6069.375"/>
+        <bracket index="2" marginalRatePct="12" openUpper="false" lowerOriginal="12450" upperOriginal="20200" widthOriginal="7750" quotaAtLowerOriginal="1182.75" lowerNominalEur="12450" upperNominalEur="20200" quotaAtLowerEur="1182.75" lowerRealEur1990="6069.375" upperRealEur1990="9847.5"/>
+        <bracket index="3" marginalRatePct="15" openUpper="false" lowerOriginal="20200" upperOriginal="35200" widthOriginal="15000" quotaAtLowerOriginal="2112.75" lowerNominalEur="20200" upperNominalEur="35200" quotaAtLowerEur="2112.75" lowerRealEur1990="9847.5" upperRealEur1990="17160"/>
+        <bracket index="4" marginalRatePct="18.5" openUpper="false" lowerOriginal="35200" upperOriginal="60000" widthOriginal="24800" quotaAtLowerOriginal="4362.75" lowerNominalEur="35200" upperNominalEur="60000" quotaAtLowerEur="4362.75" lowerRealEur1990="17160" upperRealEur1990="29250"/>
+        <bracket index="5" marginalRatePct="22.5" openUpper="true" lowerOriginal="60000" quotaAtLowerOriginal="8950.75" lowerNominalEur="60000" quotaAtLowerEur="8950.75" lowerRealEur1990="29250"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2017" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.38" deflatorTo1990="0.475" gdpPerCapitaNominalEur="25123.32" gdpPerCapitaRealEur1990="11933.577">
+      <sources>
+        <source organization="Agencia Estatal de Administración Tributaria (AEAT)" reference="Manual práctico IRPF 2017" url="https://sede.agenciatributaria.gob.es/Sede/manuales/ejercicio-2017/modelo-100/8-cumplimentacion-irpf/8_6-cuota-integra/8_6_1-gravamen-base-liquidable-general/8_6_1_1-cuota-integra-estatal.html">Gravamen estatal de la base liquidable general, ejercicio 2017</source>
+      </sources>
+      <brackets count="5">
+        <bracket index="1" marginalRatePct="9.5" openUpper="false" lowerOriginal="0" upperOriginal="12450" widthOriginal="12450" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="12450" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="5913.75"/>
+        <bracket index="2" marginalRatePct="12" openUpper="false" lowerOriginal="12450" upperOriginal="20200" widthOriginal="7750" quotaAtLowerOriginal="1182.75" lowerNominalEur="12450" upperNominalEur="20200" quotaAtLowerEur="1182.75" lowerRealEur1990="5913.75" upperRealEur1990="9595"/>
+        <bracket index="3" marginalRatePct="15" openUpper="false" lowerOriginal="20200" upperOriginal="35200" widthOriginal="15000" quotaAtLowerOriginal="2112.75" lowerNominalEur="20200" upperNominalEur="35200" quotaAtLowerEur="2112.75" lowerRealEur1990="9595" upperRealEur1990="16720"/>
+        <bracket index="4" marginalRatePct="18.5" openUpper="false" lowerOriginal="35200" upperOriginal="60000" widthOriginal="24800" quotaAtLowerOriginal="4362.75" lowerNominalEur="35200" upperNominalEur="60000" quotaAtLowerEur="4362.75" lowerRealEur1990="16720" upperRealEur1990="28500"/>
+        <bracket index="5" marginalRatePct="22.5" openUpper="true" lowerOriginal="60000" quotaAtLowerOriginal="8950.75" lowerNominalEur="60000" quotaAtLowerEur="8950.75" lowerRealEur1990="28500"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2018" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.37" deflatorTo1990="0.4625" gdpPerCapitaNominalEur="25913.29" gdpPerCapitaRealEur1990="11984.896625">
+      <sources>
+        <source organization="Agencia Estatal de Administración Tributaria (AEAT)" reference="Manual práctico IRPF 2018" url="https://sede.agenciatributaria.gob.es/Sede/manuales/ejercicio-2018/modelo-100/modelo-100/8-cumplimentacion-irpf/8_6-cuota-integra/8_6_1-gravamen-base-liquidable-general/8_6_1_1-cuota-integra-estatal.html">Gravamen estatal de la base liquidable general, ejercicio 2018</source>
+      </sources>
+      <brackets count="5">
+        <bracket index="1" marginalRatePct="9.5" openUpper="false" lowerOriginal="0" upperOriginal="12450" widthOriginal="12450" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="12450" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="5758.125"/>
+        <bracket index="2" marginalRatePct="12" openUpper="false" lowerOriginal="12450" upperOriginal="20200" widthOriginal="7750" quotaAtLowerOriginal="1182.75" lowerNominalEur="12450" upperNominalEur="20200" quotaAtLowerEur="1182.75" lowerRealEur1990="5758.125" upperRealEur1990="9342.5"/>
+        <bracket index="3" marginalRatePct="15" openUpper="false" lowerOriginal="20200" upperOriginal="35200" widthOriginal="15000" quotaAtLowerOriginal="2112.75" lowerNominalEur="20200" upperNominalEur="35200" quotaAtLowerEur="2112.75" lowerRealEur1990="9342.5" upperRealEur1990="16280"/>
+        <bracket index="4" marginalRatePct="18.5" openUpper="false" lowerOriginal="35200" upperOriginal="60000" widthOriginal="24800" quotaAtLowerOriginal="4362.75" lowerNominalEur="35200" upperNominalEur="60000" quotaAtLowerEur="4362.75" lowerRealEur1990="16280" upperRealEur1990="27750"/>
+        <bracket index="5" marginalRatePct="22.5" openUpper="true" lowerOriginal="60000" quotaAtLowerOriginal="8950.75" lowerNominalEur="60000" quotaAtLowerEur="8950.75" lowerRealEur1990="27750"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2019" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.37" deflatorTo1990="0.4625" gdpPerCapitaNominalEur="26607.6" gdpPerCapitaRealEur1990="12306.015">
+      <sources>
+        <source organization="Agencia Estatal de Administración Tributaria (AEAT)" reference="Manual práctico IRPF 2019" url="https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/IRPF-2019/ManualRenta2019_es_es.pdf">Gravamen estatal de la base liquidable general, ejercicio 2019</source>
+      </sources>
+      <brackets count="5">
+        <bracket index="1" marginalRatePct="9.5" openUpper="false" lowerOriginal="0" upperOriginal="12450" widthOriginal="12450" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="12450" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="5758.125"/>
+        <bracket index="2" marginalRatePct="12" openUpper="false" lowerOriginal="12450" upperOriginal="20200" widthOriginal="7750" quotaAtLowerOriginal="1182.75" lowerNominalEur="12450" upperNominalEur="20200" quotaAtLowerEur="1182.75" lowerRealEur1990="5758.125" upperRealEur1990="9342.5"/>
+        <bracket index="3" marginalRatePct="15" openUpper="false" lowerOriginal="20200" upperOriginal="35200" widthOriginal="15000" quotaAtLowerOriginal="2112.75" lowerNominalEur="20200" upperNominalEur="35200" quotaAtLowerEur="2112.75" lowerRealEur1990="9342.5" upperRealEur1990="16280"/>
+        <bracket index="4" marginalRatePct="18.5" openUpper="false" lowerOriginal="35200" upperOriginal="60000" widthOriginal="24800" quotaAtLowerOriginal="4362.75" lowerNominalEur="35200" upperNominalEur="60000" quotaAtLowerEur="4362.75" lowerRealEur1990="16280" upperRealEur1990="27750"/>
+        <bracket index="5" marginalRatePct="22.5" openUpper="true" lowerOriginal="60000" quotaAtLowerOriginal="8950.75" lowerNominalEur="60000" quotaAtLowerEur="8950.75" lowerRealEur1990="27750"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2020" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.37" deflatorTo1990="0.4625" gdpPerCapitaNominalEur="23843.49" gdpPerCapitaRealEur1990="11027.614125">
+      <sources>
+        <source organization="Agencia Estatal de Administración Tributaria (AEAT)" reference="Manual práctico IRPF 2020" url="https://sede.agenciatributaria.gob.es/static_files/Sede/Biblioteca/Manual/Practicos/IRPF/IRPF-2020/ManualRenta2020_es_es.pdf">Gravamen estatal de la base liquidable general, ejercicio 2020</source>
+      </sources>
+      <brackets count="5">
+        <bracket index="1" marginalRatePct="9.5" openUpper="false" lowerOriginal="0" upperOriginal="12450" widthOriginal="12450" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="12450" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="5758.125"/>
+        <bracket index="2" marginalRatePct="12" openUpper="false" lowerOriginal="12450" upperOriginal="20200" widthOriginal="7750" quotaAtLowerOriginal="1182.75" lowerNominalEur="12450" upperNominalEur="20200" quotaAtLowerEur="1182.75" lowerRealEur1990="5758.125" upperRealEur1990="9342.5"/>
+        <bracket index="3" marginalRatePct="15" openUpper="false" lowerOriginal="20200" upperOriginal="35200" widthOriginal="15000" quotaAtLowerOriginal="2112.75" lowerNominalEur="20200" upperNominalEur="35200" quotaAtLowerEur="2112.75" lowerRealEur1990="9342.5" upperRealEur1990="16280"/>
+        <bracket index="4" marginalRatePct="18.5" openUpper="false" lowerOriginal="35200" upperOriginal="60000" widthOriginal="24800" quotaAtLowerOriginal="4362.75" lowerNominalEur="35200" upperNominalEur="60000" quotaAtLowerEur="4362.75" lowerRealEur1990="16280" upperRealEur1990="27750"/>
+        <bracket index="5" marginalRatePct="22.5" openUpper="true" lowerOriginal="60000" quotaAtLowerOriginal="8950.75" lowerNominalEur="60000" quotaAtLowerEur="8950.75" lowerRealEur1990="27750"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2021" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.36" deflatorTo1990="0.45" gdpPerCapitaNominalEur="26040.78" gdpPerCapitaRealEur1990="11718.351">
+      <sources>
+        <source organization="Agencia Estatal de Administración Tributaria (AEAT)" reference="Manual práctico IRPF 2021" url="https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2021/capitulo-15-calculo-impuesto-determinacion-integras/gravamen-base-liquidable-general/gravamen-estatal.html">Gravamen estatal de la base liquidable general, ejercicio 2021</source>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2020-17339" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2020-17339">Ley 11/2020: nuevo tramo estatal superior desde 2021</source>
+      </sources>
+      <brackets count="6">
+        <bracket index="1" marginalRatePct="9.5" openUpper="false" lowerOriginal="0" upperOriginal="12450" widthOriginal="12450" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="12450" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="5602.5"/>
+        <bracket index="2" marginalRatePct="12" openUpper="false" lowerOriginal="12450" upperOriginal="20200" widthOriginal="7750" quotaAtLowerOriginal="1182.75" lowerNominalEur="12450" upperNominalEur="20200" quotaAtLowerEur="1182.75" lowerRealEur1990="5602.5" upperRealEur1990="9090"/>
+        <bracket index="3" marginalRatePct="15" openUpper="false" lowerOriginal="20200" upperOriginal="35200" widthOriginal="15000" quotaAtLowerOriginal="2112.75" lowerNominalEur="20200" upperNominalEur="35200" quotaAtLowerEur="2112.75" lowerRealEur1990="9090" upperRealEur1990="15840"/>
+        <bracket index="4" marginalRatePct="18.5" openUpper="false" lowerOriginal="35200" upperOriginal="60000" widthOriginal="24800" quotaAtLowerOriginal="4362.75" lowerNominalEur="35200" upperNominalEur="60000" quotaAtLowerEur="4362.75" lowerRealEur1990="15840" upperRealEur1990="27000"/>
+        <bracket index="5" marginalRatePct="22.5" openUpper="false" lowerOriginal="60000" upperOriginal="300000" widthOriginal="240000" quotaAtLowerOriginal="8950.75" lowerNominalEur="60000" upperNominalEur="300000" quotaAtLowerEur="8950.75" lowerRealEur1990="27000" upperRealEur1990="135000"/>
+        <bracket index="6" marginalRatePct="24.5" openUpper="true" lowerOriginal="300000" quotaAtLowerOriginal="62950.75" lowerNominalEur="300000" quotaAtLowerEur="62950.75" lowerRealEur1990="135000"/>
+      </brackets>
+      <notes>
+        <note>Se incorpora el tramo estatal adicional desde 300.000 €, con tipo marginal estatal del 24,5 %.</note>
+      </notes>
+    </year>
+    <year value="2022" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.33" deflatorTo1990="0.4125" gdpPerCapitaNominalEur="28745.37" gdpPerCapitaRealEur1990="11857.465125">
+      <sources>
+        <source organization="Agencia Estatal de Administración Tributaria (AEAT)" reference="Manual práctico IRPF 2022" url="https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2022/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-estatal.html">Gravamen estatal de la base liquidable general, ejercicio 2022</source>
+      </sources>
+      <brackets count="6">
+        <bracket index="1" marginalRatePct="9.5" openUpper="false" lowerOriginal="0" upperOriginal="12450" widthOriginal="12450" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="12450" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="5135.625"/>
+        <bracket index="2" marginalRatePct="12" openUpper="false" lowerOriginal="12450" upperOriginal="20200" widthOriginal="7750" quotaAtLowerOriginal="1182.75" lowerNominalEur="12450" upperNominalEur="20200" quotaAtLowerEur="1182.75" lowerRealEur1990="5135.625" upperRealEur1990="8332.5"/>
+        <bracket index="3" marginalRatePct="15" openUpper="false" lowerOriginal="20200" upperOriginal="35200" widthOriginal="15000" quotaAtLowerOriginal="2112.75" lowerNominalEur="20200" upperNominalEur="35200" quotaAtLowerEur="2112.75" lowerRealEur1990="8332.5" upperRealEur1990="14520"/>
+        <bracket index="4" marginalRatePct="18.5" openUpper="false" lowerOriginal="35200" upperOriginal="60000" widthOriginal="24800" quotaAtLowerOriginal="4362.75" lowerNominalEur="35200" upperNominalEur="60000" quotaAtLowerEur="4362.75" lowerRealEur1990="14520" upperRealEur1990="24750"/>
+        <bracket index="5" marginalRatePct="22.5" openUpper="false" lowerOriginal="60000" upperOriginal="300000" widthOriginal="240000" quotaAtLowerOriginal="8950.75" lowerNominalEur="60000" upperNominalEur="300000" quotaAtLowerEur="8950.75" lowerRealEur1990="24750" upperRealEur1990="123750"/>
+        <bracket index="6" marginalRatePct="24.5" openUpper="true" lowerOriginal="300000" quotaAtLowerOriginal="62950.75" lowerNominalEur="300000" quotaAtLowerEur="62950.75" lowerRealEur1990="123750"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2023" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.32" deflatorTo1990="0.4" gdpPerCapitaNominalEur="30990.46" gdpPerCapitaRealEur1990="12396.184">
+      <sources>
+        <source organization="Agencia Estatal de Administración Tributaria (AEAT)" reference="Manual práctico IRPF 2023" url="https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2023/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-estatal.html">Gravamen estatal de la base liquidable general, ejercicio 2023</source>
+      </sources>
+      <brackets count="6">
+        <bracket index="1" marginalRatePct="9.5" openUpper="false" lowerOriginal="0" upperOriginal="12450" widthOriginal="12450" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="12450" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="4980"/>
+        <bracket index="2" marginalRatePct="12" openUpper="false" lowerOriginal="12450" upperOriginal="20200" widthOriginal="7750" quotaAtLowerOriginal="1182.75" lowerNominalEur="12450" upperNominalEur="20200" quotaAtLowerEur="1182.75" lowerRealEur1990="4980" upperRealEur1990="8080"/>
+        <bracket index="3" marginalRatePct="15" openUpper="false" lowerOriginal="20200" upperOriginal="35200" widthOriginal="15000" quotaAtLowerOriginal="2112.75" lowerNominalEur="20200" upperNominalEur="35200" quotaAtLowerEur="2112.75" lowerRealEur1990="8080" upperRealEur1990="14080"/>
+        <bracket index="4" marginalRatePct="18.5" openUpper="false" lowerOriginal="35200" upperOriginal="60000" widthOriginal="24800" quotaAtLowerOriginal="4362.75" lowerNominalEur="35200" upperNominalEur="60000" quotaAtLowerEur="4362.75" lowerRealEur1990="14080" upperRealEur1990="24000"/>
+        <bracket index="5" marginalRatePct="22.5" openUpper="false" lowerOriginal="60000" upperOriginal="300000" widthOriginal="240000" quotaAtLowerOriginal="8950.75" lowerNominalEur="60000" upperNominalEur="300000" quotaAtLowerEur="8950.75" lowerRealEur1990="24000" upperRealEur1990="120000"/>
+        <bracket index="6" marginalRatePct="24.5" openUpper="true" lowerOriginal="300000" quotaAtLowerOriginal="62950.75" lowerNominalEur="300000" quotaAtLowerEur="62950.75" lowerRealEur1990="120000"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2024" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.32" deflatorTo1990="0.4" gdpPerCapitaNominalEur="32610.54" gdpPerCapitaRealEur1990="13044.216">
+      <sources>
+        <source organization="Agencia Estatal de Administración Tributaria (AEAT)" reference="Manual práctico IRPF 2024" url="https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2024/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-estatal.html">Gravamen estatal de la base liquidable general, ejercicio 2024</source>
+      </sources>
+      <brackets count="6">
+        <bracket index="1" marginalRatePct="9.5" openUpper="false" lowerOriginal="0" upperOriginal="12450" widthOriginal="12450" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="12450" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="4980"/>
+        <bracket index="2" marginalRatePct="12" openUpper="false" lowerOriginal="12450" upperOriginal="20200" widthOriginal="7750" quotaAtLowerOriginal="1182.75" lowerNominalEur="12450" upperNominalEur="20200" quotaAtLowerEur="1182.75" lowerRealEur1990="4980" upperRealEur1990="8080"/>
+        <bracket index="3" marginalRatePct="15" openUpper="false" lowerOriginal="20200" upperOriginal="35200" widthOriginal="15000" quotaAtLowerOriginal="2112.75" lowerNominalEur="20200" upperNominalEur="35200" quotaAtLowerEur="2112.75" lowerRealEur1990="8080" upperRealEur1990="14080"/>
+        <bracket index="4" marginalRatePct="18.5" openUpper="false" lowerOriginal="35200" upperOriginal="60000" widthOriginal="24800" quotaAtLowerOriginal="4362.75" lowerNominalEur="35200" upperNominalEur="60000" quotaAtLowerEur="4362.75" lowerRealEur1990="14080" upperRealEur1990="24000"/>
+        <bracket index="5" marginalRatePct="22.5" openUpper="false" lowerOriginal="60000" upperOriginal="300000" widthOriginal="240000" quotaAtLowerOriginal="8950.75" lowerNominalEur="60000" upperNominalEur="300000" quotaAtLowerEur="8950.75" lowerRealEur1990="24000" upperRealEur1990="120000"/>
+        <bracket index="6" marginalRatePct="24.5" openUpper="true" lowerOriginal="300000" quotaAtLowerOriginal="62950.75" lowerNominalEur="300000" quotaAtLowerEur="62950.75" lowerRealEur1990="120000"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2025" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.32" deflatorTo1990="0.4" gdpPerCapitaNominalEur="34213.53" gdpPerCapitaRealEur1990="13685.412" gdpStatus="estimacion_ameco_primavera_2026">
+      <sources>
+        <source organization="Agencia Estatal de Administración Tributaria (AEAT)" reference="Manual práctico IRPF 2025" url="https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-base-liquidable-general/gravamen-estatal.html">Gravamen estatal de la base liquidable general, ejercicio 2025</source>
+        <source organization="Comisión Europea, DG ECFIN" reference="AMECO HVGDP, Spring 2026 Forecast" url="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en">PIB a precios corrientes por habitante, España, 2025</source>
+      </sources>
+      <brackets count="6">
+        <bracket index="1" marginalRatePct="9.5" openUpper="false" lowerOriginal="0" upperOriginal="12450" widthOriginal="12450" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="12450" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="4980"/>
+        <bracket index="2" marginalRatePct="12" openUpper="false" lowerOriginal="12450" upperOriginal="20200" widthOriginal="7750" quotaAtLowerOriginal="1182.75" lowerNominalEur="12450" upperNominalEur="20200" quotaAtLowerEur="1182.75" lowerRealEur1990="4980" upperRealEur1990="8080"/>
+        <bracket index="3" marginalRatePct="15" openUpper="false" lowerOriginal="20200" upperOriginal="35200" widthOriginal="15000" quotaAtLowerOriginal="2112.75" lowerNominalEur="20200" upperNominalEur="35200" quotaAtLowerEur="2112.75" lowerRealEur1990="8080" upperRealEur1990="14080"/>
+        <bracket index="4" marginalRatePct="18.5" openUpper="false" lowerOriginal="35200" upperOriginal="60000" widthOriginal="24800" quotaAtLowerOriginal="4362.75" lowerNominalEur="35200" upperNominalEur="60000" quotaAtLowerEur="4362.75" lowerRealEur1990="14080" upperRealEur1990="24000"/>
+        <bracket index="5" marginalRatePct="22.5" openUpper="false" lowerOriginal="60000" upperOriginal="300000" widthOriginal="240000" quotaAtLowerOriginal="8950.75" lowerNominalEur="60000" upperNominalEur="300000" quotaAtLowerEur="8950.75" lowerRealEur1990="24000" upperRealEur1990="120000"/>
+        <bracket index="6" marginalRatePct="24.5" openUpper="true" lowerOriginal="300000" quotaAtLowerOriginal="62950.75" lowerNominalEur="300000" quotaAtLowerEur="62950.75" lowerRealEur1990="120000"/>
+      </brackets>
+      <notes/>
+    </year>
+    <year value="2026" exerciseStatus="vigente_a_2026-07-29" legalScope="escala_estatal_general" sourceStatus="norma_consolidada_vigente_a_fecha_de_corte" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.32" deflatorTo1990="0.4" gdpPerCapitaNominalEur="35630.85" gdpPerCapitaRealEur1990="14252.34" gdpStatus="prevision_ameco_primavera_2026">
+      <sources>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2006-20764" url="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764">Ley 35/2006, artículo 63, texto consolidado vigente a 2026-07-29</source>
+        <source organization="Comisión Europea, DG ECFIN" reference="AMECO HVGDP, Spring 2026 Forecast" url="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en">PIB a precios corrientes por habitante, España, previsión 2026</source>
+      </sources>
+      <brackets count="6">
+        <bracket index="1" marginalRatePct="9.5" openUpper="false" lowerOriginal="0" upperOriginal="12450" widthOriginal="12450" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="12450" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="4980"/>
+        <bracket index="2" marginalRatePct="12" openUpper="false" lowerOriginal="12450" upperOriginal="20200" widthOriginal="7750" quotaAtLowerOriginal="1182.75" lowerNominalEur="12450" upperNominalEur="20200" quotaAtLowerEur="1182.75" lowerRealEur1990="4980" upperRealEur1990="8080"/>
+        <bracket index="3" marginalRatePct="15" openUpper="false" lowerOriginal="20200" upperOriginal="35200" widthOriginal="15000" quotaAtLowerOriginal="2112.75" lowerNominalEur="20200" upperNominalEur="35200" quotaAtLowerEur="2112.75" lowerRealEur1990="8080" upperRealEur1990="14080"/>
+        <bracket index="4" marginalRatePct="18.5" openUpper="false" lowerOriginal="35200" upperOriginal="60000" widthOriginal="24800" quotaAtLowerOriginal="4362.75" lowerNominalEur="35200" upperNominalEur="60000" quotaAtLowerEur="4362.75" lowerRealEur1990="14080" upperRealEur1990="24000"/>
+        <bracket index="5" marginalRatePct="22.5" openUpper="false" lowerOriginal="60000" upperOriginal="300000" widthOriginal="240000" quotaAtLowerOriginal="8950.75" lowerNominalEur="60000" upperNominalEur="300000" quotaAtLowerEur="8950.75" lowerRealEur1990="24000" upperRealEur1990="120000"/>
+        <bracket index="6" marginalRatePct="24.5" openUpper="true" lowerOriginal="300000" quotaAtLowerOriginal="62950.75" lowerNominalEur="300000" quotaAtLowerEur="62950.75" lowerRealEur1990="120000"/>
+      </brackets>
+      <notes>
+        <note>Ejercicio en curso: escala vigente según el texto consolidado de la Ley 35/2006 a 2026-07-29; puede cambiar si una norma posterior produce efectos en 2026.</note>
+        <note>El PIB per cápita de 2026 es la previsión AMECO de primavera de 2026 y se identifica como tal en la página.</note>
+      </notes>
+    </year>
+  </years>
+</irpfDataset>

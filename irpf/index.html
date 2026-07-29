@@ -561,11 +561,6 @@
             <div class="seriesLegend" id="seriesLegend"></div>
           </div>
 
-          <div class="field">
-            <div class="label">Secuencia de datos</div>
-            <div class="segmented" id="dataSequenceButtons"></div>
-          </div>
-
         </div>
     </section>
 
@@ -620,39 +615,71 @@
   </main>
 
   <script src="renta_por_quintiles_data.js"></script>
-  <script src="irpf_chart_datasets.js"></script>
   <script>
+    (async () => {
+    const DATA_SOURCE = 'irpf_escala_estatal_1990-2026.xml';
 
-    const DATASETS = window.IRPF_CHART_DATASETS;
-    if (!DATASETS || !Array.isArray(DATASETS.original) || !Array.isArray(DATASETS.complete) || !Array.isArray(DATASETS.verified2026)) {
-      throw new Error('No se pudo cargar el dataset auditado del IRPF.');
+    function optionalNumber(element, attribute) {
+      const raw = element.getAttribute(attribute);
+      if (raw === null || raw === '') return null;
+      const value = Number(raw);
+      return Number.isFinite(value) ? value : null;
     }
-    let DATA = DATASETS.original;
 
-    const DATASET_DEFS = {
-      original: {
-        label: `Original · ${DATASETS.original.length} años`,
-        source: 'IRPF_tablas_1990-2023_completo.json',
-      },
-      complete: {
-        label: `Completa · ${DATASETS.complete.length} años`,
-        source: 'IRPF_tablas_1990-2023_completo.json',
-      },
-      verified2026: {
-        label: `Verificada · ${DATASETS.verified2026.length} años`,
-        source: 'IRPF_tramos_estatales_1990-2026_verificado.json',
-        csvSource: 'IRPF_tramos_estatales_1990-2026.csv',
-      },
-    };
+    async function loadIrpfXml(url) {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`No se pudo cargar ${url} (${response.status}).`);
+      const xml = new DOMParser().parseFromString(await response.text(), 'application/xml');
+      const parserError = xml.querySelector('parsererror');
+      if (parserError) throw new Error(`XML del IRPF no válido: ${parserError.textContent}`);
+
+      const records = Array.from(xml.querySelectorAll('years > year')).map(year => {
+        const bracketContainer = Array.from(year.children).find(child => child.tagName === 'brackets');
+        if (!bracketContainer) throw new Error(`Faltan tramos en el ejercicio ${year.getAttribute('value')}.`);
+        const brackets = Array.from(bracketContainer.children)
+          .filter(child => child.tagName === 'bracket')
+          .map(bracket => ({
+            index: Number(bracket.getAttribute('index')),
+            rate: optionalNumber(bracket, 'marginalRatePct'),
+            lower_original: optionalNumber(bracket, 'lowerOriginal'),
+            upper_original: optionalNumber(bracket, 'upperOriginal'),
+            lower_nominal_eur: optionalNumber(bracket, 'lowerNominalEur'),
+            upper_nominal_eur: optionalNumber(bracket, 'upperNominalEur'),
+            lower_real_eur_1990: optionalNumber(bracket, 'lowerRealEur1990'),
+            upper_real_eur_1990: optionalNumber(bracket, 'upperRealEur1990'),
+            is_open: bracket.getAttribute('openUpper') === 'true',
+          }));
+
+        return {
+          year: Number(year.getAttribute('value')),
+          regime: year.getAttribute('legalScope'),
+          deflator_hasta_1986: optionalNumber(year, 'deflatorTo1986'),
+          deflator_hasta_1990: optionalNumber(year, 'deflatorTo1990'),
+          original_currency: year.getAttribute('originalCurrency') === 'ESP' ? 'pesetas' : 'euros',
+          source_url: year.querySelector('sources > source')?.getAttribute('url') || '',
+          row_count: brackets.length,
+          finite_bracket_count: brackets.filter(bracket => !bracket.is_open).length,
+          gdp_pc_nominal_eur: optionalNumber(year, 'gdpPerCapitaNominalEur'),
+          gdp_pc_real_eur_1990: optionalNumber(year, 'gdpPerCapitaRealEur1990'),
+          gdp_status: year.getAttribute('gdpStatus') || 'observado',
+          brackets,
+        };
+      });
+
+      if (!records.length) throw new Error('El XML del IRPF no contiene ejercicios.');
+      return records;
+    }
+
+    const DATA = await loadIrpfXml(DATA_SOURCE);
 
     const INCOME_DISTRIBUTION = Array.isArray(window.IRPF_INCOME_DISTRIBUTION)
       ? window.IRPF_INCOME_DISTRIBUTION
       : [];
-    let YEARS = DATA.map(d => d.year);
-    let YEAR_MAP = new Map(DATA.map(d => [d.year, d]));
-    let MAX_TRAMOS = Math.max(...DATA.map(d => d.brackets.length));
+    const YEARS = DATA.map(d => d.year);
+    const YEAR_MAP = new Map(DATA.map(d => [d.year, d]));
+    const MAX_TRAMOS = Math.max(...DATA.map(d => d.brackets.length));
     const POPULATION_YEARS = INCOME_DISTRIBUTION.map(d => d.year);
-    let MAX_POPULATION_TRAMOS = Math.max(...DATA.map(d => d.brackets.length));
+    const MAX_POPULATION_TRAMOS = Math.max(...DATA.map(d => d.brackets.length));
 
     const PRESIDENT_BANDS = [
       { name:"Felipe González", start:1990, end:1996, color:"#552222" },
@@ -669,7 +696,6 @@
 
     const state = {
       chartMode: 'limits',
-      dataSequence: 'original',
       mode: 'nominal',
       scaleMode: 'log',
       visibleCount: 5,
@@ -746,17 +772,6 @@
       return Math.round(value).toLocaleString('es-ES');
     }
 
-    function dataSequenceLabel() {
-      return DATASET_DEFS[state.dataSequence].label;
-    }
-
-    function dataSequenceSourceLinks() {
-      const definition = DATASET_DEFS[state.dataSequence];
-      const jsonLink = `<a class="sourceLink" href="${definition.source}">${definition.source}</a>`;
-      if (!definition.csvSource) return jsonLink;
-      return `${jsonLink} + <a class="sourceLink" href="${definition.csvSource}">${definition.csvSource}</a>`;
-    }
-
     function getColor(index) {
       const hue = (index * 41) % 360;
       return `hsl(${hue} 78% 60%)`;
@@ -820,14 +835,16 @@
         return {
           year: distribution.year,
           adultPopulation: distribution.adultPopulation,
+          thresholdStatus: distribution.thresholdStatus || 'wid',
+          populationStatus: distribution.populationStatus || 'wid',
           sourceScheduleYear: schedule.year,
           tramos,
         };
       });
     }
 
-    let POPULATION_DATA = buildPopulationRecords();
-    let POPULATION_YEAR_MAP = new Map(POPULATION_DATA.map(d => [d.year, d]));
+    const POPULATION_DATA = buildPopulationRecords();
+    const POPULATION_YEAR_MAP = new Map(POPULATION_DATA.map(d => [d.year, d]));
 
     function valueField(which) {
       return state.mode === 'real1990'
@@ -881,7 +898,7 @@
       }).filter(Boolean);
     }
 
-    let RATE_EXTENT = (() => {
+    const RATE_EXTENT = (() => {
       const rates = DATA.flatMap(rec =>
         rec.brackets
           .filter(b => Number.isFinite(b.rate))
@@ -892,19 +909,6 @@
         max: Math.max(...rates)
       };
     })();
-
-    function refreshDatasetDerivedState() {
-      const wasShowingAll = state.visibleCount !== 5;
-      YEARS = DATA.map(record => record.year);
-      YEAR_MAP = new Map(DATA.map(record => [record.year, record]));
-      MAX_TRAMOS = Math.max(...DATA.map(record => record.brackets.length));
-      MAX_POPULATION_TRAMOS = Math.max(...DATA.map(record => record.brackets.length));
-      state.visibleCount = wasShowingAll ? MAX_TRAMOS : Math.min(5, MAX_TRAMOS);
-      const rates = DATA.flatMap(record => record.brackets.map(bracket => bracket.rate).filter(Number.isFinite));
-      RATE_EXTENT = { min: Math.min(...rates), max: Math.max(...rates) };
-      POPULATION_DATA = buildPopulationRecords();
-      POPULATION_YEAR_MAP = new Map(POPULATION_DATA.map(record => [record.year, record]));
-    }
 
     function rateRatio(rate) {
       const { min, max } = RATE_EXTENT;
@@ -1011,12 +1015,6 @@
         renderAll();
       });
 
-      buildSegmentedButtons('dataSequenceButtons', [
-        ...Object.entries(DATASET_DEFS).map(([key, definition]) => ({
-          key,
-          label: definition.label,
-        })),
-      ], state.dataSequence, setDataSequence);
     }
 
     function renderChartControls() {
@@ -1174,7 +1172,7 @@
       rows.push(`
         <div class="ttRow">
           <div class="ttDot" style="background:#ffffff"></div>
-          <div class="ttName">PIB per cápita</div>
+          <div class="ttName">PIB per cápita${yearRec.gdp_status === 'observado' ? '' : ' · estimación AMECO'}</div>
           <div class="ttVal">${money(getGDPValue(yearRec), 0)}</div>
         </div>
       `);
@@ -1366,7 +1364,7 @@
       }
       svg.innerHTML = out;
 
-      chartMeta.textContent = `${state.mode === 'real1990' ? 'Euros constantes de 1990' : 'Euros corrientes'} · Escala ${state.scaleMode === 'log' ? 'logarítmica' : 'lineal'} · Secuencia ${dataSequenceLabel().toLowerCase()}`;
+      chartMeta.textContent = `${state.mode === 'real1990' ? 'Euros constantes de 1990' : 'Euros corrientes'} · Escala ${state.scaleMode === 'log' ? 'logarítmica' : 'lineal'} · Serie anual verificada`;
       const missingRealYears = state.mode === 'real1990'
         ? DATA.filter(record => record.brackets.some(bracket => bracket.upper_nominal_eur !== null && bracket.upper_real_eur_1990 === null)).map(record => record.year)
         : [];
@@ -1440,11 +1438,17 @@
       const scheduleNote = record.sourceScheduleYear === record.year
         ? ''
         : ` · escala fiscal vigente desde ${record.sourceScheduleYear}`;
+      const estimateNote = record.thresholdStatus === 'wid'
+        ? 'Umbrales WID'
+        : 'Umbrales extrapolados con el crecimiento del PIB per cápita AMECO';
+      const populationNote = record.populationStatus === 'wid'
+        ? 'población WID'
+        : 'población extrapolada con AMECO';
       tooltip.innerHTML = `
         <div class="ttYear">${record.year}</div>
         <div class="subtle" style="margin-bottom:6px;">Población adulta: ${people(record.adultPopulation)}</div>
         ${rows.join('')}
-        <div class="subtle" style="margin-top:8px;">Estimación a partir de umbrales WID${scheduleNote}</div>`;
+        <div class="subtle" style="margin-top:8px;">${estimateNote} · ${populationNote}${scheduleNote}</div>`;
       tooltip.style.display = 'block';
 
       const rect = chartBox.getBoundingClientRect();
@@ -1523,32 +1527,29 @@
 
       out += `<text x="${plot.x}" y="${compact ? 27 : 19}" fill="#FEF702" font-size="${titleFont}" font-weight="700">Población adulta estimada por tramo del IRPF</text>`;
       if (!compact) {
-        out += `<text x="${plot.x + plot.w}" y="19" fill="#bfbfbf" font-size="${metaFont}" text-anchor="end">Adultos de 20 años o más · estimación WID</text>`;
+        out += `<text x="${plot.x + plot.w}" y="19" fill="#bfbfbf" font-size="${metaFont}" text-anchor="end">Adultos de 20 años o más · WID/AMECO</text>`;
       }
       svg.innerHTML = out;
       svg.setAttribute('aria-label', 'Gráfica de población adulta estimada por tramo del IRPF');
 
-      chartMeta.textContent = `Habitantes por tramo · Población adulta de 20 años o más · Secuencia ${dataSequenceLabel().toLowerCase()}`;
-      lineSummary.textContent = `Población adulta distribuida entre los tramos del IRPF · Secuencia ${dataSequenceLabel().toLowerCase()} · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}`;
+      chartMeta.textContent = 'Habitantes por tramo · Población adulta de 20 años o más · Serie anual verificada';
+      lineSummary.textContent = `Población adulta distribuida entre los tramos del IRPF · Serie anual verificada · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}`;
       rateEncodingNote.innerHTML = 'Cada columna apila el <strong>número estimado de habitantes</strong> de todos los tramos';
       topMeta.textContent = `${minYear}–${maxYear} · ${YEARS.length} escalas`;
     }
 
     function renderContextText() {
+      const xmlSource = `<a class="sourceLink" href="${DATA_SOURCE}">${DATA_SOURCE}</a>`;
       if (state.chartMode === 'limits') {
-        sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> (escala estatal del IRPF), ${dataSequenceSourceLinks()}, BM (PIB/deflactor) · <span style="opacity:.9;">N.Geolitics</span>`;
+        sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> y AEAT (escala estatal del IRPF), ${xmlSource}, BM (serie histórica) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (PIB 2025–2026) · <span style="opacity:.9;">N.Geolitics</span>`;
         explanationContent.innerHTML = `
-          <p>Cada serie representa la evolución del <strong>límite superior</strong> de un tramo de la escala estatal del IRPF. Un tramo abierto no tiene límite superior: la línea se interrumpe, aunque su tipo marginal estatal sigue apareciendo en el mapa de calor.</p>
-          <p>La vista permite comparar euros corrientes con <strong>euros constantes de 1990</strong>. El PIB per cápita utiliza la misma unidad seleccionada para que ambas magnitudes sean comparables.</p>
+          <p>Cada serie representa la evolución del <strong>límite superior</strong> de un tramo de la escala estatal del IRPF. Un tramo abierto no aporta un punto de límite superior; la línea conecta los ejercicios con límites válidos para mantener la continuidad temporal, mientras su tipo marginal estatal sigue apareciendo en el mapa de calor.</p>
+          <p>La vista permite comparar euros corrientes con <strong>euros constantes de 1990</strong>. El PIB per cápita utiliza la misma unidad seleccionada; los valores de 2025 y 2026 proceden de AMECO y 2026 es una previsión.</p>
           <p>La gráfica muestra el <strong>tipo marginal estatal</strong>. El tipo total soportado incluye el tramo autonómico y varía según la comunidad autónoma; no se calcula aquí un tipo total nacional único. Las bandas de fondo identifican el Gobierno de cada periodo.</p>`;
         return;
       }
-      sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta y población adulta), ${dataSequenceSourceLinks()} · <span style="opacity:.9;">N.Geolitics</span>`;
-        const scheduleMethod = state.dataSequence === 'verified2026'
-          ? 'La secuencia verificada aporta la escala estatal año a año hasta 2026; la población disponible llega hasta 2023.'
-          : state.dataSequence === 'complete'
-          ? 'La secuencia completa aporta una escala estatal para cada año del periodo.'
-          : 'Los años sin una nueva escala fiscal conservan la <strong>última escala disponible</strong>.';
+      sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta y población adulta) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (extrapolación 2025–2026), ${xmlSource} · <span style="opacity:.9;">N.Geolitics</span>`;
+      const scheduleMethod = 'La distribución de 2024 es WID; los umbrales de 2025–2026 se extrapolan con el crecimiento nominal del PIB per cápita AMECO. La población adulta de 2025 es WID y la de 2026 aplica el crecimiento de población AMECO.';
       explanationContent.innerHTML = `
         <p>La población se distribuye entre los límites legales del IRPF mediante los <strong>umbrales anuales de renta WID</strong> para P20, P40, P60, P80, P90 y P99.</p>
         <p>La estimación interpola la distribución entre esos percentiles y aplica una cola de Pareto por encima de P99. ${scheduleMethod}</p>
@@ -1601,17 +1602,9 @@
       renderAll();
     }
 
-    function setDataSequence(dataSequence) {
-      if (!DATASETS[dataSequence] || state.dataSequence === dataSequence) return;
-      state.dataSequence = dataSequence;
-      DATA = DATASETS[dataSequence];
-      refreshDatasetDerivedState();
-      resetChartInteraction();
-      renderAll();
-    }
-
     window.IRPF_TEST_API = {
-      setDataSequence,
+      getYears: () => [...YEARS],
+      getPopulationData: () => INCOME_DISTRIBUTION.map(record => ({ ...record })),
       getLimitSeries: index => getLimitSeries(index),
       getRateSeries: index => getRateSeries(index),
       getRateExtent: () => ({ ...RATE_EXTENT }),
@@ -1621,6 +1614,14 @@
         state.hoverYear = year;
         renderChart();
         renderLimitsTooltip(rect.left + (rect.width / 2), rect.top + 24);
+        return tooltip.textContent;
+      },
+      showPopulationTooltip(year) {
+        const rect = chartBox.getBoundingClientRect();
+        state.chartMode = 'population';
+        state.hoverYear = year;
+        renderChart();
+        renderPopulationTooltip(rect.left + (rect.width / 2), rect.top + 24);
         return tooltip.textContent;
       },
     };
@@ -1667,6 +1668,11 @@
     });
 
     renderAll();
+    })().catch(error => {
+      console.error(error);
+      const chartBox = document.getElementById('chartBox');
+      if (chartBox) chartBox.innerHTML = `<div class="loadError">No se pudieron cargar los datos del IRPF.</div>`;
+    });
   </script>
 </body>
 </html>

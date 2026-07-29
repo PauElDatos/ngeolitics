@@ -33,13 +33,12 @@ def normalized_text(value: str) -> str:
     return re.sub(r"\s+", " ", value.replace("\u00a0", " ")).strip()
 
 
-def check_sequence(page: Page, sequence: str) -> None:
-    page.evaluate("sequence => window.IRPF_TEST_API.setDataSequence(sequence)", sequence)
-    page.wait_for_timeout(50)
-
+def check_dataset(page: Page) -> None:
     model = page.evaluate(
         """
         () => ({
+          years: window.IRPF_TEST_API.getYears(),
+          population: window.IRPF_TEST_API.getPopulationData(),
           t4: window.IRPF_TEST_API.getLimitSeries(4),
           t5: window.IRPF_TEST_API.getLimitSeries(5),
           rate4: window.IRPF_TEST_API.getRateSeries(4),
@@ -50,6 +49,15 @@ def check_sequence(page: Page, sequence: str) -> None:
     t4_by_year = {point["year"]: point for point in model["t4"]}
     t5_by_year = {point["year"]: point for point in model["t5"]}
     rate4_by_year = {point["year"]: point for point in model["rate4"]}
+    population_by_year = {point["year"]: point for point in model["population"]}
+    assert model["years"] == list(range(1990, 2027))
+    assert sorted(population_by_year) == list(range(1990, 2027))
+    assert population_by_year[2025]["adultPopulation"] == 39265480
+    assert population_by_year[2025]["thresholdStatus"] == "ameco_extrapolation"
+    assert population_by_year[2025]["populationStatus"] == "wid"
+    assert population_by_year[2026]["adultPopulation"] == 39618870
+    assert population_by_year[2026]["thresholdStatus"] == "ameco_extrapolation"
+    assert population_by_year[2026]["populationStatus"] == "ameco_extrapolation"
     assert all(t4_by_year[year]["value"] is None for year in range(2007, 2011))
     for year in list(range(2003, 2011)) + list(range(2015, 2021)):
         if year in t5_by_year:
@@ -64,8 +72,8 @@ def check_sequence(page: Page, sequence: str) -> None:
 
     t4_path = page.locator('.limitSeries[data-tramo="4"]').get_attribute("d") or ""
     t5_path = page.locator('.limitSeries[data-tramo="5"]').get_attribute("d") or ""
-    assert t4_path.count("M") == 1, f"{sequence}: T4 path is not continuous"
-    assert t5_path.count("M") == 1, f"{sequence}: T5 path is not continuous"
+    assert t4_path.count("M") == 1, "T4 path is not continuous"
+    assert t5_path.count("M") == 1, "T5 path is not continuous"
 
     tooltip = normalized_text(
         page.evaluate("() => window.IRPF_TEST_API.showLimitsTooltip(2007)")
@@ -73,6 +81,19 @@ def check_sequence(page: Page, sequence: str) -> None:
     assert tooltip.count("Tramo ") == 4
     assert "Tramo 4 · desde 52.360 € · tipo marginal estatal 27,13 %" in tooltip
     assert "Tramo 5" not in tooltip
+
+    gdp_tooltip = normalized_text(
+        page.evaluate("() => window.IRPF_TEST_API.showLimitsTooltip(2026)")
+    )
+    assert "PIB per cápita · estimación AMECO 35.631 €" in gdp_tooltip
+
+    population_tooltip = normalized_text(
+        page.evaluate("() => window.IRPF_TEST_API.showPopulationTooltip(2026)")
+    )
+    assert "Población adulta: 39.618.870" in population_tooltip
+    assert "Umbrales extrapolados con el crecimiento del PIB per cápita AMECO" in population_tooltip
+    assert "población extrapolada con AMECO" in population_tooltip
+    page.evaluate("() => window.IRPF_TEST_API.showLimitsTooltip(2007)")
 
 
 def check_layout(page: Page) -> None:
@@ -133,28 +154,27 @@ def main() -> None:
             desktop.goto(url, wait_until="networkidle")
             desktop.locator('.limitSeries[data-tramo="4"]').wait_for()
             assert "Escala estatal del IRPF" in desktop.locator("h1").inner_text()
-            check_sequence(desktop, "original")
-            check_sequence(desktop, "complete")
-            check_sequence(desktop, "verified2026")
+            assert desktop.get_by_text("Secuencia de datos", exact=True).count() == 0
+            assert desktop.locator('a[href="irpf_escala_estatal_1990-2026.xml"]').count() == 1
+            check_dataset(desktop)
             check_all_visual_modes(desktop)
             check_layout(desktop)
             desktop.locator("#chartBox").dispatch_event("mouseleave")
             desktop.screenshot(
-                path=str(ARTIFACT_DIR / "desktop-complete.png"), full_page=True
+                path=str(ARTIFACT_DIR / "desktop-xml.png"), full_page=True
             )
 
             mobile = browser.new_page(viewport={"width": 390, "height": 844})
             mobile.on("pageerror", lambda error: errors.append(str(error)))
             mobile.goto(url, wait_until="networkidle")
             mobile.locator('.limitSeries[data-tramo="4"]').wait_for()
-            check_sequence(mobile, "original")
-            check_sequence(mobile, "complete")
-            check_sequence(mobile, "verified2026")
+            assert mobile.get_by_text("Secuencia de datos", exact=True).count() == 0
+            check_dataset(mobile)
             check_all_visual_modes(mobile)
             check_layout(mobile)
             mobile.locator("#chartBox").dispatch_event("mouseleave")
             mobile.screenshot(
-                path=str(ARTIFACT_DIR / "mobile-complete.png"), full_page=True
+                path=str(ARTIFACT_DIR / "mobile-xml.png"), full_page=True
             )
             browser.close()
     finally:
