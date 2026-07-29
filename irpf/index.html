@@ -551,11 +551,6 @@
             <div class="segmented" id="scaleButtons"></div>
           </div>
 
-          <div class="field" id="countField">
-            <div class="label">Tramos visibles</div>
-            <div class="segmented" id="countButtons"></div>
-          </div>
-
           <div class="field">
             <div class="label">Leyenda</div>
             <div class="seriesLegend" id="seriesLegend"></div>
@@ -617,7 +612,7 @@
   <script src="renta_por_quintiles_data.js"></script>
   <script>
     (async () => {
-    const DATA_SOURCE = 'irpf_escala_estatal_1990-2026.xml';
+    const DATA_SOURCE = 'irpf_escala_estatal_1990-2025.xml';
 
     function optionalNumber(element, attribute) {
       const raw = element.getAttribute(attribute);
@@ -698,7 +693,6 @@
       chartMode: 'limits',
       mode: 'nominal',
       scaleMode: 'log',
-      visibleCount: 5,
       showPresBands: true,
       hoverYear: null,
     };
@@ -716,7 +710,6 @@
     const btnChartPopulation = document.getElementById('btnChartPopulation');
     const amountField = document.getElementById('amountField');
     const scaleField = document.getElementById('scaleField');
-    const countField = document.getElementById('countField');
     const sourceFooter = document.getElementById('sourceFooter');
     const explanationContent = document.getElementById('explanationContent');
     const chartPanel = document.querySelector('.chartPanel');
@@ -861,8 +854,7 @@
     }
 
     function visibleTramos() {
-      const count = state.visibleCount === MAX_TRAMOS ? MAX_TRAMOS : Math.min(5, MAX_TRAMOS);
-      return Array.from({ length: count }, (_, i) => i + 1);
+      return Array.from({ length: MAX_TRAMOS }, (_, i) => i + 1);
     }
 
     function getLimitSeries(index) {
@@ -874,6 +866,7 @@
         return {
           year: rec.year,
           value: Number.isFinite(value) ? value : null,
+          lower: bracket ? getBracketValue(bracket, 'lower') : null,
           exists: Boolean(bracket),
           isOpen: Boolean(bracket && bracket.is_open),
         };
@@ -1006,15 +999,6 @@
         renderAll();
       });
 
-      buildSegmentedButtons('countButtons', [
-        { key: '5', label: 'Primeros 5' },
-        { key: String(MAX_TRAMOS), label: 'Todos' },
-      ], String(state.visibleCount), key => {
-        state.visibleCount = Number(key);
-        resetChartInteraction();
-        renderAll();
-      });
-
     }
 
     function renderChartControls() {
@@ -1031,7 +1015,6 @@
       btnChartPopulation.setAttribute('aria-pressed', showLimits ? 'false' : 'true');
       amountField.classList.toggle('isHidden', !showLimits);
       scaleField.classList.toggle('isHidden', !showLimits);
-      countField.classList.toggle('isHidden', !showLimits);
       chartPanel.classList.toggle('populationMode', !showLimits);
       document.body.classList.toggle('populationChartMode', !showLimits);
     }
@@ -1347,6 +1330,12 @@
         series.limitPoints.filter(p => Number.isFinite(p.value)).forEach(p => {
           out += pointMarkerSvg(x(p.year), y(p.value), series.color, state.hoverYear === p.year, compact);
         });
+        series.limitPoints.filter(p => p.isOpen && Number.isFinite(p.lower)).forEach(p => {
+          const cx = x(p.year);
+          const cy = y(p.lower);
+          const radius = state.hoverYear === p.year ? (compact ? 9 : 7) : (compact ? 7.5 : 5.5);
+          out += `<path class="openBracketPoint" data-year="${p.year}" data-tramo="${series.tramo}" d="M${cx},${cy - radius} L${cx + radius},${cy} L${cx},${cy + radius} L${cx - radius},${cy} Z" fill="#232323" stroke="${series.color}" stroke-width="${compact ? 3 : 2.2}"><title>Tramo ${series.tramo} abierto desde ${money(p.lower, 0)}</title></path>`;
+        });
       });
 
       if (gdpSeries.length) {
@@ -1541,15 +1530,15 @@
     function renderContextText() {
       const xmlSource = `<a class="sourceLink" href="${DATA_SOURCE}">${DATA_SOURCE}</a>`;
       if (state.chartMode === 'limits') {
-        sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> y AEAT (escala estatal del IRPF), ${xmlSource}, BM (serie histórica) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (PIB 2025–2026) · <span style="opacity:.9;">N.Geolitics</span>`;
+        sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> y AEAT (escala estatal del IRPF), ${xmlSource}, BM (serie histórica) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (PIB 2025) · <span style="opacity:.9;">N.Geolitics</span>`;
         explanationContent.innerHTML = `
-          <p>Cada serie representa la evolución del <strong>límite superior</strong> de un tramo de la escala estatal del IRPF. Un tramo abierto no aporta un punto de límite superior; la línea conecta los ejercicios con límites válidos para mantener la continuidad temporal, mientras su tipo marginal estatal sigue apareciendo en el mapa de calor.</p>
-          <p>La vista permite comparar euros corrientes con <strong>euros constantes de 1990</strong>. El PIB per cápita utiliza la misma unidad seleccionada; los valores de 2025 y 2026 proceden de AMECO y 2026 es una previsión.</p>
+          <p>Cada serie representa la evolución del <strong>límite superior</strong> de un tramo de la escala estatal del IRPF. Todos los tramos existentes se muestran: cuando el último tramo es abierto, un rombo marca su límite inferior sin atribuirle un techo inexistente. Las líneas conectan los ejercicios con límites superiores válidos y el mapa de calor conserva todos los tipos marginales.</p>
+          <p>La vista permite comparar euros corrientes con <strong>euros constantes de 1990</strong>. El PIB per cápita utiliza la misma unidad seleccionada; el valor de 2025 procede de AMECO.</p>
           <p>La gráfica muestra el <strong>tipo marginal estatal</strong>. El tipo total soportado incluye el tramo autonómico y varía según la comunidad autónoma; no se calcula aquí un tipo total nacional único. Las bandas de fondo identifican el Gobierno de cada periodo.</p>`;
         return;
       }
-      sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta y población adulta) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (extrapolación 2025–2026), ${xmlSource} · <span style="opacity:.9;">N.Geolitics</span>`;
-      const scheduleMethod = 'La distribución de 2024 es WID; los umbrales de 2025–2026 se extrapolan con el crecimiento nominal del PIB per cápita AMECO. La población adulta de 2025 es WID y la de 2026 aplica el crecimiento de población AMECO.';
+      sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta y población adulta) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (extrapolación 2025), ${xmlSource} · <span style="opacity:.9;">N.Geolitics</span>`;
+      const scheduleMethod = 'La distribución de 2024 es WID; los umbrales de 2025 se extrapolan con el crecimiento nominal del PIB per cápita AMECO. La población adulta de 2025 procede de WID.';
       explanationContent.innerHTML = `
         <p>La población se distribuye entre los límites legales del IRPF mediante los <strong>umbrales anuales de renta WID</strong> para P20, P40, P60, P80, P90 y P99.</p>
         <p>La estimación interpola la distribución entre esos percentiles y aplica una cola de Pareto por encima de P99. ${scheduleMethod}</p>

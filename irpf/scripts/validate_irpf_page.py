@@ -50,14 +50,11 @@ def check_dataset(page: Page) -> None:
     t5_by_year = {point["year"]: point for point in model["t5"]}
     rate4_by_year = {point["year"]: point for point in model["rate4"]}
     population_by_year = {point["year"]: point for point in model["population"]}
-    assert model["years"] == list(range(1990, 2027))
-    assert sorted(population_by_year) == list(range(1990, 2027))
+    assert model["years"] == list(range(1990, 2026))
+    assert sorted(population_by_year) == list(range(1990, 2026))
     assert population_by_year[2025]["adultPopulation"] == 39265480
     assert population_by_year[2025]["thresholdStatus"] == "ameco_extrapolation"
     assert population_by_year[2025]["populationStatus"] == "wid"
-    assert population_by_year[2026]["adultPopulation"] == 39618870
-    assert population_by_year[2026]["thresholdStatus"] == "ameco_extrapolation"
-    assert population_by_year[2026]["populationStatus"] == "ameco_extrapolation"
     assert all(t4_by_year[year]["value"] is None for year in range(2007, 2011))
     for year in list(range(2003, 2011)) + list(range(2015, 2021)):
         if year in t5_by_year:
@@ -69,6 +66,20 @@ def check_dataset(page: Page) -> None:
     assert page.locator('.rateHeatCell[data-year="2007"][data-tramo="4"]').count() == 1
     assert page.locator('.rateHeatCell[data-year="2007"][data-tramo="5"]').count() == 0
     assert page.locator(".rateHeatCell").count() > 0
+    assert page.locator('.rateHeatCell[data-year="2013"][data-tramo="7"]').count() == 1
+    assert page.locator('.rateHeatCell[data-year="1995"][data-tramo="18"]').count() == 1
+    heatmap_tramos = page.locator(".rateHeatCell").evaluate_all(
+        "nodes => [...new Set(nodes.map(node => Number(node.dataset.tramo)))].sort((a, b) => a - b)"
+    )
+    assert heatmap_tramos == list(range(1, 19))
+    assert page.locator('.openBracketPoint[data-year="2013"][data-tramo="7"]').count() == 1
+    assert page.locator('.openBracketPoint[data-year="2009"][data-tramo="4"]').count() == 1
+    assert page.locator('.openBracketPoint[data-year="1995"][data-tramo="18"]').count() == 1
+    represented_tramos = page.locator(".limitSeries, .openBracketPoint").evaluate_all(
+        "nodes => [...new Set(nodes.map(node => Number(node.dataset.tramo)))].sort((a, b) => a - b)"
+    )
+    assert represented_tramos == list(range(1, 19))
+    assert page.locator("#countButtons").count() == 0
 
     t4_path = page.locator('.limitSeries[data-tramo="4"]').get_attribute("d") or ""
     t5_path = page.locator('.limitSeries[data-tramo="5"]').get_attribute("d") or ""
@@ -83,16 +94,16 @@ def check_dataset(page: Page) -> None:
     assert "Tramo 5" not in tooltip
 
     gdp_tooltip = normalized_text(
-        page.evaluate("() => window.IRPF_TEST_API.showLimitsTooltip(2026)")
+        page.evaluate("() => window.IRPF_TEST_API.showLimitsTooltip(2025)")
     )
-    assert "PIB per cápita · estimación AMECO 35.631 €" in gdp_tooltip
+    assert "PIB per cápita · estimación AMECO 34.214 €" in gdp_tooltip
 
     population_tooltip = normalized_text(
-        page.evaluate("() => window.IRPF_TEST_API.showPopulationTooltip(2026)")
+        page.evaluate("() => window.IRPF_TEST_API.showPopulationTooltip(2025)")
     )
-    assert "Población adulta: 39.618.870" in population_tooltip
+    assert "Población adulta: 39.265.480" in population_tooltip
     assert "Umbrales extrapolados con el crecimiento del PIB per cápita AMECO" in population_tooltip
-    assert "población extrapolada con AMECO" in population_tooltip
+    assert "población WID" in population_tooltip
     page.evaluate("() => window.IRPF_TEST_API.showLimitsTooltip(2007)")
 
 
@@ -155,13 +166,13 @@ def main() -> None:
             desktop.locator('.limitSeries[data-tramo="4"]').wait_for()
             assert "Escala estatal del IRPF" in desktop.locator("h1").inner_text()
             assert desktop.get_by_text("Secuencia de datos", exact=True).count() == 0
-            assert desktop.locator('a[href="irpf_escala_estatal_1990-2026.xml"]').count() == 1
+            assert desktop.locator('a[href="irpf_escala_estatal_1990-2025.xml"]').count() == 1
             check_dataset(desktop)
             check_all_visual_modes(desktop)
             check_layout(desktop)
             desktop.locator("#chartBox").dispatch_event("mouseleave")
             desktop.screenshot(
-                path=str(ARTIFACT_DIR / "desktop-xml.png"), full_page=True
+                path=str(ARTIFACT_DIR / "desktop-2025.png"), full_page=True
             )
 
             mobile = browser.new_page(viewport={"width": 390, "height": 844})
@@ -174,7 +185,7 @@ def main() -> None:
             check_layout(mobile)
             mobile.locator("#chartBox").dispatch_event("mouseleave")
             mobile.screenshot(
-                path=str(ARTIFACT_DIR / "mobile-xml.png"), full_page=True
+                path=str(ARTIFACT_DIR / "mobile-2025.png"), full_page=True
             )
             browser.close()
     finally:

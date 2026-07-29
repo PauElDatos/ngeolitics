@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<irpfDataset schemaVersion="1.0.0" cutoffDate="2026-07-29" startYear="1990" endYear="2026" yearCount="37" scope="state-general-income-tax-scale">
+<irpfDataset schemaVersion="1.0.0" cutoffDate="2026-07-29" startYear="1990" endYear="2025" yearCount="36" scope="state-general-income-tax-scale">
   <metadata>
-    <title>Tramos nacionales/estatales del IRPF sobre la base liquidable general (España), 1990-2026</title>
+    <title>Tramos nacionales/estatales del IRPF sobre la base liquidable general (España), 1990-2025</title>
     <seriesDefinition>Escala general nacional unificada en 1990-1996 y escala estatal de la base liquidable general desde 1997.</seriesDefinition>
     <comparability>Desde la cesión del impuesto no existe una única escala total para toda España: el tipo total depende de la comunidad autónoma. Esta serie evita esa ambigüedad mostrando solo la parte estatal comparable.</comparability>
     <temporaryLevyMethod>Se suma el gravamen complementario temporal a la escala estatal ordinaria para obtener el tipo estatal marginal aplicable de cada intervalo.</temporaryLevyMethod>
     <currencyConversion from="ESP" to="EUR" pesetasPerEuro="166.386">Conversión informativa; los importes jurídicos originales se conservan.</currencyConversion>
     <realValueMethod baseYear="1990" baseDeflatorTo1986="0.8">importe_real_1990 = importe_nominal_eur × (deflactor_hasta_1986_del_año / deflactor_hasta_1986_de_1990)</realValueMethod>
-    <gdpMethod>PIB per cápita nominal en euros. Para 2025 y 2026 se usa AMECO, previsión de primavera de 2026 de la Comisión Europea; 2026 es una previsión, no un cierre estadístico.</gdpMethod>
+    <gdpMethod>PIB per cápita nominal en euros. Para 2025 se usa la estimación AMECO de primavera de 2026 de la Comisión Europea.</gdpMethod>
     <rawOrigin>Serie iniciada a partir de raw_irpf.rtf; huecos, extracciones defectuosas y errores materiales se corrigieron con BOE y AEAT antes de consolidar este XML.</rawOrigin>
     <exclusions>
       <exclusion>Escalas autonómicas o complementarias de las comunidades autónomas.</exclusion>
@@ -706,24 +706,6 @@
         <bracket index="6" marginalRatePct="24.5" openUpper="true" lowerOriginal="300000" quotaAtLowerOriginal="62950.75" lowerNominalEur="300000" quotaAtLowerEur="62950.75" lowerRealEur1990="120000"/>
       </brackets>
       <notes/>
-    </year>
-    <year value="2026" exerciseStatus="vigente_a_2026-07-29" legalScope="escala_estatal_general" sourceStatus="norma_consolidada_vigente_a_fecha_de_corte" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.32" deflatorTo1990="0.4" gdpPerCapitaNominalEur="35630.85" gdpPerCapitaRealEur1990="14252.34" gdpStatus="prevision_ameco_primavera_2026">
-      <sources>
-        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2006-20764" url="https://www.boe.es/buscar/act.php?id=BOE-A-2006-20764">Ley 35/2006, artículo 63, texto consolidado vigente a 2026-07-29</source>
-        <source organization="Comisión Europea, DG ECFIN" reference="AMECO HVGDP, Spring 2026 Forecast" url="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en">PIB a precios corrientes por habitante, España, previsión 2026</source>
-      </sources>
-      <brackets count="6">
-        <bracket index="1" marginalRatePct="9.5" openUpper="false" lowerOriginal="0" upperOriginal="12450" widthOriginal="12450" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="12450" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="4980"/>
-        <bracket index="2" marginalRatePct="12" openUpper="false" lowerOriginal="12450" upperOriginal="20200" widthOriginal="7750" quotaAtLowerOriginal="1182.75" lowerNominalEur="12450" upperNominalEur="20200" quotaAtLowerEur="1182.75" lowerRealEur1990="4980" upperRealEur1990="8080"/>
-        <bracket index="3" marginalRatePct="15" openUpper="false" lowerOriginal="20200" upperOriginal="35200" widthOriginal="15000" quotaAtLowerOriginal="2112.75" lowerNominalEur="20200" upperNominalEur="35200" quotaAtLowerEur="2112.75" lowerRealEur1990="8080" upperRealEur1990="14080"/>
-        <bracket index="4" marginalRatePct="18.5" openUpper="false" lowerOriginal="35200" upperOriginal="60000" widthOriginal="24800" quotaAtLowerOriginal="4362.75" lowerNominalEur="35200" upperNominalEur="60000" quotaAtLowerEur="4362.75" lowerRealEur1990="14080" upperRealEur1990="24000"/>
-        <bracket index="5" marginalRatePct="22.5" openUpper="false" lowerOriginal="60000" upperOriginal="300000" widthOriginal="240000" quotaAtLowerOriginal="8950.75" lowerNominalEur="60000" upperNominalEur="300000" quotaAtLowerEur="8950.75" lowerRealEur1990="24000" upperRealEur1990="120000"/>
-        <bracket index="6" marginalRatePct="24.5" openUpper="true" lowerOriginal="300000" quotaAtLowerOriginal="62950.75" lowerNominalEur="300000" quotaAtLowerEur="62950.75" lowerRealEur1990="120000"/>
-      </brackets>
-      <notes>
-        <note>Ejercicio en curso: escala vigente según el texto consolidado de la Ley 35/2006 a 2026-07-29; puede cambiar si una norma posterior produce efectos en 2026.</note>
-        <note>El PIB per cápita de 2026 es la previsión AMECO de primavera de 2026 y se identifica como tal en la página.</note>
-      </notes>
     </year>
   </years>
 </irpfDataset>

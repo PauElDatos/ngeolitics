@@ -9,7 +9,7 @@ from xml.etree import ElementTree as ET
 
 
 IRPF_DIR = Path(__file__).resolve().parents[1]
-XML_PATH = IRPF_DIR / "irpf_escala_estatal_1990-2026.xml"
+XML_PATH = IRPF_DIR / "irpf_escala_estatal_1990-2025.xml"
 PESETAS_PER_EURO = Decimal("166.386")
 
 
@@ -113,18 +113,20 @@ def main() -> None:
     assert root.tag == "irpfDataset"
     assert root.get("schemaVersion") == "1.0.0"
     assert root.get("cutoffDate") == "2026-07-29"
+    assert root.get("endYear") == "2025"
     assert root.get("scope") == "state-general-income-tax-scale"
 
     years = root.findall("./years/year")
-    expected_years = list(range(1990, 2027))
+    expected_years = list(range(1990, 2026))
     assert [int(year.get("value", "0")) for year in years] == expected_years
-    assert int(root.get("yearCount", "0")) == len(years) == 37
+    assert int(root.get("yearCount", "0")) == len(years) == 36
+    assert root.findtext("./metadata/title", "").endswith("1990-2025")
     for year in years:
         validate_year(year)
 
     by_year = {int(year.get("value", "0")): year for year in years}
     assert all(by_year[year].get("legalScope") == "escala_general_nacional_unificada" for year in range(1990, 1997))
-    assert all(by_year[year].get("legalScope") == "escala_estatal_general" for year in range(1997, 2027))
+    assert all(by_year[year].get("legalScope") == "escala_estatal_general" for year in range(1997, 2026))
 
     expected_2005 = [
         (Decimal("0"), Decimal("4080"), Decimal("9.06")),
@@ -158,12 +160,10 @@ def main() -> None:
         (Decimal("60000"), Decimal("300000"), Decimal("22.5")),
         (Decimal("300000"), None, Decimal("24.5")),
     ]
-    assert scale_signature(by_year[2026]) == expected_current
-    assert by_year[2026].get("exerciseStatus") == "vigente_a_2026-07-29"
-    assert by_year[2026].find("./sources/source").get("url", "").startswith("https://www.boe.es/")
+    assert scale_signature(by_year[2025]) == expected_current
+    assert by_year[2025].get("exerciseStatus") == "cerrado"
     expected_gdp = {
         2025: (Decimal("34213.53"), "estimacion_ameco_primavera_2026"),
-        2026: (Decimal("35630.85"), "prevision_ameco_primavera_2026"),
     }
     for value, (nominal, status) in expected_gdp.items():
         year = by_year[value]
@@ -175,7 +175,7 @@ def main() -> None:
     rates = [decimal(row, "marginalRatePct") for year in years for row in brackets(year)]
     assert Decimal("4400") not in rates
     assert min(rates) == Decimal("0") and max(rates) == Decimal("56")
-    print("IRPF XML validation passed (37 years; structure, arithmetic and historical corrections OK).")
+    print("IRPF XML validation passed (36 years; structure, arithmetic and historical corrections OK).")
 
 
 if __name__ == "__main__":
