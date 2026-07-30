@@ -70,8 +70,11 @@ def check_dataset(page: Page) -> None:
     assert model["rateRatios"][5] - model["rateRatios"][4] > 4 * (
         model["rateRatios"][2] - model["rateRatios"][1]
     )
-    assert abs(model["legendMidpointPosition"] - (model["rateRatios"][3] * 100)) < 1e-4
+    assert abs(model["legendMidpointPosition"] - 50) < 1e-4
     assert page.locator('.rateLegendGradient[data-scale="exponential"]').count() == 1
+    assert "linear-gradient" in page.locator(".rateLegendGradient").get_attribute("style")
+    assert page.locator('.rateHeatLegendCell[data-scale="exponential"]').count() == 24
+    assert page.locator('.rateHeatLegendTick[data-rate="28"]').count() == 1
     legend_label_gaps = page.evaluate(
         """
         () => {

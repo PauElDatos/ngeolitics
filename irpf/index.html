@@ -983,6 +983,16 @@
       return `rgb(${rgb.join(',')})`;
     }
 
+    function rateHeatGradientCss(steps = 32) {
+      const { min, max } = RATE_EXTENT;
+      const stops = Array.from({ length: steps }, (_, index) => {
+        const position = index / (steps - 1);
+        const rate = min + ((max - min) * position);
+        return `${rateHeatColor(rate)} ${(position * 100).toFixed(2)}%`;
+      });
+      return `linear-gradient(90deg, ${stops.join(',')})`;
+    }
+
     function buildSmoothPath(points, xFn, yFn) {
       if (!points.length) return '';
       if (points.length === 1) return `M${xFn(points[0].year)},${yFn(points[0].value)}`;
@@ -1052,7 +1062,7 @@
     function renderLegend() {
       if (state.chartMode === 'limits') {
         const midpoint = RATE_EXTENT.min + ((RATE_EXTENT.max - RATE_EXTENT.min) / 2);
-        const midpointPosition = rateRatio(midpoint) * 100;
+        const midpointPosition = ((midpoint - RATE_EXTENT.min) / (RATE_EXTENT.max - RATE_EXTENT.min)) * 100;
         const tramoItems = Array.from({ length: MAX_TRAMOS }, (_, i) => i + 1).map(n => `
           <div class="legendItem">
             <span class="legendSwatch" style="background:${getColor(n)}"></span>
@@ -1064,7 +1074,7 @@
           <div class="tramoLegendGrid">${tramoItems}</div>
           <div class="rateLegend">
             <div class="rateLegendTitle">Tipo marginal · mapa de calor exponencial</div>
-            <div class="rateLegendGradient" data-scale="exponential" aria-hidden="true"></div>
+            <div class="rateLegendGradient" data-scale="exponential" style="background:${rateHeatGradientCss()}" aria-hidden="true"></div>
             <div class="rateLegendScale">
               <span class="rateLegendTick isStart" data-rate="${RATE_EXTENT.min}" style="left:0%">${pct(RATE_EXTENT.min)}</span>
               <span class="rateLegendTick" data-rate="${midpoint}" style="left:${midpointPosition}%">${pct(midpoint)}</span>
@@ -1141,8 +1151,8 @@
       const width = compact ? 780 : 1600;
       const height = VIEWBOX_HEIGHT;
       const heatmapRowsHeight = MAX_TRAMOS * (compact ? 9 : 8);
-      const heatmapOffset = compact ? 68 : 52;
-      const heatmapLegendSpace = compact ? 38 : 32;
+      const heatmapOffset = compact ? 90 : 72;
+      const heatmapLegendSpace = compact ? 44 : 38;
       const heatmapReserve = heatmapOffset + heatmapRowsHeight + heatmapLegendSpace;
       const m = compact
         ? { top: 72, right: 28, bottom: heatmapReserve, left: 118 }
@@ -1263,11 +1273,15 @@
       const gradientX = heatmap.x + (compact ? 36 : 28);
       const steps = 24;
       const stepWidth = legendWidth / steps;
-      out += `<text x="${heatmap.x}" y="${legendY + legendHeight}" fill="#bfbfbf" font-size="${legendFont}">${RATE_EXTENT.min.toLocaleString('es-ES')}%</text>`;
+      const midpoint = RATE_EXTENT.min + ((RATE_EXTENT.max - RATE_EXTENT.min) / 2);
+      out += `<text class="rateHeatLegendTick" data-rate="${RATE_EXTENT.min}" x="${heatmap.x}" y="${legendY + legendHeight}" fill="#bfbfbf" font-size="${legendFont}">${RATE_EXTENT.min.toLocaleString('es-ES')}%</text>`;
       for (let index = 0; index < steps; index++) {
-        out += `<rect x="${gradientX + (index * stepWidth)}" y="${legendY}" width="${stepWidth + .4}" height="${legendHeight}" fill="${heatColorForRatio(index / (steps - 1))}"></rect>`;
+        const position = index / (steps - 1);
+        const rate = RATE_EXTENT.min + ((RATE_EXTENT.max - RATE_EXTENT.min) * position);
+        out += `<rect class="rateHeatLegendCell" data-scale="exponential" data-rate="${rate}" x="${gradientX + (index * stepWidth)}" y="${legendY}" width="${stepWidth + .4}" height="${legendHeight}" fill="${rateHeatColor(rate)}"></rect>`;
       }
-      out += `<text x="${gradientX + legendWidth + (compact ? 10 : 7)}" y="${legendY + legendHeight}" fill="#bfbfbf" font-size="${legendFont}">${RATE_EXTENT.max.toLocaleString('es-ES')}%</text>`;
+      out += `<text class="rateHeatLegendTick" data-rate="${midpoint}" x="${gradientX + (legendWidth / 2)}" y="${legendY + legendHeight + (compact ? 16 : 12)}" text-anchor="middle" fill="#bfbfbf" font-size="${legendFont}">${midpoint.toLocaleString('es-ES')}%</text>`;
+      out += `<text class="rateHeatLegendTick" data-rate="${RATE_EXTENT.max}" x="${gradientX + legendWidth + (compact ? 10 : 7)}" y="${legendY + legendHeight}" fill="#bfbfbf" font-size="${legendFont}">${RATE_EXTENT.max.toLocaleString('es-ES')}%</text>`;
       return out;
     }
 
