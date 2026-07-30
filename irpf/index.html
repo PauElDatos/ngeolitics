@@ -629,7 +629,7 @@
         </div>
 
         <div class="chartBox" id="chartBox">
-          <svg id="chart" viewBox="0 0 1600 760" preserveAspectRatio="none" aria-label="Gráfica de tramos del IRPF"></svg>
+          <svg id="chart" viewBox="0 0 1600 760" preserveAspectRatio="xMidYMid meet" aria-label="Gráfica de tramos del IRPF"></svg>
           <div class="tooltip" id="tooltip"></div>
         </div>
 
@@ -1146,10 +1146,18 @@
       return state.scaleMode === 'log' ? logTicks() : linearTicks(maxValue);
     }
 
+    function responsiveViewBoxWidth(height) {
+      const svgRect = svg.getBoundingClientRect();
+      const boxWidth = svgRect.width || chartBox.clientWidth;
+      const boxHeight = svgRect.height || chartBox.clientHeight;
+      if (!boxWidth || !boxHeight) return 1600;
+      return height * (boxWidth / boxHeight);
+    }
+
     function getChartGeometry() {
       const compact = chartBox.clientWidth < 720;
-      const width = compact ? 780 : 1600;
       const height = VIEWBOX_HEIGHT;
+      const width = responsiveViewBoxWidth(height);
       const heatmapRowsHeight = MAX_TRAMOS * (compact ? 9 : 8);
       const heatmapOffset = compact ? 90 : 72;
       const heatmapLegendSpace = compact ? 44 : 38;
@@ -1169,7 +1177,7 @@
     }
 
     function clientToLimitViewBox(clientX, clientY) {
-      const rect = chartBox.getBoundingClientRect();
+      const rect = svg.getBoundingClientRect();
       const { width, height } = getChartGeometry();
       const x = rect.width ? ((clientX - rect.left) / rect.width) * width : 0;
       const y = rect.height ? ((clientY - rect.top) / rect.height) * height : 0;
@@ -1435,8 +1443,8 @@
 
     function getPopulationGeometry() {
       const compact = chartBox.clientWidth < 720;
-      const width = compact ? 780 : 1600;
       const height = VIEWBOX_HEIGHT;
+      const width = responsiveViewBoxWidth(height);
       const m = compact
         ? { top: 48, right: 26, bottom: 78, left: 118 }
         : { top: 38, right: 34, bottom: 58, left: 92 };
@@ -1446,7 +1454,7 @@
     }
 
     function clientToPopulationViewBox(clientX, clientY) {
-      const rect = chartBox.getBoundingClientRect();
+      const rect = svg.getBoundingClientRect();
       const { width, height } = getPopulationGeometry();
       return {
         x: rect.width ? ((clientX - rect.left) / rect.width) * width : 0,

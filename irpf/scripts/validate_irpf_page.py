@@ -192,13 +192,23 @@ def check_layout(page: Page) -> None:
         """
         () => {
           const chart = document.querySelector('#chartBox').getBoundingClientRect();
+          const svg = document.querySelector('#chart');
+          const svgRect = svg.getBoundingClientRect();
+          const matrix = svg.getScreenCTM();
+          const viewBox = svg.viewBox.baseVal;
+          const scaleX = Math.hypot(matrix.a, matrix.b);
+          const scaleY = Math.hypot(matrix.c, matrix.d);
           return {
             overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
             chartWidth: chart.width,
             chartHeight: chart.height,
-            svgWidth: document.querySelector('#chart').getBoundingClientRect().width,
+            svgWidth: svgRect.width,
             surfaceCells: document.querySelectorAll('.fiscalSurfaceCell').length,
             heatCells: document.querySelectorAll('.rateHeatCell').length,
+            preserveAspectRatio: svg.getAttribute('preserveAspectRatio'),
+            scaleDifference: Math.abs(scaleX - scaleY),
+            viewBoxAspect: viewBox.width / viewBox.height,
+            renderedAspect: svgRect.width / svgRect.height,
           };
         }
         """
@@ -207,6 +217,9 @@ def check_layout(page: Page) -> None:
     assert metrics["chartWidth"] > 250 and metrics["chartHeight"] > 300, metrics
     assert metrics["svgWidth"] > 250 and metrics["surfaceCells"] > 0, metrics
     assert metrics["heatCells"] == metrics["surfaceCells"], metrics
+    assert metrics["preserveAspectRatio"] == "xMidYMid meet", metrics
+    assert metrics["scaleDifference"] < 0.001, metrics
+    assert abs(metrics["viewBoxAspect"] - metrics["renderedAspect"]) < 0.001, metrics
 
 
 def check_all_visual_modes(page: Page) -> None:
@@ -226,6 +239,18 @@ def check_all_visual_modes(page: Page) -> None:
     page.wait_for_timeout(50)
     assert "población adulta" in (page.locator("#chart").get_attribute("aria-label") or "")
     assert page.locator("#chart").bounding_box()["width"] > 250
+    population_scale = page.evaluate(
+        """
+        () => {
+          const matrix = document.querySelector('#chart').getScreenCTM();
+          return {
+            x: Math.hypot(matrix.a, matrix.b),
+            y: Math.hypot(matrix.c, matrix.d),
+          };
+        }
+        """
+    )
+    assert abs(population_scale["x"] - population_scale["y"]) < 0.001
 
     page.locator("#btnChartLimits").click()
     page.locator('#modeButtons button[data-key="nominal"]').click()
