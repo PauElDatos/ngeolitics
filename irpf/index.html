@@ -435,6 +435,22 @@
     }
     .rateLegendTick.isStart { transform: none; }
     .rateLegendTick.isEnd { transform: translateX(-100%); }
+    .legendGroupTitle {
+      color: var(--text);
+      font-size: calc(11px * var(--uiScale));
+      font-weight: 700;
+    }
+    .tramoLegendGrid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 6px;
+    }
+    .tramoLegendGrid .legendItem {
+      padding: 7px 8px;
+      gap: 7px;
+      border-radius: 8px;
+      font-size: calc(10px * var(--uiScale));
+    }
     .chartContent {
       min-height: 0;
       padding: 12px;
@@ -713,8 +729,9 @@
       : [];
     const YEARS = DATA.map(d => d.year);
     const YEAR_MAP = new Map(DATA.map(d => [d.year, d]));
+    const MAX_TRAMOS = Math.max(...DATA.map(d => d.brackets.length));
     const POPULATION_YEARS = INCOME_DISTRIBUTION.map(d => d.year);
-    const MAX_POPULATION_TRAMOS = Math.max(...DATA.map(d => d.brackets.length));
+    const MAX_POPULATION_TRAMOS = MAX_TRAMOS;
 
     const PRESIDENT_BANDS = [
       { name:"Felipe González", start:1990, end:1996, color:"#552222" },
@@ -952,7 +969,11 @@
     }
 
     function rateHeatColor(rate) {
-      const ratio = rateRatio(rate);
+      return heatColorForRatio(rateRatio(rate));
+    }
+
+    function heatColorForRatio(value) {
+      const ratio = Math.max(0, Math.min(1, value));
       const low = [37, 48, 71];
       const middle = [0, 213, 255];
       const high = [254, 247, 2];
@@ -1032,9 +1053,17 @@
       if (state.chartMode === 'limits') {
         const midpoint = RATE_EXTENT.min + ((RATE_EXTENT.max - RATE_EXTENT.min) / 2);
         const midpointPosition = rateRatio(midpoint) * 100;
+        const tramoItems = Array.from({ length: MAX_TRAMOS }, (_, i) => i + 1).map(n => `
+          <div class="legendItem">
+            <span class="legendSwatch" style="background:${getColor(n)}"></span>
+            <span>Tramo ${n}</span>
+          </div>
+        `).join('');
         seriesLegend.innerHTML = `
+          <div class="legendGroupTitle">Tramos · mapa principal</div>
+          <div class="tramoLegendGrid">${tramoItems}</div>
           <div class="rateLegend">
-            <div class="rateLegendTitle">Tipo marginal estatal · escala exponencial</div>
+            <div class="rateLegendTitle">Tipo marginal · mapa de calor exponencial</div>
             <div class="rateLegendGradient" data-scale="exponential" aria-hidden="true"></div>
             <div class="rateLegendScale">
               <span class="rateLegendTick isStart" data-rate="${RATE_EXTENT.min}" style="left:0%">${pct(RATE_EXTENT.min)}</span>
@@ -1111,12 +1140,22 @@
       const compact = chartBox.clientWidth < 720;
       const width = compact ? 780 : 1600;
       const height = VIEWBOX_HEIGHT;
+      const heatmapRowsHeight = MAX_TRAMOS * (compact ? 9 : 8);
+      const heatmapOffset = compact ? 68 : 52;
+      const heatmapLegendSpace = compact ? 38 : 32;
+      const heatmapReserve = heatmapOffset + heatmapRowsHeight + heatmapLegendSpace;
       const m = compact
-        ? { top: 72, right: 28, bottom: 78, left: 118 }
-        : { top: 62, right: 36, bottom: 62, left: 92 };
+        ? { top: 72, right: 28, bottom: heatmapReserve, left: 118 }
+        : { top: 62, right: 36, bottom: heatmapReserve, left: 92 };
       const plot = { x: m.left, y: m.top, w: width - m.left - m.right, h: height - m.top - m.bottom };
+      const heatmap = {
+        x: plot.x,
+        y: plot.y + plot.h + heatmapOffset,
+        w: plot.w,
+        h: heatmapRowsHeight,
+      };
       svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-      return { width, height, m, plot, compact };
+      return { width, height, m, plot, heatmap, compact };
     }
 
     function clientToLimitViewBox(clientX, clientY) {
@@ -1128,10 +1167,12 @@
     }
 
     function isInsideLimitInteractiveArea(clientX, clientY) {
-      const { plot } = getChartGeometry();
+      const { plot, heatmap } = getChartGeometry();
       const point = clientToLimitViewBox(clientX, clientY);
-      return point.x >= plot.x && point.x <= plot.x + plot.w
-        && point.y >= plot.y && point.y <= plot.y + plot.h;
+      const withinX = point.x >= plot.x && point.x <= plot.x + plot.w;
+      const withinPlot = point.y >= plot.y && point.y <= plot.y + plot.h;
+      const withinHeatmap = point.y >= heatmap.y && point.y <= heatmap.y + heatmap.h;
+      return withinX && (withinPlot || withinHeatmap);
     }
 
     function hideTooltip() {
@@ -1173,7 +1214,7 @@
             : `de ${money(lower, 0)} a ${money(upper, 0)}`;
         rows.push(`
           <div class="ttRow">
-            <div class="ttDot" style="background:${rateHeatColor(bracket.rate)}"></div>
+            <div class="ttDot" style="background:${getColor(n)}"></div>
             <div class="ttName">Tramo ${n} · ${range} · tipo marginal estatal ${pct(bracket.rate)}</div>
             <div class="ttVal"></div>
           </div>
@@ -1196,8 +1237,42 @@
       tooltip.style.top = top + 'px';
     }
 
+    function buildMarginalRateHeatmap(heatmap, xEdge, bandWidth, compact) {
+      const rowHeight = heatmap.h / MAX_TRAMOS;
+      const labelFont = Math.max(7, Math.min(compact ? 14 : 10, rowHeight * .72));
+      const titleFont = compact ? 16 : 11;
+      const legendFont = compact ? 14 : 10;
+      let out = `<text x="${heatmap.x}" y="${heatmap.y - 10}" fill="#FEF702" font-size="${titleFont}" font-weight="700">TIPO MARGINAL ESTATAL · MAPA DE CALOR EXPONENCIAL</text>`;
+
+      for (let tramo = 1; tramo <= MAX_TRAMOS; tramo++) {
+        const visualRow = MAX_TRAMOS - tramo;
+        const rowY = heatmap.y + (visualRow * rowHeight);
+        out += `<rect x="${heatmap.x}" y="${rowY}" width="${heatmap.w}" height="${rowHeight}" fill="rgba(255,255,255,.025)" stroke="rgba(255,255,255,.07)" stroke-width=".7"></rect>`;
+        out += `<text x="${heatmap.x - 10}" y="${rowY + (rowHeight * .72)}" text-anchor="end" fill="#bfbfbf" font-size="${labelFont}" font-weight="700">T${tramo}</text>`;
+
+        DATA.forEach(record => {
+          const bracket = record.brackets.find(item => item.index === tramo);
+          if (!bracket || !Number.isFinite(bracket.rate)) return;
+          out += `<rect class="rateHeatCell" data-year="${record.year}" data-tramo="${tramo}" data-rate="${bracket.rate}" x="${xEdge(record.year)}" y="${rowY + .55}" width="${bandWidth + .15}" height="${Math.max(1, rowHeight - 1.1)}" fill="${rateHeatColor(bracket.rate)}"><title>${record.year} · Tramo ${tramo} · tipo marginal estatal ${pct(bracket.rate)}</title></rect>`;
+        });
+      }
+
+      const legendY = heatmap.y + heatmap.h + (compact ? 13 : 10);
+      const legendHeight = compact ? 10 : 8;
+      const legendWidth = compact ? 220 : 170;
+      const gradientX = heatmap.x + (compact ? 36 : 28);
+      const steps = 24;
+      const stepWidth = legendWidth / steps;
+      out += `<text x="${heatmap.x}" y="${legendY + legendHeight}" fill="#bfbfbf" font-size="${legendFont}">${RATE_EXTENT.min.toLocaleString('es-ES')}%</text>`;
+      for (let index = 0; index < steps; index++) {
+        out += `<rect x="${gradientX + (index * stepWidth)}" y="${legendY}" width="${stepWidth + .4}" height="${legendHeight}" fill="${heatColorForRatio(index / (steps - 1))}"></rect>`;
+      }
+      out += `<text x="${gradientX + legendWidth + (compact ? 10 : 7)}" y="${legendY + legendHeight}" fill="#bfbfbf" font-size="${legendFont}">${RATE_EXTENT.max.toLocaleString('es-ES')}%</text>`;
+      return out;
+    }
+
     function renderFiscalMap() {
-      const { width, height, plot, compact } = getChartGeometry();
+      const { width, height, plot, heatmap, compact } = getChartGeometry();
       const minYear = Math.min(...YEARS);
       const maxYear = Math.max(...YEARS);
       const bandWidth = plot.w / YEARS.length;
@@ -1263,7 +1338,7 @@
             : bracket.index === 1
               ? `hasta ${money(legalUpper, 0)}`
               : `de ${money(lower, 0)} a ${money(legalUpper, 0)}`;
-          surface += `<rect class="fiscalSurfaceCell" data-year="${record.year}" data-tramo="${bracket.index}" data-rate="${bracket.rate}" data-open="${bracket.is_open ? 'true' : 'false'}" data-lower="${lower}" data-upper="${bracket.is_open ? '' : legalUpper}" x="${cellX}" y="${top}" width="${bandWidth + .15}" height="${Math.max(0, bottom - top)}" fill="${rateHeatColor(bracket.rate)}" stroke="rgba(0,0,0,.24)" stroke-width=".45"><title>${record.year} · Tramo ${bracket.index} · ${range} · tipo marginal estatal ${pct(bracket.rate)}</title></rect>`;
+          surface += `<rect class="fiscalSurfaceCell" data-year="${record.year}" data-tramo="${bracket.index}" data-rate="${bracket.rate}" data-open="${bracket.is_open ? 'true' : 'false'}" data-lower="${lower}" data-upper="${bracket.is_open ? '' : legalUpper}" x="${cellX}" y="${top}" width="${bandWidth + .15}" height="${Math.max(0, bottom - top)}" fill="${getColor(bracket.index)}" stroke="rgba(0,0,0,.28)" stroke-width=".45"><title>${record.year} · Tramo ${bracket.index} · ${range} · tipo marginal estatal ${pct(bracket.rate)}</title></rect>`;
           if (!bracket.is_open && legalUpper >= yMin && legalUpper <= yMax) {
             boundaries += `<line class="taxBoundary" data-year="${record.year}" data-tramo="${bracket.index}" x1="${cellX}" y1="${y(legalUpper)}" x2="${cellX + bandWidth}" y2="${y(legalUpper)}" stroke="rgba(255,255,255,.68)" stroke-width="${compact ? 1.8 : 1.1}"></line>`;
           }
@@ -1293,6 +1368,7 @@
       });
       out += `<line x1="${plot.x + plot.w}" y1="${plot.y}" x2="${plot.x + plot.w}" y2="${plot.y + plot.h}" stroke="rgba(0,0,0,.20)" stroke-width=".7"></line>`;
       out += boundaries;
+      out += buildMarginalRateHeatmap(heatmap, xEdge, bandWidth, compact);
 
       if (state.showPresBands) {
         const stripHeight = compact ? 26 : 22;
@@ -1321,24 +1397,25 @@
       if (state.hoverYear) {
         const hoverX = xEdge(state.hoverYear);
         out += `<rect class="hoverYearColumn" data-year="${state.hoverYear}" x="${hoverX}" y="${plot.y}" width="${bandWidth}" height="${plot.h}" fill="rgba(254,247,2,.05)" stroke="rgba(254,247,2,.85)" stroke-width="${compact ? 2.2 : 1.4}"></rect>`;
+        out += `<rect class="hoverHeatmapColumn" data-year="${state.hoverYear}" x="${hoverX}" y="${heatmap.y}" width="${bandWidth}" height="${heatmap.h}" fill="rgba(254,247,2,.05)" stroke="rgba(254,247,2,.85)" stroke-width="${compact ? 2.2 : 1.4}"></rect>`;
       }
 
-      out += `<text x="${plot.x}" y="${compact ? 24 : 18}" fill="#FEF702" font-size="${titleFont}" font-weight="700">Mapa fiscal del IRPF: base liquidable y tipo marginal estatal</text>`;
+      out += `<text x="${plot.x}" y="${compact ? 24 : 18}" fill="#FEF702" font-size="${titleFont}" font-weight="700">Mapa fiscal del IRPF: intervalos y fronteras de los tramos</text>`;
       if (!compact) {
         out += `<text x="${plot.x + plot.w}" y="18" fill="#bfbfbf" font-size="${metaFont}" text-anchor="end">${state.scaleMode === 'log' ? 'Escala logarítmica' : 'Escala lineal'} · ${state.mode === 'real1990' ? 'euros constantes de 1990' : 'euros corrientes'}</text>`;
       }
       svg.innerHTML = out;
 
-      svg.setAttribute('aria-label', 'Mapa fiscal de la escala estatal del IRPF por año, base liquidable y tipo marginal');
-      chartMeta.textContent = `Mapa fiscal · ${state.mode === 'real1990' ? 'Euros constantes de 1990' : 'Euros corrientes'} · Escala ${state.scaleMode === 'log' ? 'logarítmica' : 'lineal'} · Serie anual verificada`;
+      svg.setAttribute('aria-label', 'Mapa fiscal de los tramos estatales del IRPF con subgráfica de tipos marginales');
+      chartMeta.textContent = `Mapa de tramos + calor marginal · ${state.mode === 'real1990' ? 'Euros constantes de 1990' : 'Euros corrientes'} · Escala ${state.scaleMode === 'log' ? 'logarítmica' : 'lineal'} · Serie anual verificada`;
       const missingRealYears = state.mode === 'real1990'
         ? DATA.filter(record => record.brackets.some(bracket => bracket.upper_nominal_eur !== null && bracket.upper_real_eur_1990 === null)).map(record => record.year)
         : [];
       const realDataNote = missingRealYears.length
         ? ` · Sin deflactor disponible: ${missingRealYears.join(', ')}`
         : '';
-      lineSummary.textContent = `${YEARS.length} columnas anuales · Todos los intervalos fiscales · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}${realDataNote}`;
-      rateEncodingNote.innerHTML = `Color exponencial: <strong>tipo marginal estatal (${RATE_EXTENT.min.toLocaleString('es-ES')}%–${RATE_EXTENT.max.toLocaleString('es-ES')}%)</strong> · Línea blanca: <strong>PIB per cápita</strong>`;
+      lineSummary.textContent = `Mapa principal: tramos por color · ${YEARS.length} columnas anuales · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}${realDataNote}`;
+      rateEncodingNote.innerHTML = `Subgráfica exponencial: <strong>tipo marginal estatal (${RATE_EXTENT.min.toLocaleString('es-ES')}%–${RATE_EXTENT.max.toLocaleString('es-ES')}%)</strong> · Línea blanca: <strong>PIB per cápita</strong>`;
       topMeta.textContent = `${Math.min(...YEARS)}–${Math.max(...YEARS)} · ${YEARS.length} años`;
     }
 
@@ -1509,9 +1586,9 @@
       if (state.chartMode === 'limits') {
         sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> y AEAT (escala estatal del IRPF), ${xmlSource}, BM (serie histórica) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (PIB 2025) · <span style="opacity:.9;">N.Geolitics</span>`;
         explanationContent.innerHTML = `
-          <p>El mapa fiscal divide cada año en los <strong>intervalos reales de base liquidable</strong> de su escala estatal. La altura expresa el rango monetario y el color su tipo marginal. El último tramo se extiende desde su umbral hasta la parte superior del eje porque legalmente continúa en adelante.</p>
+          <p>El mapa principal divide cada año en los <strong>intervalos reales de base liquidable</strong> de su escala estatal. La altura expresa el rango monetario y cada número de tramo mantiene un color categórico. El último tramo se extiende desde su umbral hasta la parte superior del eje porque legalmente continúa en adelante.</p>
           <p>La vista permite comparar euros corrientes con <strong>euros constantes de 1990</strong>. El PIB per cápita utiliza la misma unidad seleccionada; el valor de 2025 procede de AMECO.</p>
-          <p>Cada columna se calcula de forma independiente, sin interpolar tramos entre reformas. Las líneas claras marcan fronteras legales existentes y la escala cromática representa el <strong>tipo marginal estatal</strong>. El tipo total incluye el tramo autonómico y varía según la comunidad autónoma.</p>`;
+          <p>Cada columna se calcula de forma independiente, sin interpolar tramos entre reformas. Las líneas claras marcan fronteras legales existentes. La subgráfica inferior conserva todos los tramos históricos y representa el <strong>tipo marginal estatal</strong> con una escala cromática exponencial. El tipo total incluye el tramo autonómico y varía según la comunidad autónoma.</p>`;
         return;
       }
       sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta y población adulta) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (extrapolación 2025), ${xmlSource} · <span style="opacity:.9;">N.Geolitics</span>`;

@@ -97,7 +97,33 @@ def check_dataset(page: Page) -> None:
         "nodes => [...new Set(nodes.map(node => Number(node.dataset.tramo)))].sort((a, b) => a - b)"
     )
     assert surface_tramos == list(range(1, 19))
-    assert page.locator(".limitSeries, .rateHeatCell, .openBracketPoint").count() == 0
+    assert page.locator(".limitSeries, .openBracketPoint").count() == 0
+    assert page.locator('.rateHeatCell[data-year="2007"][data-tramo="4"]').count() == 1
+    assert page.locator('.rateHeatCell[data-year="2007"][data-tramo="5"]').count() == 0
+    assert page.locator('.rateHeatCell[data-year="2013"][data-tramo="7"]').count() == 1
+    assert page.locator('.rateHeatCell[data-year="1995"][data-tramo="18"]').count() == 1
+    heatmap_tramos = page.locator(".rateHeatCell").evaluate_all(
+        "nodes => [...new Set(nodes.map(node => Number(node.dataset.tramo)))].sort((a, b) => a - b)"
+    )
+    assert heatmap_tramos == list(range(1, 19))
+    surface_colors = page.evaluate(
+        """
+        () => {
+          const colorsByTramo = {};
+          document.querySelectorAll('.fiscalSurfaceCell').forEach(node => {
+            const tramo = node.dataset.tramo;
+            if (!colorsByTramo[tramo]) colorsByTramo[tramo] = new Set();
+            colorsByTramo[tramo].add(node.getAttribute('fill'));
+          });
+          return Object.fromEntries(
+            Object.entries(colorsByTramo).map(([tramo, colors]) => [tramo, [...colors]])
+          );
+        }
+        """
+    )
+    assert sorted(int(tramo) for tramo in surface_colors) == list(range(1, 19))
+    assert all(len(colors) == 1 for colors in surface_colors.values())
+    assert len({colors[0] for colors in surface_colors.values()}) == 18
     assert page.locator('.fiscalSurfaceCell[data-open="true"]').count() == 36
     annual_structure = page.evaluate(
         """
@@ -105,14 +131,17 @@ def check_dataset(page: Page) -> None:
           .map(year => ({
             year: Number(year),
             cells: document.querySelectorAll(`.fiscalSurfaceCell[data-year="${year}"]`).length,
+            heatCells: document.querySelectorAll(`.rateHeatCell[data-year="${year}"]`).length,
             boundaries: document.querySelectorAll(`.taxBoundary[data-year="${year}"]`).length,
             open: document.querySelectorAll(`.fiscalSurfaceCell[data-year="${year}"][data-open="true"]`).length,
           }))
         """
     )
     assert all(row["boundaries"] == row["cells"] - 1 for row in annual_structure)
+    assert all(row["heatCells"] == row["cells"] for row in annual_structure)
     assert all(row["open"] == 1 for row in annual_structure)
     assert page.locator('.fiscalSurfaceCell[data-year="2008"]').count() == 4
+    assert page.locator('.rateHeatCell[data-year="2008"]').count() == 4
     assert page.locator('.taxBoundary[data-year="2008"]').count() == 3
     open_2008 = page.locator('.fiscalSurfaceCell[data-year="2008"][data-tramo="4"]')
     assert open_2008.get_attribute("data-open") == "true"
@@ -166,6 +195,7 @@ def check_layout(page: Page) -> None:
             chartHeight: chart.height,
             svgWidth: document.querySelector('#chart').getBoundingClientRect().width,
             surfaceCells: document.querySelectorAll('.fiscalSurfaceCell').length,
+            heatCells: document.querySelectorAll('.rateHeatCell').length,
           };
         }
         """
@@ -173,17 +203,20 @@ def check_layout(page: Page) -> None:
     assert metrics["overflow"] <= 1, metrics
     assert metrics["chartWidth"] > 250 and metrics["chartHeight"] > 300, metrics
     assert metrics["svgWidth"] > 250 and metrics["surfaceCells"] > 0, metrics
+    assert metrics["heatCells"] == metrics["surfaceCells"], metrics
 
 
 def check_all_visual_modes(page: Page) -> None:
     page.locator('#modeButtons button[data-key="real1990"]').click()
     page.wait_for_timeout(50)
     assert page.locator(".fiscalSurfaceCell").count() > 0
+    assert page.locator(".rateHeatCell").count() > 0
     assert page.locator('.fiscalSurfaceCell[data-year="2008"][data-tramo="4"]').count() == 1
 
     page.locator('#scaleButtons button[data-key="linear"]').click()
     page.wait_for_timeout(50)
     assert page.locator(".fiscalSurfaceCell").count() > 0
+    assert page.locator(".rateHeatCell").count() > 0
     page.locator('#scaleButtons button[data-key="log"]').click()
 
     page.locator("#btnChartPopulation").click()
@@ -195,6 +228,7 @@ def check_all_visual_modes(page: Page) -> None:
     page.locator('#modeButtons button[data-key="nominal"]').click()
     page.wait_for_timeout(50)
     assert page.locator(".fiscalSurfaceCell").count() > 0
+    assert page.locator(".rateHeatCell").count() > 0
 
 
 def main() -> None:
