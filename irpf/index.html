@@ -1727,10 +1727,20 @@
       renderTooltip(ev.clientX, ev.clientY);
     });
 
-    window.addEventListener('resize', () => {
-      renderChart();
-      if (!state.hoverYear) hideTooltip();
-    });
+    let chartResizeFrame = 0;
+    const scheduleResponsiveChartRender = () => {
+      cancelAnimationFrame(chartResizeFrame);
+      chartResizeFrame = requestAnimationFrame(() => {
+        renderChart();
+        if (!state.hoverYear) hideTooltip();
+      });
+    };
+
+    window.addEventListener('resize', scheduleResponsiveChartRender);
+    if ('ResizeObserver' in window) {
+      const chartResizeObserver = new ResizeObserver(scheduleResponsiveChartRender);
+      chartResizeObserver.observe(chartBox);
+    }
 
     renderAll();
     })().catch(error => {
