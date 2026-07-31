@@ -783,7 +783,9 @@
 
     const VIEWBOX_HEIGHT = 760;
     const LOG_AXIS_MIN = 1_000;
-    const LOG_AXIS_MAX = 1_000_000;
+    const FISCAL_AXIS_MAX = 500_000;
+    const POPULATION_AXIS_MAX = 45_000_000;
+    const POPULATION_AXIS_STEP = 5_000_000;
 
     function euroShort(v) {
       if (!Number.isFinite(v)) return '—';
@@ -1105,7 +1107,7 @@
     function yTransform(v) {
       if (!Number.isFinite(v)) return NaN;
       if (state.scaleMode === 'log') {
-        return Math.log10(Math.min(LOG_AXIS_MAX, Math.max(LOG_AXIS_MIN, v)));
+        return Math.log10(Math.min(FISCAL_AXIS_MAX, Math.max(LOG_AXIS_MIN, v)));
       }
       return v;
     }
@@ -1135,10 +1137,10 @@
         const base = Math.pow(10, p);
         for (const m of [1, 2, 5]) {
           const v = m * base;
-          if (v >= LOG_AXIS_MIN && v <= LOG_AXIS_MAX) ticks.push(v);
+          if (v >= LOG_AXIS_MIN && v <= FISCAL_AXIS_MAX) ticks.push(v);
         }
       }
-      if (!ticks.includes(LOG_AXIS_MAX)) ticks.push(LOG_AXIS_MAX);
+      if (!ticks.includes(FISCAL_AXIS_MAX)) ticks.push(FISCAL_AXIS_MAX);
       return Array.from(new Set(ticks)).sort((a, b) => a - b);
     }
 
@@ -1321,18 +1323,16 @@
       if (state.scaleMode === 'log') {
         ticks = currentTicks(maxValue);
         yMin = LOG_AXIS_MIN;
-        yMax = LOG_AXIS_MAX;
+        yMax = FISCAL_AXIS_MAX;
       } else {
-        maxValue = Math.max(1, maxValue * 1.08);
-        ticks = currentTicks(maxValue);
-        if (!ticks.length) ticks = [0, maxValue];
-        yMax = ticks[ticks.length - 1] || maxValue;
+        ticks = linearTicks(FISCAL_AXIS_MAX);
+        yMax = FISCAL_AXIS_MAX;
       }
 
       const yRange = Math.max(1e-9, yTransform(yMax) - yTransform(yMin));
       const y = value => {
         const safeValue = state.scaleMode === 'log'
-          ? Math.min(LOG_AXIS_MAX, Math.max(LOG_AXIS_MIN, value))
+          ? Math.min(FISCAL_AXIS_MAX, Math.max(LOG_AXIS_MIN, value))
           : Math.max(0, value);
         return plot.y + plot.h - ((yTransform(safeValue) - yTransform(yMin)) / yRange) * plot.h;
       };
@@ -1371,7 +1371,7 @@
       ticks.forEach(v => {
         const yy = y(v);
         out += `<line x1="${plot.x}" y1="${yy}" x2="${plot.x + plot.w}" y2="${yy}" stroke="rgba(0,0,0,.30)" stroke-width="1"></line>`;
-        out += `<text x="${plot.x - 12}" y="${yy + (compact ? 7 : 4)}" text-anchor="end" fill="#d4d4d4" font-size="${axisFont}">${axisTickLabel(v)}</text>`;
+        out += `<text class="fiscalAxisTick" data-value="${v}" x="${plot.x - 12}" y="${yy + (compact ? 7 : 4)}" text-anchor="end" fill="#d4d4d4" font-size="${axisFont}">${axisTickLabel(v)}</text>`;
       });
 
       const approxLabelCount = compact ? 8 : YEARS.length;
@@ -1531,9 +1531,8 @@
       const minYear = POPULATION_YEARS[0];
       const maxYear = POPULATION_YEARS[POPULATION_YEARS.length - 1];
       const bandWidth = plot.w / POPULATION_DATA.length;
-      const maxPopulation = Math.max(...POPULATION_DATA.map(d => d.adultPopulation));
-      const yStep = niceStep(maxPopulation / 5);
-      const yMax = Math.ceil(maxPopulation / yStep) * yStep;
+      const yStep = POPULATION_AXIS_STEP;
+      const yMax = POPULATION_AXIS_MAX;
       const y = value => plot.y + plot.h - ((value / yMax) * plot.h);
       const xEdge = year => plot.x + (((year - minYear) / POPULATION_DATA.length) * plot.w);
       const axisFont = compact ? 20 : 12;
@@ -1559,7 +1558,7 @@
       for (let tick = 0; tick <= yMax; tick += yStep) {
         const yy = y(tick);
         out += `<line x1="${plot.x}" y1="${yy}" x2="${plot.x + plot.w}" y2="${yy}" stroke="rgba(255,255,255,.10)" stroke-width="1"></line>`;
-        out += `<text x="${plot.x - 12}" y="${yy + (compact ? 7 : 4)}" text-anchor="end" fill="#bfbfbf" font-size="${axisFont}">${peopleShort(tick)}</text>`;
+        out += `<text class="populationAxisTick" data-value="${tick}" x="${plot.x - 12}" y="${yy + (compact ? 7 : 4)}" text-anchor="end" fill="#bfbfbf" font-size="${axisFont}">${peopleShort(tick)}</text>`;
       }
 
       POPULATION_DATA.forEach((record, recordIndex) => {

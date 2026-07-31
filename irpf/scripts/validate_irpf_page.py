@@ -100,6 +100,8 @@ def check_dataset(page: Page) -> None:
         "nodes => [...new Set(nodes.map(node => Number(node.dataset.tramo)))].sort((a, b) => a - b)"
     )
     assert surface_tramos == list(range(1, 19))
+    assert page.locator('.fiscalAxisTick[data-value="500000"]').count() == 1
+    assert page.locator('.fiscalAxisTick[data-value="1000000"]').count() == 0
     assert page.locator(".limitSeries, .openBracketPoint").count() == 0
     assert page.locator('.rateHeatCell[data-year="2007"][data-tramo="4"]').count() == 1
     assert page.locator('.rateHeatCell[data-year="2007"][data-tramo="5"]').count() == 0
@@ -233,12 +235,15 @@ def check_all_visual_modes(page: Page) -> None:
     page.wait_for_timeout(50)
     assert page.locator(".fiscalSurfaceCell").count() > 0
     assert page.locator(".rateHeatCell").count() > 0
+    assert page.locator('.fiscalAxisTick[data-value="500000"]').count() == 1
     page.locator('#scaleButtons button[data-key="log"]').click()
 
     page.locator("#btnChartPopulation").click()
     page.wait_for_timeout(50)
     assert "población adulta" in (page.locator("#chart").get_attribute("aria-label") or "")
     assert page.locator("#chart").bounding_box()["width"] > 250
+    assert page.locator('.populationAxisTick[data-value="45000000"]').count() == 1
+    assert page.locator('.populationAxisTick[data-value="50000000"]').count() == 0
     population_scale = page.evaluate(
         """
         () => {
