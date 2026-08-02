@@ -383,6 +383,19 @@
       font-size: calc(12px * var(--uiScale));
       line-height: 1.2;
     }
+    button.legendItem {
+      width: 100%;
+      color: inherit;
+      font: inherit;
+      text-align: left;
+      cursor: pointer;
+    }
+    button.legendItem:hover { border-color: rgba(254,247,2,.35); }
+    button.legendItem.isFocused {
+      border-color: rgba(254,247,2,.95);
+      background: rgba(254,247,2,.14);
+    }
+    button.legendItem.isMuted { opacity: .35; }
     .legendSwatch {
       width: 12px;
       height: 12px;
@@ -587,7 +600,7 @@
 
   <header>
     <div class="h-title">
-      <h1>Escala estatal del IRPF en el tiempo</h1>
+      <h1>Escala estatal del IRPF</h1>
     </div>
   </header>
 
@@ -752,6 +765,7 @@
       scaleMode: 'log',
       showPresBands: true,
       hoverYear: null,
+      focusKey: null,
     };
 
     const svg = document.getElementById('chart');
@@ -1062,15 +1076,16 @@
     }
 
     function renderLegend() {
+      const legendItem = (key, swatch, label) => {
+        const isFocused = state.focusKey === key;
+        return `<button class="legendItem${isFocused ? ' isFocused' : ''}${state.focusKey && !isFocused ? ' isMuted' : ''}" type="button" data-focus-key="${key}" aria-pressed="${isFocused ? 'true' : 'false'}">${swatch}<span>${label}</span></button>`;
+      };
       if (state.chartMode === 'limits') {
         const midpoint = RATE_EXTENT.min + ((RATE_EXTENT.max - RATE_EXTENT.min) / 2);
         const midpointPosition = ((midpoint - RATE_EXTENT.min) / (RATE_EXTENT.max - RATE_EXTENT.min)) * 100;
-        const tramoItems = Array.from({ length: MAX_TRAMOS }, (_, i) => i + 1).map(n => `
-          <div class="legendItem">
-            <span class="legendSwatch" style="background:${getColor(n)}"></span>
-            <span>Tramo ${n}</span>
-          </div>
-        `).join('');
+        const tramoItems = Array.from({ length: MAX_TRAMOS }, (_, i) => i + 1)
+          .map(n => legendItem(`tramo-${n}`, `<span class="legendSwatch" style="background:${getColor(n)}"></span>`, `Tramo ${n}`))
+          .join('');
         seriesLegend.innerHTML = `
           <div class="legendGroupTitle">Tramos · mapa principal</div>
           <div class="tramoLegendGrid">${tramoItems}</div>
@@ -1083,25 +1098,20 @@
               <span class="rateLegendTick isEnd" data-rate="${RATE_EXTENT.max}" style="left:100%">${pct(RATE_EXTENT.max)}</span>
             </div>
           </div>
-          <div class="legendItem">
-            <span class="legendSwatch boundary"></span>
-            <span>Frontera legal</span>
-          </div>
-          <div class="legendItem">
-            <span class="legendSwatch gdp"></span>
-            <span>PIB per cápita</span>
-          </div>
+          ${legendItem('boundary', '<span class="legendSwatch boundary"></span>', 'Frontera legal')}
+          ${legendItem('gdp', '<span class="legendSwatch gdp"></span>', 'PIB per cápita')}
         `;
-        return;
+      } else {
+        const tramos = Array.from({ length: MAX_POPULATION_TRAMOS }, (_, i) => i + 1);
+        seriesLegend.innerHTML = tramos
+          .map(n => legendItem(`tramo-${n}`, `<span class="legendSwatch" style="background:${getColor(n)}"></span>`, `Tramo ${n}`))
+          .join('');
       }
-      const tramos = Array.from({ length: MAX_POPULATION_TRAMOS }, (_, i) => i + 1);
-      const tramoItems = tramos.map(n => `
-        <div class="legendItem">
-          <span class="legendSwatch" style="background:${getColor(n)}"></span>
-          <span>Tramo ${n}</span>
-        </div>
-      `);
-      seriesLegend.innerHTML = tramoItems.join('');
+      seriesLegend.querySelectorAll('[data-focus-key]').forEach(item => item.addEventListener('click', () => {
+        const key = item.dataset.focusKey;
+        state.focusKey = state.focusKey === key ? null : key;
+        renderAll();
+      }));
     }
 
     function yTransform(v) {
@@ -1265,6 +1275,8 @@
       let out = `<text x="${heatmap.x}" y="${heatmap.y - 10}" fill="#FEF702" font-size="${titleFont}" font-weight="700">TIPO MARGINAL ESTATAL · MAPA DE CALOR EXPONENCIAL</text>`;
 
       for (let tramo = 1; tramo <= MAX_TRAMOS; tramo++) {
+        const tramoFocused = state.focusKey === `tramo-${tramo}`;
+        const tramoOpacity = state.focusKey && !tramoFocused ? .12 : 1;
         const visualRow = MAX_TRAMOS - tramo;
         const rowY = heatmap.y + (visualRow * rowHeight);
         out += `<rect x="${heatmap.x}" y="${rowY}" width="${heatmap.w}" height="${rowHeight}" fill="rgba(255,255,255,.025)" stroke="rgba(255,255,255,.07)" stroke-width=".7"></rect>`;
@@ -1273,7 +1285,7 @@
         DATA.forEach(record => {
           const bracket = record.brackets.find(item => item.index === tramo);
           if (!bracket || !Number.isFinite(bracket.rate)) return;
-          out += `<rect class="rateHeatCell" data-year="${record.year}" data-tramo="${tramo}" data-rate="${bracket.rate}" x="${xEdge(record.year)}" y="${rowY + .55}" width="${bandWidth + .15}" height="${Math.max(1, rowHeight - 1.1)}" fill="${rateHeatColor(bracket.rate)}"><title>${record.year} · Tramo ${tramo} · tipo marginal estatal ${pct(bracket.rate)}</title></rect>`;
+          out += `<rect class="rateHeatCell" data-year="${record.year}" data-tramo="${tramo}" data-rate="${bracket.rate}" x="${xEdge(record.year)}" y="${rowY + .55}" width="${bandWidth + .15}" height="${Math.max(1, rowHeight - 1.1)}" fill="${rateHeatColor(bracket.rate)}" opacity="${tramoOpacity}"><title>${record.year} · Tramo ${tramo} · tipo marginal estatal ${pct(bracket.rate)}</title></rect>`;
         });
       }
 
@@ -1346,6 +1358,9 @@
       DATA.forEach(record => {
         const cellX = xEdge(record.year);
         record.brackets.forEach(bracket => {
+          const tramoFocused = state.focusKey === `tramo-${bracket.index}`;
+          const cellOpacity = state.focusKey && !tramoFocused ? .12 : 1;
+          const boundaryOpacity = state.focusKey && state.focusKey !== 'boundary' ? .12 : 1;
           const lower = getBracketValue(bracket, 'lower');
           const legalUpper = getBracketValue(bracket, 'upper');
           const upper = bracket.is_open ? yMax : legalUpper;
@@ -1360,9 +1375,9 @@
             : bracket.index === 1
               ? `hasta ${money(legalUpper, 0)}`
               : `de ${money(lower, 0)} a ${money(legalUpper, 0)}`;
-          surface += `<rect class="fiscalSurfaceCell" data-year="${record.year}" data-tramo="${bracket.index}" data-rate="${bracket.rate}" data-open="${bracket.is_open ? 'true' : 'false'}" data-lower="${lower}" data-upper="${bracket.is_open ? '' : legalUpper}" x="${cellX}" y="${top}" width="${bandWidth + .15}" height="${Math.max(0, bottom - top)}" fill="${getColor(bracket.index)}" stroke="rgba(0,0,0,.28)" stroke-width=".45"><title>${record.year} · Tramo ${bracket.index} · ${range} · tipo marginal estatal ${pct(bracket.rate)}</title></rect>`;
+          surface += `<rect class="fiscalSurfaceCell" data-year="${record.year}" data-tramo="${bracket.index}" data-rate="${bracket.rate}" data-open="${bracket.is_open ? 'true' : 'false'}" data-lower="${lower}" data-upper="${bracket.is_open ? '' : legalUpper}" x="${cellX}" y="${top}" width="${bandWidth + .15}" height="${Math.max(0, bottom - top)}" fill="${getColor(bracket.index)}" opacity="${cellOpacity}" stroke="rgba(0,0,0,.28)" stroke-width=".45"><title>${record.year} · Tramo ${bracket.index} · ${range} · tipo marginal estatal ${pct(bracket.rate)}</title></rect>`;
           if (!bracket.is_open && legalUpper >= yMin && legalUpper <= yMax) {
-            boundaries += `<line class="taxBoundary" data-year="${record.year}" data-tramo="${bracket.index}" x1="${cellX}" y1="${y(legalUpper)}" x2="${cellX + bandWidth}" y2="${y(legalUpper)}" stroke="rgba(255,255,255,.68)" stroke-width="${compact ? 1.8 : 1.1}"></line>`;
+            boundaries += `<line class="taxBoundary" data-year="${record.year}" data-tramo="${bracket.index}" x1="${cellX}" y1="${y(legalUpper)}" x2="${cellX + bandWidth}" y2="${y(legalUpper)}" stroke="rgba(255,255,255,.68)" stroke-width="${compact ? 1.8 : 1.1}" opacity="${boundaryOpacity}"></line>`;
           }
         });
       });
@@ -1408,11 +1423,12 @@
       }
 
       if (gdpSeries.length) {
+        const gdpOpacity = state.focusKey && state.focusKey !== 'gdp' ? .12 : 1;
         const d = buildSmoothPath(gdpSeries, xCenter, y);
-        out += `<path class="gdpSeries" d="${d}" fill="none" stroke="rgba(255,255,255,.98)" stroke-width="${compact ? 4.8 : 3.2}" stroke-dasharray="10 6"></path>`;
+        out += `<path class="gdpSeries" d="${d}" fill="none" stroke="rgba(255,255,255,.98)" stroke-width="${compact ? 4.8 : 3.2}" stroke-dasharray="10 6" opacity="${gdpOpacity}"></path>`;
         gdpSeries.forEach(p => {
           const r = state.hoverYear === p.year ? 5.2 : 3.6;
-          out += `<circle class="gdpPoint" data-year="${p.year}" cx="${xCenter(p.year)}" cy="${y(p.value)}" r="${r}" fill="#ffffff" stroke="rgba(0,0,0,.55)" stroke-width="1"></circle>`;
+          out += `<circle class="gdpPoint" data-year="${p.year}" cx="${xCenter(p.year)}" cy="${y(p.value)}" r="${r}" fill="#ffffff" stroke="rgba(0,0,0,.55)" stroke-width="1" opacity="${gdpOpacity}"></circle>`;
         });
       }
 
@@ -1566,11 +1582,12 @@
         const barX = plot.x + (recordIndex * bandWidth) + .4;
         const barWidth = Math.max(1, bandWidth - .8);
         record.tramos.forEach(tramo => {
+          const tramoOpacity = state.focusKey && state.focusKey !== `tramo-${tramo.index}` ? .12 : .88;
           const next = cumulative + tramo.count;
           const top = y(next);
           const bottom = y(cumulative);
           if (bottom > top) {
-            out += `<rect x="${barX}" y="${top}" width="${barWidth}" height="${bottom - top}" fill="${getColor(tramo.index)}" opacity="0.88" stroke="rgba(0,0,0,.22)" stroke-width=".5"><title>${record.year} · Tramo ${tramo.index} · ${people(tramo.count)}</title></rect>`;
+            out += `<rect x="${barX}" y="${top}" width="${barWidth}" height="${bottom - top}" fill="${getColor(tramo.index)}" opacity="${tramoOpacity}" stroke="rgba(0,0,0,.22)" stroke-width=".5"><title>${record.year} · Tramo ${tramo.index} · ${people(tramo.count)}</title></rect>`;
           }
           cumulative = next;
         });
@@ -1661,6 +1678,7 @@
     function setChartMode(chartMode) {
       if (state.chartMode === chartMode) return;
       state.chartMode = chartMode;
+      state.focusKey = null;
       resetChartInteraction();
       renderAll();
     }

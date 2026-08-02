@@ -553,6 +553,11 @@
     }
     .seriesItem:hover { border-color: rgba(254,247,2,.25); }
     .seriesItem.isHidden { opacity: .35; }
+    .seriesItem.isFocused {
+      border-color: rgba(254,247,2,.95);
+      background: rgba(254,247,2,.14);
+    }
+    .seriesItem.isMuted { opacity: .35; }
     .seriesSwatch {
       width: 12px;
       height: 12px;
@@ -691,6 +696,7 @@
       mode: 'real',
       metric: 'index',
       visible: new Map(),
+      focusSid: null,
       hover: null,
       hoverFocusMode: false,
       hoverSid: null,
@@ -840,14 +846,15 @@
       els.seriesGrid.innerHTML = '';
       for(const serie of currentSeries()){
         const isVisible = state.visible.get(serie.sid) === true;
+        const isFocused = state.focusSid === serie.sid;
         const item = document.createElement('button');
         item.type = 'button';
-        item.className = `seriesItem${isVisible ? '' : ' isHidden'}`;
+        item.className = `seriesItem${isVisible ? '' : ' isHidden'}${isFocused ? ' isFocused' : ''}${state.focusSid && !isFocused ? ' isMuted' : ''}`;
         item.title = serie.source;
-        item.setAttribute('aria-pressed', isVisible ? 'true' : 'false');
+        item.setAttribute('aria-pressed', isFocused ? 'true' : 'false');
         item.innerHTML = `<span class="seriesSwatch" style="background:${serie.color}"></span><span class="seriesName">${seriesDisplayName(serie)}</span>`;
         item.addEventListener('click', () => {
-          state.visible.set(serie.sid, !state.visible.get(serie.sid));
+          state.focusSid = state.focusSid === serie.sid ? null : serie.sid;
           state.hover = null;
           renderAll();
         });
@@ -1024,8 +1031,9 @@
       const {margin, plotW, plotH, xMin, xMax, logMin, logMax, tx, ty, active, plotted, scale} = tr;
       const plotRight = width - margin.right;
       const plotBottom = height - margin.bottom;
-      const hoverSid = state.hoverFocusMode ? hoveredSeriesId(tr) : null;
-      state.hoverSid = hoverSid;
+      const hoveredSid = state.hoverFocusMode ? hoveredSeriesId(tr) : null;
+      const focusSid = state.focusSid || hoveredSid;
+      state.hoverSid = focusSid;
 
       ctx.fillStyle = 'rgba(0,0,0,.12)';
       ctx.strokeStyle = 'rgba(255,255,255,.16)';
@@ -1140,18 +1148,18 @@
         ctx.restore();
       }
 
-      const drawQueue = hoverSid
-        ? [...plotted.filter(item => item.serie.sid !== hoverSid), ...plotted.filter(item => item.serie.sid === hoverSid)]
+      const drawQueue = focusSid
+        ? [...plotted.filter(item => item.serie.sid !== focusSid), ...plotted.filter(item => item.serie.sid === focusSid)]
         : plotted;
       for(const {serie, segments} of drawQueue){
         ctx.save();
-        ctx.globalAlpha = hoverSid && serie.sid !== hoverSid ? .12 : 1;
+        ctx.globalAlpha = focusSid && serie.sid !== focusSid ? .12 : 1;
         for(const points of segments){
           const projected = projectedSeriesPoints(points, tx, ty);
           if(projected.length < 2) continue;
           ctx.beginPath();
           ctx.strokeStyle = serie.color;
-          ctx.lineWidth = hoverSid === serie.sid ? serie.width + .8 : serie.width;
+          ctx.lineWidth = focusSid === serie.sid ? serie.width + .8 : serie.width;
           ctx.lineJoin = 'round';
           ctx.lineCap = 'round';
           traceSmoothSeries(projected);
