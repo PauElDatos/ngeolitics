@@ -636,6 +636,58 @@
       .chartPanel { min-height: 520px; }
       .chartBox { min-height: 420px; }
     }
+
+    /* Selector de vistas y controles de la comparación de muy largo plazo. */
+    .chartViewBar {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      flex: 0 0 auto;
+    }
+    .wideViewToggle {
+      width: 100%;
+      min-height: 48px;
+      border-radius: 14px;
+      font-family: var(--fontTitle);
+      font-size: calc(13px * var(--uiScale));
+      font-weight: 700;
+      letter-spacing: .2px;
+      text-transform: none;
+    }
+    .selectorModeBlock {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+    .selectorModeBlock[hidden],
+    [hidden] {
+      display: none !important;
+    }
+    .longRunSeriesItem {
+      align-items: center;
+    }
+    .longRunSeriesItem .seriesSwatch {
+      width: 24px;
+      height: 0;
+      margin-top: 0;
+      border-radius: 0;
+      border-top: 3px solid var(--series-color);
+      background: transparent !important;
+    }
+    .longRunSeriesItem .seriesSwatch.isDashed {
+      border-top-style: dashed;
+    }
+    .longRunSeriesItem[aria-pressed="false"] {
+      opacity: .34;
+    }
+    .longRunSeriesItem[aria-pressed="false"] .seriesName {
+      text-decoration: line-through;
+    }
+    @media (max-width: 620px) {
+      .chartViewBar { grid-template-columns: 1fr; }
+      .wideViewToggle { min-height: 44px; }
+    }
   </style>
 </head>
 <body>
@@ -651,22 +703,57 @@
     <section class="panel selectorPanel" aria-label="Datos del gráfico">
       <div class="panelHeader">
         <div class="panelTitleText">Datos del gráfico</div>
-        <div class="panelMeta">1900–2020</div>
+        <div class="panelMeta" id="selectorMeta">1900–2020</div>
       </div>
       <div class="panelContent selectorContent">
-        <div class="field">
-          <div class="label">Modo</div>
-          <div class="modeRow" id="modeRow"></div>
+        <div class="selectorModeBlock" id="historicalControls">
+          <div class="field">
+            <div class="label">Modo</div>
+            <div class="modeRow" id="modeRow"></div>
+          </div>
+
+          <div class="field">
+            <div class="label">Visualización</div>
+            <div class="modeRow" id="metricRow"></div>
+          </div>
+
+          <div class="field seriesField">
+            <div class="label">Series visibles</div>
+            <div class="seriesGrid" id="seriesGrid"></div>
+          </div>
         </div>
 
-        <div class="field">
-          <div class="label">Visualización</div>
-          <div class="modeRow" id="metricRow"></div>
-        </div>
+        <div class="selectorModeBlock" id="longRunControls" hidden>
+          <div class="field">
+            <div class="label">Cobertura</div>
+            <div class="modeRow">
+              <button class="btn modeButton on" id="btnLongFull" type="button" aria-pressed="true">Completa · 1801–2026</button>
+              <button class="btn modeButton" id="btnLongCommon" type="button" aria-pressed="false">Periodo común · 1871–2025</button>
+            </div>
+          </div>
 
-        <div class="field seriesField">
-          <div class="label">Series visibles</div>
-          <div class="seriesGrid" id="seriesGrid"></div>
+          <div class="field seriesField">
+            <div class="label">Series visibles</div>
+            <div class="seriesGrid">
+              <button class="seriesItem longRunSeriesItem" id="btnLongLondon" type="button" aria-pressed="true">
+                <span class="seriesSwatch" style="--series-color:#8F7CFF"></span>
+                <span class="seriesName">Londres · precio nominal reconstruido</span>
+              </button>
+              <button class="seriesItem longRunSeriesItem" id="btnLongUsa" type="button" aria-pressed="true">
+                <span class="seriesSwatch isDashed" style="--series-color:#FF5A5F"></span>
+                <span class="seriesName">Estados Unidos · precio nominal aportado</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="field">
+            <div class="label">Escala</div>
+            <div class="modeRow">
+              <button class="btn modeButton on" id="btnLongLog" type="button" aria-pressed="true">Logarítmica</button>
+              <button class="btn modeButton" id="btnLongLinear" type="button" aria-pressed="false">Lineal</button>
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
@@ -677,22 +764,30 @@
         <div class="panelMeta" id="chartMeta">Base 1900 = 100 · Escala logarítmica</div>
       </div>
       <div class="chartContent">
+        <div class="chartViewBar" role="tablist" aria-label="Selector de gráfico">
+          <button class="btn wideViewToggle on" id="btnViewHistorical" type="button" role="tab" aria-selected="true">Índices históricos</button>
+          <button class="btn wideViewToggle" id="btnViewLongRun" type="button" role="tab" aria-selected="false">Londres vs Estados Unidos</button>
+        </div>
         <div class="chartBox">
           <canvas aria-label="Gráfico de índices históricos" id="chart"></canvas>
         </div>
-        <div class="chartControls">
+        <div class="chartControls" id="historicalChartControls">
           <button class="btn" id="btnHoverFocus" type="button" aria-pressed="false">Resaltar al pasar: OFF</button>
         </div>
         <div class="footerSingle">
-          <span class="footerSource">Fuente: <a class="sourceLink" href="https://www.macrohistory.net/database/" target="_blank" rel="noopener noreferrer">Jordà-Schularick-Taylor Macrohistory Database</a> (<span style="color:#fff">JSTdatasetR6.xlsx</span>, R.6) · <span style="opacity:.9;">N.Geolitics</span></span>
+          <span class="footerSource" id="historicalFooter">Fuente: <a class="sourceLink" href="https://www.macrohistory.net/database/" target="_blank" rel="noopener noreferrer">Jordà-Schularick-Taylor Macrohistory Database</a> (<span style="color:#fff">JSTdatasetR6.xlsx</span>, R.6) · <span style="opacity:.9;">N.Geolitics</span></span>
+          <span class="footerSource" id="longRunFooter" hidden>Fuentes: <a class="sourceLink" href="https://www.bankofengland.co.uk/statistics/research-datasets" target="_blank" rel="noopener noreferrer">Banco de Inglaterra</a> / <a class="sourceLink" href="https://www.lseg.com/en/ftse-russell/indices/uk" target="_blank" rel="noopener noreferrer">FTSE Russell–LSEG</a> / <span style="color:#fff">SP500_historico_completo_1871_2026.csv</span> · Precios nominales, sin dividendos ni inflación.</span>
         </div>
       </div>
     </section>
   </main>
 <script src="series-data.js"></script>
+<script src="long-run-indices-data.js"></script>
 <script>
     const DATA = window.NG_SERIES_DATA;
+    const LONG_RUN_DATA = window.NGE_LONG_RUN_DATA;
     const state = {
+      view: 'historical',
       mode: 'real',
       metric: 'index',
       visible: new Map(),
@@ -700,6 +795,9 @@
       hover: null,
       hoverFocusMode: false,
       hoverSid: null,
+      longRunCoverage: 'full',
+      longRunScale: 'log',
+      longRunVisible: new Map([['london', true], ['usa', true]]),
       pixelRatio: Math.max(1, window.devicePixelRatio || 1)
     };
 
@@ -710,6 +808,20 @@
       chart: document.getElementById('chart'),
       chartMeta: document.getElementById('chartMeta'),
       btnHoverFocus: document.getElementById('btnHoverFocus'),
+      selectorMeta: document.getElementById('selectorMeta'),
+      historicalControls: document.getElementById('historicalControls'),
+      longRunControls: document.getElementById('longRunControls'),
+      historicalChartControls: document.getElementById('historicalChartControls'),
+      historicalFooter: document.getElementById('historicalFooter'),
+      longRunFooter: document.getElementById('longRunFooter'),
+      btnViewHistorical: document.getElementById('btnViewHistorical'),
+      btnViewLongRun: document.getElementById('btnViewLongRun'),
+      btnLongFull: document.getElementById('btnLongFull'),
+      btnLongCommon: document.getElementById('btnLongCommon'),
+      btnLongLondon: document.getElementById('btnLongLondon'),
+      btnLongUsa: document.getElementById('btnLongUsa'),
+      btnLongLog: document.getElementById('btnLongLog'),
+      btnLongLinear: document.getElementById('btnLongLinear'),
       status: document.getElementById('status'),
       statsGrid: document.getElementById('statsGrid'),
       seriesTable: document.getElementById('seriesTable')
@@ -725,6 +837,10 @@
       annual: 'Rendimientos anuales'
     };
     const GERMANY_SID = 'jst_germany';
+    const longRunSeriesStyle = {
+      london: {label: 'Londres', color: '#8F7CFF', dash: []},
+      usa: {label: 'Estados Unidos', color: '#FF5A5F', dash: [9, 6]}
+    };
 
     const historicalFragments = [
       {
@@ -769,6 +885,72 @@
     }
     function formatPct(v){
       return Number.isFinite(v) ? (v * 100).toLocaleString('es-ES', {maximumFractionDigits:2}) + '%' : '—';
+    }
+
+    const longRunDataIsValid = Boolean(
+      LONG_RUN_DATA &&
+      Array.isArray(LONG_RUN_DATA.london) && LONG_RUN_DATA.london.length === 225 &&
+      Array.isArray(LONG_RUN_DATA.usa) && LONG_RUN_DATA.usa.length === 156 &&
+      LONG_RUN_DATA.london[0]?.year === 1801 && LONG_RUN_DATA.london.at(-1)?.year === 2025 &&
+      LONG_RUN_DATA.usa[0]?.year === 1871 && LONG_RUN_DATA.usa.at(-1)?.year === 2026
+    );
+    const longRunMaps = {
+      london: new Map(longRunDataIsValid ? LONG_RUN_DATA.london.map(row => [row.year, Number(row.value)]) : []),
+      usa: new Map(longRunDataIsValid ? LONG_RUN_DATA.usa.map(row => [row.year, Number(row.value)]) : [])
+    };
+
+    function currentLongRunSeries(){
+      if(!longRunDataIsValid) return [];
+      const common = state.longRunCoverage === 'common';
+      const start = common ? 1871 : 1801;
+      const end = common ? 2025 : 2026;
+      const baseYears = common ? {london: 1871, usa: 1871} : {london: 1801, usa: 1871};
+      return ['london', 'usa'].map(id => {
+        const map = longRunMaps[id];
+        const base = map.get(baseYears[id]);
+        const points = [];
+        for(let year = start; year <= end; year++){
+          const raw = map.get(year);
+          if(!Number.isFinite(raw) || !Number.isFinite(base) || base <= 0) continue;
+          points.push({t: Date.UTC(year, 0, 1), year, v: (raw / base) * 100});
+        }
+        return {id, ...longRunSeriesStyle[id], points};
+      });
+    }
+
+    function renderViewSelector(){
+      const historical = state.view === 'historical';
+      els.btnViewHistorical.classList.toggle('on', historical);
+      els.btnViewLongRun.classList.toggle('on', !historical);
+      els.btnViewHistorical.setAttribute('aria-selected', historical ? 'true' : 'false');
+      els.btnViewLongRun.setAttribute('aria-selected', historical ? 'false' : 'true');
+      els.historicalControls.hidden = !historical;
+      els.longRunControls.hidden = historical;
+      els.historicalChartControls.hidden = !historical;
+      els.historicalFooter.hidden = !historical;
+      els.longRunFooter.hidden = historical;
+      els.selectorMeta.textContent = historical
+        ? '1900–2020'
+        : (state.longRunCoverage === 'common' ? '1871–2025' : '1801–2026');
+    }
+
+    function renderLongRunControls(){
+      const common = state.longRunCoverage === 'common';
+      els.btnLongFull.classList.toggle('on', !common);
+      els.btnLongCommon.classList.toggle('on', common);
+      els.btnLongFull.setAttribute('aria-pressed', common ? 'false' : 'true');
+      els.btnLongCommon.setAttribute('aria-pressed', common ? 'true' : 'false');
+
+      for(const [id, button] of [['london', els.btnLongLondon], ['usa', els.btnLongUsa]]){
+        const visible = state.longRunVisible.get(id) === true;
+        button.setAttribute('aria-pressed', visible ? 'true' : 'false');
+      }
+
+      const logarithmic = state.longRunScale === 'log';
+      els.btnLongLog.classList.toggle('on', logarithmic);
+      els.btnLongLinear.classList.toggle('on', !logarithmic);
+      els.btnLongLog.setAttribute('aria-pressed', logarithmic ? 'true' : 'false');
+      els.btnLongLinear.setAttribute('aria-pressed', logarithmic ? 'false' : 'true');
     }
 
     for(const mode of Object.keys(DATA.modes)){
@@ -1012,7 +1194,201 @@
       }
     }
 
+    function niceLinearStep(span, target = 5){
+      const raw = span / Math.max(1, target);
+      const power = Math.pow(10, Math.floor(Math.log10(raw || 1)));
+      const fraction = raw / power;
+      return (fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 5 ? 5 : 10) * power;
+    }
+
+    function drawLongRun(){
+      const {width, height} = resizeCanvas();
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = '#252525';
+      ctx.fillRect(0, 0, width, height);
+
+      if(!longRunDataIsValid){
+        ctx.fillStyle = '#e3e3e3';
+        ctx.font = '700 18px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('No se han podido cargar los datos de muy largo plazo.', width / 2, height / 2);
+        return;
+      }
+
+      const allSeries = currentLongRunSeries();
+      const active = allSeries.filter(serie => state.longRunVisible.get(serie.id) === true);
+      if(!active.length){
+        ctx.fillStyle = '#e3e3e3';
+        ctx.font = '700 18px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('Activa al menos una serie.', width / 2, height / 2);
+        return;
+      }
+
+      const compact = width < 620;
+      const margin = {left: compact ? 66 : 88, right: compact ? 18 : 34, top: compact ? 58 : 62, bottom: compact ? 70 : 82};
+      const plotW = Math.max(1, width - margin.left - margin.right);
+      const plotH = Math.max(1, height - margin.top - margin.bottom);
+      const plotRight = margin.left + plotW;
+      const plotBottom = margin.top + plotH;
+      const common = state.longRunCoverage === 'common';
+      const startYear = common ? 1871 : 1801;
+      const endYear = common ? 2025 : 2026;
+      const values = active.flatMap(serie => serie.points.map(point => point.v)).filter(value => Number.isFinite(value) && value > 0);
+      const minValue = Math.min(...values);
+      const maxValue = Math.max(...values);
+      const tx = year => margin.left + ((year - startYear) / (endYear - startYear)) * plotW;
+
+      let yTicks;
+      let ty;
+      if(state.longRunScale === 'log'){
+        const logMin = Math.floor(Math.log10(minValue));
+        const logMax = Math.ceil(Math.log10(maxValue));
+        const span = Math.max(1, logMax - logMin);
+        ty = value => margin.top + (1 - ((Math.log10(value) - logMin) / span)) * plotH;
+        yTicks = Array.from({length: span + 1}, (_value, index) => Math.pow(10, logMin + index));
+      } else {
+        const domainMax = maxValue * 1.06;
+        const step = niceLinearStep(domainMax, 5);
+        const roundedMax = Math.ceil(domainMax / step) * step;
+        ty = value => margin.top + (1 - value / roundedMax) * plotH;
+        yTicks = Array.from({length: Math.round(roundedMax / step) + 1}, (_value, index) => index * step);
+      }
+
+      ctx.fillStyle = 'rgba(0,0,0,.12)';
+      ctx.strokeStyle = 'rgba(255,255,255,.16)';
+      ctx.lineWidth = 1;
+      ctx.fillRect(margin.left, margin.top, plotW, plotH);
+      ctx.strokeRect(margin.left, margin.top, plotW, plotH);
+
+      ctx.font = compact ? '10px Arial' : '12px Arial';
+      ctx.textBaseline = 'middle';
+      for(const tick of yTicks){
+        const y = ty(tick);
+        if(y < margin.top - 1 || y > plotBottom + 1) continue;
+        ctx.strokeStyle = 'rgba(255,255,255,.10)';
+        ctx.beginPath();
+        ctx.moveTo(margin.left, y);
+        ctx.lineTo(plotRight, y);
+        ctx.stroke();
+        ctx.fillStyle = '#b0b0b0';
+        ctx.textAlign = 'right';
+        ctx.fillText(formatValue(tick), margin.left - 10, y);
+      }
+
+      const xTickCount = compact ? 4 : 6;
+      ctx.textBaseline = 'top';
+      for(let index = 0; index < xTickCount; index++){
+        const year = Math.round(startYear + (index / (xTickCount - 1)) * (endYear - startYear));
+        const x = tx(year);
+        ctx.strokeStyle = 'rgba(255,255,255,.10)';
+        ctx.beginPath();
+        ctx.moveTo(x, margin.top);
+        ctx.lineTo(x, plotBottom);
+        ctx.stroke();
+        ctx.fillStyle = '#b0b0b0';
+        ctx.textAlign = 'center';
+        ctx.fillText(String(year), x, plotBottom + 12);
+      }
+
+      for(const serie of active){
+        ctx.save();
+        ctx.strokeStyle = serie.color;
+        ctx.lineWidth = 2.6;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'butt';
+        ctx.setLineDash(serie.dash);
+        ctx.beginPath();
+        let started = false;
+        for(const point of serie.points){
+          if(point.year < startYear || point.year > endYear) continue;
+          const x = tx(point.year);
+          const y = ty(point.v);
+          if(!Number.isFinite(x) || !Number.isFinite(y)){
+            started = false;
+            continue;
+          }
+          if(!started){ ctx.moveTo(x, y); started = true; }
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      if(state.hover && state.hover.x >= margin.left && state.hover.x <= plotRight && state.hover.y >= margin.top && state.hover.y <= plotBottom){
+        const year = Math.round(startYear + ((state.hover.x - margin.left) / plotW) * (endYear - startYear));
+        const x = tx(year);
+        ctx.save();
+        ctx.strokeStyle = 'rgba(254,247,2,.55)';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(x, margin.top);
+        ctx.lineTo(x, plotBottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        const tooltipW = Math.min(compact ? 245 : 330, plotW - 16);
+        const tooltipH = 34 + active.length * 24;
+        const tooltipX = Math.max(margin.left + 8, Math.min(plotRight - tooltipW - 8, state.hover.x + 14));
+        const tooltipY = margin.top + 10;
+        ctx.fillStyle = 'rgba(20,20,20,.96)';
+        ctx.strokeStyle = 'rgba(254,247,2,.45)';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.roundRect(tooltipX, tooltipY, tooltipW, tooltipH, 9);
+        ctx.fill();
+        ctx.stroke();
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillStyle = '#FEF702';
+        ctx.font = '700 13px Arial';
+        ctx.fillText(String(year), tooltipX + 12, tooltipY + 10);
+        active.forEach((serie, index) => {
+          const point = serie.points.find(candidate => candidate.year === year);
+          ctx.fillStyle = serie.color;
+          ctx.fillRect(tooltipX + 12, tooltipY + 34 + index * 24, 14, 3);
+          ctx.fillStyle = '#e3e3e3';
+          ctx.font = compact ? '11px Arial' : '12px Arial';
+          ctx.fillText(`${serie.label}: ${point ? formatValue(point.v) : 'sin dato'}`, tooltipX + 34, tooltipY + 27 + index * 24);
+        });
+        ctx.restore();
+      }
+
+      ctx.strokeStyle = 'rgba(255,255,255,.72)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(margin.left, plotBottom);
+      ctx.lineTo(plotRight, plotBottom);
+      ctx.moveTo(margin.left, margin.top);
+      ctx.lineTo(margin.left, plotBottom);
+      ctx.stroke();
+
+      ctx.fillStyle = '#FEF702';
+      ctx.font = compact ? '700 15px Arial' : '700 19px Arial';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText(common ? 'Londres vs Estados Unidos · 1871 = 100' : 'Cobertura completa · bases propias', margin.left, 32);
+
+      ctx.save();
+      ctx.translate(compact ? 17 : 24, margin.top + plotH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillStyle = '#e3e3e3';
+      ctx.font = compact ? '700 10px Arial' : '700 13px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Precio nominal · base 100', 0, 0);
+      ctx.restore();
+
+      ctx.fillStyle = '#b0b0b0';
+      ctx.font = compact ? '10px Arial' : '12px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Año', margin.left + plotW / 2, height - 18);
+    }
+
     function draw(){
+      if(state.view === 'longRun'){
+        drawLongRun();
+        return;
+      }
       const {width, height} = resizeCanvas();
       ctx.clearRect(0,0,width,height);
       ctx.fillStyle = '#252525';
@@ -1338,6 +1714,14 @@
     }
 
     function renderChartMeta(){
+      if(state.view === 'longRun'){
+        const common = state.longRunCoverage === 'common';
+        els.chartMeta.textContent = `${common ? 'Base común 1871 = 100' : 'Bases propias: Londres 1801 / USA 1871'} · Escala ${state.longRunScale === 'log' ? 'logarítmica' : 'lineal'}`;
+        els.chart.setAttribute('aria-label', common
+          ? 'Comparación de precios nominales de Londres y Estados Unidos entre 1871 y 2025, base 1871 igual a 100'
+          : 'Comparación completa de precios nominales de Londres y Estados Unidos, con bases iniciales propias');
+        return;
+      }
       els.chartMeta.textContent = state.metric === 'annual'
         ? 'Variación interanual · Escala simétrica logarítmica'
         : 'Base 1900 = 100 · Escala logarítmica';
@@ -1354,6 +1738,13 @@
     }
 
     function renderAll(rebuildSelectors = true){
+      renderViewSelector();
+      if(state.view === 'longRun'){
+        renderLongRunControls();
+        renderChartMeta();
+        draw();
+        return;
+      }
       renderModes();
       renderMetrics();
       if(rebuildSelectors) renderSeriesSelectors();
@@ -1382,6 +1773,53 @@
       state.hoverFocusMode = !state.hoverFocusMode;
       renderHoverFocusControl();
       draw();
+    });
+
+    els.btnViewHistorical.addEventListener('click', () => {
+      if(state.view === 'historical') return;
+      state.view = 'historical';
+      state.hover = null;
+      renderAll();
+    });
+    els.btnViewLongRun.addEventListener('click', () => {
+      if(state.view === 'longRun') return;
+      state.view = 'longRun';
+      state.hover = null;
+      renderAll(false);
+    });
+
+    els.btnLongFull.addEventListener('click', () => {
+      if(state.longRunCoverage === 'full') return;
+      state.longRunCoverage = 'full';
+      state.hover = null;
+      renderAll(false);
+    });
+    els.btnLongCommon.addEventListener('click', () => {
+      if(state.longRunCoverage === 'common') return;
+      state.longRunCoverage = 'common';
+      state.hover = null;
+      renderAll(false);
+    });
+
+    for(const [id, button] of [['london', els.btnLongLondon], ['usa', els.btnLongUsa]]){
+      button.addEventListener('click', () => {
+        state.longRunVisible.set(id, state.longRunVisible.get(id) !== true);
+        state.hover = null;
+        renderAll(false);
+      });
+    }
+
+    els.btnLongLog.addEventListener('click', () => {
+      if(state.longRunScale === 'log') return;
+      state.longRunScale = 'log';
+      state.hover = null;
+      renderAll(false);
+    });
+    els.btnLongLinear.addEventListener('click', () => {
+      if(state.longRunScale === 'linear') return;
+      state.longRunScale = 'linear';
+      state.hover = null;
+      renderAll(false);
     });
 
     window.addEventListener('resize', () => draw());
