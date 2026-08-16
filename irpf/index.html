@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>N.Geolitics — Tramos históricos del IRPF</title>
-  <meta name="description" content="Evolución histórica de los tramos estatales del IRPF, la población por tramo y el esfuerzo fiscal teórico por grupos de renta en España.">
+  <meta name="description" content="Evolución histórica de los tramos estatales del IRPF, la población por tramo y el esfuerzo fiscal estatal estimado por grupos de renta en España.">
   <link rel="icon" href="../assets/faviconNG.png">
   <style>
     :root {
@@ -953,6 +953,148 @@
       return Math.max(0, tax);
     }
 
+    const PESETAS_PER_EURO = 166.386;
+
+    function eurFromPesetas(value) {
+      return value / PESETAS_PER_EURO;
+    }
+
+    // Modelo estatutario comparable: contribuyente individual, menor de 65 años,
+    // sin hijos ni discapacidad y con la renta modelizada como rendimiento ordinario del trabajo.
+    // No intenta reproducir una declaración real: WID no aporta cotizaciones, situación familiar,
+    // deducciones individualizadas ni la composición trabajo/capital de cada persona.
+    function legacyOtherWorkExpenses(income, year) {
+      if (year < 1992 || year > 1998) return 0;
+      const rate = year === 1992 ? 0.05 : 0.06;
+      return Math.min(Math.max(0, income) * rate, eurFromPesetas(250000));
+    }
+
+    function legacyWorkQuotaDeduction(netWorkIncome, year) {
+      const netPtas = Math.max(0, netWorkIncome) * PESETAS_PER_EURO;
+      let deductionPtas = 0;
+
+      if (year === 1990) {
+        deductionPtas = 24000;
+      } else if (year === 1991) {
+        deductionPtas = 25200;
+      } else if (year >= 1992 && year <= 1994) {
+        if (netPtas <= 1000000) deductionPtas = 68000;
+        else if (netPtas <= 1800000) deductionPtas = 68000 - (0.05 * (netPtas - 1000000));
+        else deductionPtas = 25200;
+      } else if (year === 1995) {
+        if (netPtas <= 1035000) deductionPtas = 70000;
+        else if (netPtas <= 1915000) deductionPtas = 70000 - (0.05 * (netPtas - 1035000));
+        else deductionPtas = 26000;
+      } else if (year >= 1996 && year <= 1998) {
+        if (netPtas <= 1071000) deductionPtas = 72000;
+        else if (netPtas <= 1971000) deductionPtas = 72000 - (0.05 * (netPtas - 1071000));
+        else deductionPtas = 27000;
+      }
+
+      // Desde 1997 la escala de esta página representa la parte estatal.
+      // La normativa de cesión imputaba al Estado el 85 % de estas deducciones.
+      const stateShare = year >= 1997 && year <= 1998 ? 0.85 : 1;
+      return Math.max(0, eurFromPesetas(deductionPtas) * stateShare);
+    }
+
+    function workIncomeReduction(netWorkIncome, year) {
+      const income = Math.max(0, netWorkIncome);
+      let reduction = 0;
+
+      if (year >= 1999 && year <= 2002) {
+        const low = eurFromPesetas(1350000);
+        const high = eurFromPesetas(2000000);
+        if (income <= low) reduction = eurFromPesetas(500000);
+        else if (income <= high) reduction = eurFromPesetas(500000) - (0.1923 * (income - low));
+        else reduction = eurFromPesetas(375000);
+      } else if (year >= 2003 && year <= 2006) {
+        if (income <= 8200) reduction = 3500;
+        else if (income <= 13000) reduction = 3500 - (0.2291 * (income - 8200));
+        else reduction = 2400;
+      } else if (year === 2007) {
+        if (income <= 9000) reduction = 4000;
+        else if (income <= 13000) reduction = 4000 - (0.35 * (income - 9000));
+        else reduction = 2600;
+      } else if (year >= 2008 && year <= 2014) {
+        if (income <= 9180) reduction = 4080;
+        else if (income <= 13260) reduction = 4080 - (0.35 * (income - 9180));
+        else reduction = 2652;
+      } else if (year >= 2015 && year <= 2017) {
+        if (income <= 11250) reduction = 3700;
+        else if (income < 14450) reduction = 3700 - (1.15625 * (income - 11250));
+      } else if (year === 2018) {
+        const oldReduction = income <= 11250
+          ? 3700
+          : income < 14450
+            ? 3700 - (1.15625 * (income - 11250))
+            : 0;
+        const newReduction = income <= 13115
+          ? 5565
+          : income < 16825
+            ? 5565 - (1.5 * (income - 13115))
+            : 0;
+        reduction = oldReduction + (0.5 * Math.max(0, newReduction - oldReduction));
+      } else if (year >= 2019 && year <= 2022) {
+        if (income <= 13115) reduction = 5565;
+        else if (income < 16825) reduction = 5565 - (1.5 * (income - 13115));
+      } else if (year === 2023) {
+        if (income <= 14047.5) reduction = 6498;
+        else if (income < 19747.5) reduction = 6498 - (1.14 * (income - 14047.5));
+      } else if (year >= 2024) {
+        if (income <= 14852) reduction = 7302;
+        else if (income <= 17673.52) reduction = 7302 - (1.75 * (income - 14852));
+        else if (income < 19747.5) reduction = 2364.34 - (1.14 * (income - 17673.52));
+      }
+
+      return Math.max(0, Math.min(income, reduction));
+    }
+
+    function personalMinimumStandard(year) {
+      if (year >= 1999 && year <= 2006) return year <= 2002 ? eurFromPesetas(550000) : 3400;
+      if (year === 2007) return 5050;
+      if (year >= 2008 && year <= 2014) return 5151;
+      if (year >= 2015) return 5550;
+      return 0;
+    }
+
+    function standardizedStateIrpf(income, schedule, year) {
+      if (!Number.isFinite(income) || income <= 0 || !schedule) return 0;
+
+      // 1990-1991: deducción en cuota por rendimientos del trabajo dependiente.
+      if (year <= 1991) {
+        const grossQuota = theoreticalIrpf(income, schedule);
+        return Math.max(0, grossQuota - Math.min(grossQuota, legacyWorkQuotaDeduction(income, year)));
+      }
+
+      // 1992-1998: gastos porcentuales del trabajo + deducción específica en cuota.
+      if (year <= 1998) {
+        const netWork = Math.max(0, income - legacyOtherWorkExpenses(income, year));
+        const grossQuota = theoreticalIrpf(netWork, schedule);
+        const deduction = legacyWorkQuotaDeduction(netWork, year);
+        return Math.max(0, grossQuota - Math.min(grossQuota, deduction));
+      }
+
+      // 1999-2006: reducción por rendimientos del trabajo y mínimo personal reducían la base.
+      if (year <= 2006) {
+        const reduction = workIncomeReduction(income, year);
+        const afterWorkReduction = Math.max(0, income - reduction);
+        const taxableBase = Math.max(0, afterWorkReduction - personalMinimumStandard(year));
+        return theoreticalIrpf(taxableBase, schedule);
+      }
+
+      // 2007 en adelante: el mínimo personal/familiar se integra en base y su cuota se resta
+      // aplicando la misma escala estatal (equivalente económico a gravarlo a tipo cero).
+      // Desde 2015 añadimos los 2.000 € de "otros gastos" deducibles del trabajo.
+      const genericWorkExpense = year >= 2015 ? Math.min(2000, income) : 0;
+      const reductionBasis = Math.max(0, income); // proxy: WID no individualiza cotizaciones sociales.
+      const reduction = workIncomeReduction(reductionBasis, year);
+      const reducedNetWork = Math.max(0, income - genericWorkExpense - reduction);
+      const grossQuota = theoreticalIrpf(reducedNetWork, schedule);
+      const minimum = Math.min(reducedNetWork, personalMinimumStandard(year));
+      const minimumQuota = theoreticalIrpf(minimum, schedule);
+      return Math.max(0, grossQuota - minimumQuota);
+    }
+
     function marginalRateAtIncome(income, schedule) {
       if (!Number.isFinite(income) || !schedule) return 0;
       for (const bracket of schedule.brackets) {
@@ -1017,7 +1159,7 @@
           let weightedMarginal = 0;
           samples.forEach(income => {
             weightedIncome += income * sampleWeight;
-            weightedTax += theoreticalIrpf(income, schedule) * sampleWeight;
+            weightedTax += standardizedStateIrpf(income, schedule, distribution.year) * sampleWeight;
             weightedMarginal += marginalRateAtIncome(income, schedule) * sampleWeight;
           });
           const count = share * distribution.adultPopulation;
@@ -1820,7 +1962,7 @@
         <div class="ttRow">
           <div class="ttDot" style="background:${getColor(group.colorIndex)}"></div>
           <div class="ttName">${group.label} · ${peopleShort(group.count)} pers. · renta ${money(group.meanIncome, 0)}</div>
-          <div class="ttVal">${pct(group.effectiveRate)} ef. · ${pct(group.contributionShare)} rec.</div>
+          <div class="ttVal">${pct(group.effectiveRate)} ef. est. · ${pct(group.contributionShare)} rec.</div>
         </div>
       `);
       const incomeNote = record.meanIncomeStatus === 'wid'
@@ -1831,9 +1973,9 @@
       tooltip.innerHTML = `
         <div class="ttYear">${record.year}</div>
         <div class="subtle" style="margin-bottom:6px;">Población adulta: ${people(record.adultPopulation)} · PIB per cápita: ${money(record.gdpPerCapita, 0)}</div>
-        <div class="subtle" style="margin-bottom:6px;">Tipo efectivo medio teórico: ${pct(record.nationalEffectiveRate)}</div>
+        <div class="subtle" style="margin-bottom:6px;">Tipo efectivo estatal estimado: ${pct(record.nationalEffectiveRate)}</div>
         ${rows.join('')}
-        <div class="subtle" style="margin-top:8px;">${incomeNote} · IRPF estatal teórico, sin mínimos personales ni deducciones.</div>`;
+        <div class="subtle" style="margin-top:8px;">${incomeNote} · Modelo estándar: asalariado individual, menor de 65 años, sin hijos ni discapacidad. Incorpora mínimos/reducciones legales modelizables; no incluye cotizaciones ni deducciones personales.</div>`;
       tooltip.style.display = 'block';
 
       const rect = chartBox.getBoundingClientRect();
@@ -1922,22 +2064,22 @@
       }
 
       const isContribution = state.effortMetric === 'contribution';
-      out += `<text x="${plot.x}" y="${compact ? 27 : 19}" fill="#FEF702" font-size="${titleFont}" font-weight="700">${isContribution ? 'Aportación teórica al IRPF por grupo de renta' : 'Esfuerzo fiscal teórico por grupo de renta'}</text>`;
+      out += `<text x="${plot.x}" y="${compact ? 27 : 19}" fill="#FEF702" font-size="${titleFont}" font-weight="700">${isContribution ? 'Aportación estimada al IRPF estatal por grupo de renta' : 'Esfuerzo fiscal estatal estimado por grupo de renta'}</text>`;
       if (!compact) {
-        out += `<text x="${plot.x + plot.w}" y="19" fill="#bfbfbf" font-size="${metaFont}" text-anchor="end">${isContribution ? '% de la recaudación teórica' : 'IRPF estatal teórico / renta bruta'}</text>`;
+        out += `<text x="${plot.x + plot.w}" y="19" fill="#bfbfbf" font-size="${metaFont}" text-anchor="end">${isContribution ? '% de la recaudación estatal estimada' : 'IRPF estatal estimado / renta WID'}</text>`;
       }
       svg.innerHTML = out;
-      svg.setAttribute('aria-label', isContribution ? 'Aportación teórica al IRPF por grupos de renta' : 'Esfuerzo fiscal teórico por grupos de renta');
+      svg.setAttribute('aria-label', isContribution ? 'Aportación estimada al IRPF estatal por grupos de renta' : 'Esfuerzo fiscal estatal estimado por grupos de renta');
 
       chartMeta.textContent = isContribution
-        ? 'Peso en la recaudación teórica · IRPF estatal + población + renta media WID'
-        : 'Tipo efectivo teórico · IRPF estatal / renta · distribución WID y población adulta';
+        ? 'Peso en la recaudación estatal estimada · escala legal + población + renta media WID'
+        : 'Tipo efectivo estatal estimado · modelo de asalariado estándar + renta WID';
       lineSummary.textContent = isContribution
-        ? 'Aportación = IRPF teórico del grupo / IRPF teórico total · incorpora población y renta por grupo'
-        : 'Esfuerzo = IRPF estatal teórico / renta bruta del grupo · cálculo progresivo por todos los tramos';
+        ? 'Aportación = IRPF estatal estimado del grupo / IRPF estatal estimado total · incorpora población y renta por grupo'
+        : 'Esfuerzo = IRPF estatal estimado / renta del grupo · incluye mínimos y reducciones legales modelizables';
       rateEncodingNote.innerHTML = isContribution
-        ? 'Cada línea muestra el <strong>porcentaje de recaudación teórica</strong> aportado por P0–20, P20–40, P40–60, P60–80, P80–90, P90–99 y P99–100'
-        : 'Cada línea muestra el <strong>tipo efectivo teórico</strong>; la población pondera los agregados y la renta WID calibra la capacidad económica de cada grupo';
+        ? 'Cada línea muestra el <strong>porcentaje de recaudación estatal estimada</strong> aportado por P0–20, P20–40, P40–60, P60–80, P80–90, P90–99 y P99–100'
+        : 'Cada línea muestra el <strong>tipo efectivo estatal estimado</strong>; la renta WID se liquida bajo el mismo contribuyente estándar y la población pondera los agregados';
       topMeta.textContent = `${minYear}–${maxYear} · ${EFFORT_DATA.length} años`;
     }
 
@@ -1952,11 +2094,12 @@
         return;
       }
       if (state.chartMode === 'effort') {
-        sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta media por grupos, umbrales y población adulta), ${xmlSource} (escala estatal) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (extrapolación 2025) · <span style="opacity:.9;">N.Geolitics</span>`;
+        sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta media por grupos, umbrales y población adulta), <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> y AEAT (escala estatal, mínimos y reducciones), ${xmlSource}, y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (extrapolación 2025) · <span style="opacity:.9;">N.Geolitics</span>`;
         explanationContent.innerHTML = `
-          <p><strong>Esfuerzo fiscal teórico</strong> = IRPF estatal calculado de forma progresiva / renta bruta estimada del grupo. No se aplica el tipo marginal a toda la renta: cada euro tributa en el tramo que le corresponde.</p>
-          <p>La distribución se modela con P20, P40, P60, P80, P90 y P99, las <strong>medias de renta WID</strong> de P0–20, P20–40, P40–60, P60–80, P80–90, P90–99 y P99–100 y la población adulta anual. La vista «Aportación al IRPF» pondera además cuántos adultos hay en cada grupo.</p>
-          <p>Es una <strong>carga fiscal teórica</strong>: usa la escala estatal y no reproduce mínimos personales, deducciones, circunstancias familiares ni el tramo autonómico. WID mide renta nacional antes de impuestos por adulto, no declaraciones individuales.</p>`;
+          <p><strong>Esfuerzo fiscal estatal estimado</strong> = cuota estatal estimada del IRPF / renta WID del grupo. Cada muestra de renta se liquida progresivamente bajo un <strong>contribuyente estándar</strong>: individual, menor de 65 años, sin hijos ni discapacidad y con la renta modelizada como rendimiento ordinario del trabajo.</p>
+          <p>El modelo incorpora, según el año, <strong>gastos/reducciones generales del trabajo, deducción histórica por rendimientos del trabajo y mínimo personal</strong>. Desde 2007 el mínimo se trata con su mecánica legal de cuota a tipo cero; desde 2015 se incorpora además el gasto general de 2.000 €. No se aplica nunca el marginal superior a toda la renta.</p>
+          <p>La distribución usa P20, P40, P60, P80, P90 y P99, las <strong>medias de renta WID</strong> de P0–20, P20–40, P40–60, P60–80, P80–90, P90–99 y P99–100 y la población adulta anual. «Aportación al IRPF» pondera además cuántos adultos hay en cada grupo.</p>
+          <p><strong>Limitación:</strong> es una estimación estatutaria comparable, no el IRPF realmente pagado. WID no proporciona cotizaciones sociales individuales, composición exacta trabajo/capital, situación familiar ni deducciones personales. Tras la cesión autonómica, esta vista mide sólo el <strong>componente estatal</strong>, no la suma Estado + comunidad autónoma.</p>`;
         return;
       }
       sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta y población adulta) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (extrapolación 2025), ${xmlSource} · <span style="opacity:.9;">N.Geolitics</span>`;
