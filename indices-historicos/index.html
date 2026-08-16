@@ -728,7 +728,9 @@
             <div class="label">Cobertura</div>
             <div class="modeRow">
               <button class="btn modeButton on" id="btnLongFull" type="button" aria-pressed="true">Completa · 1492–2026</button>
-              <button class="btn modeButton" id="btnLongModern" type="button" aria-pressed="false">Desde 1871 · 1871–2026</button>
+              <button class="btn modeButton" id="btnLongSpainNetherlands" type="button" aria-pressed="false">España vs Holanda · 1602–1794</button>
+              <button class="btn modeButton" id="btnLongUkUsa" type="button" aria-pressed="false">Reino Unido vs EE. UU. · 1871–2025</button>
+              <button class="btn modeButton" id="btnLongUkUsaChina" type="button" aria-pressed="false">EE. UU. vs China + Reino Unido · 1990–2025</button>
             </div>
           </div>
 
@@ -829,7 +831,9 @@
       btnViewHistorical: document.getElementById('btnViewHistorical'),
       btnViewLongRun: document.getElementById('btnViewLongRun'),
       btnLongFull: document.getElementById('btnLongFull'),
-      btnLongModern: document.getElementById('btnLongModern'),
+      btnLongSpainNetherlands: document.getElementById('btnLongSpainNetherlands'),
+      btnLongUkUsa: document.getElementById('btnLongUkUsa'),
+      btnLongUkUsaChina: document.getElementById('btnLongUkUsaChina'),
       btnLongNetherlands: document.getElementById('btnLongNetherlands'),
       btnLongUk: document.getElementById('btnLongUk'),
       btnLongUsa: document.getElementById('btnLongUsa'),
@@ -860,6 +864,52 @@
       spain: {label: 'España', color: '#22C55E', dash: []},
       china: {label: 'China', color: '#38BDF8', dash: [4, 4]}
     };
+    const longRunCoverageProfiles = {
+      full: {
+        start: 1492, end: 2026,
+        selector: '1492–2026',
+        title: 'Cinco series históricas · cobertura completa',
+        meta: 'Cobertura completa; cada tramo = 100 en su primer año',
+        aria: 'Comparación de cinco series históricas entre 1492 y 2026, con cada tramo normalizado a 100 en su primer año disponible',
+        visible: ['netherlands', 'uk', 'usa', 'spain', 'china']
+      },
+      spainNetherlands: {
+        start: 1602, end: 1794,
+        selector: '1602–1794',
+        title: 'España vs Holanda · 1602–1794',
+        meta: 'España vs Holanda · mismo periodo 1602–1794; cada tramo = 100 en su primer año visible',
+        aria: 'Comparación histórica de España y Holanda entre 1602 y 1794, normalizadas a 100 en su primer año visible',
+        visible: ['spain', 'netherlands']
+      },
+      ukUsa: {
+        start: 1871, end: 2025,
+        selector: '1871–2025',
+        title: 'Reino Unido vs Estados Unidos · 1871–2025',
+        meta: 'Reino Unido vs Estados Unidos · mismo periodo 1871–2025; base 1871 = 100',
+        aria: 'Comparación histórica del Reino Unido y Estados Unidos entre 1871 y 2025, con base 1871 igual a 100',
+        visible: ['uk', 'usa']
+      },
+      ukUsaChina: {
+        start: 1990, end: 2025,
+        selector: '1990–2025',
+        title: 'Estados Unidos vs China + Reino Unido · 1990–2025',
+        meta: 'Estados Unidos vs China + Reino Unido · mismo periodo 1990–2025; base 1990 = 100',
+        aria: 'Comparación histórica de Estados Unidos, China y Reino Unido entre 1990 y 2025, con base 1990 igual a 100',
+        visible: ['usa', 'china', 'uk']
+      }
+    };
+    function currentLongRunCoverageProfile(){
+      return longRunCoverageProfiles[state.longRunCoverage] || longRunCoverageProfiles.full;
+    }
+    function applyLongRunCoverageProfile(id){
+      const profile = longRunCoverageProfiles[id];
+      if(!profile) return;
+      state.longRunCoverage = id;
+      const visible = new Set(profile.visible);
+      for(const seriesId of longRunSeriesOrder) state.longRunVisible.set(seriesId, visible.has(seriesId));
+      state.hover = null;
+      renderAll(false);
+    }
 
     const historicalFragments = [
       {
@@ -913,9 +963,9 @@
 
     function currentLongRunSeries(){
       if(!longRunDataIsValid) return [];
-      const modern = state.longRunCoverage === 'modern';
-      const start = modern ? 1871 : 1492;
-      const end = 2026;
+      const profile = currentLongRunCoverageProfile();
+      const start = profile.start;
+      const end = profile.end;
 
       return longRunSeriesOrder.map(id => {
         const rows = LONG_RUN_DATA[id]
@@ -966,15 +1016,20 @@
       els.longRunFooter.hidden = historical;
       els.selectorMeta.textContent = historical
         ? '1900–2020'
-        : (state.longRunCoverage === 'modern' ? '1871–2026' : '1492–2026');
+        : currentLongRunCoverageProfile().selector;
     }
 
     function renderLongRunControls(){
-      const modern = state.longRunCoverage === 'modern';
-      els.btnLongFull.classList.toggle('on', !modern);
-      els.btnLongModern.classList.toggle('on', modern);
-      els.btnLongFull.setAttribute('aria-pressed', modern ? 'false' : 'true');
-      els.btnLongModern.setAttribute('aria-pressed', modern ? 'true' : 'false');
+      for(const [id, button] of [
+        ['full', els.btnLongFull],
+        ['spainNetherlands', els.btnLongSpainNetherlands],
+        ['ukUsa', els.btnLongUkUsa],
+        ['ukUsaChina', els.btnLongUkUsaChina]
+      ]){
+        const active = state.longRunCoverage === id;
+        button.classList.toggle('on', active);
+        button.setAttribute('aria-pressed', active ? 'true' : 'false');
+      }
 
       for(const [id, button] of [
         ['netherlands', els.btnLongNetherlands],
@@ -1272,9 +1327,9 @@
       const plotH = Math.max(1, height - margin.top - margin.bottom);
       const plotRight = margin.left + plotW;
       const plotBottom = margin.top + plotH;
-      const modern = state.longRunCoverage === 'modern';
-      const startYear = modern ? 1871 : 1492;
-      const endYear = 2026;
+      const profile = currentLongRunCoverageProfile();
+      const startYear = profile.start;
+      const endYear = profile.end;
       const values = active.flatMap(serie => serie.points.map(point => point.v)).filter(value => Number.isFinite(value) && value > 0);
       const minValue = Math.min(...values);
       const maxValue = Math.max(...values);
@@ -1420,7 +1475,7 @@
       ctx.font = compact ? '700 15px Arial' : '700 19px Arial';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
-      ctx.fillText(modern ? 'Cinco series históricas · desde 1871' : 'Cinco series históricas · cobertura completa', margin.left, 32);
+      ctx.fillText(profile.title, margin.left, 32);
 
       ctx.save();
       ctx.translate(compact ? 17 : 24, margin.top + plotH / 2);
@@ -1768,14 +1823,9 @@
 
     function renderChartMeta(){
       if(state.view === 'longRun'){
-        const modern = state.longRunCoverage === 'modern';
-        els.chartMeta.textContent = `${modern ? 'Desde 1871; cada tramo = 100 en su primer año visible' : 'Cobertura completa; cada tramo = 100 en su primer año'} · huecos históricos sin unir · Escala ${state.longRunScale === 'log' ? 'logarítmica' : 'lineal'}`;
-        els.chart.setAttribute(
-          'aria-label',
-          modern
-            ? 'Comparación de cinco series históricas desde 1871, con cada tramo normalizado a 100 en su primer año visible'
-            : 'Comparación de cinco series históricas entre 1492 y 2026, con cada tramo normalizado a 100 en su primer año disponible'
-        );
+        const profile = currentLongRunCoverageProfile();
+        els.chartMeta.textContent = `${profile.meta} · huecos históricos sin unir · Escala ${state.longRunScale === 'log' ? 'logarítmica' : 'lineal'}`;
+        els.chart.setAttribute('aria-label', profile.aria);
         return;
       }
       els.chartMeta.textContent = state.metric === 'annual'
@@ -1844,18 +1894,10 @@
       renderAll(false);
     });
 
-    els.btnLongFull.addEventListener('click', () => {
-      if(state.longRunCoverage === 'full') return;
-      state.longRunCoverage = 'full';
-      state.hover = null;
-      renderAll(false);
-    });
-    els.btnLongModern.addEventListener('click', () => {
-      if(state.longRunCoverage === 'modern') return;
-      state.longRunCoverage = 'modern';
-      state.hover = null;
-      renderAll(false);
-    });
+    els.btnLongFull.addEventListener('click', () => applyLongRunCoverageProfile('full'));
+    els.btnLongSpainNetherlands.addEventListener('click', () => applyLongRunCoverageProfile('spainNetherlands'));
+    els.btnLongUkUsa.addEventListener('click', () => applyLongRunCoverageProfile('ukUsa'));
+    els.btnLongUkUsaChina.addEventListener('click', () => applyLongRunCoverageProfile('ukUsaChina'));
 
     for(const [id, button] of [
       ['netherlands', els.btnLongNetherlands],
