@@ -727,7 +727,7 @@
           <div class="field">
             <div class="label">Cobertura</div>
             <div class="modeRow">
-              <button class="btn modeButton on" id="btnLongFull" type="button" aria-pressed="true">Completa · 1602–2026</button>
+              <button class="btn modeButton on" id="btnLongFull" type="button" aria-pressed="true">Completa · 1492–2026</button>
               <button class="btn modeButton" id="btnLongModern" type="button" aria-pressed="false">Desde 1871 · 1871–2026</button>
             </div>
           </div>
@@ -737,11 +737,11 @@
             <div class="seriesGrid">
               <button class="seriesItem longRunSeriesItem" id="btnLongNetherlands" type="button" aria-pressed="true">
                 <span class="seriesSwatch" style="--series-color:#F59E0B"></span>
-                <span class="seriesName">Holanda (VOC) · 1602–1698</span>
+                <span class="seriesName">Holanda · 1602–1698 / 1723–1794</span>
               </button>
               <button class="seriesItem longRunSeriesItem" id="btnLongUk" type="button" aria-pressed="true">
                 <span class="seriesSwatch" style="--series-color:#8F7CFF"></span>
-                <span class="seriesName">Inglaterra / Reino Unido (Londres) · 1801–2025</span>
+                <span class="seriesName">Reino Unido (Londres) · 1801–2025</span>
               </button>
               <button class="seriesItem longRunSeriesItem" id="btnLongUsa" type="button" aria-pressed="true">
                 <span class="seriesSwatch isDashed" style="--series-color:#FF5A5F"></span>
@@ -749,11 +749,11 @@
               </button>
               <button class="seriesItem longRunSeriesItem" id="btnLongSpain" type="button" aria-pressed="true">
                 <span class="seriesSwatch" style="--series-color:#22C55E"></span>
-                <span class="seriesName">España (H-IBEX) · 1900–2020</span>
+                <span class="seriesName">España · 1492–1810 / 1900–2020</span>
               </button>
               <button class="seriesItem longRunSeriesItem" id="btnLongChina" type="button" aria-pressed="true">
                 <span class="seriesSwatch isDashed" style="--series-color:#38BDF8"></span>
-                <span class="seriesName">China (Shanghai) · 1871–1940</span>
+                <span class="seriesName">China · 1871–1940 / 1990–2026</span>
               </button>
             </div>
           </div>
@@ -778,7 +778,7 @@
       <div class="chartContent">
         <div class="chartViewBar" role="tablist" aria-label="Selector de gráfico">
           <button class="btn wideViewToggle on" id="btnViewHistorical" type="button" role="tab" aria-selected="true">Índices históricos</button>
-          <button class="btn wideViewToggle" id="btnViewLongRun" type="button" role="tab" aria-selected="false">5 mercados históricos</button>
+          <button class="btn wideViewToggle" id="btnViewLongRun" type="button" role="tab" aria-selected="false">5 series históricas</button>
         </div>
         <div class="chartBox">
           <canvas aria-label="Gráfico de índices históricos" id="chart"></canvas>
@@ -788,13 +788,13 @@
         </div>
         <div class="footerSingle">
           <span class="footerSource" id="historicalFooter">Fuente: <a class="sourceLink" href="https://www.macrohistory.net/database/" target="_blank" rel="noopener noreferrer">Jordà-Schularick-Taylor Macrohistory Database</a> (<span style="color:#fff">JSTdatasetR6.xlsx</span>, R.6) · <span style="opacity:.9;">N.Geolitics</span></span>
-          <span class="footerSource" id="longRunFooter" hidden>Fuentes: <span style="color:#fff">VOC share price 1602-1698.xlsx</span> · <a class="sourceLink" href="https://www.bankofengland.co.uk/statistics/research-datasets" target="_blank" rel="noopener noreferrer">Banco de Inglaterra</a> / <a class="sourceLink" href="https://www.lseg.com/en/ftse-russell/indices/uk" target="_blank" rel="noopener noreferrer">FTSE Russell–LSEG</a> · <span style="color:#fff">SP500_historico_completo_1871_2026.csv</span> · <span style="color:#fff">H-IBEX 1900–2020</span> · <span style="color:#fff">sseindices.xls</span> · Índices de precio nominal, normalizados a base 100.</span>
+          <span class="footerSource" id="longRunFooter" hidden>Fuentes: <span style="color:#fff">ICPSR 139761 (España monetaria 1492–1810)</span> · <span style="color:#fff">H-IBEX 1900–2020</span> · <span style="color:#fff">VOC 1602–1698</span> · <span style="color:#fff">Golez–Koudijs 1723–1794</span> · Banco de Inglaterra / FTSE Russell–LSEG · <span style="color:#fff">SP500 histórico</span> · <span style="color:#fff">Shanghai histórico</span> · <span style="color:#fff">SSE Composite 1990–2026</span> · Cada tramo se normaliza a base 100 y los huecos históricos no se unen.</span>
         </div>
       </div>
     </section>
   </main>
 <script src="series-data.js"></script>
-<script src="long-run-indices-data.js"></script>
+<script src="long-run-indices-data.js?v=20260816-2"></script>
 <script>
     const DATA = window.NG_SERIES_DATA;
     const LONG_RUN_DATA = window.NGE_LONG_RUN_DATA;
@@ -854,11 +854,11 @@
     const GERMANY_SID = 'jst_germany';
     const longRunSeriesOrder = ['netherlands', 'uk', 'usa', 'spain', 'china'];
     const longRunSeriesStyle = {
-      netherlands: {label: 'Holanda (VOC)', color: '#F59E0B', dash: []},
+      netherlands: {label: 'Holanda', color: '#F59E0B', dash: []},
       uk: {label: 'Inglaterra / Reino Unido', color: '#8F7CFF', dash: []},
       usa: {label: 'Estados Unidos', color: '#FF5A5F', dash: [9, 6]},
-      spain: {label: 'España (H-IBEX)', color: '#22C55E', dash: []},
-      china: {label: 'China (Shanghai)', color: '#38BDF8', dash: [4, 4]}
+      spain: {label: 'España', color: '#22C55E', dash: []},
+      china: {label: 'China', color: '#38BDF8', dash: [4, 4]}
     };
 
     const historicalFragments = [
@@ -910,31 +910,45 @@
       LONG_RUN_DATA &&
       longRunSeriesOrder.every(id => Array.isArray(LONG_RUN_DATA[id]) && LONG_RUN_DATA[id].length > 1)
     );
-    const longRunMaps = Object.fromEntries(
-      longRunSeriesOrder.map(id => [
-        id,
-        new Map(longRunDataIsValid ? LONG_RUN_DATA[id].map(row => [Number(row.year), Number(row.value)]) : [])
-      ])
-    );
 
     function currentLongRunSeries(){
       if(!longRunDataIsValid) return [];
       const modern = state.longRunCoverage === 'modern';
-      const start = modern ? 1871 : 1602;
+      const start = modern ? 1871 : 1492;
       const end = 2026;
+
       return longRunSeriesOrder.map(id => {
-        const map = longRunMaps[id];
-        const visibleYears = [...map.keys()].filter(year => year >= start && year <= end).sort((a,b) => a - b);
-        if(!visibleYears.length) return {id, ...longRunSeriesStyle[id], points: []};
-        const baseYear = visibleYears[0];
-        const base = map.get(baseYear);
-        const points = visibleYears
-          .map(year => {
-            const raw = map.get(year);
-            if(!Number.isFinite(raw) || !Number.isFinite(base) || base <= 0) return null;
-            return {t: Date.UTC(year, 0, 1), year, v: (raw / base) * 100};
-          })
-          .filter(Boolean);
+        const rows = LONG_RUN_DATA[id]
+          .map(row => ({
+            year: Number(row.year),
+            raw: Number(row.value),
+            segment: String(row.segment || id),
+            segmentLabel: String(row.segment_label || ''),
+            source: String(row.source || ''),
+            note: String(row.note || '')
+          }))
+          .filter(row => row.year >= start && row.year <= end && Number.isFinite(row.raw) && row.raw > 0)
+          .sort((a,b) => a.year - b.year || a.segment.localeCompare(b.segment));
+
+        if(!rows.length) return {id, ...longRunSeriesStyle[id], points: []};
+
+        const segmentBases = new Map();
+        const points = [];
+        for(const row of rows){
+          if(!segmentBases.has(row.segment)) segmentBases.set(row.segment, row.raw);
+          const base = segmentBases.get(row.segment);
+          if(!Number.isFinite(base) || base <= 0) continue;
+          points.push({
+            t: Date.UTC(row.year, 0, 1),
+            year: row.year,
+            v: (row.raw / base) * 100,
+            raw: row.raw,
+            segment: row.segment,
+            segmentLabel: row.segmentLabel,
+            source: row.source,
+            note: row.note
+          });
+        }
         return {id, ...longRunSeriesStyle[id], points};
       });
     }
@@ -952,7 +966,7 @@
       els.longRunFooter.hidden = historical;
       els.selectorMeta.textContent = historical
         ? '1900–2020'
-        : (state.longRunCoverage === 'modern' ? '1871–2026' : '1602–2026');
+        : (state.longRunCoverage === 'modern' ? '1871–2026' : '1492–2026');
     }
 
     function renderLongRunControls(){
@@ -1259,7 +1273,7 @@
       const plotRight = margin.left + plotW;
       const plotBottom = margin.top + plotH;
       const modern = state.longRunCoverage === 'modern';
-      const startYear = modern ? 1871 : 1602;
+      const startYear = modern ? 1871 : 1492;
       const endYear = 2026;
       const values = active.flatMap(serie => serie.points.map(point => point.v)).filter(value => Number.isFinite(value) && value > 0);
       const minValue = Math.min(...values);
@@ -1327,16 +1341,28 @@
         ctx.setLineDash(serie.dash);
         ctx.beginPath();
         let started = false;
+        let previousYear = null;
+        let previousSegment = null;
         for(const point of serie.points){
           if(point.year < startYear || point.year > endYear) continue;
           const x = tx(point.year);
           const y = ty(point.v);
           if(!Number.isFinite(x) || !Number.isFinite(y)){
             started = false;
+            previousYear = null;
+            previousSegment = null;
             continue;
           }
-          if(!started){ ctx.moveTo(x, y); started = true; }
-          else ctx.lineTo(x, y);
+          const newSegment = previousSegment !== null && point.segment !== previousSegment;
+          const yearGap = previousYear !== null && point.year - previousYear > 1;
+          if(!started || newSegment || yearGap){
+            ctx.moveTo(x, y);
+            started = true;
+          } else {
+            ctx.lineTo(x, y);
+          }
+          previousYear = point.year;
+          previousSegment = point.segment;
         }
         ctx.stroke();
         ctx.restore();
@@ -1376,7 +1402,7 @@
           ctx.fillRect(tooltipX + 12, tooltipY + 34 + index * 24, 14, 3);
           ctx.fillStyle = '#e3e3e3';
           ctx.font = compact ? '11px Arial' : '12px Arial';
-          ctx.fillText(`${serie.label}: ${point ? formatValue(point.v) : 'sin dato'}`, tooltipX + 34, tooltipY + 27 + index * 24);
+          ctx.fillText(`${serie.label}${point?.segmentLabel ? ' · ' + point.segmentLabel : ''}: ${point ? formatValue(point.v) : 'sin dato'}`, tooltipX + 34, tooltipY + 27 + index * 24);
         });
         ctx.restore();
       }
@@ -1394,7 +1420,7 @@
       ctx.font = compact ? '700 15px Arial' : '700 19px Arial';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
-      ctx.fillText(modern ? 'Cinco mercados históricos · desde 1871' : 'Cinco mercados históricos · cobertura completa', margin.left, 32);
+      ctx.fillText(modern ? 'Cinco series históricas · desde 1871' : 'Cinco series históricas · cobertura completa', margin.left, 32);
 
       ctx.save();
       ctx.translate(compact ? 17 : 24, margin.top + plotH / 2);
@@ -1402,7 +1428,7 @@
       ctx.fillStyle = '#e3e3e3';
       ctx.font = compact ? '700 10px Arial' : '700 13px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText('Índice nominal · base 100', 0, 0);
+      ctx.fillText('Índice normalizado por tramo · base 100', 0, 0);
       ctx.restore();
 
       ctx.fillStyle = '#b0b0b0';
@@ -1743,12 +1769,12 @@
     function renderChartMeta(){
       if(state.view === 'longRun'){
         const modern = state.longRunCoverage === 'modern';
-        els.chartMeta.textContent = `${modern ? 'Desde 1871; cada serie = 100 en su primer año visible' : 'Cobertura completa; cada serie = 100 en su primer año'} · Escala ${state.longRunScale === 'log' ? 'logarítmica' : 'lineal'}`;
+        els.chartMeta.textContent = `${modern ? 'Desde 1871; cada tramo = 100 en su primer año visible' : 'Cobertura completa; cada tramo = 100 en su primer año'} · huecos históricos sin unir · Escala ${state.longRunScale === 'log' ? 'logarítmica' : 'lineal'}`;
         els.chart.setAttribute(
           'aria-label',
           modern
-            ? 'Comparación de cinco mercados históricos desde 1871, con cada serie normalizada a 100 en su primer año visible'
-            : 'Comparación de cinco mercados históricos entre 1602 y 2026, con cada serie normalizada a 100 en su primer año disponible'
+            ? 'Comparación de cinco series históricas desde 1871, con cada tramo normalizado a 100 en su primer año visible'
+            : 'Comparación de cinco series históricas entre 1492 y 2026, con cada tramo normalizado a 100 en su primer año disponible'
         );
         return;
       }
