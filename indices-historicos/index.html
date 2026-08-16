@@ -727,21 +727,33 @@
           <div class="field">
             <div class="label">Cobertura</div>
             <div class="modeRow">
-              <button class="btn modeButton on" id="btnLongFull" type="button" aria-pressed="true">Completa · 1801–2026</button>
-              <button class="btn modeButton" id="btnLongCommon" type="button" aria-pressed="false">Periodo común · 1871–2025</button>
+              <button class="btn modeButton on" id="btnLongFull" type="button" aria-pressed="true">Completa · 1602–2026</button>
+              <button class="btn modeButton" id="btnLongModern" type="button" aria-pressed="false">Desde 1871 · 1871–2026</button>
             </div>
           </div>
 
           <div class="field seriesField">
             <div class="label">Series visibles</div>
             <div class="seriesGrid">
-              <button class="seriesItem longRunSeriesItem" id="btnLongLondon" type="button" aria-pressed="true">
+              <button class="seriesItem longRunSeriesItem" id="btnLongNetherlands" type="button" aria-pressed="true">
+                <span class="seriesSwatch" style="--series-color:#F59E0B"></span>
+                <span class="seriesName">Holanda (VOC) · 1602–1698</span>
+              </button>
+              <button class="seriesItem longRunSeriesItem" id="btnLongUk" type="button" aria-pressed="true">
                 <span class="seriesSwatch" style="--series-color:#8F7CFF"></span>
-                <span class="seriesName">Londres · precio nominal reconstruido</span>
+                <span class="seriesName">Inglaterra / Reino Unido (Londres) · 1801–2025</span>
               </button>
               <button class="seriesItem longRunSeriesItem" id="btnLongUsa" type="button" aria-pressed="true">
                 <span class="seriesSwatch isDashed" style="--series-color:#FF5A5F"></span>
-                <span class="seriesName">Estados Unidos · precio nominal aportado</span>
+                <span class="seriesName">Estados Unidos · 1871–2026</span>
+              </button>
+              <button class="seriesItem longRunSeriesItem" id="btnLongSpain" type="button" aria-pressed="true">
+                <span class="seriesSwatch" style="--series-color:#22C55E"></span>
+                <span class="seriesName">España (H-IBEX) · 1900–2020</span>
+              </button>
+              <button class="seriesItem longRunSeriesItem" id="btnLongChina" type="button" aria-pressed="true">
+                <span class="seriesSwatch isDashed" style="--series-color:#38BDF8"></span>
+                <span class="seriesName">China (Shanghai) · 1871–1940</span>
               </button>
             </div>
           </div>
@@ -766,7 +778,7 @@
       <div class="chartContent">
         <div class="chartViewBar" role="tablist" aria-label="Selector de gráfico">
           <button class="btn wideViewToggle on" id="btnViewHistorical" type="button" role="tab" aria-selected="true">Índices históricos</button>
-          <button class="btn wideViewToggle" id="btnViewLongRun" type="button" role="tab" aria-selected="false">Londres vs Estados Unidos</button>
+          <button class="btn wideViewToggle" id="btnViewLongRun" type="button" role="tab" aria-selected="false">5 mercados históricos</button>
         </div>
         <div class="chartBox">
           <canvas aria-label="Gráfico de índices históricos" id="chart"></canvas>
@@ -776,7 +788,7 @@
         </div>
         <div class="footerSingle">
           <span class="footerSource" id="historicalFooter">Fuente: <a class="sourceLink" href="https://www.macrohistory.net/database/" target="_blank" rel="noopener noreferrer">Jordà-Schularick-Taylor Macrohistory Database</a> (<span style="color:#fff">JSTdatasetR6.xlsx</span>, R.6) · <span style="opacity:.9;">N.Geolitics</span></span>
-          <span class="footerSource" id="longRunFooter" hidden>Fuentes: <a class="sourceLink" href="https://www.bankofengland.co.uk/statistics/research-datasets" target="_blank" rel="noopener noreferrer">Banco de Inglaterra</a> / <a class="sourceLink" href="https://www.lseg.com/en/ftse-russell/indices/uk" target="_blank" rel="noopener noreferrer">FTSE Russell–LSEG</a> / <span style="color:#fff">SP500_historico_completo_1871_2026.csv</span> · Precios nominales, sin dividendos ni inflación.</span>
+          <span class="footerSource" id="longRunFooter" hidden>Fuentes: <span style="color:#fff">VOC share price 1602-1698.xlsx</span> · <a class="sourceLink" href="https://www.bankofengland.co.uk/statistics/research-datasets" target="_blank" rel="noopener noreferrer">Banco de Inglaterra</a> / <a class="sourceLink" href="https://www.lseg.com/en/ftse-russell/indices/uk" target="_blank" rel="noopener noreferrer">FTSE Russell–LSEG</a> · <span style="color:#fff">SP500_historico_completo_1871_2026.csv</span> · <span style="color:#fff">H-IBEX 1900–2020</span> · <span style="color:#fff">sseindices.xls</span> · Índices de precio nominal, normalizados a base 100.</span>
         </div>
       </div>
     </section>
@@ -797,7 +809,7 @@
       hoverSid: null,
       longRunCoverage: 'full',
       longRunScale: 'log',
-      longRunVisible: new Map([['london', true], ['usa', true]]),
+      longRunVisible: new Map([['netherlands', true], ['uk', true], ['usa', true], ['spain', true], ['china', true]]),
       pixelRatio: Math.max(1, window.devicePixelRatio || 1)
     };
 
@@ -817,9 +829,12 @@
       btnViewHistorical: document.getElementById('btnViewHistorical'),
       btnViewLongRun: document.getElementById('btnViewLongRun'),
       btnLongFull: document.getElementById('btnLongFull'),
-      btnLongCommon: document.getElementById('btnLongCommon'),
-      btnLongLondon: document.getElementById('btnLongLondon'),
+      btnLongModern: document.getElementById('btnLongModern'),
+      btnLongNetherlands: document.getElementById('btnLongNetherlands'),
+      btnLongUk: document.getElementById('btnLongUk'),
       btnLongUsa: document.getElementById('btnLongUsa'),
+      btnLongSpain: document.getElementById('btnLongSpain'),
+      btnLongChina: document.getElementById('btnLongChina'),
       btnLongLog: document.getElementById('btnLongLog'),
       btnLongLinear: document.getElementById('btnLongLinear'),
       status: document.getElementById('status'),
@@ -837,9 +852,13 @@
       annual: 'Rendimientos anuales'
     };
     const GERMANY_SID = 'jst_germany';
+    const longRunSeriesOrder = ['netherlands', 'uk', 'usa', 'spain', 'china'];
     const longRunSeriesStyle = {
-      london: {label: 'Londres', color: '#8F7CFF', dash: []},
-      usa: {label: 'Estados Unidos', color: '#FF5A5F', dash: [9, 6]}
+      netherlands: {label: 'Holanda (VOC)', color: '#F59E0B', dash: []},
+      uk: {label: 'Inglaterra / Reino Unido', color: '#8F7CFF', dash: []},
+      usa: {label: 'Estados Unidos', color: '#FF5A5F', dash: [9, 6]},
+      spain: {label: 'España (H-IBEX)', color: '#22C55E', dash: []},
+      china: {label: 'China (Shanghai)', color: '#38BDF8', dash: [4, 4]}
     };
 
     const historicalFragments = [
@@ -889,31 +908,33 @@
 
     const longRunDataIsValid = Boolean(
       LONG_RUN_DATA &&
-      Array.isArray(LONG_RUN_DATA.london) && LONG_RUN_DATA.london.length === 225 &&
-      Array.isArray(LONG_RUN_DATA.usa) && LONG_RUN_DATA.usa.length === 156 &&
-      LONG_RUN_DATA.london[0]?.year === 1801 && LONG_RUN_DATA.london.at(-1)?.year === 2025 &&
-      LONG_RUN_DATA.usa[0]?.year === 1871 && LONG_RUN_DATA.usa.at(-1)?.year === 2026
+      longRunSeriesOrder.every(id => Array.isArray(LONG_RUN_DATA[id]) && LONG_RUN_DATA[id].length > 1)
     );
-    const longRunMaps = {
-      london: new Map(longRunDataIsValid ? LONG_RUN_DATA.london.map(row => [row.year, Number(row.value)]) : []),
-      usa: new Map(longRunDataIsValid ? LONG_RUN_DATA.usa.map(row => [row.year, Number(row.value)]) : [])
-    };
+    const longRunMaps = Object.fromEntries(
+      longRunSeriesOrder.map(id => [
+        id,
+        new Map(longRunDataIsValid ? LONG_RUN_DATA[id].map(row => [Number(row.year), Number(row.value)]) : [])
+      ])
+    );
 
     function currentLongRunSeries(){
       if(!longRunDataIsValid) return [];
-      const common = state.longRunCoverage === 'common';
-      const start = common ? 1871 : 1801;
-      const end = common ? 2025 : 2026;
-      const baseYears = common ? {london: 1871, usa: 1871} : {london: 1801, usa: 1871};
-      return ['london', 'usa'].map(id => {
+      const modern = state.longRunCoverage === 'modern';
+      const start = modern ? 1871 : 1602;
+      const end = 2026;
+      return longRunSeriesOrder.map(id => {
         const map = longRunMaps[id];
-        const base = map.get(baseYears[id]);
-        const points = [];
-        for(let year = start; year <= end; year++){
-          const raw = map.get(year);
-          if(!Number.isFinite(raw) || !Number.isFinite(base) || base <= 0) continue;
-          points.push({t: Date.UTC(year, 0, 1), year, v: (raw / base) * 100});
-        }
+        const visibleYears = [...map.keys()].filter(year => year >= start && year <= end).sort((a,b) => a - b);
+        if(!visibleYears.length) return {id, ...longRunSeriesStyle[id], points: []};
+        const baseYear = visibleYears[0];
+        const base = map.get(baseYear);
+        const points = visibleYears
+          .map(year => {
+            const raw = map.get(year);
+            if(!Number.isFinite(raw) || !Number.isFinite(base) || base <= 0) return null;
+            return {t: Date.UTC(year, 0, 1), year, v: (raw / base) * 100};
+          })
+          .filter(Boolean);
         return {id, ...longRunSeriesStyle[id], points};
       });
     }
@@ -931,17 +952,23 @@
       els.longRunFooter.hidden = historical;
       els.selectorMeta.textContent = historical
         ? '1900–2020'
-        : (state.longRunCoverage === 'common' ? '1871–2025' : '1801–2026');
+        : (state.longRunCoverage === 'modern' ? '1871–2026' : '1602–2026');
     }
 
     function renderLongRunControls(){
-      const common = state.longRunCoverage === 'common';
-      els.btnLongFull.classList.toggle('on', !common);
-      els.btnLongCommon.classList.toggle('on', common);
-      els.btnLongFull.setAttribute('aria-pressed', common ? 'false' : 'true');
-      els.btnLongCommon.setAttribute('aria-pressed', common ? 'true' : 'false');
+      const modern = state.longRunCoverage === 'modern';
+      els.btnLongFull.classList.toggle('on', !modern);
+      els.btnLongModern.classList.toggle('on', modern);
+      els.btnLongFull.setAttribute('aria-pressed', modern ? 'false' : 'true');
+      els.btnLongModern.setAttribute('aria-pressed', modern ? 'true' : 'false');
 
-      for(const [id, button] of [['london', els.btnLongLondon], ['usa', els.btnLongUsa]]){
+      for(const [id, button] of [
+        ['netherlands', els.btnLongNetherlands],
+        ['uk', els.btnLongUk],
+        ['usa', els.btnLongUsa],
+        ['spain', els.btnLongSpain],
+        ['china', els.btnLongChina]
+      ]){
         const visible = state.longRunVisible.get(id) === true;
         button.setAttribute('aria-pressed', visible ? 'true' : 'false');
       }
@@ -1216,7 +1243,7 @@
       }
 
       const allSeries = currentLongRunSeries();
-      const active = allSeries.filter(serie => state.longRunVisible.get(serie.id) === true);
+      const active = allSeries.filter(serie => state.longRunVisible.get(serie.id) === true && serie.points.length > 0);
       if(!active.length){
         ctx.fillStyle = '#e3e3e3';
         ctx.font = '700 18px Arial';
@@ -1231,9 +1258,9 @@
       const plotH = Math.max(1, height - margin.top - margin.bottom);
       const plotRight = margin.left + plotW;
       const plotBottom = margin.top + plotH;
-      const common = state.longRunCoverage === 'common';
-      const startYear = common ? 1871 : 1801;
-      const endYear = common ? 2025 : 2026;
+      const modern = state.longRunCoverage === 'modern';
+      const startYear = modern ? 1871 : 1602;
+      const endYear = 2026;
       const values = active.flatMap(serie => serie.points.map(point => point.v)).filter(value => Number.isFinite(value) && value > 0);
       const minValue = Math.min(...values);
       const maxValue = Math.max(...values);
@@ -1367,7 +1394,7 @@
       ctx.font = compact ? '700 15px Arial' : '700 19px Arial';
       ctx.textAlign = 'left';
       ctx.textBaseline = 'alphabetic';
-      ctx.fillText(common ? 'Londres vs Estados Unidos · 1871 = 100' : 'Cobertura completa · bases propias', margin.left, 32);
+      ctx.fillText(modern ? 'Cinco mercados históricos · desde 1871' : 'Cinco mercados históricos · cobertura completa', margin.left, 32);
 
       ctx.save();
       ctx.translate(compact ? 17 : 24, margin.top + plotH / 2);
@@ -1375,7 +1402,7 @@
       ctx.fillStyle = '#e3e3e3';
       ctx.font = compact ? '700 10px Arial' : '700 13px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText('Precio nominal · base 100', 0, 0);
+      ctx.fillText('Índice nominal · base 100', 0, 0);
       ctx.restore();
 
       ctx.fillStyle = '#b0b0b0';
@@ -1715,11 +1742,14 @@
 
     function renderChartMeta(){
       if(state.view === 'longRun'){
-        const common = state.longRunCoverage === 'common';
-        els.chartMeta.textContent = `${common ? 'Base común 1871 = 100' : 'Bases propias: Londres 1801 / USA 1871'} · Escala ${state.longRunScale === 'log' ? 'logarítmica' : 'lineal'}`;
-        els.chart.setAttribute('aria-label', common
-          ? 'Comparación de precios nominales de Londres y Estados Unidos entre 1871 y 2025, base 1871 igual a 100'
-          : 'Comparación completa de precios nominales de Londres y Estados Unidos, con bases iniciales propias');
+        const modern = state.longRunCoverage === 'modern';
+        els.chartMeta.textContent = `${modern ? 'Desde 1871; cada serie = 100 en su primer año visible' : 'Cobertura completa; cada serie = 100 en su primer año'} · Escala ${state.longRunScale === 'log' ? 'logarítmica' : 'lineal'}`;
+        els.chart.setAttribute(
+          'aria-label',
+          modern
+            ? 'Comparación de cinco mercados históricos desde 1871, con cada serie normalizada a 100 en su primer año visible'
+            : 'Comparación de cinco mercados históricos entre 1602 y 2026, con cada serie normalizada a 100 en su primer año disponible'
+        );
         return;
       }
       els.chartMeta.textContent = state.metric === 'annual'
@@ -1794,14 +1824,20 @@
       state.hover = null;
       renderAll(false);
     });
-    els.btnLongCommon.addEventListener('click', () => {
-      if(state.longRunCoverage === 'common') return;
-      state.longRunCoverage = 'common';
+    els.btnLongModern.addEventListener('click', () => {
+      if(state.longRunCoverage === 'modern') return;
+      state.longRunCoverage = 'modern';
       state.hover = null;
       renderAll(false);
     });
 
-    for(const [id, button] of [['london', els.btnLongLondon], ['usa', els.btnLongUsa]]){
+    for(const [id, button] of [
+      ['netherlands', els.btnLongNetherlands],
+      ['uk', els.btnLongUk],
+      ['usa', els.btnLongUsa],
+      ['spain', els.btnLongSpain],
+      ['china', els.btnLongChina]
+    ]){
       button.addEventListener('click', () => {
         state.longRunVisible.set(id, state.longRunVisible.get(id) !== true);
         state.hover = null;
