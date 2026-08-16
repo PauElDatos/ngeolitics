@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>N.Geolitics — Tramos históricos del IRPF</title>
-  <meta name="description" content="Evolución histórica de los tramos estatales del IRPF y del PIB per cápita en España.">
+  <meta name="description" content="Evolución histórica de los tramos estatales del IRPF, la población por tramo y el esfuerzo fiscal teórico por grupos de renta en España.">
   <link rel="icon" href="../assets/faviconNG.png">
   <style>
     :root {
@@ -475,7 +475,7 @@
     .chartModeBar {
       width: 100%;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 12px;
       flex: 0 0 auto;
     }
@@ -574,7 +574,10 @@
       }
       .chartNotes { flex-direction: column; }
       .tooltip { min-width: min(290px, calc(100vw - 64px)); }
-      .chartModeBar { gap: 8px; }
+      .chartModeBar {
+        gap: 8px;
+        grid-template-columns: 1fr;
+      }
       .chartModeButton {
         min-height: 44px;
         font-size: calc(11px * var(--uiScale));
@@ -621,6 +624,11 @@
             <div class="segmented" id="scaleButtons"></div>
           </div>
 
+          <div class="field isHidden" id="effortMetricField">
+            <div class="label">Indicador</div>
+            <div class="segmented" id="effortMetricButtons"></div>
+          </div>
+
           <div class="field">
             <div class="label">Leyenda</div>
             <div class="seriesLegend" id="seriesLegend"></div>
@@ -639,6 +647,7 @@
         <div class="chartModeBar" role="group" aria-label="Selector de gráfico">
           <button class="btn chartModeButton active" id="btnChartLimits" type="button" aria-pressed="true">Mapa fiscal del IRPF</button>
           <button class="btn chartModeButton" id="btnChartPopulation" type="button" aria-pressed="false">Población por tramo</button>
+          <button class="btn chartModeButton" id="btnChartEffort" type="button" aria-pressed="false">Esfuerzo fiscal</button>
         </div>
 
         <div class="chartBox" id="chartBox">
@@ -680,6 +689,7 @@
   </main>
 
   <script src="renta_por_quintiles_data.js"></script>
+  <script src="renta_media_grupos_data.js"></script>
   <script>
     (async () => {
     const DATA_SOURCE = 'irpf_escala_estatal_1990-2025.xml';
@@ -740,6 +750,19 @@
     const INCOME_DISTRIBUTION = Array.isArray(window.IRPF_INCOME_DISTRIBUTION)
       ? window.IRPF_INCOME_DISTRIBUTION
       : [];
+    const INCOME_GROUP_MEANS = Array.isArray(window.IRPF_INCOME_GROUP_MEANS)
+      ? window.IRPF_INCOME_GROUP_MEANS
+      : [];
+    const INCOME_GROUP_MEAN_MAP = new Map(INCOME_GROUP_MEANS.map(d => [d.year, d]));
+    const EFFORT_GROUP_DEFS = [
+      { key: 'p0_20', label: 'P0–20', colorIndex: 1 },
+      { key: 'p20_40', label: 'P20–40', colorIndex: 2 },
+      { key: 'p40_60', label: 'P40–60', colorIndex: 3 },
+      { key: 'p60_80', label: 'P60–80', colorIndex: 4 },
+      { key: 'p80_90', label: 'P80–90', colorIndex: 5 },
+      { key: 'p90_99', label: 'P90–99', colorIndex: 6 },
+      { key: 'p99_100', label: 'P99–100', colorIndex: 7 },
+    ];
     const YEARS = DATA.map(d => d.year);
     const YEAR_MAP = new Map(DATA.map(d => [d.year, d]));
     const MAX_TRAMOS = Math.max(...DATA.map(d => d.brackets.length));
@@ -761,6 +784,7 @@
 
     const state = {
       chartMode: 'limits',
+      effortMetric: 'effective',
       mode: 'nominal',
       scaleMode: 'log',
       showPresBands: true,
@@ -779,8 +803,10 @@
     const rateEncodingNote = document.getElementById('rateEncodingNote');
     const btnChartLimits = document.getElementById('btnChartLimits');
     const btnChartPopulation = document.getElementById('btnChartPopulation');
+    const btnChartEffort = document.getElementById('btnChartEffort');
     const amountField = document.getElementById('amountField');
     const scaleField = document.getElementById('scaleField');
+    const effortMetricField = document.getElementById('effortMetricField');
     const sourceFooter = document.getElementById('sourceFooter');
     const explanationContent = document.getElementById('explanationContent');
     const chartPanel = document.querySelector('.chartPanel');
@@ -911,6 +937,129 @@
 
     const POPULATION_DATA = buildPopulationRecords();
     const POPULATION_YEAR_MAP = new Map(POPULATION_DATA.map(d => [d.year, d]));
+
+    function theoreticalIrpf(income, schedule) {
+      if (!Number.isFinite(income) || income <= 0 || !schedule) return 0;
+      let tax = 0;
+      schedule.brackets.forEach(bracket => {
+        if (!Number.isFinite(bracket.rate)) return;
+        const lower = Number.isFinite(bracket.lower_nominal_eur) ? bracket.lower_nominal_eur : 0;
+        const upper = bracket.is_open || !Number.isFinite(bracket.upper_nominal_eur)
+          ? income
+          : Math.min(income, bracket.upper_nominal_eur);
+        const taxable = Math.max(0, upper - lower);
+        tax += taxable * (bracket.rate / 100);
+      });
+      return Math.max(0, tax);
+    }
+
+    function marginalRateAtIncome(income, schedule) {
+      if (!Number.isFinite(income) || !schedule) return 0;
+      for (const bracket of schedule.brackets) {
+        const lower = Number.isFinite(bracket.lower_nominal_eur) ? bracket.lower_nominal_eur : 0;
+        const upper = bracket.is_open ? Infinity : bracket.upper_nominal_eur;
+        if (income >= lower && income <= upper && Number.isFinite(bracket.rate)) return bracket.rate;
+      }
+      const last = schedule.brackets[schedule.brackets.length - 1];
+      return Number.isFinite(last?.rate) && income >= (last.lower_nominal_eur || 0) ? last.rate : 0;
+    }
+
+    function calibratedIncomeSamples(groupIndex, distribution, meanGroup) {
+      const group = meanGroup.groups[groupIndex];
+      if (!group || !Number.isFinite(group.meanIncomeNominalEur)) return [];
+      const share = group.populationShare;
+      const lower = groupIndex === 0 ? 0 : distribution.thresholds[groupIndex - 1];
+      const upper = groupIndex < 6 ? distribution.thresholds[groupIndex] : Infinity;
+      const targetMean = group.meanIncomeNominalEur;
+      const n = Math.max(80, Math.round(1200 * share));
+      const values = [];
+
+      if (Number.isFinite(upper)) {
+        const span = Math.max(1e-9, upper - lower);
+        const meanAboveLower = Math.max(1e-9, targetMean - lower);
+        const power = Math.max(0.05, Math.min(50, (span / meanAboveLower) - 1));
+        for (let i = 0; i < n; i++) {
+          const s = (i + 0.5) / n;
+          values.push(lower + (span * Math.pow(s, power)));
+        }
+      } else {
+        const alpha = targetMean > lower
+          ? Math.max(1.01, targetMean / Math.max(1e-9, targetMean - lower))
+          : 1.5;
+        for (let i = 0; i < n; i++) {
+          const s = (i + 0.5) / n;
+          values.push(lower / Math.pow(Math.max(1e-9, 1 - s), 1 / alpha));
+        }
+        const rawMean = values.reduce((sum, value) => sum + value, 0) / values.length;
+        if (rawMean > lower && targetMean > lower) {
+          const factor = (targetMean - lower) / (rawMean - lower);
+          for (let i = 0; i < values.length; i++) {
+            values[i] = lower + ((values[i] - lower) * factor);
+          }
+        }
+      }
+      return values;
+    }
+
+    function buildEffortRecords() {
+      return INCOME_DISTRIBUTION.map(distribution => {
+        const meanGroup = INCOME_GROUP_MEAN_MAP.get(distribution.year);
+        const schedule = scheduleForYear(distribution.year);
+        const yearRecord = YEAR_MAP.get(distribution.year);
+        if (!meanGroup) return null;
+
+        const groups = meanGroup.groups.map((group, groupIndex) => {
+          const samples = calibratedIncomeSamples(groupIndex, distribution, meanGroup);
+          const share = group.populationShare;
+          const sampleWeight = samples.length ? share / samples.length : 0;
+          let weightedIncome = 0;
+          let weightedTax = 0;
+          let weightedMarginal = 0;
+          samples.forEach(income => {
+            weightedIncome += income * sampleWeight;
+            weightedTax += theoreticalIrpf(income, schedule) * sampleWeight;
+            weightedMarginal += marginalRateAtIncome(income, schedule) * sampleWeight;
+          });
+          const count = share * distribution.adultPopulation;
+          const incomeTotal = weightedIncome * distribution.adultPopulation;
+          const taxTotal = weightedTax * distribution.adultPopulation;
+          const meanIncome = share > 0 ? weightedIncome / share : 0;
+          const taxPerAdult = share > 0 ? weightedTax / share : 0;
+          return {
+            ...group,
+            colorIndex: EFFORT_GROUP_DEFS[groupIndex]?.colorIndex || groupIndex + 1,
+            count,
+            meanIncome,
+            taxPerAdult,
+            incomeTotal,
+            taxTotal,
+            effectiveRate: incomeTotal > 0 ? (taxTotal / incomeTotal) * 100 : 0,
+            averageMarginalRate: share > 0 ? weightedMarginal / share : 0,
+          };
+        });
+
+        const totalTax = groups.reduce((sum, group) => sum + group.taxTotal, 0);
+        const totalIncome = groups.reduce((sum, group) => sum + group.incomeTotal, 0);
+        groups.forEach(group => {
+          group.contributionShare = totalTax > 0 ? (group.taxTotal / totalTax) * 100 : 0;
+        });
+        return {
+          year: distribution.year,
+          adultPopulation: distribution.adultPopulation,
+          gdpPerCapita: yearRecord?.gdp_pc_nominal_eur ?? null,
+          sourceScheduleYear: schedule.year,
+          thresholdStatus: distribution.thresholdStatus || 'wid',
+          meanIncomeStatus: meanGroup.meanIncomeStatus || 'wid',
+          groups,
+          totalTax,
+          totalIncome,
+          nationalEffectiveRate: totalIncome > 0 ? (totalTax / totalIncome) * 100 : 0,
+        };
+      }).filter(Boolean);
+    }
+
+    const EFFORT_DATA = buildEffortRecords();
+    const EFFORT_YEAR_MAP = new Map(EFFORT_DATA.map(d => [d.year, d]));
 
     function valueField(which) {
       return state.mode === 'real1990'
@@ -1055,6 +1204,15 @@
         renderAll();
       });
 
+      buildSegmentedButtons('effortMetricButtons', [
+        { key: 'effective', label: 'Tipo efectivo' },
+        { key: 'contribution', label: 'Aportación al IRPF' },
+      ], state.effortMetric, key => {
+        state.effortMetric = key;
+        resetChartInteraction();
+        renderAll();
+      });
+
     }
 
     function renderChartControls() {
@@ -1065,12 +1223,17 @@
 
     function renderChartModeControls() {
       const showLimits = state.chartMode === 'limits';
+      const showPopulation = state.chartMode === 'population';
+      const showEffort = state.chartMode === 'effort';
       btnChartLimits.classList.toggle('active', showLimits);
-      btnChartPopulation.classList.toggle('active', !showLimits);
+      btnChartPopulation.classList.toggle('active', showPopulation);
+      btnChartEffort.classList.toggle('active', showEffort);
       btnChartLimits.setAttribute('aria-pressed', showLimits ? 'true' : 'false');
-      btnChartPopulation.setAttribute('aria-pressed', showLimits ? 'false' : 'true');
+      btnChartPopulation.setAttribute('aria-pressed', showPopulation ? 'true' : 'false');
+      btnChartEffort.setAttribute('aria-pressed', showEffort ? 'true' : 'false');
       amountField.classList.toggle('isHidden', !showLimits);
       scaleField.classList.toggle('isHidden', !showLimits);
+      effortMetricField.classList.toggle('isHidden', !showEffort);
       chartPanel.classList.toggle('populationMode', !showLimits);
       document.body.classList.toggle('populationChartMode', !showLimits);
     }
@@ -1101,11 +1264,15 @@
           ${legendItem('boundary', '<span class="legendSwatch boundary"></span>', 'Frontera legal')}
           ${legendItem('gdp', '<span class="legendSwatch gdp"></span>', 'PIB per cápita')}
         `;
-      } else {
+      } else if (state.chartMode === 'population') {
         const tramos = Array.from({ length: MAX_POPULATION_TRAMOS }, (_, i) => i + 1);
         seriesLegend.innerHTML = tramos
           .map(n => legendItem(`tramo-${n}`, `<span class="legendSwatch" style="background:${getColor(n)}"></span>`, `Tramo ${n}`))
           .join('');
+      } else {
+        seriesLegend.innerHTML = EFFORT_GROUP_DEFS
+          .map(group => legendItem(`effort-${group.key}`, `<span class="legendSwatch" style="background:${getColor(group.colorIndex)}"></span>`, group.label))
+          .join('') + legendItem('effort-average', '<span class="legendSwatch gdp"></span>', 'Media ponderada');
       }
       seriesLegend.querySelectorAll('[data-focus-key]').forEach(item => item.addEventListener('click', () => {
         const key = item.dataset.focusKey;
@@ -1619,6 +1786,161 @@
       topMeta.textContent = `${minYear}–${maxYear} · ${YEARS.length} escalas`;
     }
 
+    function clientToEffortViewBox(clientX, clientY) {
+      const rect = svg.getBoundingClientRect();
+      const { width, height } = getPopulationGeometry();
+      return {
+        x: rect.width ? ((clientX - rect.left) / rect.width) * width : 0,
+        y: rect.height ? ((clientY - rect.top) / rect.height) * height : 0,
+      };
+    }
+
+    function isInsideEffortInteractiveArea(clientX, clientY) {
+      const { plot } = getPopulationGeometry();
+      const point = clientToEffortViewBox(clientX, clientY);
+      return point.x >= plot.x && point.x <= plot.x + plot.w
+        && point.y >= plot.y && point.y <= plot.y + plot.h;
+    }
+
+    function nearestEffortYearFromClientX(clientX) {
+      const { plot } = getPopulationGeometry();
+      const point = clientToEffortViewBox(clientX, 0);
+      const ratio = Math.max(0, Math.min(.999999, (point.x - plot.x) / plot.w));
+      const index = Math.floor(ratio * EFFORT_DATA.length);
+      return EFFORT_DATA[Math.max(0, Math.min(EFFORT_DATA.length - 1, index))].year;
+    }
+
+    function renderEffortTooltip(clientX, clientY) {
+      const record = EFFORT_YEAR_MAP.get(state.hoverYear);
+      if (!record) {
+        hideTooltip();
+        return;
+      }
+      const rows = record.groups.map(group => `
+        <div class="ttRow">
+          <div class="ttDot" style="background:${getColor(group.colorIndex)}"></div>
+          <div class="ttName">${group.label} · ${peopleShort(group.count)} pers. · renta ${money(group.meanIncome, 0)}</div>
+          <div class="ttVal">${pct(group.effectiveRate)} ef. · ${pct(group.contributionShare)} rec.</div>
+        </div>
+      `);
+      const incomeNote = record.meanIncomeStatus === 'wid'
+        ? 'Medias WID'
+        : record.meanIncomeStatus === 'wid_threshold_extrapolation'
+          ? 'Medias 2024 extrapoladas con umbrales WID'
+          : 'Medias 2025 extrapoladas con umbrales/AMECO';
+      tooltip.innerHTML = `
+        <div class="ttYear">${record.year}</div>
+        <div class="subtle" style="margin-bottom:6px;">Población adulta: ${people(record.adultPopulation)} · PIB per cápita: ${money(record.gdpPerCapita, 0)}</div>
+        <div class="subtle" style="margin-bottom:6px;">Tipo efectivo medio teórico: ${pct(record.nationalEffectiveRate)}</div>
+        ${rows.join('')}
+        <div class="subtle" style="margin-top:8px;">${incomeNote} · IRPF estatal teórico, sin mínimos personales ni deducciones.</div>`;
+      tooltip.style.display = 'block';
+
+      const rect = chartBox.getBoundingClientRect();
+      const ttRect = tooltip.getBoundingClientRect();
+      let left = clientX - rect.left + 14;
+      let top = clientY - rect.top + 14;
+      if (left + ttRect.width > rect.width - 10) left = rect.width - ttRect.width - 10;
+      if (top + ttRect.height > rect.height - 10) top = rect.height - ttRect.height - 10;
+      tooltip.style.left = Math.max(10, left) + 'px';
+      tooltip.style.top = Math.max(10, top) + 'px';
+    }
+
+    function renderEffortChart() {
+      const { width, height, plot, compact } = getPopulationGeometry();
+      const minYear = EFFORT_DATA[0].year;
+      const maxYear = EFFORT_DATA[EFFORT_DATA.length - 1].year;
+      const bandWidth = plot.w / EFFORT_DATA.length;
+      const xEdge = year => plot.x + (((year - minYear) / EFFORT_DATA.length) * plot.w);
+      const xCenter = year => xEdge(year) + (bandWidth / 2);
+      const metricKey = state.effortMetric === 'contribution' ? 'contributionShare' : 'effectiveRate';
+      const allValues = EFFORT_DATA.flatMap(record => record.groups.map(group => group[metricKey]));
+      if (state.effortMetric === 'effective') allValues.push(...EFFORT_DATA.map(record => record.nationalEffectiveRate));
+      const rawMax = Math.max(5, ...allValues.filter(Number.isFinite));
+      const yStep = rawMax <= 20 ? 2.5 : rawMax <= 50 ? 5 : 10;
+      const yMax = Math.ceil(rawMax / yStep) * yStep;
+      const y = value => plot.y + plot.h - ((Math.max(0, value) / yMax) * plot.h);
+      const axisFont = compact ? 20 : 12;
+      const bandFont = compact ? 17 : 12;
+      const titleFont = compact ? 20 : 13;
+      const metaFont = compact ? 18 : 12;
+      let out = `<rect x="0" y="0" width="${width}" height="${height}" fill="transparent"></rect>`;
+
+      if (state.showPresBands) {
+        PRESIDENT_BANDS.forEach(band => {
+          const start = Math.max(minYear, band.start);
+          const end = Math.min(maxYear + 1, band.end === null ? maxYear + 1 : band.end);
+          if (end <= minYear || start > maxYear) return;
+          const x1 = xEdge(start);
+          const x2 = xEdge(end);
+          const bandLabel = compact ? band.name.split(' ').pop() : band.name;
+          out += `<rect x="${x1}" y="${plot.y}" width="${Math.max(0, x2 - x1)}" height="${plot.h}" fill="${band.color}" opacity="0.16"></rect>`;
+          out += `<text x="${(x1 + x2) / 2}" y="${plot.y + (compact ? 26 : 18)}" text-anchor="middle" fill="rgba(255,255,255,.62)" font-size="${bandFont}" font-weight="700">${bandLabel}</text>`;
+        });
+      }
+
+      out += `<rect x="${plot.x}" y="${plot.y}" width="${plot.w}" height="${plot.h}" fill="rgba(255,255,255,.02)" stroke="rgba(255,255,255,.05)"></rect>`;
+      for (let tick = 0; tick <= yMax + 1e-9; tick += yStep) {
+        const yy = y(tick);
+        out += `<line x1="${plot.x}" y1="${yy}" x2="${plot.x + plot.w}" y2="${yy}" stroke="rgba(255,255,255,.10)" stroke-width="1"></line>`;
+        out += `<text class="effortAxisTick" data-value="${tick}" x="${plot.x - 12}" y="${yy + (compact ? 7 : 4)}" text-anchor="end" fill="#bfbfbf" font-size="${axisFont}">${pct(tick)}</text>`;
+      }
+
+      EFFORT_GROUP_DEFS.forEach(groupDef => {
+        const focusKey = `effort-${groupDef.key}`;
+        const opacity = state.focusKey && state.focusKey !== focusKey ? .12 : 1;
+        const points = EFFORT_DATA.map(record => {
+          const group = record.groups.find(item => item.key === groupDef.key);
+          return { year: record.year, value: group?.[metricKey] ?? 0 };
+        });
+        out += `<path class="effortSeries" data-group="${groupDef.key}" d="${buildSmoothPath(points, xCenter, y)}" fill="none" stroke="${getColor(groupDef.colorIndex)}" stroke-width="${compact ? 4.4 : 2.8}" opacity="${opacity}"></path>`;
+        points.forEach(point => {
+          const r = state.hoverYear === point.year ? (compact ? 5.6 : 4.5) : (compact ? 3.5 : 2.5);
+          out += `<circle class="effortPoint" data-group="${groupDef.key}" data-year="${point.year}" cx="${xCenter(point.year)}" cy="${y(point.value)}" r="${r}" fill="${getColor(groupDef.colorIndex)}" stroke="rgba(0,0,0,.5)" stroke-width=".8" opacity="${opacity}"></circle>`;
+        });
+      });
+
+      if (state.effortMetric === 'effective') {
+        const avgOpacity = state.focusKey && state.focusKey !== 'effort-average' ? .12 : 1;
+        const avgPoints = EFFORT_DATA.map(record => ({ year: record.year, value: record.nationalEffectiveRate }));
+        out += `<path class="effortAverage" d="${buildSmoothPath(avgPoints, xCenter, y)}" fill="none" stroke="#ffffff" stroke-width="${compact ? 4.6 : 3}" stroke-dasharray="10 6" opacity="${avgOpacity}"></path>`;
+      }
+
+      const yearStep = compact ? 5 : 3;
+      EFFORT_DATA.forEach((record, index) => {
+        const isLast = index === EFFORT_DATA.length - 1;
+        if (index % yearStep !== 0 && !isLast) return;
+        const xx = xCenter(record.year);
+        const labelY = plot.y + plot.h + (compact ? 36 : 26);
+        out += `<line x1="${xx}" y1="${plot.y + plot.h}" x2="${xx}" y2="${plot.y + plot.h + 6}" stroke="rgba(255,255,255,.25)"></line>`;
+        out += `<text x="${xx}" y="${labelY}" text-anchor="middle" fill="#bfbfbf" font-size="${axisFont}" transform="rotate(${compact ? -42 : -35} ${xx} ${labelY})">${record.year}</text>`;
+      });
+
+      if (state.hoverYear) {
+        const hoverX = xEdge(state.hoverYear);
+        out += `<rect x="${hoverX}" y="${plot.y}" width="${bandWidth}" height="${plot.h}" fill="rgba(254,247,2,.04)" stroke="rgba(254,247,2,.78)" stroke-width="${compact ? 2.2 : 1.4}"></rect>`;
+      }
+
+      const isContribution = state.effortMetric === 'contribution';
+      out += `<text x="${plot.x}" y="${compact ? 27 : 19}" fill="#FEF702" font-size="${titleFont}" font-weight="700">${isContribution ? 'Aportación teórica al IRPF por grupo de renta' : 'Esfuerzo fiscal teórico por grupo de renta'}</text>`;
+      if (!compact) {
+        out += `<text x="${plot.x + plot.w}" y="19" fill="#bfbfbf" font-size="${metaFont}" text-anchor="end">${isContribution ? '% de la recaudación teórica' : 'IRPF estatal teórico / renta bruta'}</text>`;
+      }
+      svg.innerHTML = out;
+      svg.setAttribute('aria-label', isContribution ? 'Aportación teórica al IRPF por grupos de renta' : 'Esfuerzo fiscal teórico por grupos de renta');
+
+      chartMeta.textContent = isContribution
+        ? 'Peso en la recaudación teórica · IRPF estatal + población + renta media WID'
+        : 'Tipo efectivo teórico · IRPF estatal / renta · distribución WID y población adulta';
+      lineSummary.textContent = isContribution
+        ? 'Aportación = IRPF teórico del grupo / IRPF teórico total · incorpora población y renta por grupo'
+        : 'Esfuerzo = IRPF estatal teórico / renta bruta del grupo · cálculo progresivo por todos los tramos';
+      rateEncodingNote.innerHTML = isContribution
+        ? 'Cada línea muestra el <strong>porcentaje de recaudación teórica</strong> aportado por P0–20, P20–40, P40–60, P60–80, P80–90, P90–99 y P99–100'
+        : 'Cada línea muestra el <strong>tipo efectivo teórico</strong>; la población pondera los agregados y la renta WID calibra la capacidad económica de cada grupo';
+      topMeta.textContent = `${minYear}–${maxYear} · ${EFFORT_DATA.length} años`;
+    }
+
     function renderContextText() {
       const xmlSource = `<a class="sourceLink" href="${DATA_SOURCE}">${DATA_SOURCE}</a>`;
       if (state.chartMode === 'limits') {
@@ -1627,6 +1949,14 @@
           <p>El mapa principal divide cada año en los <strong>intervalos reales de base liquidable</strong> de su escala estatal. La altura expresa el rango monetario y cada número de tramo mantiene un color categórico. El último tramo se extiende desde su umbral hasta la parte superior del eje porque legalmente continúa en adelante.</p>
           <p>La vista permite comparar euros corrientes con <strong>euros constantes de 1990</strong>. El PIB per cápita utiliza la misma unidad seleccionada; el valor de 2025 procede de AMECO.</p>
           <p>Cada columna se calcula de forma independiente, sin interpolar tramos entre reformas. Las líneas claras marcan fronteras legales existentes. La subgráfica inferior conserva todos los tramos históricos y representa el <strong>tipo marginal estatal</strong> con una escala cromática exponencial. El tipo total incluye el tramo autonómico y varía según la comunidad autónoma.</p>`;
+        return;
+      }
+      if (state.chartMode === 'effort') {
+        sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta media por grupos, umbrales y población adulta), ${xmlSource} (escala estatal) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (extrapolación 2025) · <span style="opacity:.9;">N.Geolitics</span>`;
+        explanationContent.innerHTML = `
+          <p><strong>Esfuerzo fiscal teórico</strong> = IRPF estatal calculado de forma progresiva / renta bruta estimada del grupo. No se aplica el tipo marginal a toda la renta: cada euro tributa en el tramo que le corresponde.</p>
+          <p>La distribución se modela con P20, P40, P60, P80, P90 y P99, las <strong>medias de renta WID</strong> de P0–20, P20–40, P40–60, P60–80, P80–90, P90–99 y P99–100 y la población adulta anual. La vista «Aportación al IRPF» pondera además cuántos adultos hay en cada grupo.</p>
+          <p>Es una <strong>carga fiscal teórica</strong>: usa la escala estatal y no reproduce mínimos personales, deducciones, circunstancias familiares ni el tramo autonómico. WID mide renta nacional antes de impuestos por adulto, no declaraciones individuales.</p>`;
         return;
       }
       sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta y población adulta) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (extrapolación 2025), ${xmlSource} · <span style="opacity:.9;">N.Geolitics</span>`;
@@ -1639,26 +1969,26 @@
 
     function renderChart() {
       if (state.chartMode === 'population') renderPopulationChart();
-      else {
-        renderFiscalMap();
-      }
+      else if (state.chartMode === 'effort') renderEffortChart();
+      else renderFiscalMap();
       renderContextText();
     }
 
     function isInsideInteractiveArea(clientX, clientY) {
-      return state.chartMode === 'population'
-        ? isInsidePopulationInteractiveArea(clientX, clientY)
-        : isInsideLimitInteractiveArea(clientX, clientY);
+      if (state.chartMode === 'population') return isInsidePopulationInteractiveArea(clientX, clientY);
+      if (state.chartMode === 'effort') return isInsideEffortInteractiveArea(clientX, clientY);
+      return isInsideLimitInteractiveArea(clientX, clientY);
     }
 
     function nearestYearFromClientX(clientX) {
-      return state.chartMode === 'population'
-        ? nearestPopulationYearFromClientX(clientX)
-        : nearestLimitYearFromClientX(clientX);
+      if (state.chartMode === 'population') return nearestPopulationYearFromClientX(clientX);
+      if (state.chartMode === 'effort') return nearestEffortYearFromClientX(clientX);
+      return nearestLimitYearFromClientX(clientX);
     }
 
     function renderTooltip(clientX, clientY) {
       if (state.chartMode === 'population') renderPopulationTooltip(clientX, clientY);
+      else if (state.chartMode === 'effort') renderEffortTooltip(clientX, clientY);
       else renderLimitsTooltip(clientX, clientY);
     }
 
@@ -1686,6 +2016,7 @@
     window.IRPF_TEST_API = {
       getYears: () => [...YEARS],
       getPopulationData: () => INCOME_DISTRIBUTION.map(record => ({ ...record })),
+      getEffortData: () => EFFORT_DATA.map(record => ({ ...record, groups: record.groups.map(group => ({ ...group })) })),
       getLimitSeries: index => getLimitSeries(index),
       getRateSeries: index => getRateSeries(index),
       getRateExtent: () => ({ ...RATE_EXTENT }),
@@ -1706,10 +2037,19 @@
         renderPopulationTooltip(rect.left + (rect.width / 2), rect.top + 24);
         return tooltip.textContent;
       },
+      showEffortTooltip(year) {
+        const rect = chartBox.getBoundingClientRect();
+        state.chartMode = 'effort';
+        state.hoverYear = year;
+        renderChart();
+        renderEffortTooltip(rect.left + (rect.width / 2), rect.top + 24);
+        return tooltip.textContent;
+      },
     };
 
     btnChartLimits.addEventListener('click', () => setChartMode('limits'));
     btnChartPopulation.addEventListener('click', () => setChartMode('population'));
+    btnChartEffort.addEventListener('click', () => setChartMode('effort'));
 
     btnPolitics.addEventListener('click', () => {
       state.showPresBands = !state.showPresBands;
