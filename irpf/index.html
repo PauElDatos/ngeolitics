@@ -629,6 +629,11 @@
             <div class="segmented" id="effortMetricButtons"></div>
           </div>
 
+          <div class="field isHidden" id="effortScopeField">
+            <div class="label">Ámbito fiscal</div>
+            <div class="segmented" id="effortScopeButtons"></div>
+          </div>
+
           <div class="field">
             <div class="label">Leyenda</div>
             <div class="seriesLegend" id="seriesLegend"></div>
@@ -690,6 +695,7 @@
 
   <script src="renta_por_quintiles_data.js"></script>
   <script src="renta_media_grupos_data.js"></script>
+  <script src="irpf_autonomico_valencia_1997-2025.js"></script>
   <script>
     (async () => {
     const DATA_SOURCE = 'irpf_escala_estatal_1990-2025.xml';
@@ -754,6 +760,10 @@
       ? window.IRPF_INCOME_GROUP_MEANS
       : [];
     const INCOME_GROUP_MEAN_MAP = new Map(INCOME_GROUP_MEANS.map(d => [d.year, d]));
+    const VALENCIA_AUTONOMIC_SCHEDULES = Array.isArray(window.IRPF_VALENCIA_AUTONOMIC_SCHEDULES)
+      ? window.IRPF_VALENCIA_AUTONOMIC_SCHEDULES
+      : [];
+    const VALENCIA_AUTONOMIC_MAP = new Map(VALENCIA_AUTONOMIC_SCHEDULES.map(d => [d.year, d]));
     const EFFORT_GROUP_DEFS = [
       { key: 'p0_20', label: 'P0–20', colorIndex: 1 },
       { key: 'p20_40', label: 'P20–40', colorIndex: 2 },
@@ -785,6 +795,7 @@
     const state = {
       chartMode: 'limits',
       effortMetric: 'effective',
+      effortScope: 'totalValencia',
       mode: 'nominal',
       scaleMode: 'log',
       showPresBands: true,
@@ -807,6 +818,7 @@
     const amountField = document.getElementById('amountField');
     const scaleField = document.getElementById('scaleField');
     const effortMetricField = document.getElementById('effortMetricField');
+    const effortScopeField = document.getElementById('effortScopeField');
     const sourceFooter = document.getElementById('sourceFooter');
     const explanationContent = document.getElementById('explanationContent');
     const chartPanel = document.querySelector('.chartPanel');
@@ -969,7 +981,7 @@
       return Math.min(Math.max(0, income) * rate, eurFromPesetas(250000));
     }
 
-    function legacyWorkQuotaDeduction(netWorkIncome, year) {
+    function legacyWorkQuotaDeductionFull(netWorkIncome, year) {
       const netPtas = Math.max(0, netWorkIncome) * PESETAS_PER_EURO;
       let deductionPtas = 0;
 
@@ -991,10 +1003,14 @@
         else deductionPtas = 27000;
       }
 
-      // Desde 1997 la escala de esta página representa la parte estatal.
-      // La normativa de cesión imputaba al Estado el 85 % de estas deducciones.
+      return Math.max(0, eurFromPesetas(deductionPtas));
+    }
+
+    function legacyWorkQuotaDeduction(netWorkIncome, year) {
+      // Desde 1997 la cuota/deducción se reparte entre el Estado (85 %) y
+      // el tramo autonómico (15 %) dentro del modelo histórico de cesión.
       const stateShare = year >= 1997 && year <= 1998 ? 0.85 : 1;
-      return Math.max(0, eurFromPesetas(deductionPtas) * stateShare);
+      return legacyWorkQuotaDeductionFull(netWorkIncome, year) * stateShare;
     }
 
     function workIncomeReduction(netWorkIncome, year) {
@@ -1095,6 +1111,56 @@
       return Math.max(0, grossQuota - minimumQuota);
     }
 
+    function autonomousPersonalMinimumStandard(year) {
+      // Desde el ejercicio 2022 la Comunitat Valenciana eleva el mínimo
+      // autonómico general del contribuyente estándar a 6.105 €.
+      return year >= 2022 ? 6105 : personalMinimumStandard(year);
+    }
+
+    function standardizedAutonomousValenciaIrpf(income, schedule, year) {
+      if (!Number.isFinite(income) || income <= 0 || !schedule || year < 1997) return 0;
+
+      // 1997-1998: mismo rendimiento neto; a la cuota autonómica se imputa
+      // el 15 % de la deducción general por rendimientos del trabajo.
+      if (year <= 1998) {
+        const netWork = Math.max(0, income - legacyOtherWorkExpenses(income, year));
+        const grossQuota = theoreticalIrpf(netWork, schedule);
+        const deduction = legacyWorkQuotaDeductionFull(netWork, year) * 0.15;
+        return Math.max(0, grossQuota - Math.min(grossQuota, deduction));
+      }
+
+      // 1999-2006: el mínimo personal y la reducción del trabajo reducían
+      // la base sobre la que se aplican también los tipos autonómicos.
+      if (year <= 2006) {
+        const reduction = workIncomeReduction(income, year);
+        const afterWorkReduction = Math.max(0, income - reduction);
+        const taxableBase = Math.max(0, afterWorkReduction - personalMinimumStandard(year));
+        return theoreticalIrpf(taxableBase, schedule);
+      }
+
+      // 2007+: cuota autonómica sobre la base general y resta de la cuota
+      // asociada al mínimo personal/familiar con la propia escala autonómica.
+      const genericWorkExpense = year >= 2015 ? Math.min(2000, income) : 0;
+      const reduction = workIncomeReduction(Math.max(0, income), year);
+      const reducedNetWork = Math.max(0, income - genericWorkExpense - reduction);
+      const grossQuota = theoreticalIrpf(reducedNetWork, schedule);
+      const minimum = Math.min(reducedNetWork, autonomousPersonalMinimumStandard(year));
+      const minimumQuota = theoreticalIrpf(minimum, schedule);
+      return Math.max(0, grossQuota - minimumQuota);
+    }
+
+    function standardizedTotalValenciaIrpf(income, stateSchedule, autonomousSchedule, year) {
+      const stateTax = standardizedStateIrpf(income, stateSchedule, year);
+      const autonomousTax = year >= 1997
+        ? standardizedAutonomousValenciaIrpf(income, autonomousSchedule, year)
+        : 0;
+      return {
+        stateTax,
+        autonomousTax,
+        totalTax: stateTax + autonomousTax,
+      };
+    }
+
     function marginalRateAtIncome(income, schedule) {
       if (!Number.isFinite(income) || !schedule) return 0;
       for (const bracket of schedule.brackets) {
@@ -1146,58 +1212,113 @@
     function buildEffortRecords() {
       return INCOME_DISTRIBUTION.map(distribution => {
         const meanGroup = INCOME_GROUP_MEAN_MAP.get(distribution.year);
-        const schedule = scheduleForYear(distribution.year);
+        const stateSchedule = scheduleForYear(distribution.year);
+        const autonomousSchedule = VALENCIA_AUTONOMIC_MAP.get(distribution.year) || null;
         const yearRecord = YEAR_MAP.get(distribution.year);
         if (!meanGroup) return null;
+        if (distribution.year >= 1997 && !autonomousSchedule) {
+          throw new Error(`Falta escala autonómica valenciana para ${distribution.year}.`);
+        }
 
         const groups = meanGroup.groups.map((group, groupIndex) => {
           const samples = calibratedIncomeSamples(groupIndex, distribution, meanGroup);
           const share = group.populationShare;
           const sampleWeight = samples.length ? share / samples.length : 0;
           let weightedIncome = 0;
-          let weightedTax = 0;
-          let weightedMarginal = 0;
+          let weightedStateTax = 0;
+          let weightedAutonomousTax = 0;
+          let weightedStateMarginal = 0;
+          let weightedAutonomousMarginal = 0;
+
           samples.forEach(income => {
             weightedIncome += income * sampleWeight;
-            weightedTax += standardizedStateIrpf(income, schedule, distribution.year) * sampleWeight;
-            weightedMarginal += marginalRateAtIncome(income, schedule) * sampleWeight;
+            const taxes = standardizedTotalValenciaIrpf(
+              income,
+              stateSchedule,
+              autonomousSchedule,
+              distribution.year
+            );
+            weightedStateTax += taxes.stateTax * sampleWeight;
+            weightedAutonomousTax += taxes.autonomousTax * sampleWeight;
+            weightedStateMarginal += marginalRateAtIncome(income, stateSchedule) * sampleWeight;
+            if (autonomousSchedule) {
+              weightedAutonomousMarginal += marginalRateAtIncome(income, autonomousSchedule) * sampleWeight;
+            }
           });
+
           const count = share * distribution.adultPopulation;
           const incomeTotal = weightedIncome * distribution.adultPopulation;
-          const taxTotal = weightedTax * distribution.adultPopulation;
+          const stateTaxTotal = weightedStateTax * distribution.adultPopulation;
+          const autonomousTaxTotal = weightedAutonomousTax * distribution.adultPopulation;
+          const totalTaxTotal = stateTaxTotal + autonomousTaxTotal;
           const meanIncome = share > 0 ? weightedIncome / share : 0;
-          const taxPerAdult = share > 0 ? weightedTax / share : 0;
+          const stateTaxPerAdult = share > 0 ? weightedStateTax / share : 0;
+          const autonomousTaxPerAdult = share > 0 ? weightedAutonomousTax / share : 0;
+          const totalTaxPerAdult = stateTaxPerAdult + autonomousTaxPerAdult;
+
           return {
             ...group,
             colorIndex: EFFORT_GROUP_DEFS[groupIndex]?.colorIndex || groupIndex + 1,
             count,
             meanIncome,
-            taxPerAdult,
             incomeTotal,
-            taxTotal,
-            effectiveRate: incomeTotal > 0 ? (taxTotal / incomeTotal) * 100 : 0,
-            averageMarginalRate: share > 0 ? weightedMarginal / share : 0,
+            stateTaxPerAdult,
+            autonomousTaxPerAdult,
+            totalTaxPerAdult,
+            stateTaxTotal,
+            autonomousTaxTotal,
+            totalTaxTotal,
+            stateEffectiveRate: incomeTotal > 0 ? (stateTaxTotal / incomeTotal) * 100 : 0,
+            totalEffectiveRate: incomeTotal > 0 ? (totalTaxTotal / incomeTotal) * 100 : 0,
+            stateAverageMarginalRate: share > 0 ? weightedStateMarginal / share : 0,
+            autonomousAverageMarginalRate: share > 0 ? weightedAutonomousMarginal / share : 0,
+            totalAverageMarginalRate: share > 0 ? (weightedStateMarginal + weightedAutonomousMarginal) / share : 0,
           };
         });
 
-        const totalTax = groups.reduce((sum, group) => sum + group.taxTotal, 0);
+        const stateTotalTax = groups.reduce((sum, group) => sum + group.stateTaxTotal, 0);
+        const autonomousTotalTax = groups.reduce((sum, group) => sum + group.autonomousTaxTotal, 0);
+        const totalTax = stateTotalTax + autonomousTotalTax;
         const totalIncome = groups.reduce((sum, group) => sum + group.incomeTotal, 0);
+
         groups.forEach(group => {
-          group.contributionShare = totalTax > 0 ? (group.taxTotal / totalTax) * 100 : 0;
+          group.stateContributionShare = stateTotalTax > 0 ? (group.stateTaxTotal / stateTotalTax) * 100 : 0;
+          group.totalContributionShare = totalTax > 0 ? (group.totalTaxTotal / totalTax) * 100 : 0;
         });
+
         return {
           year: distribution.year,
           adultPopulation: distribution.adultPopulation,
           gdpPerCapita: yearRecord?.gdp_pc_nominal_eur ?? null,
-          sourceScheduleYear: schedule.year,
+          sourceScheduleYear: stateSchedule.year,
+          autonomousScheduleYear: autonomousSchedule?.year ?? null,
+          autonomousScheduleStatus: autonomousSchedule?.status ?? null,
           thresholdStatus: distribution.thresholdStatus || 'wid',
           meanIncomeStatus: meanGroup.meanIncomeStatus || 'wid',
           groups,
+          stateTotalTax,
+          autonomousTotalTax,
           totalTax,
           totalIncome,
-          nationalEffectiveRate: totalIncome > 0 ? (totalTax / totalIncome) * 100 : 0,
+          stateNationalEffectiveRate: totalIncome > 0 ? (stateTotalTax / totalIncome) * 100 : 0,
+          totalNationalEffectiveRate: totalIncome > 0 ? (totalTax / totalIncome) * 100 : 0,
         };
       }).filter(Boolean);
+    }
+
+    function effortUsesTotalValencia() {
+      return state.effortScope === 'totalValencia';
+    }
+
+    function effortGroupMetric(group) {
+      if (state.effortMetric === 'contribution') {
+        return effortUsesTotalValencia() ? group.totalContributionShare : group.stateContributionShare;
+      }
+      return effortUsesTotalValencia() ? group.totalEffectiveRate : group.stateEffectiveRate;
+    }
+
+    function effortNationalRate(record) {
+      return effortUsesTotalValencia() ? record.totalNationalEffectiveRate : record.stateNationalEffectiveRate;
     }
 
     const EFFORT_DATA = buildEffortRecords();
@@ -1355,6 +1476,15 @@
         renderAll();
       });
 
+      buildSegmentedButtons('effortScopeButtons', [
+        { key: 'totalValencia', label: 'Total · C. Valenciana' },
+        { key: 'stateOnly', label: 'Solo estatal' },
+      ], state.effortScope, key => {
+        state.effortScope = key;
+        resetChartInteraction();
+        renderAll();
+      });
+
     }
 
     function renderChartControls() {
@@ -1376,6 +1506,7 @@
       amountField.classList.toggle('isHidden', !showLimits);
       scaleField.classList.toggle('isHidden', !showLimits);
       effortMetricField.classList.toggle('isHidden', !showEffort);
+      effortScopeField.classList.toggle('isHidden', !showEffort);
       chartPanel.classList.toggle('populationMode', !showLimits);
       document.body.classList.toggle('populationChartMode', !showLimits);
     }
@@ -1958,24 +2089,43 @@
         hideTooltip();
         return;
       }
-      const rows = record.groups.map(group => `
-        <div class="ttRow">
-          <div class="ttDot" style="background:${getColor(group.colorIndex)}"></div>
-          <div class="ttName">${group.label} · ${peopleShort(group.count)} pers. · renta ${money(group.meanIncome, 0)}</div>
-          <div class="ttVal">${pct(group.effectiveRate)} ef. est. · ${pct(group.contributionShare)} rec.</div>
-        </div>
-      `);
+
+      const totalScope = effortUsesTotalValencia();
+      const rows = record.groups.map(group => {
+        const effectiveRate = totalScope ? group.totalEffectiveRate : group.stateEffectiveRate;
+        const contributionShare = totalScope ? group.totalContributionShare : group.stateContributionShare;
+        const taxPerAdult = totalScope ? group.totalTaxPerAdult : group.stateTaxPerAdult;
+        const componentText = totalScope && record.year >= 1997
+          ? ` · Estado ${money(group.stateTaxPerAdult, 0)} + C. Valenciana ${money(group.autonomousTaxPerAdult, 0)}`
+          : '';
+        return `
+          <div class="ttRow">
+            <div class="ttDot" style="background:${getColor(group.colorIndex)}"></div>
+            <div class="ttName">${group.label} · ${peopleShort(group.count)} pers. · renta ${money(group.meanIncome, 0)}</div>
+            <div class="ttVal">${pct(effectiveRate)} ef. · ${pct(contributionShare)} rec.</div>
+          </div>
+          <div class="subtle" style="margin:-1px 0 5px 18px;">IRPF medio est. ${money(taxPerAdult, 0)}${componentText}</div>`;
+      });
+
       const incomeNote = record.meanIncomeStatus === 'wid'
         ? 'Medias WID'
         : record.meanIncomeStatus === 'wid_threshold_extrapolation'
           ? 'Medias 2024 extrapoladas con umbrales WID'
           : 'Medias 2025 extrapoladas con umbrales/AMECO';
+      const scopeLabel = totalScope
+        ? 'IRPF total estimado (Estado + Comunitat Valenciana)'
+        : 'IRPF estatal estimado';
+      const avgRate = effortNationalRate(record);
+      const minimumNote = totalScope && record.year >= 2022
+        ? ' · mínimo autonómico general C. Valenciana: 6.105 €'
+        : '';
+
       tooltip.innerHTML = `
         <div class="ttYear">${record.year}</div>
         <div class="subtle" style="margin-bottom:6px;">Población adulta: ${people(record.adultPopulation)} · PIB per cápita: ${money(record.gdpPerCapita, 0)}</div>
-        <div class="subtle" style="margin-bottom:6px;">Tipo efectivo estatal estimado: ${pct(record.nationalEffectiveRate)}</div>
+        <div class="subtle" style="margin-bottom:6px;">${scopeLabel}: tipo efectivo medio ${pct(avgRate)}</div>
         ${rows.join('')}
-        <div class="subtle" style="margin-top:8px;">${incomeNote} · Modelo estándar: asalariado individual, menor de 65 años, sin hijos ni discapacidad. Incorpora mínimos/reducciones legales modelizables; no incluye cotizaciones ni deducciones personales.</div>`;
+        <div class="subtle" style="margin-top:8px;">${incomeNote} · Modelo estándar: asalariado individual, menor de 65 años, sin hijos ni discapacidad${minimumNote}. Incluye mínimos/reducciones legales modelizables; no incluye cotizaciones ni deducciones personales/autonómicas específicas.</div>`;
       tooltip.style.display = 'block';
 
       const rect = chartBox.getBoundingClientRect();
@@ -1995,9 +2145,8 @@
       const bandWidth = plot.w / EFFORT_DATA.length;
       const xEdge = year => plot.x + (((year - minYear) / EFFORT_DATA.length) * plot.w);
       const xCenter = year => xEdge(year) + (bandWidth / 2);
-      const metricKey = state.effortMetric === 'contribution' ? 'contributionShare' : 'effectiveRate';
-      const allValues = EFFORT_DATA.flatMap(record => record.groups.map(group => group[metricKey]));
-      if (state.effortMetric === 'effective') allValues.push(...EFFORT_DATA.map(record => record.nationalEffectiveRate));
+      const allValues = EFFORT_DATA.flatMap(record => record.groups.map(group => effortGroupMetric(group)));
+      if (state.effortMetric === 'effective') allValues.push(...EFFORT_DATA.map(record => effortNationalRate(record)));
       const rawMax = Math.max(5, ...allValues.filter(Number.isFinite));
       const yStep = rawMax <= 20 ? 2.5 : rawMax <= 50 ? 5 : 10;
       const yMax = Math.ceil(rawMax / yStep) * yStep;
@@ -2033,7 +2182,7 @@
         const opacity = state.focusKey && state.focusKey !== focusKey ? .12 : 1;
         const points = EFFORT_DATA.map(record => {
           const group = record.groups.find(item => item.key === groupDef.key);
-          return { year: record.year, value: group?.[metricKey] ?? 0 };
+          return { year: record.year, value: group ? effortGroupMetric(group) : 0 };
         });
         out += `<path class="effortSeries" data-group="${groupDef.key}" d="${buildSmoothPath(points, xCenter, y)}" fill="none" stroke="${getColor(groupDef.colorIndex)}" stroke-width="${compact ? 4.4 : 2.8}" opacity="${opacity}"></path>`;
         points.forEach(point => {
@@ -2044,7 +2193,7 @@
 
       if (state.effortMetric === 'effective') {
         const avgOpacity = state.focusKey && state.focusKey !== 'effort-average' ? .12 : 1;
-        const avgPoints = EFFORT_DATA.map(record => ({ year: record.year, value: record.nationalEffectiveRate }));
+        const avgPoints = EFFORT_DATA.map(record => ({ year: record.year, value: effortNationalRate(record) }));
         out += `<path class="effortAverage" d="${buildSmoothPath(avgPoints, xCenter, y)}" fill="none" stroke="#ffffff" stroke-width="${compact ? 4.6 : 3}" stroke-dasharray="10 6" opacity="${avgOpacity}"></path>`;
       }
 
@@ -2064,22 +2213,25 @@
       }
 
       const isContribution = state.effortMetric === 'contribution';
-      out += `<text x="${plot.x}" y="${compact ? 27 : 19}" fill="#FEF702" font-size="${titleFont}" font-weight="700">${isContribution ? 'Aportación estimada al IRPF estatal por grupo de renta' : 'Esfuerzo fiscal estatal estimado por grupo de renta'}</text>`;
+      const totalScope = effortUsesTotalValencia();
+      const shortScope = totalScope ? 'IRPF total · C. Valenciana' : 'IRPF estatal';
+      const titleScope = totalScope ? 'IRPF total (Estado + C. Valenciana)' : 'IRPF estatal';
+      out += `<text x="${plot.x}" y="${compact ? 27 : 19}" fill="#FEF702" font-size="${titleFont}" font-weight="700">${isContribution ? `Aportación estimada al ${shortScope} por grupo de renta` : `Esfuerzo fiscal estimado · ${shortScope}`}</text>`;
       if (!compact) {
-        out += `<text x="${plot.x + plot.w}" y="19" fill="#bfbfbf" font-size="${metaFont}" text-anchor="end">${isContribution ? '% de la recaudación estatal estimada' : 'IRPF estatal estimado / renta WID'}</text>`;
+        out += `<text x="${plot.x + plot.w}" y="19" fill="#bfbfbf" font-size="${metaFont}" text-anchor="end">${isContribution ? '% de la recaudación estimada' : `${titleScope} / renta WID`}</text>`;
       }
       svg.innerHTML = out;
-      svg.setAttribute('aria-label', isContribution ? 'Aportación estimada al IRPF estatal por grupos de renta' : 'Esfuerzo fiscal estatal estimado por grupos de renta');
+      svg.setAttribute('aria-label', isContribution ? `Aportación estimada al ${titleScope} por grupos de renta` : `Esfuerzo fiscal estimado del ${titleScope} por grupos de renta`);
 
       chartMeta.textContent = isContribution
-        ? 'Peso en la recaudación estatal estimada · escala legal + población + renta media WID'
-        : 'Tipo efectivo estatal estimado · modelo de asalariado estándar + renta WID';
+        ? `Peso en la recaudación estimada · ${titleScope} + población + renta media WID`
+        : `Tipo efectivo estimado · ${titleScope} · modelo de asalariado estándar + renta WID`;
       lineSummary.textContent = isContribution
-        ? 'Aportación = IRPF estatal estimado del grupo / IRPF estatal estimado total · incorpora población y renta por grupo'
-        : 'Esfuerzo = IRPF estatal estimado / renta del grupo · incluye mínimos y reducciones legales modelizables';
+        ? `Aportación = impuesto estimado del grupo / impuesto estimado total · ámbito: ${titleScope}`
+        : `Esfuerzo = ${titleScope} estimado / renta del grupo · incluye mínimos y reducciones legales modelizables`;
       rateEncodingNote.innerHTML = isContribution
-        ? 'Cada línea muestra el <strong>porcentaje de recaudación estatal estimada</strong> aportado por P0–20, P20–40, P40–60, P60–80, P80–90, P90–99 y P99–100'
-        : 'Cada línea muestra el <strong>tipo efectivo estatal estimado</strong>; la renta WID se liquida bajo el mismo contribuyente estándar y la población pondera los agregados';
+        ? `Cada línea muestra el <strong>porcentaje de recaudación estimada</strong> aportado por cada grupo · ámbito: ${titleScope}`
+        : `Cada línea muestra el <strong>tipo efectivo estimado</strong> · ámbito: ${titleScope}; la población pondera los agregados`;
       topMeta.textContent = `${minYear}–${maxYear} · ${EFFORT_DATA.length} años`;
     }
 
@@ -2094,12 +2246,15 @@
         return;
       }
       if (state.chartMode === 'effort') {
-        sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta media por grupos, umbrales y población adulta), <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> y AEAT (escala estatal, mínimos y reducciones), ${xmlSource}, y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (extrapolación 2025) · <span style="opacity:.9;">N.Geolitics</span>`;
+        const totalScope = effortUsesTotalValencia();
+        const scopeText = totalScope ? 'IRPF total (Estado + Comunitat Valenciana)' : 'componente estatal del IRPF';
+        sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta media por grupos, umbrales y población adulta), <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> y AEAT (escalas, mínimos y reducciones), ${xmlSource}, <a class="sourceLink" href="irpf_autonomico_valencia_1997-2025.js">escala autonómica C. Valenciana</a>, <a class="sourceLink" href="data_fuentes/IRPF_tablas_1990-2023.json">JSON normalizado aportado</a> y <a class="sourceLink" href="data_fuentes/raw_irpf.rtf">raw BOE aportado</a> · <span style="opacity:.9;">N.Geolitics</span>`;
         explanationContent.innerHTML = `
-          <p><strong>Esfuerzo fiscal estatal estimado</strong> = cuota estatal estimada del IRPF / renta WID del grupo. Cada muestra de renta se liquida progresivamente bajo un <strong>contribuyente estándar</strong>: individual, menor de 65 años, sin hijos ni discapacidad y con la renta modelizada como rendimiento ordinario del trabajo.</p>
-          <p>El modelo incorpora, según el año, <strong>gastos/reducciones generales del trabajo, deducción histórica por rendimientos del trabajo y mínimo personal</strong>. Desde 2007 el mínimo se trata con su mecánica legal de cuota a tipo cero; desde 2015 se incorpora además el gasto general de 2.000 €. No se aplica nunca el marginal superior a toda la renta.</p>
+          <p><strong>Esfuerzo fiscal estimado</strong> = cuota estimada / renta WID del grupo. Por defecto se usa una referencia territorial homogénea: un contribuyente residente en la <strong>Comunitat Valenciana</strong>. Desde 1997 se suman la cuota estatal y la autonómica; entre 1990 y 1996 la escala era nacional sin el desdoblamiento utilizado después. El selector «Solo estatal» permite comparar con la vista anterior.</p>
+          <p>Cada muestra se liquida progresivamente bajo un <strong>contribuyente estándar</strong>: individual, menor de 65 años, sin hijos ni discapacidad y con la renta modelizada como rendimiento ordinario del trabajo. El modelo incorpora, según el año, gastos/reducciones generales del trabajo, deducción histórica por rendimientos del trabajo y mínimo personal. Desde 2007 se resta la cuota correspondiente al mínimo con la escala estatal y con la escala autonómica; desde 2015 se incorpora además el gasto general de 2.000 €.</p>
+          <p>La serie autonómica utiliza las tablas históricas BOE/AEAT aportadas y verificadas. <strong>2010</strong> se armoniza con el nuevo sistema de financiación: escala estatal 12/14/18,5/21,5 + escala valenciana 11,90/13,92/18,45/21,48, evitando sumar por error una escala estatal del reparto anterior con una autonómica ya adaptada al 50 %. Para <strong>2022 en adelante</strong>, el mínimo autonómico general del contribuyente estándar es 6.105 €.</p>
           <p>La distribución usa P20, P40, P60, P80, P90 y P99, las <strong>medias de renta WID</strong> de P0–20, P20–40, P40–60, P60–80, P80–90, P90–99 y P99–100 y la población adulta anual. «Aportación al IRPF» pondera además cuántos adultos hay en cada grupo.</p>
-          <p><strong>Limitación:</strong> es una estimación estatutaria comparable, no el IRPF realmente pagado. WID no proporciona cotizaciones sociales individuales, composición exacta trabajo/capital, situación familiar ni deducciones personales. Tras la cesión autonómica, esta vista mide sólo el <strong>componente estatal</strong>, no la suma Estado + comunidad autónoma.</p>`;
+          <p><strong>Limitación:</strong> ${scopeText} es una estimación estatutaria comparable, no el impuesto realmente declarado. WID no individualiza cotizaciones sociales, composición trabajo/capital, situación familiar ni todas las deducciones estatales/autonómicas. La referencia valenciana resuelve la ruptura de comparabilidad territorial, pero no convierte la serie en microdatos fiscales observados.</p>`;
         return;
       }
       sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta y población adulta) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (extrapolación 2025), ${xmlSource} · <span style="opacity:.9;">N.Geolitics</span>`;
@@ -2164,6 +2319,12 @@
       getRateSeries: index => getRateSeries(index),
       getRateExtent: () => ({ ...RATE_EXTENT }),
       getRateRatio: rate => rateRatio(rate),
+      getEffortScope: () => state.effortScope,
+      setEffortScope: scope => {
+        state.effortScope = scope === 'stateOnly' ? 'stateOnly' : 'totalValencia';
+        renderAll();
+        return state.effortScope;
+      },
       showLimitsTooltip(year) {
         const rect = chartBox.getBoundingClientRect();
         state.chartMode = 'limits';

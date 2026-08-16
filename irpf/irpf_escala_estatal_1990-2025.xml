@@ -414,17 +414,20 @@
       </brackets>
       <notes/>
     </year>
-    <year value="2010" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.41" deflatorTo1990="0.5125" gdpPerCapitaNominalEur="23126.16" gdpPerCapitaRealEur1990="11852.157">
+    <year value="2010" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa_corregida_financiacion_2009" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.41" deflatorTo1990="0.5125" gdpPerCapitaNominalEur="23126.16" gdpPerCapitaRealEur1990="11852.157">
       <sources>
-        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2009-20765" url="https://www.boe.es/buscar/doc.php?id=BOE-A-2009-20765">Ley 26/2009, escala aplicable en 2010</source>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2009-20375" url="https://www.boe.es/buscar/act.php?id=BOE-A-2009-20375">Ley 22/2009: escala estatal del IRPF aplicable con el nuevo sistema de financiación</source>
+        <source organization="Boletín Oficial del Estado (BOE)" reference="BOE-A-2010-11417" url="https://www.boe.es/buscar/act.php?id=BOE-A-2010-11417">Ley 23/2010: régimen de cesión a la Comunitat Valenciana y transición del ejercicio 2010</source>
       </sources>
       <brackets count="4">
-        <bracket index="1" marginalRatePct="15.66" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="9074.94"/>
-        <bracket index="2" marginalRatePct="18.27" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="2772.95" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="2772.95" lowerRealEur1990="9074.94" upperRealEur1990="16916.19"/>
-        <bracket index="3" marginalRatePct="24.14" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="5568.26" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="5568.26" lowerRealEur1990="16916.19" upperRealEur1990="27371.19"/>
-        <bracket index="4" marginalRatePct="27.13" openUpper="true" lowerOriginal="53407.2" quotaAtLowerOriginal="10492.82" lowerNominalEur="53407.2" quotaAtLowerEur="10492.82" lowerRealEur1990="27371.19"/>
+        <bracket index="1" marginalRatePct="12" openUpper="false" lowerOriginal="0" upperOriginal="17707.2" widthOriginal="17707.2" quotaAtLowerOriginal="0" lowerNominalEur="0" upperNominalEur="17707.2" quotaAtLowerEur="0" lowerRealEur1990="0" upperRealEur1990="9074.94"/>
+        <bracket index="2" marginalRatePct="14" openUpper="false" lowerOriginal="17707.2" upperOriginal="33007.2" widthOriginal="15300" quotaAtLowerOriginal="2124.86" lowerNominalEur="17707.2" upperNominalEur="33007.2" quotaAtLowerEur="2124.86" lowerRealEur1990="9074.94" upperRealEur1990="16916.19"/>
+        <bracket index="3" marginalRatePct="18.5" openUpper="false" lowerOriginal="33007.2" upperOriginal="53407.2" widthOriginal="20400" quotaAtLowerOriginal="4266.86" lowerNominalEur="33007.2" upperNominalEur="53407.2" quotaAtLowerEur="4266.86" lowerRealEur1990="16916.19" upperRealEur1990="27371.19"/>
+        <bracket index="4" marginalRatePct="21.5" openUpper="true" lowerOriginal="53407.2" quotaAtLowerOriginal="8040.86" lowerNominalEur="53407.2" quotaAtLowerEur="8040.86" lowerRealEur1990="27371.19"/>
       </brackets>
-      <notes/>
+      <notes>
+        <note>Corrección de comparabilidad: para 2010 se aplica la escala estatal vigente tras la Ley 22/2009 (12/14/18,5/21,5), en lugar de mezclar la escala estatal del sistema anterior con la nueva escala autonómica al 50 %.</note>
+      </notes>
     </year>
     <year value="2011" exerciseStatus="cerrado" legalScope="escala_estatal_general" sourceStatus="tabla_oficial_directa" originalCurrency="EUR" originalCurrencyName="euro" deflatorTo1986="0.4" deflatorTo1990="0.5" gdpPerCapitaNominalEur="22863.25" gdpPerCapitaRealEur1990="11431.625">
       <sources>
