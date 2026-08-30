@@ -696,6 +696,28 @@
           </div>
         </div>
 
+        <div class="selectorModeBlock" id="comparisonControls" hidden>
+          <div class="field seriesField">
+            <div class="label">Series mostradas</div>
+            <div class="seriesGrid">
+              <div class="seriesItem comparisonSeriesItem">
+                <span class="seriesSwatch" style="background:#8F7CFF"></span>
+                <span class="seriesName">Reino Unido · Londres desde 1801</span>
+              </div>
+              <div class="seriesItem comparisonSeriesItem">
+                <span class="seriesSwatch" style="background:#FF5A5F"></span>
+                <span class="seriesName">Estados Unidos · mercado desde 1871</span>
+              </div>
+            </div>
+          </div>
+          <div class="field">
+            <div class="label">Medida</div>
+            <div class="modeRow">
+              <span class="btn modeButton on" aria-current="true">Precio · escala logarítmica</span>
+            </div>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -707,6 +729,7 @@
       <div class="chartContent">
         <div class="chartViewBar" role="tablist" aria-label="Selector de gráfico">
           <button class="btn wideViewToggle on" id="btnViewHistorical" type="button" role="tab" aria-selected="true">Índices históricos</button>
+          <button class="btn wideViewToggle" id="btnViewComparison" type="button" role="tab" aria-selected="false">EE. UU. vs Reino Unido</button>
         </div>
         <div class="chartBox">
           <canvas aria-label="Gráfico de índices históricos" id="chart"></canvas>
@@ -716,13 +739,16 @@
         </div>
         <div class="footerSingle">
           <span class="footerSource" id="historicalFooter">Fuente: <a class="sourceLink" href="https://www.macrohistory.net/database/" target="_blank" rel="noopener noreferrer">Jordà-Schularick-Taylor Macrohistory Database</a> (<span style="color:#fff">JSTdatasetR6.xlsx</span>, R.6) · <span style="opacity:.9;">N.Geolitics</span></span>
+          <span class="footerSource" id="comparisonFooter" hidden>Fuente: reconstrucciones históricas de Londres y del mercado estadounidense incluidas en el proyecto. Cada serie se normaliza a 100 en su primer año disponible.</span>
         </div>
       </div>
     </section>
   </main>
 <script src="series-data.js"></script>
+<script src="long-run-indices-data.js?v=20260816-2"></script>
 <script>
     const DATA = window.NG_SERIES_DATA;
+    const LONG_RUN_DATA = window.NGE_LONG_RUN_DATA;
     const state = {
       view: 'historical',
       mode: 'real',
@@ -744,9 +770,12 @@
       btnHoverFocus: document.getElementById('btnHoverFocus'),
       selectorMeta: document.getElementById('selectorMeta'),
       historicalControls: document.getElementById('historicalControls'),
+      comparisonControls: document.getElementById('comparisonControls'),
       historicalChartControls: document.getElementById('historicalChartControls'),
       historicalFooter: document.getElementById('historicalFooter'),
+      comparisonFooter: document.getElementById('comparisonFooter'),
       btnViewHistorical: document.getElementById('btnViewHistorical'),
+      btnViewComparison: document.getElementById('btnViewComparison'),
       status: document.getElementById('status'),
       statsGrid: document.getElementById('statsGrid'),
       seriesTable: document.getElementById('seriesTable')
@@ -807,11 +836,38 @@
       return Number.isFinite(v) ? (v * 100).toLocaleString('es-ES', {maximumFractionDigits:2}) + '%' : '—';
     }
 
+    const comparisonSeriesConfig = [
+      {id: 'uk', label: 'Reino Unido', color: '#8F7CFF'},
+      {id: 'usa', label: 'Estados Unidos', color: '#FF5A5F'}
+    ];
+    const comparisonSeries = comparisonSeriesConfig.map(config => {
+      const rows = Array.isArray(LONG_RUN_DATA?.[config.id])
+        ? LONG_RUN_DATA[config.id]
+            .map(row => ({year: Number(row.year), value: Number(row.value)}))
+            .filter(row => row.year >= 1801 && row.year <= 2026 && Number.isFinite(row.value) && row.value > 0)
+            .sort((a,b) => a.year - b.year)
+        : [];
+      const base = rows[0]?.value;
+      return {
+        ...config,
+        points: base > 0
+          ? rows.map(row => ({year: row.year, t: Date.UTC(row.year, 0, 1), value: row.value / base * 100}))
+          : []
+      };
+    });
+
     function renderViewSelector(){
-      els.historicalControls.hidden = false;
-      els.historicalChartControls.hidden = false;
-      els.historicalFooter.hidden = false;
-      els.selectorMeta.textContent = '1900–2020';
+      const historical = state.view === 'historical';
+      els.btnViewHistorical.classList.toggle('on', historical);
+      els.btnViewComparison.classList.toggle('on', !historical);
+      els.btnViewHistorical.setAttribute('aria-selected', historical ? 'true' : 'false');
+      els.btnViewComparison.setAttribute('aria-selected', historical ? 'false' : 'true');
+      els.historicalControls.hidden = !historical;
+      els.comparisonControls.hidden = historical;
+      els.historicalChartControls.hidden = !historical;
+      els.historicalFooter.hidden = !historical;
+      els.comparisonFooter.hidden = historical;
+      els.selectorMeta.textContent = historical ? '1900–2020' : '1801–2026';
     }
 
     for(const mode of Object.keys(DATA.modes)){
@@ -1062,7 +1118,161 @@
       return (fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 5 ? 5 : 10) * power;
     }
 
+    function drawComparison(){
+      const {width, height} = resizeCanvas();
+      ctx.clearRect(0, 0, width, height);
+      ctx.fillStyle = '#252525';
+      ctx.fillRect(0, 0, width, height);
+
+      const active = comparisonSeries.filter(series => series.points.length > 1);
+      if(!active.length){
+        ctx.fillStyle = '#e3e3e3';
+        ctx.font = '700 18px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText('No se han podido cargar las series comparables.', width / 2, height / 2);
+        return;
+      }
+
+      const compact = width < 620;
+      const margin = {left: compact ? 68 : 90, right: compact ? 18 : 34, top: compact ? 58 : 62, bottom: compact ? 70 : 82};
+      const plotW = Math.max(1, width - margin.left - margin.right);
+      const plotH = Math.max(1, height - margin.top - margin.bottom);
+      const right = margin.left + plotW;
+      const bottom = margin.top + plotH;
+      const startYear = 1801;
+      const endYear = 2026;
+      const values = active.flatMap(series => series.points.map(point => point.value)).filter(value => value > 0);
+      const logMin = Math.floor(Math.log10(Math.min(...values)));
+      const logMax = Math.ceil(Math.log10(Math.max(...values)));
+      const logSpan = Math.max(1, logMax - logMin);
+      const tx = year => margin.left + ((year - startYear) / (endYear - startYear)) * plotW;
+      const ty = value => margin.top + (1 - ((Math.log10(value) - logMin) / logSpan)) * plotH;
+
+      ctx.fillStyle = 'rgba(0,0,0,.12)';
+      ctx.strokeStyle = 'rgba(255,255,255,.16)';
+      ctx.fillRect(margin.left, margin.top, plotW, plotH);
+      ctx.strokeRect(margin.left, margin.top, plotW, plotH);
+
+      ctx.font = compact ? '10px Arial' : '12px Arial';
+      ctx.textBaseline = 'middle';
+      for(let power = logMin; power <= logMax; power++){
+        const value = 10 ** power;
+        const y = ty(value);
+        if(y < margin.top - 1 || y > bottom + 1) continue;
+        ctx.strokeStyle = 'rgba(255,255,255,.10)';
+        ctx.beginPath();
+        ctx.moveTo(margin.left, y);
+        ctx.lineTo(right, y);
+        ctx.stroke();
+        ctx.fillStyle = '#b0b0b0';
+        ctx.textAlign = 'right';
+        ctx.fillText(formatValue(value), margin.left - 10, y);
+      }
+
+      const xTicks = compact ? [1801, 1900, 2000, 2026] : [1801, 1850, 1900, 1950, 2000, 2026];
+      ctx.textBaseline = 'top';
+      for(const year of xTicks){
+        const x = tx(year);
+        ctx.strokeStyle = 'rgba(255,255,255,.10)';
+        ctx.beginPath();
+        ctx.moveTo(x, margin.top);
+        ctx.lineTo(x, bottom);
+        ctx.stroke();
+        ctx.fillStyle = '#b0b0b0';
+        ctx.textAlign = 'center';
+        ctx.fillText(String(year), x, bottom + 12);
+      }
+
+      for(const series of active){
+        ctx.save();
+        ctx.strokeStyle = series.color;
+        ctx.lineWidth = 2.8;
+        ctx.lineJoin = 'round';
+        ctx.lineCap = 'round';
+        ctx.beginPath();
+        let started = false;
+        let previousYear = null;
+        for(const point of series.points){
+          const x = tx(point.year);
+          const y = ty(point.value);
+          if(previousYear !== null && point.year - previousYear > 1){
+            ctx.stroke();
+            ctx.beginPath();
+            started = false;
+          }
+          if(!started){ ctx.moveTo(x, y); started = true; }
+          else ctx.lineTo(x, y);
+          previousYear = point.year;
+        }
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      if(state.hover && state.hover.x >= margin.left && state.hover.x <= right && state.hover.y >= margin.top && state.hover.y <= bottom){
+        const year = Math.max(startYear, Math.min(endYear, Math.round(startYear + ((state.hover.x - margin.left) / plotW) * (endYear - startYear))));
+        const x = tx(year);
+        const tooltipW = Math.min(compact ? 250 : 330, plotW - 16);
+        const tooltipH = 34 + active.length * 24;
+        const tooltipX = Math.max(margin.left + 8, Math.min(right - tooltipW - 8, state.hover.x + 14));
+        const tooltipY = margin.top + 10;
+        ctx.save();
+        ctx.strokeStyle = 'rgba(254,247,2,.55)';
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(x, margin.top);
+        ctx.lineTo(x, bottom);
+        ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = 'rgba(20,20,20,.96)';
+        ctx.strokeStyle = 'rgba(254,247,2,.45)';
+        ctx.beginPath();
+        ctx.roundRect(tooltipX, tooltipY, tooltipW, tooltipH, 9);
+        ctx.fill();
+        ctx.stroke();
+        ctx.fillStyle = '#FEF702';
+        ctx.font = '700 13px Arial';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'top';
+        ctx.fillText(String(year), tooltipX + 12, tooltipY + 10);
+        active.forEach((series, index) => {
+          const point = series.points.reduce((nearest, candidate) => Math.abs(candidate.year - year) < Math.abs(nearest.year - year) ? candidate : nearest);
+          ctx.fillStyle = series.color;
+          ctx.fillRect(tooltipX + 12, tooltipY + 34 + index * 24, 14, 3);
+          ctx.fillStyle = '#e3e3e3';
+          ctx.font = compact ? '11px Arial' : '12px Arial';
+          ctx.fillText(`${series.label}: ${formatValue(point.value)}`, tooltipX + 34, tooltipY + 27 + index * 24);
+        });
+        ctx.restore();
+      }
+
+      ctx.strokeStyle = 'rgba(255,255,255,.72)';
+      ctx.lineWidth = 1.4;
+      ctx.beginPath();
+      ctx.moveTo(margin.left, bottom);
+      ctx.lineTo(right, bottom);
+      ctx.moveTo(margin.left, margin.top);
+      ctx.lineTo(margin.left, bottom);
+      ctx.stroke();
+      ctx.fillStyle = '#FEF702';
+      ctx.font = compact ? '700 15px Arial' : '700 19px Arial';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'alphabetic';
+      ctx.fillText('EE. UU. vs Reino Unido · precio normalizado', margin.left, 32);
+      ctx.save();
+      ctx.translate(compact ? 18 : 24, margin.top + plotH / 2);
+      ctx.rotate(-Math.PI / 2);
+      ctx.fillStyle = '#e3e3e3';
+      ctx.font = compact ? '700 10px Arial' : '700 13px Arial';
+      ctx.textAlign = 'center';
+      ctx.fillText('Índice de precio · base 100', 0, 0);
+      ctx.restore();
+    }
+
     function draw(){
+      if(state.view === 'comparison'){
+        drawComparison();
+        return;
+      }
       const {width, height} = resizeCanvas();
       ctx.clearRect(0,0,width,height);
       ctx.fillStyle = '#252525';
@@ -1388,6 +1598,11 @@
     }
 
     function renderChartMeta(){
+      if(state.view === 'comparison'){
+        els.chartMeta.textContent = 'Precio normalizado · Base 100 en el primer año disponible · Escala logarítmica';
+        els.chart.setAttribute('aria-label', 'Comparación de los índices de precio del Reino Unido y Estados Unidos entre 1801 y 2026');
+        return;
+      }
       els.chartMeta.textContent = state.metric === 'annual'
         ? 'Variación interanual · Escala simétrica logarítmica'
         : 'Base 1900 = 100 · Escala logarítmica';
@@ -1405,6 +1620,11 @@
 
     function renderAll(rebuildSelectors = true){
       renderViewSelector();
+      if(state.view === 'comparison'){
+        renderChartMeta();
+        draw();
+        return;
+      }
       renderModes();
       renderMetrics();
       if(rebuildSelectors) renderSeriesSelectors();
@@ -1440,6 +1660,12 @@
       state.view = 'historical';
       state.hover = null;
       renderAll();
+    });
+    els.btnViewComparison.addEventListener('click', () => {
+      if(state.view === 'comparison') return;
+      state.view = 'comparison';
+      state.hover = null;
+      renderAll(false);
     });
     window.addEventListener('resize', () => draw());
 
