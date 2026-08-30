@@ -641,7 +641,7 @@
     .chartViewBar {
       width: 100%;
       display: grid;
-      grid-template-columns: 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 12px;
       flex: 0 0 auto;
     }
@@ -658,7 +658,13 @@
     [hidden] {
       display: none !important;
     }
+    #comparisonControls {
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
     @media (max-width: 620px) {
+      .chartViewBar { grid-template-columns: 1fr; }
       .wideViewToggle { min-height: 44px; }
     }
   </style>
@@ -713,7 +719,7 @@
           <div class="field">
             <div class="label">Medida</div>
             <div class="modeRow">
-              <span class="btn modeButton on" aria-current="true">Precio · escala logarítmica</span>
+              <button class="btn modeButton" id="btnComparisonSince1871" type="button" aria-pressed="false">Desde 1871 · mismo periodo</button>
             </div>
           </div>
         </div>
@@ -758,6 +764,7 @@
       hover: null,
       hoverFocusMode: false,
       hoverSid: null,
+      comparisonStartYear: 1801,
       pixelRatio: Math.max(1, window.devicePixelRatio || 1)
     };
 
@@ -776,6 +783,7 @@
       comparisonFooter: document.getElementById('comparisonFooter'),
       btnViewHistorical: document.getElementById('btnViewHistorical'),
       btnViewComparison: document.getElementById('btnViewComparison'),
+      btnComparisonSince1871: document.getElementById('btnComparisonSince1871'),
       status: document.getElementById('status'),
       statsGrid: document.getElementById('statsGrid'),
       seriesTable: document.getElementById('seriesTable')
@@ -847,27 +855,30 @@
             .filter(row => row.year >= 1801 && row.year <= 2026 && Number.isFinite(row.value) && row.value > 0)
             .sort((a,b) => a.year - b.year)
         : [];
-      const base = rows[0]?.value;
       return {
         ...config,
-        points: base > 0
-          ? rows.map(row => ({year: row.year, t: Date.UTC(row.year, 0, 1), value: row.value / base * 100}))
-          : []
+        points: rows.map(row => ({year: row.year, t: Date.UTC(row.year, 0, 1), value: row.value}))
       };
     });
 
     function renderViewSelector(){
       const historical = state.view === 'historical';
+      const commonPeriod = state.comparisonStartYear === 1871;
       els.btnViewHistorical.classList.toggle('on', historical);
       els.btnViewComparison.classList.toggle('on', !historical);
       els.btnViewHistorical.setAttribute('aria-selected', historical ? 'true' : 'false');
       els.btnViewComparison.setAttribute('aria-selected', historical ? 'false' : 'true');
+      els.btnComparisonSince1871.classList.toggle('on', commonPeriod);
+      els.btnComparisonSince1871.setAttribute('aria-pressed', commonPeriod ? 'true' : 'false');
+      els.btnComparisonSince1871.textContent = commonPeriod
+        ? 'Desde 1871 · mismo periodo (activo)'
+        : 'Desde 1871 · mismo periodo';
       els.historicalControls.hidden = !historical;
       els.comparisonControls.hidden = historical;
       els.historicalChartControls.hidden = !historical;
       els.historicalFooter.hidden = !historical;
       els.comparisonFooter.hidden = historical;
-      els.selectorMeta.textContent = historical ? '1900–2020' : '1801–2026';
+      els.selectorMeta.textContent = historical ? '1900–2020' : `${state.comparisonStartYear}–2026`;
     }
 
     for(const mode of Object.keys(DATA.modes)){
@@ -1124,7 +1135,16 @@
       ctx.fillStyle = '#252525';
       ctx.fillRect(0, 0, width, height);
 
-      const active = comparisonSeries.filter(series => series.points.length > 1);
+      const startYear = state.comparisonStartYear;
+      const endYear = 2026;
+      const active = comparisonSeries.map(series => {
+        const points = series.points.filter(point => point.year >= startYear && point.year <= endYear);
+        const base = points[0]?.value;
+        return {
+          ...series,
+          points: base > 0 ? points.map(point => ({...point, value: point.value / base * 100})) : []
+        };
+      }).filter(series => series.points.length > 1);
       if(!active.length){
         ctx.fillStyle = '#e3e3e3';
         ctx.font = '700 18px Arial';
@@ -1139,8 +1159,6 @@
       const plotH = Math.max(1, height - margin.top - margin.bottom);
       const right = margin.left + plotW;
       const bottom = margin.top + plotH;
-      const startYear = 1801;
-      const endYear = 2026;
       const values = active.flatMap(series => series.points.map(point => point.value)).filter(value => value > 0);
       const logMin = Math.floor(Math.log10(Math.min(...values)));
       const logMax = Math.ceil(Math.log10(Math.max(...values)));
@@ -1599,7 +1617,9 @@
 
     function renderChartMeta(){
       if(state.view === 'comparison'){
-        els.chartMeta.textContent = 'Precio normalizado · Base 100 en el primer año disponible · Escala logarítmica';
+        els.chartMeta.textContent = state.comparisonStartYear === 1871
+          ? 'Precio normalizado · Base 1871 = 100 para ambas series · Escala logarítmica'
+          : 'Precio normalizado · Base 100 en el primer año disponible · Escala logarítmica';
         els.chart.setAttribute('aria-label', 'Comparación de los índices de precio del Reino Unido y Estados Unidos entre 1801 y 2026');
         return;
       }
@@ -1664,6 +1684,11 @@
     els.btnViewComparison.addEventListener('click', () => {
       if(state.view === 'comparison') return;
       state.view = 'comparison';
+      state.hover = null;
+      renderAll(false);
+    });
+    els.btnComparisonSince1871.addEventListener('click', () => {
+      state.comparisonStartYear = state.comparisonStartYear === 1871 ? 1801 : 1871;
       state.hover = null;
       renderAll(false);
     });
