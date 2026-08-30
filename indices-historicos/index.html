@@ -637,11 +637,11 @@
       .chartBox { min-height: 420px; }
     }
 
-    /* Selector de vistas y controles de la comparación de muy largo plazo. */
+    /* Selector del gráfico principal. */
     .chartViewBar {
       width: 100%;
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr;
       gap: 12px;
       flex: 0 0 auto;
     }
@@ -655,92 +655,11 @@
       letter-spacing: .2px;
       text-transform: none;
     }
-    .selectorModeBlock {
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
-    }
-    .selectorModeBlock[hidden],
     [hidden] {
       display: none !important;
     }
-    .longRunSeriesItem {
-      align-items: center;
-    }
-    .longRunSeriesItem .seriesSwatch {
-      width: 24px;
-      height: 0;
-      margin-top: 0;
-      border-radius: 0;
-      border-top: 3px solid var(--series-color);
-      background: transparent !important;
-    }
-    .longRunSeriesItem .seriesSwatch.isDashed {
-      border-top-style: dashed;
-    }
-    .longRunSeriesItem[aria-pressed="false"] {
-      opacity: .34;
-    }
-    .longRunSeriesItem[aria-pressed="false"] .seriesName {
-      text-decoration: line-through;
-    }
-    .btn[disabled], .seriesItem[disabled] {
-      opacity: .28 !important;
-      cursor: not-allowed;
-      filter: grayscale(.65);
-    }
-    .qualityLegend {
-      display: grid;
-      gap: 7px;
-      padding: 10px 12px;
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 12px;
-      background: rgba(0,0,0,.14);
-      color: var(--muted);
-      font-size: 11px;
-      line-height: 1.4;
-    }
-    .qualityLegendRow { display:flex; gap:16px; flex-wrap:wrap; align-items:center; }
-    .qualityKey { display:inline-flex; gap:7px; align-items:center; color:rgba(255,255,255,.82); }
-    .qualityLine { width:28px; height:0; border-top:3px solid #ddd; display:inline-block; }
-    .qualityLine.single { border-top-style:dashed; }
-    .qualityLine.proxy { border-top-style:dotted; }
-    .studySummary {
-      display:grid;
-      grid-template-columns:repeat(4,minmax(0,1fr));
-      gap:10px;
-      padding: 0 0 2px;
-    }
-    .studyCard {
-      min-width:0;
-      border:1px solid rgba(255,255,255,.09);
-      background:rgba(0,0,0,.16);
-      border-radius:12px;
-      padding:11px 12px;
-    }
-    .studyCard .k { color:var(--muted); font-size:10px; text-transform:uppercase; letter-spacing:.35px; }
-    .studyCard .v { color:#fff; font-size:17px; font-weight:800; margin-top:3px; }
-    .studyCard .s { color:var(--muted); font-size:11px; margin-top:3px; line-height:1.35; }
-    .studyCard.emphasis { border-color:rgba(254,247,2,.3); }
-    .methodology {
-      border:1px solid rgba(255,255,255,.08);
-      border-radius:12px;
-      background:rgba(0,0,0,.13);
-      padding:0 12px;
-      color:var(--muted);
-      font-size:12px;
-      line-height:1.5;
-    }
-    .methodology summary { cursor:pointer; color:#fff; font-weight:700; padding:10px 0; }
-    .methodologyBody { padding:0 0 12px; display:grid; gap:8px; }
-    .methodologyBody strong { color:#fff; }
-    .methodologyBody a { color:var(--accent); text-decoration:underline; text-underline-offset:2px; }
-    .studyWarning { color:#dedede; font-size:11px; line-height:1.45; padding:8px 10px; border-left:3px solid rgba(254,247,2,.72); background:rgba(254,247,2,.045); border-radius:7px; }
-    @media (max-width: 980px) { .studySummary { grid-template-columns:repeat(2,minmax(0,1fr)); } }
     @media (max-width: 620px) {
-      .chartViewBar { grid-template-columns: 1fr; }
       .wideViewToggle { min-height: 44px; }
-      .studySummary { grid-template-columns:1fr; }
     }
   </style>
 </head>
@@ -777,78 +696,6 @@
           </div>
         </div>
 
-        <div class="selectorModeBlock" id="longRunControls" hidden>
-          <div class="field">
-            <div class="label">Cobertura</div>
-            <div class="modeRow">
-              <button class="btn modeButton on" id="btnLongFull" type="button" aria-pressed="true">Completa · 1492–2026</button>
-              <button class="btn modeButton" id="btnLongSpainNetherlands" type="button" aria-pressed="false">Transición España–Holanda · 1602–1794</button>
-              <button class="btn modeButton" id="btnLongUkUsa" type="button" aria-pressed="false">Reino Unido vs EE. UU. · 1871–2025</button>
-              <button class="btn modeButton" id="btnLongUkUsaChina" type="button" aria-pressed="false">EE. UU. vs China + Reino Unido · 1990–2025</button>
-            </div>
-          </div>
-
-          <div class="field">
-            <div class="label">Medida</div>
-            <div class="modeRow">
-              <button class="btn modeButton on" id="btnMeasurePrice" type="button" aria-pressed="true">Precio</button>
-              <button class="btn modeButton" id="btnMeasureTotal" type="button" aria-pressed="false">Retorno total</button>
-              <button class="btn modeButton" id="btnMeasureReal" type="button" aria-pressed="false">Retorno total real</button>
-              <button class="btn modeButton" id="btnMeasureDiv" type="button" aria-pressed="false">Dividendos anuales</button>
-            </div>
-          </div>
-
-          <div class="field">
-            <div class="label">Análisis</div>
-            <div class="modeRow">
-              <button class="btn modeButton on" id="btnAnalysisTimeline" type="button" aria-pressed="true">Cronología</button>
-              <button class="btn modeButton" id="btnAnalysisEvent" type="button" aria-pressed="false">Cambio UK→USA · 1944 = 0</button>
-            </div>
-          </div>
-
-          <div class="field seriesField">
-            <div class="label">Series visibles</div>
-            <div class="seriesGrid">
-              <button class="seriesItem longRunSeriesItem" id="btnLongNetherlands" type="button" aria-pressed="true">
-                <span class="seriesSwatch" style="--series-color:#F59E0B"></span>
-                <span class="seriesName">Holanda · VOC 1602–1698 / Ámsterdam 1723–1794</span>
-              </button>
-              <button class="seriesItem longRunSeriesItem" id="btnLongUk" type="button" aria-pressed="true">
-                <span class="seriesSwatch" style="--series-color:#8F7CFF"></span>
-                <span class="seriesName">Reino Unido · Londres 1801–2025</span>
-              </button>
-              <button class="seriesItem longRunSeriesItem" id="btnLongUsa" type="button" aria-pressed="true">
-                <span class="seriesSwatch" style="--series-color:#FF5A5F"></span>
-                <span class="seriesName">Estados Unidos · mercado 1871–2026</span>
-              </button>
-              <button class="seriesItem longRunSeriesItem" id="btnLongSpain" type="button" aria-pressed="true">
-                <span class="seriesSwatch" style="--series-color:#22C55E"></span>
-                <span class="seriesName">España · proxy 1492–1810 / H-IBEX 1900–2020</span>
-              </button>
-              <button class="seriesItem longRunSeriesItem" id="btnLongChina" type="button" aria-pressed="true">
-                <span class="seriesSwatch" style="--series-color:#38BDF8"></span>
-                <span class="seriesName">Shanghái histórico 1871–1940 / SSE 1990–2026</span>
-              </button>
-            </div>
-          </div>
-
-          <div class="field">
-            <div class="label">Escala</div>
-            <div class="modeRow">
-              <button class="btn modeButton on" id="btnLongLog" type="button" aria-pressed="true">Logarítmica</button>
-              <button class="btn modeButton" id="btnLongLinear" type="button" aria-pressed="false">Lineal</button>
-            </div>
-          </div>
-
-          <div class="qualityLegend" id="qualityLegend">
-            <div><strong style="color:#fff">Calidad conceptual de la línea</strong> — el color identifica el país; el trazo identifica qué tipo de evidencia es.</div>
-            <div class="qualityLegendRow">
-              <span class="qualityKey"><i class="qualityLine"></i> mercado / cartera</span>
-              <span class="qualityKey"><i class="qualityLine single"></i> acción individual (VOC)</span>
-              <span class="qualityKey"><i class="qualityLine proxy"></i> proxy no bursátil (España imperial)</span>
-            </div>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -860,41 +707,22 @@
       <div class="chartContent">
         <div class="chartViewBar" role="tablist" aria-label="Selector de gráfico">
           <button class="btn wideViewToggle on" id="btnViewHistorical" type="button" role="tab" aria-selected="true">Índices históricos</button>
-          <button class="btn wideViewToggle" id="btnViewLongRun" type="button" role="tab" aria-selected="false">5 series históricas · estudio por capas</button>
         </div>
         <div class="chartBox">
           <canvas aria-label="Gráfico de índices históricos" id="chart"></canvas>
         </div>
-        <div class="studySummary" id="studySummary" hidden></div>
-        <details class="methodology" id="studyMethodology" hidden>
-          <summary>Metodología, fuentes y límites del estudio</summary>
-          <div class="methodologyBody">
-            <div><strong>Precio:</strong> mide únicamente la variación del precio. <strong>Retorno total:</strong> reinvierte dividendos. <strong>Retorno total real:</strong> descuenta el IPC local. La capa de dividendos muestra su aportación anual al retorno, no una supuesta “rentabilidad bursátil” de España imperial.</div>
-            <div><strong>Comparabilidad estricta:</strong> UK y EE. UU. usan las variables <code>eq_capgain</code>, <code>eq_tr</code>, <code>eq_div_rtn</code> y <code>cpi</code> de JST R6 (1871–2020). China usa SSE Composite, SSE Composite Total Return Index y CPI oficial chino; su capa total comparable empieza en 2020.</div>
-            <div><strong>España 1492–1810:</strong> es stock monetario estimado en equivalente de plata, un proxy del sistema monetario imperial, <em>no una bolsa</em>. <strong>VOC 1602–1698:</strong> es una acción individual. Por eso se dibujan con trazos distintos y no se utilizan como prueba directa de retorno bursátil agregado.</div>
-            <div><strong>China:</strong> Shanghái 1871–1940 y SSE moderno son regímenes distintos; el hueco histórico se conserva. El SSE Total Return Index fue lanzado por la Bolsa de Shanghái con base 21-07-2020 = 3320,89 y desde 2024 su código en tiempo real es 000888.</div>
-            <div><strong>China 2024:</strong> el retorno total anual mostrado es una reconstrucción derivada. Combina el diferencial acumulado de 11,32 puntos porcentuales frente al índice de precio hasta 31-12-2024, el diferencial parcial de 2020 (0,34 pp), los retornos totales completos 2021–2023 y los cierres del SSE Composite. Se marca como “derivado”.</div>
-            <div><strong>Estudio de evento:</strong> 1944 (Bretton Woods) es un marcador institucional de la transición libra→dólar, no una fecha causal única ni el instante exacto en que Reino Unido “dejó de ser hegemón”. El eje horizontal muestra años respecto a 1944.</div>
-            <div>Fuentes externas: <a href="https://www.macrohistory.net/database/" target="_blank" rel="noopener noreferrer">JST Macrohistory Database</a> · <a href="https://english.sse.com.cn/markets/indices/indexnews/c/5221435.shtml" target="_blank" rel="noopener noreferrer">SSE TRI (lanzamiento)</a> · <a href="https://english.sse.com.cn/markets/indices/indexnews/c/c_20240715_10759850.shtml" target="_blank" rel="noopener noreferrer">SSE TR 000888</a> · National Bureau of Statistics of China (IPC) · <a href="METODOLOGIA_ESTUDIO.md" target="_blank" rel="noopener noreferrer">metodología completa y cálculos</a>.</div>
-          </div>
-        </details>
         <div class="chartControls" id="historicalChartControls">
           <button class="btn" id="btnHoverFocus" type="button" aria-pressed="false">Resaltar al pasar: OFF</button>
         </div>
         <div class="footerSingle">
           <span class="footerSource" id="historicalFooter">Fuente: <a class="sourceLink" href="https://www.macrohistory.net/database/" target="_blank" rel="noopener noreferrer">Jordà-Schularick-Taylor Macrohistory Database</a> (<span style="color:#fff">JSTdatasetR6.xlsx</span>, R.6) · <span style="opacity:.9;">N.Geolitics</span></span>
-          <span class="footerSource" id="longRunFooter" hidden>Fuentes: ICPSR 139761 · H-IBEX · VOC/Petram · Golez–Koudijs · Banco de Inglaterra/FTSE Russell–LSEG · mercado estadounidense reconstruido/S&amp;P posterior · Yale Shanghái · SSE Composite/SSE TR · <span style="color:#fff">JST R6 para precio, dividendos, retorno total e IPC UK/USA</span>. Las alturas del gráfico completo no son niveles comparables: cada tramo se inicia en 100.</span>
         </div>
       </div>
     </section>
   </main>
 <script src="series-data.js"></script>
-<script src="long-run-indices-data.js?v=20260816-2"></script>
-<script src="study-data.js?v=20260816-1"></script>
 <script>
     const DATA = window.NG_SERIES_DATA;
-    const LONG_RUN_DATA = window.NGE_LONG_RUN_DATA;
-    const STUDY_DATA = window.NGE_STUDY_DATA;
     const state = {
       view: 'historical',
       mode: 'real',
@@ -904,11 +732,6 @@
       hover: null,
       hoverFocusMode: false,
       hoverSid: null,
-      longRunCoverage: 'full',
-      longRunScale: 'log',
-      longRunMeasure: 'price',
-      longRunAnalysis: 'timeline',
-      longRunVisible: new Map([['netherlands', true], ['uk', true], ['usa', true], ['spain', true], ['china', true]]),
       pixelRatio: Math.max(1, window.devicePixelRatio || 1)
     };
 
@@ -921,32 +744,9 @@
       btnHoverFocus: document.getElementById('btnHoverFocus'),
       selectorMeta: document.getElementById('selectorMeta'),
       historicalControls: document.getElementById('historicalControls'),
-      longRunControls: document.getElementById('longRunControls'),
       historicalChartControls: document.getElementById('historicalChartControls'),
       historicalFooter: document.getElementById('historicalFooter'),
-      longRunFooter: document.getElementById('longRunFooter'),
       btnViewHistorical: document.getElementById('btnViewHistorical'),
-      btnViewLongRun: document.getElementById('btnViewLongRun'),
-      btnLongFull: document.getElementById('btnLongFull'),
-      btnLongSpainNetherlands: document.getElementById('btnLongSpainNetherlands'),
-      btnLongUkUsa: document.getElementById('btnLongUkUsa'),
-      btnLongUkUsaChina: document.getElementById('btnLongUkUsaChina'),
-      btnLongNetherlands: document.getElementById('btnLongNetherlands'),
-      btnLongUk: document.getElementById('btnLongUk'),
-      btnLongUsa: document.getElementById('btnLongUsa'),
-      btnLongSpain: document.getElementById('btnLongSpain'),
-      btnLongChina: document.getElementById('btnLongChina'),
-      btnLongLog: document.getElementById('btnLongLog'),
-      btnLongLinear: document.getElementById('btnLongLinear'),
-      btnMeasurePrice: document.getElementById('btnMeasurePrice'),
-      btnMeasureTotal: document.getElementById('btnMeasureTotal'),
-      btnMeasureReal: document.getElementById('btnMeasureReal'),
-      btnMeasureDiv: document.getElementById('btnMeasureDiv'),
-      btnAnalysisTimeline: document.getElementById('btnAnalysisTimeline'),
-      btnAnalysisEvent: document.getElementById('btnAnalysisEvent'),
-      qualityLegend: document.getElementById('qualityLegend'),
-      studySummary: document.getElementById('studySummary'),
-      studyMethodology: document.getElementById('studyMethodology'),
       status: document.getElementById('status'),
       statsGrid: document.getElementById('statsGrid'),
       seriesTable: document.getElementById('seriesTable')
@@ -962,63 +762,6 @@
       annual: 'Rendimientos anuales'
     };
     const GERMANY_SID = 'jst_germany';
-    const longRunSeriesOrder = ['netherlands', 'uk', 'usa', 'spain', 'china'];
-    const longRunSeriesStyle = {
-      netherlands: {label: 'Holanda', color: '#F59E0B', dash: []},
-      uk: {label: 'Inglaterra / Reino Unido', color: '#8F7CFF', dash: []},
-      usa: {label: 'Estados Unidos', color: '#FF5A5F', dash: []},
-      spain: {label: 'España', color: '#22C55E', dash: []},
-      china: {label: 'China / Shanghái', color: '#38BDF8', dash: []}
-    };
-    const longRunCoverageProfiles = {
-      full: {
-        start: 1492, end: 2026,
-        selector: '1492–2026',
-        title: 'Cinco series históricas · cobertura completa',
-        meta: 'Cobertura completa; cada tramo = 100 en su primer año',
-        aria: 'Comparación de cinco series históricas entre 1492 y 2026, con cada tramo normalizado a 100 en su primer año disponible',
-        visible: ['netherlands', 'uk', 'usa', 'spain', 'china']
-      },
-      spainNetherlands: {
-        start: 1602, end: 1794,
-        selector: '1602–1794',
-        title: 'Transición financiera España–Holanda · 1602–1794',
-        meta: 'Transición financiera España–Holanda · proxy monetario español frente a activos neerlandeses; no es una comparación bursátil homogénea',
-        aria: 'Comparación contextual financiera de España y Holanda entre 1602 y 1794, normalizadas a 100 en su primer año visible',
-        visible: ['spain', 'netherlands']
-      },
-      ukUsa: {
-        start: 1871, end: 2025,
-        selector: '1871–2025',
-        title: 'Reino Unido vs Estados Unidos · 1871–2025',
-        meta: 'Reino Unido vs Estados Unidos · mismo periodo 1871–2025; base 1871 = 100',
-        aria: 'Comparación histórica del Reino Unido y Estados Unidos entre 1871 y 2025, con base 1871 igual a 100',
-        visible: ['uk', 'usa']
-      },
-      ukUsaChina: {
-        start: 1990, end: 2025,
-        selector: '1990–2025',
-        title: 'Estados Unidos vs China + Reino Unido · 1990–2025',
-        meta: 'Estados Unidos vs China + Reino Unido · mismo periodo 1990–2025; base 1990 = 100',
-        aria: 'Comparación histórica de Estados Unidos, China y Reino Unido entre 1990 y 2025, con base 1990 igual a 100',
-        visible: ['usa', 'china', 'uk']
-      }
-    };
-    function currentLongRunCoverageProfile(){
-      return longRunCoverageProfiles[state.longRunCoverage] || longRunCoverageProfiles.full;
-    }
-    function applyLongRunCoverageProfile(id){
-      const profile = longRunCoverageProfiles[id];
-      if(!profile) return;
-      state.longRunCoverage = id;
-      if(id === 'spainNetherlands' && state.longRunMeasure !== 'price') state.longRunMeasure = 'price';
-      if(id === 'spainNetherlands') state.longRunAnalysis = 'timeline';
-      const visible = new Set(profile.visible);
-      for(const seriesId of longRunSeriesOrder) state.longRunVisible.set(seriesId, visible.has(seriesId));
-      state.hover = null;
-      renderAll(false);
-    }
-
     const historicalFragments = [
       {
         start: Date.UTC(1914, 6, 28),
@@ -1064,221 +807,11 @@
       return Number.isFinite(v) ? (v * 100).toLocaleString('es-ES', {maximumFractionDigits:2}) + '%' : '—';
     }
 
-    const longRunDataIsValid = Boolean(
-      LONG_RUN_DATA &&
-      longRunSeriesOrder.every(id => Array.isArray(LONG_RUN_DATA[id]) && LONG_RUN_DATA[id].length > 1)
-    );
-
-    function currentLongRunSeries(){
-      if(!longRunDataIsValid) return [];
-      const profile = currentLongRunCoverageProfile();
-      const start = profile.start;
-      const end = profile.end;
-
-      return longRunSeriesOrder.map(id => {
-        const rows = LONG_RUN_DATA[id]
-          .map(row => ({
-            year: Number(row.year),
-            raw: Number(row.value),
-            segment: String(row.segment || id),
-            segmentLabel: String(row.segment_label || ''),
-            source: String(row.source || ''),
-            note: String(row.note || '')
-          }))
-          .filter(row => row.year >= start && row.year <= end && Number.isFinite(row.raw) && row.raw > 0)
-          .sort((a,b) => a.year - b.year || a.segment.localeCompare(b.segment));
-
-        if(!rows.length) return {id, ...longRunSeriesStyle[id], points: []};
-
-        const segmentBases = new Map();
-        const points = [];
-        for(const row of rows){
-          if(!segmentBases.has(row.segment)) segmentBases.set(row.segment, row.raw);
-          const base = segmentBases.get(row.segment);
-          if(!Number.isFinite(base) || base <= 0) continue;
-          points.push({
-            t: Date.UTC(row.year, 0, 1),
-            year: row.year,
-            v: (row.raw / base) * 100,
-            raw: row.raw,
-            segment: row.segment,
-            segmentLabel: row.segmentLabel,
-            source: row.source,
-            note: row.note
-          });
-        }
-        return {id, ...longRunSeriesStyle[id], points};
-      });
-    }
-
-    const studyDataIsValid = Boolean(STUDY_DATA && STUDY_DATA.strict && STUDY_DATA.event);
-    const studyMeasureLabels = {
-      price: 'Precio',
-      total: 'Retorno total (dividendos reinvertidos)',
-      realTotal: 'Retorno total real (IPC local)',
-      dividends: 'Aportación anual de dividendos'
-    };
-
-    function currentStrictRange(){
-      const profile = currentLongRunCoverageProfile();
-      if(state.longRunCoverage === 'ukUsa') return {start:1871,end:2020,label:'1871–2020'};
-      if(state.longRunCoverage === 'ukUsaChina') return {start:2020,end:2024,label:'2020–2024'};
-      return {start:1871,end:2024,label:'1871–2024'};
-    }
-
-    function currentStrictStudySeries(){
-      if(!studyDataIsValid) return [];
-      const range = currentStrictRange();
-      const measure = state.longRunMeasure;
-      const mapId = id => id === 'uk' ? 'uk' : id === 'usa' ? 'usa' : id === 'china' ? 'china' : null;
-      return longRunSeriesOrder.map(id => {
-        const key = mapId(id);
-        if(!key || !STUDY_DATA.strict[key] || !Array.isArray(STUDY_DATA.strict[key][measure])) return {id, ...longRunSeriesStyle[id], points: []};
-        let points = STUDY_DATA.strict[key][measure]
-          .filter(p => Number(p.year) >= range.start && Number(p.year) <= range.end && Number.isFinite(Number(p.value)))
-          .map(p => ({year:Number(p.year), t:Date.UTC(Number(p.year),0,1), v:Number(p.value), derived:Boolean(p.derived), segment:`strict_${key}_${measure}`, segmentLabel:studyMeasureLabels[measure], source:key === 'china' ? 'SSE/SSE TR/NBS' : 'JST R6'}));
-        if(measure !== 'dividends' && points.length){
-          const base = points[0].v;
-          if(Number.isFinite(base) && base > 0) points = points.map(p => ({...p, v:(p.v/base)*100}));
-        }
-        return {id, ...longRunSeriesStyle[id], points};
-      });
-    }
-
-    function formatMultiple(v){ return Number.isFinite(v) ? '×' + v.toLocaleString('es-ES',{maximumFractionDigits:1}) : '—'; }
-    function formatPp(v){ return Number.isFinite(v) ? v.toLocaleString('es-ES',{maximumFractionDigits:2}) + ' pp' : '—'; }
-
-    function renderStudySummary(){
-      if(state.view !== 'longRun') { els.studySummary.hidden = true; els.studyMethodology.hidden = true; return; }
-      els.studySummary.hidden = false;
-      els.studyMethodology.hidden = false;
-      let cards = [];
-      if(state.longRunAnalysis === 'event'){
-        const st = STUDY_DATA?.eventStats;
-        if(st){
-          cards = [
-            ['Precio 1944→2020', `UK ${formatMultiple(st.uk.price.multiple)} · USA ${formatMultiple(st.usa.price.multiple)}`, `CAGR: UK ${formatPct(st.uk.price.cagr)} · USA ${formatPct(st.usa.price.cagr)}`],
-            ['Retorno total', `UK ${formatMultiple(st.uk.total.multiple)} · USA ${formatMultiple(st.usa.total.multiple)}`, `Con dividendos la brecha nominal terminal se reduce mucho.`],
-            ['Retorno total real', `UK ${formatMultiple(st.uk.realTotal.multiple)} · USA ${formatMultiple(st.usa.realTotal.multiple)}`, `Tras IPC local, la ventaja estadounidense vuelve a ser amplia.`],
-            ['Dividendo medio 1945–2020', `UK ${formatPct(st.uk.avgDividendReturn)} · USA ${formatPct(st.usa.avgDividendReturn)}`, `JST eq_div_rtn; promedio aritmético anual.`]
-          ];
-        }
-      } else if(state.longRunMeasure === 'dividends'){
-        const c = STUDY_DATA?.strict?.china?.dividends || [];
-        const vals = Object.fromEntries(c.map(x => [x.year,x.value]));
-        cards = [
-          ['China · 2021', formatPp(vals[2021]), 'Aportación del dividendo: retorno total − precio.'],
-          ['China · 2022', formatPp(vals[2022]), 'Aportación del dividendo: retorno total − precio.'],
-          ['China · 2023', formatPp(vals[2023]), 'Aportación del dividendo: retorno total − precio.'],
-          ['China · 2024', formatPp(vals[2024]), 'Derivado de fuentes SSE/Wind; marcado como estimación.']
-        ];
-      } else if(state.longRunMeasure === 'total' || state.longRunMeasure === 'realTotal'){
-        cards = [
-          ['Cobertura UK', '1871–2020', 'JST R6; misma metodología para precio, dividendos e IPC.'],
-          ['Cobertura USA', '1871–2020', 'JST R6; misma metodología para precio, dividendos e IPC.'],
-          ['Cobertura China', '2020–2024', 'SSE Total Return + SSE Composite + CPI oficial.'],
-          ['Regla de lectura', 'No rellenar huecos', state.longRunMeasure === 'realTotal' ? 'Retorno total deflactado por IPC local.' : 'Dividendos reinvertidos; no confundir con price index.']
-        ];
-      } else {
-        cards = [
-          ['España imperial', 'PROXY', '1492–1810 = stock monetario, no índice bursátil.'],
-          ['Holanda temprana', 'VOC', '1602–1698 = acción individual; después mercado de Ámsterdam.'],
-          ['Línea sólida', 'MERCADO', 'Serie bursátil o reconstrucción agregada.'],
-          ['Base 100', 'POR TRAMO', 'Las alturas entre países no representan “poder” ni capitalización comparable.']
-        ];
-      }
-      els.studySummary.innerHTML = cards.map((c,i) => `<article class="studyCard ${i===1 && state.longRunAnalysis==='event' ? 'emphasis':''}"><div class="k">${c[0]}</div><div class="v">${c[1]}</div><div class="s">${c[2]}</div></article>`).join('');
-    }
-
-    function setStudyMeasure(measure){
-      if(!['price','total','realTotal','dividends'].includes(measure)) return;
-      state.longRunMeasure = measure;
-      if(measure === 'dividends') { state.longRunScale = 'linear'; if(state.longRunAnalysis === 'event') state.longRunAnalysis = 'timeline'; }
-      if(state.longRunCoverage === 'spainNetherlands' && measure !== 'price') state.longRunCoverage = 'full';
-      if(measure !== 'price'){
-        state.longRunVisible.set('spain', false); state.longRunVisible.set('netherlands', false);
-        state.longRunVisible.set('uk', true); state.longRunVisible.set('usa', true); state.longRunVisible.set('china', true);
-      } else if(state.longRunCoverage === 'full'){
-        for(const id of longRunSeriesOrder) state.longRunVisible.set(id,true);
-      }
-      state.hover = null;
-      renderAll(false);
-    }
-
-    function setLongRunAnalysis(mode){
-      if(!['timeline','event'].includes(mode)) return;
-      state.longRunAnalysis = mode;
-      if(mode === 'event'){
-        if(state.longRunMeasure === 'dividends') state.longRunMeasure = 'total';
-        state.longRunVisible.set('uk', true); state.longRunVisible.set('usa', true);
-        state.longRunVisible.set('spain', false); state.longRunVisible.set('netherlands', false); state.longRunVisible.set('china', false);
-      }
-      state.hover = null;
-      renderAll(false);
-    }
-
     function renderViewSelector(){
-      const historical = state.view === 'historical';
-      els.btnViewHistorical.classList.toggle('on', historical);
-      els.btnViewLongRun.classList.toggle('on', !historical);
-      els.btnViewHistorical.setAttribute('aria-selected', historical ? 'true' : 'false');
-      els.btnViewLongRun.setAttribute('aria-selected', historical ? 'false' : 'true');
-      els.historicalControls.hidden = !historical;
-      els.longRunControls.hidden = historical;
-      els.historicalChartControls.hidden = !historical;
-      els.historicalFooter.hidden = !historical;
-      els.longRunFooter.hidden = historical;
-      els.studySummary.hidden = historical;
-      els.studyMethodology.hidden = historical;
-      els.selectorMeta.textContent = historical
-        ? '1900–2020'
-        : currentLongRunCoverageProfile().selector;
-    }
-
-    function renderLongRunControls(){
-      for(const [id, button] of [
-        ['full', els.btnLongFull],
-        ['spainNetherlands', els.btnLongSpainNetherlands],
-        ['ukUsa', els.btnLongUkUsa],
-        ['ukUsaChina', els.btnLongUkUsaChina]
-      ]){
-        const active = state.longRunCoverage === id;
-        button.classList.toggle('on', active);
-        button.setAttribute('aria-pressed', active ? 'true' : 'false');
-      }
-
-      for(const [id, button] of [
-        ['netherlands', els.btnLongNetherlands],
-        ['uk', els.btnLongUk],
-        ['usa', els.btnLongUsa],
-        ['spain', els.btnLongSpain],
-        ['china', els.btnLongChina]
-      ]){
-        const visible = state.longRunVisible.get(id) === true;
-        button.setAttribute('aria-pressed', visible ? 'true' : 'false');
-      }
-
-      const logarithmic = state.longRunScale === 'log';
-      els.btnLongLog.classList.toggle('on', logarithmic);
-      els.btnLongLinear.classList.toggle('on', !logarithmic);
-      els.btnLongLog.setAttribute('aria-pressed', logarithmic ? 'true' : 'false');
-      els.btnLongLinear.setAttribute('aria-pressed', logarithmic ? 'false' : 'true');
-
-      for(const [measure,button] of [['price',els.btnMeasurePrice],['total',els.btnMeasureTotal],['realTotal',els.btnMeasureReal],['dividends',els.btnMeasureDiv]]){
-        const on = state.longRunMeasure === measure; button.classList.toggle('on',on); button.setAttribute('aria-pressed',on?'true':'false');
-      }
-      for(const [mode,button] of [['timeline',els.btnAnalysisTimeline],['event',els.btnAnalysisEvent]]){
-        const on = state.longRunAnalysis === mode; button.classList.toggle('on',on); button.setAttribute('aria-pressed',on?'true':'false');
-      }
-      const strict = state.longRunMeasure !== 'price' || state.longRunAnalysis === 'event';
-      els.btnLongSpain.disabled = strict; els.btnLongNetherlands.disabled = strict;
-      els.btnLongChina.disabled = state.longRunAnalysis === 'event';
-      els.btnLongFull.disabled = state.longRunAnalysis === 'event';
-      els.btnLongSpainNetherlands.disabled = state.longRunAnalysis === 'event' || state.longRunMeasure !== 'price';
-      els.btnLongUkUsa.disabled = state.longRunAnalysis === 'event';
-      els.btnLongUkUsaChina.disabled = state.longRunAnalysis === 'event';
-      els.qualityLegend.hidden = state.longRunMeasure !== 'price' || state.longRunAnalysis === 'event';
-      els.btnLongLog.disabled = state.longRunMeasure === 'dividends';
+      els.historicalControls.hidden = false;
+      els.historicalChartControls.hidden = false;
+      els.historicalFooter.hidden = false;
+      els.selectorMeta.textContent = '1900–2020';
     }
 
     for(const mode of Object.keys(DATA.modes)){
@@ -1529,263 +1062,7 @@
       return (fraction <= 1 ? 1 : fraction <= 2 ? 2 : fraction <= 5 ? 5 : 10) * power;
     }
 
-    function drawStrictTimeline(){
-      const {width,height}=resizeCanvas();
-      ctx.clearRect(0,0,width,height); ctx.fillStyle='#252525'; ctx.fillRect(0,0,width,height);
-      const series=currentStrictStudySeries().filter(s => state.longRunVisible.get(s.id) === true && s.points.length);
-      if(!series.length){ ctx.fillStyle='#e3e3e3';ctx.font='700 17px Arial';ctx.textAlign='center';ctx.fillText('No hay una serie comparable para esta combinación.',width/2,height/2);return; }
-      const compact=width<620, margin={left:compact?68:90,right:compact?18:34,top:compact?58:62,bottom:compact?70:82};
-      const plotW=Math.max(1,width-margin.left-margin.right), plotH=Math.max(1,height-margin.top-margin.bottom), right=margin.left+plotW,bottom=margin.top+plotH;
-      const profile=currentLongRunCoverageProfile(); const strictRange=currentStrictRange(); const start=strictRange.start,end=strictRange.end; const tx=y=>margin.left+((y-start)/(end-start))*plotW;
-      const values=series.flatMap(s=>s.points.map(p=>p.v)).filter(Number.isFinite);
-      let ty,yTicks;
-      if(state.longRunMeasure==='dividends'){
-        const min=Math.min(0,...values), max=Math.max(...values); const span=Math.max(1,max-min); const step=niceLinearStep(span,5); const lo=Math.floor(min/step)*step, hi=Math.ceil(max/step)*step;
-        ty=v=>margin.top+(1-(v-lo)/(hi-lo||1))*plotH; yTicks=[]; for(let v=lo;v<=hi+step*.1;v+=step)yTicks.push(v);
-      } else if(state.longRunScale==='log'){
-        const positives=values.filter(v=>v>0); const lo=Math.floor(Math.log10(Math.min(...positives))), hi=Math.ceil(Math.log10(Math.max(...positives))), span=Math.max(1,hi-lo);
-        ty=v=>margin.top+(1-(Math.log10(v)-lo)/span)*plotH; yTicks=Array.from({length:span+1},(_,i)=>10**(lo+i));
-      } else {
-        const max=Math.max(...values)*1.06, step=niceLinearStep(max,5), hi=Math.ceil(max/step)*step; ty=v=>margin.top+(1-v/hi)*plotH; yTicks=Array.from({length:Math.round(hi/step)+1},(_,i)=>i*step);
-      }
-      ctx.fillStyle='rgba(0,0,0,.12)';ctx.strokeStyle='rgba(255,255,255,.16)';ctx.fillRect(margin.left,margin.top,plotW,plotH);ctx.strokeRect(margin.left,margin.top,plotW,plotH);
-      ctx.font=compact?'10px Arial':'12px Arial';ctx.textBaseline='middle';
-      for(const t of yTicks){const y=ty(t);if(y<margin.top-1||y>bottom+1)continue;ctx.strokeStyle='rgba(255,255,255,.10)';ctx.beginPath();ctx.moveTo(margin.left,y);ctx.lineTo(right,y);ctx.stroke();ctx.fillStyle='#b0b0b0';ctx.textAlign='right';ctx.fillText(state.longRunMeasure==='dividends'?formatPp(t):formatValue(t),margin.left-10,y);}
-      const tickCount=compact?4:6;ctx.textBaseline='top';for(let i=0;i<tickCount;i++){const yr=Math.round(start+(i/(tickCount-1))*(end-start));const x=tx(yr);ctx.strokeStyle='rgba(255,255,255,.10)';ctx.beginPath();ctx.moveTo(x,margin.top);ctx.lineTo(x,bottom);ctx.stroke();ctx.fillStyle='#b0b0b0';ctx.textAlign='center';ctx.fillText(String(yr),x,bottom+12);}
-      for(const s of series){ctx.save();ctx.strokeStyle=s.color;ctx.fillStyle=s.color;ctx.lineWidth=2.6;ctx.setLineDash([]);ctx.beginPath();s.points.forEach((p,i)=>{const x=tx(p.year),y=ty(p.v);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke(); if(state.longRunMeasure==='dividends'){s.points.forEach(p=>{const x=tx(p.year),y=ty(p.v);ctx.beginPath();ctx.arc(x,y,p.derived?4.5:3.2,0,Math.PI*2);ctx.fill();if(p.derived){ctx.strokeStyle='#FEF702';ctx.lineWidth=1.5;ctx.stroke();}});}ctx.restore();}
-      if(state.hover&&state.hover.x>=margin.left&&state.hover.x<=right&&state.hover.y>=margin.top&&state.hover.y<=bottom){const yr=Math.round(start+((state.hover.x-margin.left)/plotW)*(end-start));const x=tx(yr);ctx.save();ctx.strokeStyle='rgba(254,247,2,.55)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(x,margin.top);ctx.lineTo(x,bottom);ctx.stroke();ctx.setLineDash([]);const w=Math.min(compact?250:350,plotW-16),h=34+series.length*24,xx=Math.max(margin.left+8,Math.min(right-w-8,state.hover.x+14)),yy=margin.top+10;ctx.fillStyle='rgba(20,20,20,.96)';ctx.strokeStyle='rgba(254,247,2,.45)';ctx.beginPath();ctx.roundRect(xx,yy,w,h,9);ctx.fill();ctx.stroke();ctx.fillStyle='#FEF702';ctx.font='700 13px Arial';ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText(String(yr),xx+12,yy+10);series.forEach((s,i)=>{const p=s.points.find(q=>q.year===yr);ctx.fillStyle=s.color;ctx.fillRect(xx+12,yy+34+i*24,14,3);ctx.fillStyle='#e3e3e3';ctx.font=compact?'11px Arial':'12px Arial';const val=p?(state.longRunMeasure==='dividends'?formatPp(p.v):formatValue(p.v)):'sin dato';ctx.fillText(`${s.label}: ${val}${p?.derived?' · derivado':''}`,xx+34,yy+27+i*24);});ctx.restore();}
-      ctx.strokeStyle='rgba(255,255,255,.72)';ctx.beginPath();ctx.moveTo(margin.left,bottom);ctx.lineTo(right,bottom);ctx.moveTo(margin.left,margin.top);ctx.lineTo(margin.left,bottom);ctx.stroke();
-      ctx.fillStyle='#FEF702';ctx.font=compact?'700 15px Arial':'700 19px Arial';ctx.textAlign='left';ctx.fillText(`${studyMeasureLabels[state.longRunMeasure]} · ${strictRange.label}`,margin.left,32);
-      ctx.save();ctx.translate(compact?17:24,margin.top+plotH/2);ctx.rotate(-Math.PI/2);ctx.fillStyle='#e3e3e3';ctx.font=compact?'700 10px Arial':'700 13px Arial';ctx.textAlign='center';ctx.fillText(state.longRunMeasure==='dividends'?'Aportación anual · puntos porcentuales':'Índice base 100',0,0);ctx.restore();ctx.fillStyle='#b0b0b0';ctx.font=compact?'10px Arial':'12px Arial';ctx.textAlign='center';ctx.fillText('Año',margin.left+plotW/2,height-18);
-    }
-
-    function drawEventStudy(){
-      const {width,height}=resizeCanvas();ctx.clearRect(0,0,width,height);ctx.fillStyle='#252525';ctx.fillRect(0,0,width,height);
-      if(!studyDataIsValid)return;
-      const measure=state.longRunMeasure==='price'?'price':state.longRunMeasure;
-      const colors={uk:longRunSeriesStyle.uk.color,usa:longRunSeriesStyle.usa.color};
-      const active=['uk','usa'].filter(id=>state.longRunVisible.get(id)===true).map(id=>({id,label:longRunSeriesStyle[id].label,color:colors[id],points:STUDY_DATA.event.series[id][measure]||[]})).filter(s=>s.points.length);
-      const compact=width<620,margin={left:compact?68:90,right:compact?18:34,top:compact?58:62,bottom:compact?70:82},plotW=width-margin.left-margin.right,plotH=height-margin.top-margin.bottom,right=margin.left+plotW,bottom=margin.top+plotH;
-      const start=-50,end=76,tx=x=>margin.left+((x-start)/(end-start))*plotW;const vals=active.flatMap(s=>s.points.map(p=>p.value)).filter(v=>v>0);let ty,yTicks;
-      if(state.longRunScale==='log'){const lo=Math.floor(Math.log10(Math.min(...vals))),hi=Math.ceil(Math.log10(Math.max(...vals))),span=Math.max(1,hi-lo);ty=v=>margin.top+(1-(Math.log10(v)-lo)/span)*plotH;yTicks=Array.from({length:span+1},(_,i)=>10**(lo+i));}else{const max=Math.max(...vals)*1.06,step=niceLinearStep(max,5),hi=Math.ceil(max/step)*step;ty=v=>margin.top+(1-v/hi)*plotH;yTicks=Array.from({length:Math.round(hi/step)+1},(_,i)=>i*step);}
-      ctx.fillStyle='rgba(0,0,0,.12)';ctx.strokeStyle='rgba(255,255,255,.16)';ctx.fillRect(margin.left,margin.top,plotW,plotH);ctx.strokeRect(margin.left,margin.top,plotW,plotH);ctx.font=compact?'10px Arial':'12px Arial';ctx.textBaseline='middle';for(const t of yTicks){const y=ty(t);ctx.strokeStyle='rgba(255,255,255,.10)';ctx.beginPath();ctx.moveTo(margin.left,y);ctx.lineTo(right,y);ctx.stroke();ctx.fillStyle='#b0b0b0';ctx.textAlign='right';ctx.fillText(formatValue(t),margin.left-10,y);}
-      const xTicks=[-50,-25,0,25,50,75];ctx.textBaseline='top';for(const t of xTicks){const x=tx(t);ctx.strokeStyle=t===0?'rgba(254,247,2,.55)':'rgba(255,255,255,.10)';ctx.lineWidth=t===0?1.8:1;ctx.beginPath();ctx.moveTo(x,margin.top);ctx.lineTo(x,bottom);ctx.stroke();ctx.fillStyle=t===0?'#FEF702':'#b0b0b0';ctx.textAlign='center';ctx.fillText(t===0?'0 · 1944':(t>0?`+${t}`:String(t)),x,bottom+12);}
-      ctx.fillStyle='#FEF702';ctx.font=compact?'700 10px Arial':'700 12px Arial';ctx.textAlign='left';ctx.fillText('Bretton Woods · marcador institucional',Math.min(right-210,tx(0)+6),margin.top+8);
-      for(const s of active){ctx.save();ctx.strokeStyle=s.color;ctx.lineWidth=2.8;ctx.beginPath();s.points.forEach((p,i)=>{const x=tx(p.x),y=ty(p.value);if(i===0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke();ctx.restore();}
-      if(state.hover&&state.hover.x>=margin.left&&state.hover.x<=right&&state.hover.y>=margin.top&&state.hover.y<=bottom){const rel=Math.round(start+((state.hover.x-margin.left)/plotW)*(end-start));const yr=1944+rel,x=tx(rel);ctx.save();ctx.strokeStyle='rgba(254,247,2,.45)';ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(x,margin.top);ctx.lineTo(x,bottom);ctx.stroke();ctx.setLineDash([]);const w=Math.min(330,plotW-16),h=34+active.length*24,xx=Math.max(margin.left+8,Math.min(right-w-8,state.hover.x+14)),yy=margin.top+35;ctx.fillStyle='rgba(20,20,20,.96)';ctx.strokeStyle='rgba(254,247,2,.45)';ctx.beginPath();ctx.roundRect(xx,yy,w,h,9);ctx.fill();ctx.stroke();ctx.fillStyle='#FEF702';ctx.font='700 13px Arial';ctx.textAlign='left';ctx.textBaseline='top';ctx.fillText(`${rel>=0?'+':''}${rel} años · ${yr}`,xx+12,yy+10);active.forEach((s,i)=>{const p=s.points.find(q=>q.x===rel);ctx.fillStyle=s.color;ctx.fillRect(xx+12,yy+34+i*24,14,3);ctx.fillStyle='#e3e3e3';ctx.font='12px Arial';ctx.fillText(`${s.label}: ${p?formatValue(p.value):'sin dato'}`,xx+34,yy+27+i*24);});ctx.restore();}
-      ctx.strokeStyle='rgba(255,255,255,.72)';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(margin.left,bottom);ctx.lineTo(right,bottom);ctx.moveTo(margin.left,margin.top);ctx.lineTo(margin.left,bottom);ctx.stroke();ctx.fillStyle='#FEF702';ctx.font=compact?'700 15px Arial':'700 19px Arial';ctx.textAlign='left';ctx.fillText(`Cambio UK→USA · ${studyMeasureLabels[measure]} · 1944 = 100`,margin.left,32);ctx.save();ctx.translate(compact?17:24,margin.top+plotH/2);ctx.rotate(-Math.PI/2);ctx.fillStyle='#e3e3e3';ctx.font=compact?'700 10px Arial':'700 13px Arial';ctx.textAlign='center';ctx.fillText('Índice relativo · 1944 = 100',0,0);ctx.restore();ctx.fillStyle='#b0b0b0';ctx.font=compact?'10px Arial':'12px Arial';ctx.textAlign='center';ctx.fillText('Años respecto a 1944',margin.left+plotW/2,height-18);
-    }
-
-    function drawLongRun(){
-      if(state.longRunAnalysis === 'event') return drawEventStudy();
-      if(state.longRunMeasure !== 'price') return drawStrictTimeline();
-      const {width, height} = resizeCanvas();
-      ctx.clearRect(0, 0, width, height);
-      ctx.fillStyle = '#252525';
-      ctx.fillRect(0, 0, width, height);
-
-      if(!longRunDataIsValid){
-        ctx.fillStyle = '#e3e3e3';
-        ctx.font = '700 18px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('No se han podido cargar los datos de muy largo plazo.', width / 2, height / 2);
-        return;
-      }
-
-      const allSeries = currentLongRunSeries();
-      const active = allSeries.filter(serie => state.longRunVisible.get(serie.id) === true && serie.points.length > 0);
-      if(!active.length){
-        ctx.fillStyle = '#e3e3e3';
-        ctx.font = '700 18px Arial';
-        ctx.textAlign = 'center';
-        ctx.fillText('Activa al menos una serie.', width / 2, height / 2);
-        return;
-      }
-
-      const compact = width < 620;
-      const margin = {left: compact ? 66 : 88, right: compact ? 18 : 34, top: compact ? 58 : 62, bottom: compact ? 70 : 82};
-      const plotW = Math.max(1, width - margin.left - margin.right);
-      const plotH = Math.max(1, height - margin.top - margin.bottom);
-      const plotRight = margin.left + plotW;
-      const plotBottom = margin.top + plotH;
-      const profile = currentLongRunCoverageProfile();
-      const startYear = profile.start;
-      const endYear = profile.end;
-      const values = active.flatMap(serie => serie.points.map(point => point.v)).filter(value => Number.isFinite(value) && value > 0);
-      const minValue = Math.min(...values);
-      const maxValue = Math.max(...values);
-      const tx = year => margin.left + ((year - startYear) / (endYear - startYear)) * plotW;
-
-      let yTicks;
-      let ty;
-      if(state.longRunScale === 'log'){
-        const logMin = Math.floor(Math.log10(minValue));
-        const logMax = Math.ceil(Math.log10(maxValue));
-        const span = Math.max(1, logMax - logMin);
-        ty = value => margin.top + (1 - ((Math.log10(value) - logMin) / span)) * plotH;
-        yTicks = Array.from({length: span + 1}, (_value, index) => Math.pow(10, logMin + index));
-      } else {
-        const domainMax = maxValue * 1.06;
-        const step = niceLinearStep(domainMax, 5);
-        const roundedMax = Math.ceil(domainMax / step) * step;
-        ty = value => margin.top + (1 - value / roundedMax) * plotH;
-        yTicks = Array.from({length: Math.round(roundedMax / step) + 1}, (_value, index) => index * step);
-      }
-
-      ctx.fillStyle = 'rgba(0,0,0,.12)';
-      ctx.strokeStyle = 'rgba(255,255,255,.16)';
-      ctx.lineWidth = 1;
-      ctx.fillRect(margin.left, margin.top, plotW, plotH);
-      ctx.strokeRect(margin.left, margin.top, plotW, plotH);
-
-      ctx.font = compact ? '10px Arial' : '12px Arial';
-      ctx.textBaseline = 'middle';
-      for(const tick of yTicks){
-        const y = ty(tick);
-        if(y < margin.top - 1 || y > plotBottom + 1) continue;
-        ctx.strokeStyle = 'rgba(255,255,255,.10)';
-        ctx.beginPath();
-        ctx.moveTo(margin.left, y);
-        ctx.lineTo(plotRight, y);
-        ctx.stroke();
-        ctx.fillStyle = '#b0b0b0';
-        ctx.textAlign = 'right';
-        ctx.fillText(formatValue(tick), margin.left - 10, y);
-      }
-
-      const xTickCount = compact ? 4 : 6;
-      ctx.textBaseline = 'top';
-      for(let index = 0; index < xTickCount; index++){
-        const year = Math.round(startYear + (index / (xTickCount - 1)) * (endYear - startYear));
-        const x = tx(year);
-        ctx.strokeStyle = 'rgba(255,255,255,.10)';
-        ctx.beginPath();
-        ctx.moveTo(x, margin.top);
-        ctx.lineTo(x, plotBottom);
-        ctx.stroke();
-        ctx.fillStyle = '#b0b0b0';
-        ctx.textAlign = 'center';
-        ctx.fillText(String(year), x, plotBottom + 12);
-      }
-
-      for(const serie of active){
-        ctx.save();
-        ctx.strokeStyle = serie.color;
-        ctx.lineWidth = 2.6;
-        ctx.lineJoin = 'round';
-        ctx.lineCap = 'butt';
-        ctx.setLineDash([]);
-        ctx.beginPath();
-        let started = false;
-        let previousYear = null;
-        let previousSegment = null;
-        for(const point of serie.points){
-          if(point.year < startYear || point.year > endYear) continue;
-          const x = tx(point.year);
-          const y = ty(point.v);
-          if(!Number.isFinite(x) || !Number.isFinite(y)){
-            started = false;
-            previousYear = null;
-            previousSegment = null;
-            continue;
-          }
-          const newSegment = previousSegment !== null && point.segment !== previousSegment;
-          const yearGap = previousYear !== null && point.year - previousYear > 1;
-          if(newSegment && started){ ctx.stroke(); ctx.beginPath(); }
-          const qualityDash = STUDY_DATA?.quality?.[point.segment]?.dash || [];
-          if(!started || newSegment || yearGap){
-            if(yearGap && started){ ctx.stroke(); ctx.beginPath(); }
-            ctx.setLineDash(qualityDash);
-            ctx.moveTo(x, y);
-            started = true;
-            if(previousYear !== null || previousSegment !== null){
-              ctx.save(); ctx.setLineDash([]); ctx.fillStyle = serie.color; ctx.beginPath(); ctx.arc(x,y,3.6,0,Math.PI*2); ctx.fill(); ctx.restore(); ctx.beginPath(); ctx.moveTo(x,y); ctx.setLineDash(qualityDash);
-            }
-          } else {
-            ctx.lineTo(x, y);
-          }
-          previousYear = point.year;
-          previousSegment = point.segment;
-        }
-        ctx.stroke();
-        ctx.restore();
-      }
-
-      if(state.hover && state.hover.x >= margin.left && state.hover.x <= plotRight && state.hover.y >= margin.top && state.hover.y <= plotBottom){
-        const year = Math.round(startYear + ((state.hover.x - margin.left) / plotW) * (endYear - startYear));
-        const x = tx(year);
-        ctx.save();
-        ctx.strokeStyle = 'rgba(254,247,2,.55)';
-        ctx.setLineDash([4, 4]);
-        ctx.beginPath();
-        ctx.moveTo(x, margin.top);
-        ctx.lineTo(x, plotBottom);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        const tooltipW = Math.min(compact ? 245 : 330, plotW - 16);
-        const tooltipH = 34 + active.length * 24;
-        const tooltipX = Math.max(margin.left + 8, Math.min(plotRight - tooltipW - 8, state.hover.x + 14));
-        const tooltipY = margin.top + 10;
-        ctx.fillStyle = 'rgba(20,20,20,.96)';
-        ctx.strokeStyle = 'rgba(254,247,2,.45)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.roundRect(tooltipX, tooltipY, tooltipW, tooltipH, 9);
-        ctx.fill();
-        ctx.stroke();
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'top';
-        ctx.fillStyle = '#FEF702';
-        ctx.font = '700 13px Arial';
-        ctx.fillText(String(year), tooltipX + 12, tooltipY + 10);
-        active.forEach((serie, index) => {
-          const point = serie.points.find(candidate => candidate.year === year);
-          ctx.fillStyle = serie.color;
-          ctx.fillRect(tooltipX + 12, tooltipY + 34 + index * 24, 14, 3);
-          ctx.fillStyle = '#e3e3e3';
-          ctx.font = compact ? '11px Arial' : '12px Arial';
-          ctx.fillText(`${serie.label}${point?.segmentLabel ? ' · ' + point.segmentLabel : ''}: ${point ? formatValue(point.v) : 'sin dato'}`, tooltipX + 34, tooltipY + 27 + index * 24);
-        });
-        ctx.restore();
-      }
-
-      ctx.strokeStyle = 'rgba(255,255,255,.72)';
-      ctx.lineWidth = 1.4;
-      ctx.beginPath();
-      ctx.moveTo(margin.left, plotBottom);
-      ctx.lineTo(plotRight, plotBottom);
-      ctx.moveTo(margin.left, margin.top);
-      ctx.lineTo(margin.left, plotBottom);
-      ctx.stroke();
-
-      ctx.fillStyle = '#FEF702';
-      ctx.font = compact ? '700 15px Arial' : '700 19px Arial';
-      ctx.textAlign = 'left';
-      ctx.textBaseline = 'alphabetic';
-      ctx.fillText(profile.title, margin.left, 32);
-      ctx.fillStyle = '#c8c8c8'; ctx.font = compact ? '10px Arial' : '11px Arial'; ctx.textAlign = 'right'; ctx.fillText('Alturas entre países ≠ niveles comparables · base 100 independiente por tramo', plotRight, 32);
-
-      ctx.save();
-      ctx.translate(compact ? 17 : 24, margin.top + plotH / 2);
-      ctx.rotate(-Math.PI / 2);
-      ctx.fillStyle = '#e3e3e3';
-      ctx.font = compact ? '700 10px Arial' : '700 13px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('Índice normalizado por tramo · base 100', 0, 0);
-      ctx.restore();
-
-      ctx.fillStyle = '#b0b0b0';
-      ctx.font = compact ? '10px Arial' : '12px Arial';
-      ctx.textAlign = 'center';
-      ctx.fillText('Año', margin.left + plotW / 2, height - 18);
-    }
-
     function draw(){
-      if(state.view === 'longRun'){
-        drawLongRun();
-        return;
-      }
       const {width, height} = resizeCanvas();
       ctx.clearRect(0,0,width,height);
       ctx.fillStyle = '#252525';
@@ -2111,20 +1388,6 @@
     }
 
     function renderChartMeta(){
-      if(state.view === 'longRun'){
-        const profile = currentLongRunCoverageProfile();
-        if(state.longRunAnalysis === 'event'){
-          els.chartMeta.textContent = `Estudio de evento UK→USA · 1944 = 100 · ${studyMeasureLabels[state.longRunMeasure]} · 1944 es marcador institucional, no fecha causal única`;
-          els.selectorMeta.textContent = '−50 / +76 años';
-          els.chart.setAttribute('aria-label','Estudio de evento de Reino Unido y Estados Unidos alrededor de 1944');
-        } else {
-          const strictRange = state.longRunMeasure === 'price' ? null : currentStrictRange();
-          els.chartMeta.textContent = `${state.longRunMeasure === 'price' ? profile.meta : (state.longRunCoverage === 'ukUsaChina' ? 'Periodo común UK–USA–China ' + strictRange.label : state.longRunCoverage === 'ukUsa' ? 'Periodo común UK–USA ' + strictRange.label : 'Capas comparables ' + strictRange.label + ' · China disponible desde 2020')} · ${studyMeasureLabels[state.longRunMeasure]} · huecos sin unir · Escala ${state.longRunMeasure==='dividends'?'lineal':(state.longRunScale === 'log' ? 'logarítmica' : 'lineal')}`;
-          els.selectorMeta.textContent = strictRange ? strictRange.label : profile.selector;
-          els.chart.setAttribute('aria-label', profile.aria);
-        }
-        return;
-      }
       els.chartMeta.textContent = state.metric === 'annual'
         ? 'Variación interanual · Escala simétrica logarítmica'
         : 'Base 1900 = 100 · Escala logarítmica';
@@ -2142,13 +1405,6 @@
 
     function renderAll(rebuildSelectors = true){
       renderViewSelector();
-      if(state.view === 'longRun'){
-        renderLongRunControls();
-        renderChartMeta();
-        renderStudySummary();
-        draw();
-        return;
-      }
       renderModes();
       renderMetrics();
       if(rebuildSelectors) renderSeriesSelectors();
@@ -2185,52 +1441,6 @@
       state.hover = null;
       renderAll();
     });
-    els.btnViewLongRun.addEventListener('click', () => {
-      if(state.view === 'longRun') return;
-      state.view = 'longRun';
-      state.hover = null;
-      renderAll(false);
-    });
-
-    els.btnLongFull.addEventListener('click', () => applyLongRunCoverageProfile('full'));
-    els.btnLongSpainNetherlands.addEventListener('click', () => applyLongRunCoverageProfile('spainNetherlands'));
-    els.btnLongUkUsa.addEventListener('click', () => applyLongRunCoverageProfile('ukUsa'));
-    els.btnLongUkUsaChina.addEventListener('click', () => applyLongRunCoverageProfile('ukUsaChina'));
-
-    for(const [id, button] of [
-      ['netherlands', els.btnLongNetherlands],
-      ['uk', els.btnLongUk],
-      ['usa', els.btnLongUsa],
-      ['spain', els.btnLongSpain],
-      ['china', els.btnLongChina]
-    ]){
-      button.addEventListener('click', () => {
-        state.longRunVisible.set(id, state.longRunVisible.get(id) !== true);
-        state.hover = null;
-        renderAll(false);
-      });
-    }
-
-    els.btnLongLog.addEventListener('click', () => {
-      if(state.longRunScale === 'log') return;
-      state.longRunScale = 'log';
-      state.hover = null;
-      renderAll(false);
-    });
-    els.btnLongLinear.addEventListener('click', () => {
-      if(state.longRunScale === 'linear') return;
-      state.longRunScale = 'linear';
-      state.hover = null;
-      renderAll(false);
-    });
-
-    els.btnMeasurePrice.addEventListener('click', () => setStudyMeasure('price'));
-    els.btnMeasureTotal.addEventListener('click', () => setStudyMeasure('total'));
-    els.btnMeasureReal.addEventListener('click', () => setStudyMeasure('realTotal'));
-    els.btnMeasureDiv.addEventListener('click', () => setStudyMeasure('dividends'));
-    els.btnAnalysisTimeline.addEventListener('click', () => setLongRunAnalysis('timeline'));
-    els.btnAnalysisEvent.addEventListener('click', () => setLongRunAnalysis('event'));
-
     window.addEventListener('resize', () => draw());
 
     initVisibility();
