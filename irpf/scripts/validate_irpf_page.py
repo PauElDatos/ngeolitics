@@ -45,6 +45,8 @@ def check_dataset(page: Page) -> None:
           rate4: window.IRPF_TEST_API.getRateSeries(4),
           extent: window.IRPF_TEST_API.getRateExtent(),
           rateRatios: [0, 9.5, 12, 28, 53.5, 56].map(rate => window.IRPF_TEST_API.getRateRatio(rate)),
+          effortScope: window.IRPF_TEST_API.getEffortScope(),
+          effort: window.IRPF_TEST_API.getEffortData(),
           legendMidpointPosition: Number.parseFloat(document.querySelector('.rateLegendTick[data-rate="28"]').style.left),
         })
         """
@@ -70,6 +72,12 @@ def check_dataset(page: Page) -> None:
     assert model["rateRatios"][5] - model["rateRatios"][4] > 4 * (
         model["rateRatios"][2] - model["rateRatios"][1]
     )
+    assert model["effortScope"] == "totalCcaa"
+    effort_by_year = {point["year"]: point for point in model["effort"]}
+    assert effort_by_year[2023]["autonomousScheduleStatus"] == "ccaa_average"
+    assert effort_by_year[2023]["autonomousScheduleCount"] >= 14
+    assert effort_by_year[2025]["autonomousScheduleStatus"] == "valencia_reference_fallback"
+    assert effort_by_year[2023]["totalNationalEffectiveRate"] != effort_by_year[2023]["stateNationalEffectiveRate"]
     assert abs(model["legendMidpointPosition"] - 50) < 1e-4
     assert page.locator('.rateLegendGradient[data-scale="exponential"]').count() == 1
     assert "linear-gradient" in page.locator(".rateLegendGradient").get_attribute("style")

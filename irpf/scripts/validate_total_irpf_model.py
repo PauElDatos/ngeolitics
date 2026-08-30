@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Valida continuidad y puntos de control del modelo IRPF total (C. Valenciana)."""
+"""Valida continuidad y puntos de control del modelo IRPF total con media autonómica."""
 from __future__ import annotations
 import json, re
 import xml.etree.ElementTree as ET
@@ -35,14 +35,17 @@ def main():
     assert [b["rate"] for b in by_year[2023]["brackets"]][:3] == [9.0, 12.0, 15.0]
 
     html = (ROOT / "index.html").read_text(encoding="utf-8")
-    assert "effortScope: 'totalValencia'" in html
+    assert "effortScope: 'totalCcaa'" in html
     assert "autonomousPersonalMinimumStandard" in html
+    assert "averageAutonomousIrpf" in html
+    assert "autonomousScheduleCount" in html
     assert "return year >= 2022 ? 6105" in html
-    assert "Total · C. Valenciana" in html
+    assert "Total · media CCAA" in html
+    assert "data_fuentes/IRPF_tablas_1990-2023.json" in html
     assert (ROOT / "data_fuentes" / "raw_irpf.rtf").exists()
     assert (ROOT / "data_fuentes" / "IRPF_tablas_1990-2023.json").exists()
 
-    print("IRPF total Valencia validation passed (1997–2025; 2010 transition and 2022+ minimum checks OK).")
+    print("IRPF total media autonómica validation passed (1997–2025; 2010 transition and 2022+ minimum checks OK).")
 
 if __name__ == "__main__":
     main()

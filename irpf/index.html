@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>N.Geolitics — Tramos históricos del IRPF</title>
-  <meta name="description" content="Evolución histórica de los tramos estatales del IRPF, la población por tramo y el esfuerzo fiscal estatal estimado por grupos de renta en España.">
+  <meta name="description" content="Evolución histórica de los tramos estatales del IRPF, la población por tramo y el esfuerzo fiscal estimado con media autonómica por grupos de renta en España.">
   <link rel="icon" href="../assets/faviconNG.png">
   <style>
     :root {
@@ -751,6 +751,12 @@
       return records;
     }
 
+    async function loadJson(url) {
+      const response = await fetch(url);
+      if (!response.ok) throw new Error(`No se pudo cargar ${url} (${response.status}).`);
+      return response.json();
+    }
+
     const DATA = await loadIrpfXml(DATA_SOURCE);
 
     const INCOME_DISTRIBUTION = Array.isArray(window.IRPF_INCOME_DISTRIBUTION)
@@ -764,6 +770,8 @@
       ? window.IRPF_VALENCIA_AUTONOMIC_SCHEDULES
       : [];
     const VALENCIA_AUTONOMIC_MAP = new Map(VALENCIA_AUTONOMIC_SCHEDULES.map(d => [d.year, d]));
+    const AUTONOMIC_SOURCE_DATA = await loadJson('data_fuentes/IRPF_tablas_1990-2023.json');
+    const AUTONOMIC_CCAA_SCHEDULES_BY_YEAR = buildAutonomousCaaScheduleMap(AUTONOMIC_SOURCE_DATA);
     const EFFORT_GROUP_DEFS = [
       { key: 'p0_20', label: 'P0–20', colorIndex: 1 },
       { key: 'p20_40', label: 'P20–40', colorIndex: 2 },
@@ -795,7 +803,7 @@
     const state = {
       chartMode: 'limits',
       effortMetric: 'effective',
-      effortScope: 'totalValencia',
+      effortScope: 'totalCcaa',
       mode: 'nominal',
       scaleMode: 'log',
       showPresBands: true,
@@ -879,6 +887,95 @@
     function getColor(index) {
       const hue = (index * 41) % 360;
       return `hsl(${hue} 78% 60%)`;
+    }
+
+    function parseSpanishNumber(raw) {
+      if (raw === null || raw === undefined) return null;
+      const normalized = String(raw).trim().replace(/\s+/g, '').replace('%', '');
+      if (!normalized || normalized === '-' || /adelante/i.test(normalized)) return null;
+      const value = normalized.includes(',')
+        ? normalized.replace(/\./g, '').replace(',', '.')
+        : normalized;
+      const number = Number(value);
+      return Number.isFinite(number) ? number : null;
+    }
+
+    function normalizeAutonomousCaaEntry(entry) {
+      const rows = Array.isArray(entry?.rows) ? entry.rows : [];
+      if (rows.length < 2) return null;
+
+      const brackets = rows.map((row, index) => {
+        const lower = parseSpanishNumber(row.base_hasta);
+        const remainder = parseSpanishNumber(row.resto_base);
+        const rate = parseSpanishNumber(row.tipo_aplicable);
+        const normalizedLower = index === 0 && !Number.isFinite(lower) ? 0 : lower;
+        return {
+          index: index + 1,
+          lower_nominal_eur: normalizedLower,
+          upper_nominal_eur: Number.isFinite(remainder) && Number.isFinite(normalizedLower)
+            ? normalizedLower + remainder
+            : null,
+          rate,
+          is_open: !Number.isFinite(remainder),
+        };
+      });
+
+      if (!Number.isFinite(brackets[0].lower_nominal_eur)) return null;
+      brackets[0].lower_nominal_eur = 0;
+      let previousLower = 0;
+      for (let index = 0; index < brackets.length; index++) {
+        const bracket = brackets[index];
+        if (!Number.isFinite(bracket.rate) || bracket.rate < 0 || bracket.rate > 50) return null;
+        if (index > 0 && (!Number.isFinite(bracket.lower_nominal_eur) || bracket.lower_nominal_eur < previousLower)) return null;
+        if (!bracket.is_open && (!Number.isFinite(bracket.upper_nominal_eur) || bracket.upper_nominal_eur <= bracket.lower_nominal_eur)) return null;
+        previousLower = bracket.lower_nominal_eur;
+      }
+
+      const last = brackets[brackets.length - 1];
+      if (!last.is_open) return null;
+      return {
+        year: entry.year,
+        jurisdiction: entry.ccaa,
+        scope: 'autonomous',
+        status: 'source_json',
+        sourceType: 'ccaa',
+        source: { url: entry.url || '', title: entry.canonical_label || entry.ccaa || 'Escala autonómica' },
+        brackets,
+      };
+    }
+
+    function buildAutonomousCaaScheduleMap(sourceData) {
+      const map = new Map();
+      const years = Array.isArray(sourceData?.years) ? sourceData.years : [];
+      years.forEach(yearRecord => {
+        const entries = Array.isArray(yearRecord.entries)
+          ? yearRecord.entries.filter(entry => entry.scope === 'autonomous' && entry.ccaa)
+          : [];
+        const seenJurisdictions = new Set();
+        const schedules = [];
+
+        entries.forEach(entry => {
+          if (seenJurisdictions.has(entry.ccaa)) return;
+          const schedule = normalizeAutonomousCaaEntry({ ...entry, year: yearRecord.year });
+          if (!schedule) return;
+          seenJurisdictions.add(entry.ccaa);
+          schedules.push(schedule);
+        });
+
+        const valenciaFallback = VALENCIA_AUTONOMIC_MAP.get(yearRecord.year);
+        if (valenciaFallback && !seenJurisdictions.has('Comunitat Valenciana')) {
+          schedules.push({ ...valenciaFallback, sourceType: 'valencia_reference' });
+        }
+        if (schedules.length) map.set(yearRecord.year, schedules);
+      });
+      return map;
+    }
+
+    function autonomousSchedulesForYear(year) {
+      const schedules = AUTONOMIC_CCAA_SCHEDULES_BY_YEAR.get(year);
+      if (schedules?.length) return schedules;
+      const fallback = VALENCIA_AUTONOMIC_MAP.get(year);
+      return fallback ? [{ ...fallback, sourceType: 'valencia_reference' }] : [];
     }
 
     function scheduleForYear(year) {
@@ -1112,12 +1209,12 @@
     }
 
     function autonomousPersonalMinimumStandard(year) {
-      // Desde el ejercicio 2022 la Comunitat Valenciana eleva el mínimo
-      // autonómico general del contribuyente estándar a 6.105 €.
+      // Se mantiene un mínimo autonómico general común para que la media
+      // territorial aísle el efecto de las escalas disponibles.
       return year >= 2022 ? 6105 : personalMinimumStandard(year);
     }
 
-    function standardizedAutonomousValenciaIrpf(income, schedule, year) {
+    function standardizedAutonomousIrpf(income, schedule, year) {
       if (!Number.isFinite(income) || income <= 0 || !schedule || year < 1997) return 0;
 
       // 1997-1998: mismo rendimiento neto; a la cuota autonómica se imputa
@@ -1149,10 +1246,25 @@
       return Math.max(0, grossQuota - minimumQuota);
     }
 
-    function standardizedTotalValenciaIrpf(income, stateSchedule, autonomousSchedule, year) {
+    function averageAutonomousIrpf(income, schedules, year) {
+      if (!Array.isArray(schedules) || !schedules.length) return 0;
+      const total = schedules.reduce(
+        (sum, schedule) => sum + standardizedAutonomousIrpf(income, schedule, year),
+        0
+      );
+      return total / schedules.length;
+    }
+
+    function averageMarginalRateAtIncome(income, schedules) {
+      if (!Array.isArray(schedules) || !schedules.length) return 0;
+      const total = schedules.reduce((sum, schedule) => sum + marginalRateAtIncome(income, schedule), 0);
+      return total / schedules.length;
+    }
+
+    function standardizedTotalCcaaIrpf(income, stateSchedule, autonomousSchedules, year) {
       const stateTax = standardizedStateIrpf(income, stateSchedule, year);
       const autonomousTax = year >= 1997
-        ? standardizedAutonomousValenciaIrpf(income, autonomousSchedule, year)
+        ? averageAutonomousIrpf(income, autonomousSchedules, year)
         : 0;
       return {
         stateTax,
@@ -1213,11 +1325,11 @@
       return INCOME_DISTRIBUTION.map(distribution => {
         const meanGroup = INCOME_GROUP_MEAN_MAP.get(distribution.year);
         const stateSchedule = scheduleForYear(distribution.year);
-        const autonomousSchedule = VALENCIA_AUTONOMIC_MAP.get(distribution.year) || null;
+        const autonomousSchedules = autonomousSchedulesForYear(distribution.year);
         const yearRecord = YEAR_MAP.get(distribution.year);
         if (!meanGroup) return null;
-        if (distribution.year >= 1997 && !autonomousSchedule) {
-          throw new Error(`Falta escala autonómica valenciana para ${distribution.year}.`);
+        if (distribution.year >= 1997 && !autonomousSchedules.length) {
+          throw new Error(`Falta escala autonómica para ${distribution.year}.`);
         }
 
         const groups = meanGroup.groups.map((group, groupIndex) => {
@@ -1232,18 +1344,16 @@
 
           samples.forEach(income => {
             weightedIncome += income * sampleWeight;
-            const taxes = standardizedTotalValenciaIrpf(
+            const taxes = standardizedTotalCcaaIrpf(
               income,
               stateSchedule,
-              autonomousSchedule,
+              autonomousSchedules,
               distribution.year
             );
             weightedStateTax += taxes.stateTax * sampleWeight;
             weightedAutonomousTax += taxes.autonomousTax * sampleWeight;
             weightedStateMarginal += marginalRateAtIncome(income, stateSchedule) * sampleWeight;
-            if (autonomousSchedule) {
-              weightedAutonomousMarginal += marginalRateAtIncome(income, autonomousSchedule) * sampleWeight;
-            }
+            weightedAutonomousMarginal += averageMarginalRateAtIncome(income, autonomousSchedules) * sampleWeight;
           });
 
           const count = share * distribution.adultPopulation;
@@ -1291,8 +1401,11 @@
           adultPopulation: distribution.adultPopulation,
           gdpPerCapita: yearRecord?.gdp_pc_nominal_eur ?? null,
           sourceScheduleYear: stateSchedule.year,
-          autonomousScheduleYear: autonomousSchedule?.year ?? null,
-          autonomousScheduleStatus: autonomousSchedule?.status ?? null,
+          autonomousScheduleYear: distribution.year,
+          autonomousScheduleStatus: autonomousSchedules.some(schedule => schedule.sourceType === 'ccaa')
+            ? 'ccaa_average'
+            : 'valencia_reference_fallback',
+          autonomousScheduleCount: autonomousSchedules.length,
           thresholdStatus: distribution.thresholdStatus || 'wid',
           meanIncomeStatus: meanGroup.meanIncomeStatus || 'wid',
           groups,
@@ -1306,19 +1419,19 @@
       }).filter(Boolean);
     }
 
-    function effortUsesTotalValencia() {
-      return state.effortScope === 'totalValencia';
+    function effortUsesTotalCcaa() {
+      return state.effortScope === 'totalCcaa';
     }
 
     function effortGroupMetric(group) {
       if (state.effortMetric === 'contribution') {
-        return effortUsesTotalValencia() ? group.totalContributionShare : group.stateContributionShare;
+        return effortUsesTotalCcaa() ? group.totalContributionShare : group.stateContributionShare;
       }
-      return effortUsesTotalValencia() ? group.totalEffectiveRate : group.stateEffectiveRate;
+      return effortUsesTotalCcaa() ? group.totalEffectiveRate : group.stateEffectiveRate;
     }
 
     function effortNationalRate(record) {
-      return effortUsesTotalValencia() ? record.totalNationalEffectiveRate : record.stateNationalEffectiveRate;
+      return effortUsesTotalCcaa() ? record.totalNationalEffectiveRate : record.stateNationalEffectiveRate;
     }
 
     const EFFORT_DATA = buildEffortRecords();
@@ -1477,7 +1590,7 @@
       });
 
       buildSegmentedButtons('effortScopeButtons', [
-        { key: 'totalValencia', label: 'Total · C. Valenciana' },
+        { key: 'totalCcaa', label: 'Total · media CCAA' },
         { key: 'stateOnly', label: 'Solo estatal' },
       ], state.effortScope, key => {
         state.effortScope = key;
@@ -2090,13 +2203,16 @@
         return;
       }
 
-      const totalScope = effortUsesTotalValencia();
+      const totalScope = effortUsesTotalCcaa();
+      const autonomousLabel = record.autonomousScheduleStatus === 'ccaa_average'
+        ? `media CCAA (${record.autonomousScheduleCount})`
+        : 'referencia valenciana (fallback)';
       const rows = record.groups.map(group => {
         const effectiveRate = totalScope ? group.totalEffectiveRate : group.stateEffectiveRate;
         const contributionShare = totalScope ? group.totalContributionShare : group.stateContributionShare;
         const taxPerAdult = totalScope ? group.totalTaxPerAdult : group.stateTaxPerAdult;
         const componentText = totalScope && record.year >= 1997
-          ? ` · Estado ${money(group.stateTaxPerAdult, 0)} + C. Valenciana ${money(group.autonomousTaxPerAdult, 0)}`
+          ? ` · Estado ${money(group.stateTaxPerAdult, 0)} + ${autonomousLabel} ${money(group.autonomousTaxPerAdult, 0)}`
           : '';
         return `
           <div class="ttRow">
@@ -2113,11 +2229,11 @@
           ? 'Medias 2024 extrapoladas con umbrales WID'
           : 'Medias 2025 extrapoladas con umbrales/AMECO';
       const scopeLabel = totalScope
-        ? 'IRPF total estimado (Estado + Comunitat Valenciana)'
+        ? 'IRPF total estimado (Estado + media de CCAA)'
         : 'IRPF estatal estimado';
       const avgRate = effortNationalRate(record);
       const minimumNote = totalScope && record.year >= 2022
-        ? ' · mínimo autonómico general C. Valenciana: 6.105 €'
+        ? ' · mínimo autonómico general de referencia: 6.105 €'
         : '';
 
       tooltip.innerHTML = `
@@ -2213,9 +2329,9 @@
       }
 
       const isContribution = state.effortMetric === 'contribution';
-      const totalScope = effortUsesTotalValencia();
-      const shortScope = totalScope ? 'IRPF total · C. Valenciana' : 'IRPF estatal';
-      const titleScope = totalScope ? 'IRPF total (Estado + C. Valenciana)' : 'IRPF estatal';
+      const totalScope = effortUsesTotalCcaa();
+      const shortScope = totalScope ? 'IRPF total · media CCAA' : 'IRPF estatal';
+      const titleScope = totalScope ? 'IRPF total (Estado + media de CCAA)' : 'IRPF estatal';
       out += `<text x="${plot.x}" y="${compact ? 27 : 19}" fill="#FEF702" font-size="${titleFont}" font-weight="700">${isContribution ? `Aportación estimada al ${shortScope} por grupo de renta` : `Esfuerzo fiscal estimado · ${shortScope}`}</text>`;
       if (!compact) {
         out += `<text x="${plot.x + plot.w}" y="19" fill="#bfbfbf" font-size="${metaFont}" text-anchor="end">${isContribution ? '% de la recaudación estimada' : `${titleScope} / renta WID`}</text>`;
@@ -2246,15 +2362,15 @@
         return;
       }
       if (state.chartMode === 'effort') {
-        const totalScope = effortUsesTotalValencia();
-        const scopeText = totalScope ? 'IRPF total (Estado + Comunitat Valenciana)' : 'componente estatal del IRPF';
-        sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta media por grupos, umbrales y población adulta), <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> y AEAT (escalas, mínimos y reducciones), ${xmlSource}, <a class="sourceLink" href="irpf_autonomico_valencia_1997-2025.js">escala autonómica C. Valenciana</a>, <a class="sourceLink" href="data_fuentes/IRPF_tablas_1990-2023.json">JSON normalizado aportado</a> y <a class="sourceLink" href="data_fuentes/raw_irpf.rtf">raw BOE aportado</a> · <span style="opacity:.9;">N.Geolitics</span>`;
+        const totalScope = effortUsesTotalCcaa();
+        const scopeText = totalScope ? 'IRPF total (Estado + media de CCAA)' : 'componente estatal del IRPF';
+        sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta media por grupos, umbrales y población adulta), <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> y AEAT (escalas, mínimos y reducciones), ${xmlSource}, <a class="sourceLink" href="irpf_autonomico_valencia_1997-2025.js">escala autonómica valenciana de continuidad histórica</a>, <a class="sourceLink" href="data_fuentes/IRPF_tablas_1990-2023.json">JSON normalizado de escalas autonómicas</a> y <a class="sourceLink" href="data_fuentes/raw_irpf.rtf">raw BOE aportado</a> · <span style="opacity:.9;">N.Geolitics</span>`;
         explanationContent.innerHTML = `
-          <p><strong>Esfuerzo fiscal estimado</strong> = cuota estimada / renta WID del grupo. Por defecto se usa una referencia territorial homogénea: un contribuyente residente en la <strong>Comunitat Valenciana</strong>. Desde 1997 se suman la cuota estatal y la autonómica; entre 1990 y 1996 la escala era nacional sin el desdoblamiento utilizado después. El selector «Solo estatal» permite comparar con la vista anterior.</p>
+          <p><strong>Esfuerzo fiscal estimado</strong> = cuota estimada / renta WID del grupo. Por defecto se suma la cuota estatal y la <strong>media simple de las escalas autonómicas disponibles</strong> para las comunidades de régimen común. Entre 1990 y 1996 la escala era nacional sin el desdoblamiento utilizado después. El selector «Solo estatal» permite comparar con la vista anterior.</p>
           <p>Cada muestra se liquida progresivamente bajo un <strong>contribuyente estándar</strong>: individual, menor de 65 años, sin hijos ni discapacidad y con la renta modelizada como rendimiento ordinario del trabajo. El modelo incorpora, según el año, gastos/reducciones generales del trabajo, deducción histórica por rendimientos del trabajo y mínimo personal. Desde 2007 se resta la cuota correspondiente al mínimo con la escala estatal y con la escala autonómica; desde 2015 se incorpora además el gasto general de 2.000 €.</p>
-          <p>La serie autonómica utiliza las tablas históricas BOE/AEAT aportadas y verificadas. <strong>2010</strong> se armoniza con el nuevo sistema de financiación: escala estatal 12/14/18,5/21,5 + escala valenciana 11,90/13,92/18,45/21,48, evitando sumar por error una escala estatal del reparto anterior con una autonómica ya adaptada al 50 %. Para <strong>2022 en adelante</strong>, el mínimo autonómico general del contribuyente estándar es 6.105 €.</p>
+          <p>La media autonómica usa las escalas de las comunidades disponibles en el JSON normalizado, sin ponderarlas por población: para cada renta se calcula la cuota bajo cada escala y se promedia. Para los años sin tablas autonómicas completas en la fuente se conserva la serie valenciana como referencia de continuidad, y queda identificado en los datos de la página. Para <strong>2022 en adelante</strong>, el mínimo autonómico general de referencia del contribuyente estándar es 6.105 €.</p>
           <p>La distribución usa P20, P40, P60, P80, P90 y P99, las <strong>medias de renta WID</strong> de P0–20, P20–40, P40–60, P60–80, P80–90, P90–99 y P99–100 y la población adulta anual. «Aportación al IRPF» pondera además cuántos adultos hay en cada grupo.</p>
-          <p><strong>Limitación:</strong> ${scopeText} es una estimación estatutaria comparable, no el impuesto realmente declarado. WID no individualiza cotizaciones sociales, composición trabajo/capital, situación familiar ni todas las deducciones estatales/autonómicas. La referencia valenciana resuelve la ruptura de comparabilidad territorial, pero no convierte la serie en microdatos fiscales observados.</p>`;
+          <p><strong>Limitación:</strong> ${scopeText} es una estimación estatutaria comparable, no el impuesto realmente declarado. WID no individualiza cotizaciones sociales, composición trabajo/capital, situación familiar ni todas las deducciones estatales/autonómicas. La media autonómica reduce la dependencia de una sola comunidad, pero no convierte la serie en microdatos fiscales observados.</p>`;
         return;
       }
       sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta y población adulta) y <a class="sourceLink" href="https://economy-finance.ec.europa.eu/economic-research-and-databases/economic-databases/ameco-database/download-annual-data-set-macro-economic-database-ameco_en" target="_blank" rel="noopener noreferrer">AMECO</a> (extrapolación 2025), ${xmlSource} · <span style="opacity:.9;">N.Geolitics</span>`;
@@ -2321,7 +2437,7 @@
       getRateRatio: rate => rateRatio(rate),
       getEffortScope: () => state.effortScope,
       setEffortScope: scope => {
-        state.effortScope = scope === 'stateOnly' ? 'stateOnly' : 'totalValencia';
+        state.effortScope = scope === 'stateOnly' ? 'stateOnly' : 'totalCcaa';
         renderAll();
         return state.effortScope;
       },

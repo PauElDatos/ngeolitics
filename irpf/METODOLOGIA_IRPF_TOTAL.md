@@ -1,11 +1,12 @@
-# Metodología — IRPF total, referencia Comunitat Valenciana (1990–2025)
+# Metodología — IRPF total, media autonómica (1990–2025)
 
 ## Objetivo
 
-La vista **Esfuerzo fiscal** compara una estimación estatutaria del IRPF soportado por un contribuyente estándar a lo largo del tiempo. Para evitar la ruptura histórica causada por la cesión del IRPF a las comunidades autónomas, la vista por defecto usa una referencia territorial fija: **residente en la Comunitat Valenciana**.
+La vista **Esfuerzo fiscal** compara una estimación estatutaria del IRPF soportado por un contribuyente estándar a lo largo del tiempo. Para evitar que una sola comunidad determine el resultado, la vista por defecto usa la **media simple de las escalas autonómicas disponibles** de las comunidades de régimen común.
 
 - 1990–1996: escala nacional/unificada del proyecto.
-- 1997–2025: **cuota estatal + cuota autonómica valenciana**.
+- 1997–2025: **cuota estatal + media de las cuotas autonómicas**.
+- En los años sin tablas autonómicas completas en la fuente se conserva la escala valenciana como referencia de continuidad y el registro queda marcado como fallback.
 - El selector **Solo estatal** conserva la serie del componente estatal para comparación.
 
 No se pretende reconstruir una declaración real individual. El contribuyente estándar es: individual, menor de 65 años, sin hijos ni discapacidad, con la renta modelizada como rendimiento ordinario del trabajo.
@@ -15,11 +16,17 @@ No se pretende reconstruir una declaración real individual. El contribuyente es
 - `data_fuentes/raw_irpf.rtf`: HTML/texto copiado de BOE/AEAT por ejercicio.
 - `data_fuentes/IRPF_tablas_1990-2023.json`: normalización semántica de esas tablas.
 - `irpf_escala_estatal_1990-2025.xml`: serie estatal usada por la página.
-- `irpf_autonomico_valencia_1997-2025.js`: serie autonómica valenciana curada para esta versión.
+- `irpf_autonomico_valencia_1997-2025.js`: serie valenciana de continuidad histórica y fallback.
 
 El JSON aportado se usa como **fuente de extracción y contraste**, no como verdad automática. El propio archivo advierte que no infiere comunidades ausentes ni corrige etiquetas duplicadas inventando una comunidad. Por eso las entradas manifiestamente desplazadas o duplicadas se verifican contra BOE/AEAT antes de entrar en la serie.
 
-## Serie autonómica valenciana
+## Media autonómica
+
+Para cada renta modelizada, la página calcula la cuota con cada escala autonómica válida del año y obtiene la media aritmética simple, sin ponderarla por población. El JSON aportado contiene 15 comunidades de régimen común en los años con tablas autonómicas completas; País Vasco y Navarra no se incorporan porque tienen régimen foral y no son directamente comparables con esta base.
+
+La página deduplica entradas repetidas por comunidad y descarta filas que no forman una escala progresiva válida. Si un año no tiene tablas autonómicas suficientes en la fuente, usa la serie valenciana de continuidad, identificada como `valencia_reference_fallback` en los datos de la página.
+
+## Serie valenciana de continuidad
 
 | Periodo | Tratamiento |
 |---|---|
@@ -48,7 +55,7 @@ La Ley 22/2009 redactó la escala estatal como 12 / 14 / 18,5 / 21,5 y la Comuni
 ## Mínimo personal
 
 - Se conserva el mínimo estatal del modelo histórico.
-- Para la **cuota autonómica valenciana**, desde el ejercicio 2022 se usa **6.105 €** para el contribuyente estándar, conforme a la regulación autonómica.
+- Para la cuota autonómica media se usa **6.105 €** desde el ejercicio 2022 como mínimo general de referencia común para el contribuyente estándar.
 - Antes de 2022 se usa el mínimo general estatal como referencia autonómica del modelo.
 
 ## Cálculo del esfuerzo
@@ -57,9 +64,9 @@ Para cada muestra de renta dentro de cada grupo WID:
 
 1. Se aplican los gastos/reducciones de rendimientos del trabajo modelizados.
 2. Se calcula la cuota estatal progresiva.
-3. Desde 1997 se calcula la cuota autonómica valenciana progresiva.
+3. Desde 1997 se calcula la cuota autonómica progresiva para cada escala disponible.
 4. Desde 2007 se resta por separado la cuota que corresponde al mínimo personal con cada escala.
-5. Se suman Estado + Comunitat Valenciana para el modo **Total · C. Valenciana**.
+5. Se suman Estado + la media autonómica para el modo **Total · media CCAA**.
 
 Luego:
 
@@ -81,7 +88,7 @@ Esta es una **estimación estatutaria comparable**, no una estadística de cuota
 - todas las deducciones estatales y autonómicas;
 - comportamiento fiscal, exenciones y circunstancias particulares.
 
-Por tanto, la serie sirve para estudiar la **evolución de la carga legal comparable** bajo un perfil fijo, no para afirmar cuánto pagó realmente cada percentil en Hacienda.
+Por tanto, la serie sirve para estudiar la **evolución de la carga legal comparable** bajo un perfil fijo, no para afirmar cuánto pagó realmente cada percentil en Hacienda ni para medir la recaudación territorial observada.
 
 ## Fuentes legales principales
 
