@@ -1738,7 +1738,7 @@
       tooltip.style.top = top + 'px';
     }
 
-    function buildMarginalRateOverlay(plot, xEdge, xCenter, bandWidth, compact) {
+    function buildMarginalRateOverlay(plot, xCenter, compact) {
       const plotRight = plot.x + plot.w;
       const plotBottom = plot.y + plot.h;
       const zeroGap = compact ? 34 : 28;
@@ -1786,15 +1786,15 @@
         const color = getColor(tramo);
         runs.forEach(points => {
           const path = points.map((point, index) =>
-            `${index === 0 ? `M${xEdge(point.year)},${rateY(point.rate)}` : `V${rateY(point.rate)}`} H${xEdge(point.year) + bandWidth}`
+            `${index === 0 ? 'M' : 'L'}${xCenter(point.year)},${rateY(point.rate)}`
           ).join(' ');
           const start = points[0].year;
           const end = points[points.length - 1].year;
           lines += `<path class="marginalRateHalo" d="${path}" fill="none" stroke="#151515" stroke-width="${compact ? 6 : 5}" stroke-linejoin="round" opacity="${tramoOpacity * .9}" pointer-events="none"></path>`;
           lines += `<path class="marginalRateSeries" data-tramo="${tramo}" data-year-start="${start}" data-year-end="${end}" d="${path}" fill="none" stroke="${color}" stroke-width="${tramoFocused ? (compact ? 4.3 : 3.5) : (compact ? 3.5 : 2.6)}" stroke-linejoin="round" opacity="${tramoOpacity}" pointer-events="none"><title>Tramo ${tramo} · tipo marginal estatal · ${start}–${end}</title></path>`;
           points.forEach(point => {
-            const highlighted = state.hoverYear === point.year || tramoFocused || point.rate === 0;
-            lines += `<circle class="marginalRatePoint" data-year="${point.year}" data-tramo="${tramo}" data-rate="${point.rate}" cx="${xCenter(point.year)}" cy="${rateY(point.rate)}" r="${highlighted ? (compact ? 4.4 : 3.2) : 1.8}" fill="${color}" stroke="#151515" stroke-width="1.2" opacity="${highlighted ? tramoOpacity : 0}" pointer-events="none"><title>${point.year} · Tramo ${tramo} · tipo marginal estatal ${pct(point.rate)}</title></circle>`;
+            const highlighted = state.hoverYear === point.year || tramoFocused;
+            lines += `<circle class="marginalRatePoint" data-year="${point.year}" data-tramo="${tramo}" data-rate="${point.rate}" cx="${xCenter(point.year)}" cy="${rateY(point.rate)}" r="${highlighted ? (compact ? 5 : 4.3) : (compact ? 3.6 : 3.1)}" fill="${color}" stroke="#151515" stroke-width="${compact ? 1.6 : 1.4}" opacity="${tramoOpacity}" pointer-events="none"><title>${point.year} · Tramo ${tramo} · tipo marginal estatal ${pct(point.rate)}</title></circle>`;
           });
         });
       }
@@ -1915,7 +1915,7 @@
         });
       }
 
-      out += buildMarginalRateOverlay(plot, xEdge, xCenter, bandWidth, compact);
+      out += buildMarginalRateOverlay(plot, xCenter, compact);
 
       if (gdpSeries.length) {
         const gdpOpacity = state.focusKey && state.focusKey !== 'gdp' ? .12 : 1;
@@ -1946,7 +1946,7 @@
       const realDataNote = missingRealYears.length
         ? ` · Sin deflactor disponible: ${missingRealYears.join(', ')}`
         : '';
-      lineSummary.textContent = `Tramos por color y líneas escalonadas anuales · ${YEARS.length} columnas · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}${realDataNote}`;
+      lineSummary.textContent = `Tramos por color · Líneas rectas entre puntos anuales · ${YEARS.length} columnas · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}${realDataNote}`;
       rateEncodingNote.innerHTML = `Eje derecho logarítmico: <strong>tipo marginal estatal (${RATE_EXTENT.min.toLocaleString('es-ES')}%–${RATE_EXTENT.max.toLocaleString('es-ES')}%)</strong>; 0 % en base separada · Línea blanca: <strong>PIB per cápita</strong> (eje izquierdo)`;
       topMeta.textContent = `${Math.min(...YEARS)}–${Math.max(...YEARS)} · ${YEARS.length} años`;
     }
@@ -2299,7 +2299,7 @@
         explanationContent.innerHTML = `
           <p>El mapa principal divide cada año en los <strong>intervalos reales de base liquidable</strong> de su escala estatal. La altura expresa el rango monetario y cada número de tramo mantiene un color categórico. El último tramo se extiende desde su umbral hasta la parte superior del eje porque legalmente continúa en adelante.</p>
           <p>La vista permite comparar euros corrientes con <strong>euros constantes de 1990</strong>. El PIB per cápita utiliza la misma unidad seleccionada; el valor de 2025 procede de AMECO.</p>
-          <p>Cada columna se calcula de forma independiente. Las líneas claras marcan fronteras legales; las líneas escalonadas del mismo color que cada tramo muestran su <strong>tipo marginal estatal</strong> en el eje derecho logarítmico, sin unir años en los que el tramo no existe. El número de tramo es ordinal: su intervalo de renta puede cambiar con cada reforma. El 0 % se señala aparte porque no tiene logaritmo. La altura de estas líneas no corresponde a euros. El tipo total incluye el tramo autonómico y varía según la comunidad autónoma.</p>`;
+          <p>Cada columna se calcula de forma independiente. Las líneas claras marcan fronteras legales; los puntos anuales y las líneas rectas del mismo color que cada tramo muestran su <strong>tipo marginal estatal</strong> en el eje derecho logarítmico, sin unir años en los que el tramo no existe. Los segmentos entre puntos ayudan a seguir la serie visualmente, pero no representan tipos legales intermedios. El número de tramo es ordinal: su intervalo de renta puede cambiar con cada reforma. El 0 % se señala aparte porque no tiene logaritmo. La altura de estas líneas no corresponde a euros. El tipo total incluye el tramo autonómico y varía según la comunidad autónoma.</p>`;
         return;
       }
       if (state.chartMode === 'effort') {
