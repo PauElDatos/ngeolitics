@@ -1769,6 +1769,50 @@
       axis += `<text x="${titleX}" y="${titleY}" transform="rotate(90 ${titleX} ${titleY})" text-anchor="middle" fill="#FEF702" font-size="${compact ? 15 : 12}" font-weight="700">TIPO MARGINAL ESTATAL (%) · LOG</text></g>`;
 
       let lines = '<g class="marginalRateLines" aria-label="Tipos marginales por tramo y año">';
+      const smoothPath = points => {
+        const coords = points.map(point => ({
+          x: xCenter(point.year),
+          y: rateY(point.rate)
+        }));
+        if (!coords.length) return '';
+        if (coords.length === 1) return `M${coords[0].x},${coords[0].y}`;
+
+        const slopes = coords.slice(0, -1).map((point, index) =>
+          (coords[index + 1].y - point.y) / (coords[index + 1].x - point.x)
+        );
+        const tangents = coords.map((point, index) => {
+          if (index === 0) return slopes[0];
+          if (index === coords.length - 1) return slopes[slopes.length - 1];
+          return slopes[index - 1] * slopes[index] <= 0
+            ? 0
+            : (slopes[index - 1] + slopes[index]) / 2;
+        });
+
+        slopes.forEach((slope, index) => {
+          if (slope === 0) {
+            tangents[index] = 0;
+            tangents[index + 1] = 0;
+            return;
+          }
+          const alpha = tangents[index] / slope;
+          const beta = tangents[index + 1] / slope;
+          const magnitude = Math.hypot(alpha, beta);
+          if (magnitude > 3) {
+            const scale = 3 / magnitude;
+            tangents[index] = scale * alpha * slope;
+            tangents[index + 1] = scale * beta * slope;
+          }
+        });
+
+        let path = `M${coords[0].x},${coords[0].y}`;
+        for (let index = 0; index < coords.length - 1; index++) {
+          const current = coords[index];
+          const next = coords[index + 1];
+          const third = (next.x - current.x) / 3;
+          path += ` C${current.x + third},${current.y + (tangents[index] * third)} ${next.x - third},${next.y - (tangents[index + 1] * third)} ${next.x},${next.y}`;
+        }
+        return path;
+      };
       for (let tramo = 1; tramo <= MAX_TRAMOS; tramo++) {
         const runs = [];
         let run = [];
@@ -1785,9 +1829,7 @@
         const tramoOpacity = state.focusKey && !tramoFocused ? .12 : .96;
         const color = getColor(tramo);
         runs.forEach(points => {
-          const path = points.map((point, index) =>
-            `${index === 0 ? 'M' : 'L'}${xCenter(point.year)},${rateY(point.rate)}`
-          ).join(' ');
+          const path = smoothPath(points);
           const start = points[0].year;
           const end = points[points.length - 1].year;
           lines += `<path class="marginalRateHalo" d="${path}" fill="none" stroke="#151515" stroke-width="${compact ? 6 : 5}" stroke-linejoin="round" opacity="${tramoOpacity * .9}" pointer-events="none"></path>`;
@@ -1946,7 +1988,7 @@
       const realDataNote = missingRealYears.length
         ? ` · Sin deflactor disponible: ${missingRealYears.join(', ')}`
         : '';
-      lineSummary.textContent = `Tramos por color · Líneas rectas entre puntos anuales · ${YEARS.length} columnas · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}${realDataNote}`;
+      lineSummary.textContent = `Tramos por color · Curvas suaves entre puntos anuales · ${YEARS.length} columnas · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}${realDataNote}`;
       rateEncodingNote.innerHTML = `Eje derecho logarítmico: <strong>tipo marginal estatal (${RATE_EXTENT.min.toLocaleString('es-ES')}%–${RATE_EXTENT.max.toLocaleString('es-ES')}%)</strong>; 0 % en base separada · Línea blanca: <strong>PIB per cápita</strong> (eje izquierdo)`;
       topMeta.textContent = `${Math.min(...YEARS)}–${Math.max(...YEARS)} · ${YEARS.length} años`;
     }
@@ -2299,7 +2341,7 @@
         explanationContent.innerHTML = `
           <p>El mapa principal divide cada año en los <strong>intervalos reales de base liquidable</strong> de su escala estatal. La altura expresa el rango monetario y cada número de tramo mantiene un color categórico. El último tramo se extiende desde su umbral hasta la parte superior del eje porque legalmente continúa en adelante.</p>
           <p>La vista permite comparar euros corrientes con <strong>euros constantes de 1990</strong>. El PIB per cápita utiliza la misma unidad seleccionada; el valor de 2025 procede de AMECO.</p>
-          <p>Cada columna se calcula de forma independiente. Las líneas claras marcan fronteras legales; los puntos anuales y las líneas rectas del mismo color que cada tramo muestran su <strong>tipo marginal estatal</strong> en el eje derecho logarítmico, sin unir años en los que el tramo no existe. Los segmentos entre puntos ayudan a seguir la serie visualmente, pero no representan tipos legales intermedios. El número de tramo es ordinal: su intervalo de renta puede cambiar con cada reforma. El 0 % se señala aparte porque no tiene logaritmo. La altura de estas líneas no corresponde a euros. El tipo total incluye el tramo autonómico y varía según la comunidad autónoma.</p>`;
+          <p>Cada columna se calcula de forma independiente. Las líneas claras marcan fronteras legales; los puntos anuales y las curvas suaves del mismo color que cada tramo muestran su <strong>tipo marginal estatal</strong> en el eje derecho logarítmico, sin unir años en los que el tramo no existe. Las curvas ayudan a seguir la serie visualmente, pero no representan tipos legales intermedios. El número de tramo es ordinal: su intervalo de renta puede cambiar con cada reforma. El 0 % se señala aparte porque no tiene logaritmo. La altura de estas líneas no corresponde a euros. El tipo total incluye el tramo autonómico y varía según la comunidad autónoma.</p>`;
         return;
       }
       if (state.chartMode === 'effort') {

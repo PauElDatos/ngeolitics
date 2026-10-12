@@ -261,8 +261,8 @@ def check_marginal_overlay(page: Page) -> None:
     for segment in segments:
         tramo, start, end = segment["tramo"], segment["start"], segment["end"]
         assert 1990 <= start <= end <= 2025 and segment["path"], segment
-        assert segment["path"].startswith("M") and not re.search(r"[HVCQ]", segment["path"]), segment
-        assert segment["path"].count(" L") == end - start, segment
+        assert segment["path"].startswith("M") and not re.search(r"[HLVQ]", segment["path"]), segment
+        assert segment["path"].count(" C") == end - start, segment
         assert all(legal_series[str(tramo)][str(year)] for year in range(start, end + 1)), segment
         surface_color = page.locator(
             f'.fiscalSurfaceCell[data-tramo="{tramo}"]'
