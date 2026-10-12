@@ -414,40 +414,14 @@
       border-top: 2px solid rgba(255,255,255,.72);
       border-radius: 0;
     }
-    .rateLegend {
-      padding: 10px;
-      display: grid;
-      gap: 8px;
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 8px;
-      background: rgba(255,255,255,.02);
+    .legendLine {
+      width: 17px;
+      height: 0;
+      flex: 0 0 auto;
+      border-top: 3px solid;
+      border-radius: 2px;
+      box-shadow: 0 1px 0 #151515;
     }
-    .rateLegendTitle {
-      color: var(--text);
-      font-size: calc(11px * var(--uiScale));
-      font-weight: 700;
-    }
-    .rateLegendGradient {
-      width: 100%;
-      height: 14px;
-      border: 1px solid rgba(255,255,255,.16);
-      border-radius: 3px;
-      background: linear-gradient(90deg, rgb(37,48,71), rgb(0,213,255), rgb(254,247,2));
-    }
-    .rateLegendScale {
-      position: relative;
-      height: 17px;
-      color: var(--muted);
-      font-size: calc(10px * var(--uiScale));
-    }
-    .rateLegendTick {
-      position: absolute;
-      top: 0;
-      transform: translateX(-50%);
-      white-space: nowrap;
-    }
-    .rateLegendTick.isStart { transform: none; }
-    .rateLegendTick.isEnd { transform: translateX(-100%); }
     .legendGroupTitle {
       color: var(--text);
       font-size: calc(11px * var(--uiScale));
@@ -1494,45 +1468,12 @@
         max: Math.max(...rates)
       };
     })();
-    const RATE_COLOR_CURVE = 2;
-
-    function rateRatio(rate) {
-      const { min, max } = RATE_EXTENT;
-      if (!Number.isFinite(rate) || max <= min) return 0;
-      const shifted = Math.max(0, Math.min(max - min, rate - min));
-      const linearRatio = shifted / (max - min);
-      // expm1 keeps the endpoints exact while expanding differences among high rates.
-      return Math.expm1(RATE_COLOR_CURVE * linearRatio) / Math.expm1(RATE_COLOR_CURVE);
-    }
-
-    function mixRgb(from, to, amount) {
-      return from.map((channel, index) => Math.round(channel + ((to[index] - channel) * amount)));
-    }
-
-    function rateHeatColor(rate) {
-      return heatColorForRatio(rateRatio(rate));
-    }
-
-    function heatColorForRatio(value) {
-      const ratio = Math.max(0, Math.min(1, value));
-      const low = [37, 48, 71];
-      const middle = [0, 213, 255];
-      const high = [254, 247, 2];
-      const rgb = ratio <= 0.5
-        ? mixRgb(low, middle, ratio * 2)
-        : mixRgb(middle, high, (ratio - 0.5) * 2);
-      return `rgb(${rgb.join(',')})`;
-    }
-
-    function rateHeatGradientCss(steps = 32) {
-      const { min, max } = RATE_EXTENT;
-      const stops = Array.from({ length: steps }, (_, index) => {
-        const position = index / (steps - 1);
-        const rate = min + ((max - min) * position);
-        return `${rateHeatColor(rate)} ${(position * 100).toFixed(2)}%`;
-      });
-      return `linear-gradient(90deg, ${stops.join(',')})`;
-    }
+    const RATE_LOG_MIN = (() => {
+      const positiveRates = DATA.flatMap(record => record.brackets.map(bracket => bracket.rate))
+        .filter(rate => Number.isFinite(rate) && rate > 0);
+      const minimum = Math.min(...positiveRates);
+      return Math.max(0.1, Math.floor(minimum / 2) * 2);
+    })();
 
     function buildSmoothPath(points, xFn, yFn) {
       if (!points.length) return '';
@@ -1630,23 +1571,12 @@
         return `<button class="legendItem${isFocused ? ' isFocused' : ''}${state.focusKey && !isFocused ? ' isMuted' : ''}" type="button" data-focus-key="${key}" aria-pressed="${isFocused ? 'true' : 'false'}">${swatch}<span>${label}</span></button>`;
       };
       if (state.chartMode === 'limits') {
-        const midpoint = RATE_EXTENT.min + ((RATE_EXTENT.max - RATE_EXTENT.min) / 2);
-        const midpointPosition = ((midpoint - RATE_EXTENT.min) / (RATE_EXTENT.max - RATE_EXTENT.min)) * 100;
         const tramoItems = Array.from({ length: MAX_TRAMOS }, (_, i) => i + 1)
-          .map(n => legendItem(`tramo-${n}`, `<span class="legendSwatch" style="background:${getColor(n)}"></span>`, `Tramo ${n}`))
+          .map(n => legendItem(`tramo-${n}`, `<span class="legendSwatch" style="background:${getColor(n)}"></span><span class="legendLine" style="border-color:${getColor(n)}"></span>`, `Tramo ${n}`))
           .join('');
         seriesLegend.innerHTML = `
-          <div class="legendGroupTitle">Tramos · mapa principal</div>
+          <div class="legendGroupTitle">Tramos · franja y tipo marginal</div>
           <div class="tramoLegendGrid">${tramoItems}</div>
-          <div class="rateLegend">
-            <div class="rateLegendTitle">Tipo marginal · mapa de calor exponencial</div>
-            <div class="rateLegendGradient" data-scale="exponential" style="background:${rateHeatGradientCss()}" aria-hidden="true"></div>
-            <div class="rateLegendScale">
-              <span class="rateLegendTick isStart" data-rate="${RATE_EXTENT.min}" style="left:0%">${pct(RATE_EXTENT.min)}</span>
-              <span class="rateLegendTick" data-rate="${midpoint}" style="left:${midpointPosition}%">${pct(midpoint)}</span>
-              <span class="rateLegendTick isEnd" data-rate="${RATE_EXTENT.max}" style="left:100%">${pct(RATE_EXTENT.max)}</span>
-            </div>
-          </div>
           ${legendItem('boundary', '<span class="legendSwatch boundary"></span>', 'Frontera legal')}
           ${legendItem('gdp', '<span class="legendSwatch gdp"></span>', 'PIB per cápita')}
         `;
@@ -1723,22 +1653,12 @@
       const compact = chartBox.clientWidth < 720;
       const height = VIEWBOX_HEIGHT;
       const width = responsiveViewBoxWidth(height);
-      const heatmapRowsHeight = MAX_TRAMOS * (compact ? 9 : 8);
-      const heatmapOffset = compact ? 90 : 72;
-      const heatmapLegendSpace = compact ? 44 : 38;
-      const heatmapReserve = heatmapOffset + heatmapRowsHeight + heatmapLegendSpace;
       const m = compact
-        ? { top: 72, right: 28, bottom: heatmapReserve, left: 118 }
-        : { top: 62, right: 36, bottom: heatmapReserve, left: 92 };
+        ? { top: 72, right: 104, bottom: 94, left: 118 }
+        : { top: 62, right: 108, bottom: 78, left: 92 };
       const plot = { x: m.left, y: m.top, w: width - m.left - m.right, h: height - m.top - m.bottom };
-      const heatmap = {
-        x: plot.x,
-        y: plot.y + plot.h + heatmapOffset,
-        w: plot.w,
-        h: heatmapRowsHeight,
-      };
       svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
-      return { width, height, m, plot, heatmap, compact };
+      return { width, height, m, plot, compact };
     }
 
     function clientToLimitViewBox(clientX, clientY) {
@@ -1750,12 +1670,10 @@
     }
 
     function isInsideLimitInteractiveArea(clientX, clientY) {
-      const { plot, heatmap } = getChartGeometry();
+      const { plot } = getChartGeometry();
       const point = clientToLimitViewBox(clientX, clientY);
       const withinX = point.x >= plot.x && point.x <= plot.x + plot.w;
-      const withinPlot = point.y >= plot.y && point.y <= plot.y + plot.h;
-      const withinHeatmap = point.y >= heatmap.y && point.y <= heatmap.y + heatmap.h;
-      return withinX && (withinPlot || withinHeatmap);
+      return withinX && point.y >= plot.y && point.y <= plot.y + plot.h;
     }
 
     function hideTooltip() {
@@ -1820,48 +1738,71 @@
       tooltip.style.top = top + 'px';
     }
 
-    function buildMarginalRateHeatmap(heatmap, xEdge, bandWidth, compact) {
-      const rowHeight = heatmap.h / MAX_TRAMOS;
-      const labelFont = Math.max(7, Math.min(compact ? 14 : 10, rowHeight * .72));
-      const titleFont = compact ? 16 : 11;
-      const legendFont = compact ? 14 : 10;
-      let out = `<text x="${heatmap.x}" y="${heatmap.y - 10}" fill="#FEF702" font-size="${titleFont}" font-weight="700">TIPO MARGINAL ESTATAL · MAPA DE CALOR EXPONENCIAL</text>`;
+    function buildMarginalRateOverlay(plot, xEdge, xCenter, bandWidth, compact) {
+      const plotRight = plot.x + plot.w;
+      const plotBottom = plot.y + plot.h;
+      const zeroGap = compact ? 34 : 28;
+      const positiveBottom = plotBottom - zeroGap;
+      const positiveSpan = Math.log(RATE_EXTENT.max / RATE_LOG_MIN);
+      const rateY = rate => rate === 0
+        ? plotBottom - 3
+        : positiveBottom - (Math.log(rate / RATE_LOG_MIN) / positiveSpan) * (positiveBottom - plot.y);
+      const axisFont = compact ? 17 : 12;
+      const axisX = plotRight + 11;
+      const ticks = Array.from(new Set([10, 15, 20, 30, 40, RATE_EXTENT.max]))
+        .filter(rate => rate >= RATE_LOG_MIN && rate <= RATE_EXTENT.max);
+      let axis = `<g class="marginalRateAxis" data-scale="log"><line x1="${plotRight}" y1="${plot.y}" x2="${plotRight}" y2="${positiveBottom}" stroke="rgba(255,255,255,.56)" stroke-width="1.2"></line>`;
+      ticks.forEach(rate => {
+        const yy = rateY(rate);
+        axis += `<line x1="${plotRight}" y1="${yy}" x2="${plotRight + 7}" y2="${yy}" stroke="rgba(255,255,255,.62)" stroke-width="1.2"></line>`;
+        axis += `<text class="rateAxisTick" data-rate="${rate}" x="${axisX}" y="${yy + (compact ? 6 : 4)}" fill="#e3e3e3" font-size="${axisFont}">${rate.toLocaleString('es-ES')} %</text>`;
+      });
+      if (RATE_EXTENT.min === 0) {
+        const yy = rateY(0);
+        const breakY = positiveBottom + (zeroGap / 2);
+        axis += `<path d="M${plotRight - 4},${breakY - 5} l8,-5 M${plotRight - 4},${breakY + 5} l8,-5" fill="none" stroke="rgba(255,255,255,.72)" stroke-width="1.4"></path>`;
+        axis += `<line x1="${plotRight}" y1="${yy}" x2="${plotRight + 7}" y2="${yy}" stroke="rgba(255,255,255,.62)" stroke-width="1.2"></line>`;
+        axis += `<text class="rateZeroTick" data-rate="0" x="${axisX}" y="${yy + (compact ? 6 : 4)}" fill="#e3e3e3" font-size="${axisFont}">0 %</text>`;
+      }
+      const titleX = plotRight + 91;
+      const titleY = plot.y + (plot.h / 2);
+      axis += `<text x="${titleX}" y="${titleY}" transform="rotate(90 ${titleX} ${titleY})" text-anchor="middle" fill="#FEF702" font-size="${compact ? 15 : 12}" font-weight="700">TIPO MARGINAL ESTATAL (%) · LOG</text></g>`;
 
+      let lines = '<g class="marginalRateLines" aria-label="Tipos marginales por tramo y año">';
       for (let tramo = 1; tramo <= MAX_TRAMOS; tramo++) {
-        const tramoFocused = state.focusKey === `tramo-${tramo}`;
-        const tramoOpacity = state.focusKey && !tramoFocused ? .12 : 1;
-        const visualRow = MAX_TRAMOS - tramo;
-        const rowY = heatmap.y + (visualRow * rowHeight);
-        out += `<rect x="${heatmap.x}" y="${rowY}" width="${heatmap.w}" height="${rowHeight}" fill="rgba(255,255,255,.025)" stroke="rgba(255,255,255,.07)" stroke-width=".7"></rect>`;
-        out += `<text x="${heatmap.x - 10}" y="${rowY + (rowHeight * .72)}" text-anchor="end" fill="#bfbfbf" font-size="${labelFont}" font-weight="700">T${tramo}</text>`;
+        const runs = [];
+        let run = [];
+        getRateSeries(tramo).forEach(point => {
+          if (!Number.isFinite(point.rate) || (run.length && point.year !== run[run.length - 1].year + 1)) {
+            if (run.length) runs.push(run);
+            run = [];
+          }
+          if (Number.isFinite(point.rate)) run.push(point);
+        });
+        if (run.length) runs.push(run);
 
-        DATA.forEach(record => {
-          const bracket = record.brackets.find(item => item.index === tramo);
-          if (!bracket || !Number.isFinite(bracket.rate)) return;
-          out += `<rect class="rateHeatCell" data-year="${record.year}" data-tramo="${tramo}" data-rate="${bracket.rate}" x="${xEdge(record.year)}" y="${rowY + .55}" width="${bandWidth + .15}" height="${Math.max(1, rowHeight - 1.1)}" fill="${rateHeatColor(bracket.rate)}" opacity="${tramoOpacity}"><title>${record.year} · Tramo ${tramo} · tipo marginal estatal ${pct(bracket.rate)}</title></rect>`;
+        const tramoFocused = state.focusKey === `tramo-${tramo}`;
+        const tramoOpacity = state.focusKey && !tramoFocused ? .12 : .96;
+        const color = getColor(tramo);
+        runs.forEach(points => {
+          const path = points.map((point, index) =>
+            `${index === 0 ? `M${xEdge(point.year)},${rateY(point.rate)}` : `V${rateY(point.rate)}`} H${xEdge(point.year) + bandWidth}`
+          ).join(' ');
+          const start = points[0].year;
+          const end = points[points.length - 1].year;
+          lines += `<path class="marginalRateHalo" d="${path}" fill="none" stroke="#151515" stroke-width="${compact ? 6 : 5}" stroke-linejoin="round" opacity="${tramoOpacity * .9}" pointer-events="none"></path>`;
+          lines += `<path class="marginalRateSeries" data-tramo="${tramo}" data-year-start="${start}" data-year-end="${end}" d="${path}" fill="none" stroke="${color}" stroke-width="${tramoFocused ? (compact ? 4.3 : 3.5) : (compact ? 3.5 : 2.6)}" stroke-linejoin="round" opacity="${tramoOpacity}" pointer-events="none"><title>Tramo ${tramo} · tipo marginal estatal · ${start}–${end}</title></path>`;
+          points.forEach(point => {
+            const highlighted = state.hoverYear === point.year || tramoFocused || point.rate === 0;
+            lines += `<circle class="marginalRatePoint" data-year="${point.year}" data-tramo="${tramo}" data-rate="${point.rate}" cx="${xCenter(point.year)}" cy="${rateY(point.rate)}" r="${highlighted ? (compact ? 4.4 : 3.2) : 1.8}" fill="${color}" stroke="#151515" stroke-width="1.2" opacity="${highlighted ? tramoOpacity : 0}" pointer-events="none"><title>${point.year} · Tramo ${tramo} · tipo marginal estatal ${pct(point.rate)}</title></circle>`;
+          });
         });
       }
-
-      const legendY = heatmap.y + heatmap.h + (compact ? 13 : 10);
-      const legendHeight = compact ? 10 : 8;
-      const legendWidth = compact ? 220 : 170;
-      const gradientX = heatmap.x + (compact ? 36 : 28);
-      const steps = 24;
-      const stepWidth = legendWidth / steps;
-      const midpoint = RATE_EXTENT.min + ((RATE_EXTENT.max - RATE_EXTENT.min) / 2);
-      out += `<text class="rateHeatLegendTick" data-rate="${RATE_EXTENT.min}" x="${heatmap.x}" y="${legendY + legendHeight}" fill="#bfbfbf" font-size="${legendFont}">${RATE_EXTENT.min.toLocaleString('es-ES')}%</text>`;
-      for (let index = 0; index < steps; index++) {
-        const position = index / (steps - 1);
-        const rate = RATE_EXTENT.min + ((RATE_EXTENT.max - RATE_EXTENT.min) * position);
-        out += `<rect class="rateHeatLegendCell" data-scale="exponential" data-rate="${rate}" x="${gradientX + (index * stepWidth)}" y="${legendY}" width="${stepWidth + .4}" height="${legendHeight}" fill="${rateHeatColor(rate)}"></rect>`;
-      }
-      out += `<text class="rateHeatLegendTick" data-rate="${midpoint}" x="${gradientX + (legendWidth / 2)}" y="${legendY + legendHeight + (compact ? 16 : 12)}" text-anchor="middle" fill="#bfbfbf" font-size="${legendFont}">${midpoint.toLocaleString('es-ES')}%</text>`;
-      out += `<text class="rateHeatLegendTick" data-rate="${RATE_EXTENT.max}" x="${gradientX + legendWidth + (compact ? 10 : 7)}" y="${legendY + legendHeight}" fill="#bfbfbf" font-size="${legendFont}">${RATE_EXTENT.max.toLocaleString('es-ES')}%</text>`;
-      return out;
+      return axis + lines + '</g>';
     }
 
     function renderFiscalMap() {
-      const { width, height, plot, heatmap, compact } = getChartGeometry();
+      const { width, height, plot, compact } = getChartGeometry();
       const minYear = Math.min(...YEARS);
       const maxYear = Math.max(...YEARS);
       const bandWidth = plot.w / YEARS.length;
@@ -1958,7 +1899,6 @@
       });
       out += `<line x1="${plot.x + plot.w}" y1="${plot.y}" x2="${plot.x + plot.w}" y2="${plot.y + plot.h}" stroke="rgba(0,0,0,.20)" stroke-width=".7"></line>`;
       out += boundaries;
-      out += buildMarginalRateHeatmap(heatmap, xEdge, bandWidth, compact);
 
       if (state.showPresBands) {
         const stripHeight = compact ? 26 : 22;
@@ -1975,6 +1915,8 @@
         });
       }
 
+      out += buildMarginalRateOverlay(plot, xEdge, xCenter, bandWidth, compact);
+
       if (gdpSeries.length) {
         const gdpOpacity = state.focusKey && state.focusKey !== 'gdp' ? .12 : 1;
         const d = buildSmoothPath(gdpSeries, xCenter, y);
@@ -1988,25 +1930,24 @@
       if (state.hoverYear) {
         const hoverX = xEdge(state.hoverYear);
         out += `<rect class="hoverYearColumn" data-year="${state.hoverYear}" x="${hoverX}" y="${plot.y}" width="${bandWidth}" height="${plot.h}" fill="rgba(254,247,2,.05)" stroke="rgba(254,247,2,.85)" stroke-width="${compact ? 2.2 : 1.4}"></rect>`;
-        out += `<rect class="hoverHeatmapColumn" data-year="${state.hoverYear}" x="${hoverX}" y="${heatmap.y}" width="${bandWidth}" height="${heatmap.h}" fill="rgba(254,247,2,.05)" stroke="rgba(254,247,2,.85)" stroke-width="${compact ? 2.2 : 1.4}"></rect>`;
       }
 
-      out += `<text x="${plot.x}" y="${compact ? 24 : 18}" fill="#FEF702" font-size="${titleFont}" font-weight="700">Mapa fiscal del IRPF: intervalos y fronteras de los tramos</text>`;
+      out += `<text x="${plot.x}" y="${compact ? 24 : 18}" fill="#FEF702" font-size="${titleFont}" font-weight="700">${compact ? 'IRPF · tramos y tipos marginales' : 'Mapa fiscal del IRPF: intervalos y fronteras de los tramos'}</text>`;
       if (!compact) {
         out += `<text x="${plot.x + plot.w}" y="18" fill="#bfbfbf" font-size="${metaFont}" text-anchor="end">${state.scaleMode === 'log' ? 'Escala logarítmica' : 'Escala lineal'} · ${state.mode === 'real1990' ? 'euros constantes de 1990' : 'euros corrientes'}</text>`;
       }
       svg.innerHTML = out;
 
-      svg.setAttribute('aria-label', 'Mapa fiscal de los tramos estatales del IRPF con subgráfica de tipos marginales');
-      chartMeta.textContent = `Mapa de tramos + calor marginal · ${state.mode === 'real1990' ? 'Euros constantes de 1990' : 'Euros corrientes'} · Escala ${state.scaleMode === 'log' ? 'logarítmica' : 'lineal'} · Serie anual verificada`;
+      svg.setAttribute('aria-label', 'Mapa fiscal de los tramos estatales del IRPF con líneas de tipo marginal y eje porcentual logarítmico a la derecha');
+      chartMeta.textContent = `Mapa de tramos + tipo marginal · ${state.mode === 'real1990' ? 'Euros constantes de 1990' : 'Euros corrientes'} · Eje € ${state.scaleMode === 'log' ? 'logarítmico' : 'lineal'} · Eje % logarítmico`;
       const missingRealYears = state.mode === 'real1990'
         ? DATA.filter(record => record.brackets.some(bracket => bracket.upper_nominal_eur !== null && bracket.upper_real_eur_1990 === null)).map(record => record.year)
         : [];
       const realDataNote = missingRealYears.length
         ? ` · Sin deflactor disponible: ${missingRealYears.join(', ')}`
         : '';
-      lineSummary.textContent = `Mapa principal: tramos por color · ${YEARS.length} columnas anuales · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}${realDataNote}`;
-      rateEncodingNote.innerHTML = `Subgráfica exponencial: <strong>tipo marginal estatal (${RATE_EXTENT.min.toLocaleString('es-ES')}%–${RATE_EXTENT.max.toLocaleString('es-ES')}%)</strong> · Línea blanca: <strong>PIB per cápita</strong>`;
+      lineSummary.textContent = `Tramos por color y líneas escalonadas anuales · ${YEARS.length} columnas · Bandas políticas: ${state.showPresBands ? 'visibles' : 'ocultas'}${realDataNote}`;
+      rateEncodingNote.innerHTML = `Eje derecho logarítmico: <strong>tipo marginal estatal (${RATE_EXTENT.min.toLocaleString('es-ES')}%–${RATE_EXTENT.max.toLocaleString('es-ES')}%)</strong>; 0 % en base separada · Línea blanca: <strong>PIB per cápita</strong> (eje izquierdo)`;
       topMeta.textContent = `${Math.min(...YEARS)}–${Math.max(...YEARS)} · ${YEARS.length} años`;
     }
 
@@ -2358,7 +2299,7 @@
         explanationContent.innerHTML = `
           <p>El mapa principal divide cada año en los <strong>intervalos reales de base liquidable</strong> de su escala estatal. La altura expresa el rango monetario y cada número de tramo mantiene un color categórico. El último tramo se extiende desde su umbral hasta la parte superior del eje porque legalmente continúa en adelante.</p>
           <p>La vista permite comparar euros corrientes con <strong>euros constantes de 1990</strong>. El PIB per cápita utiliza la misma unidad seleccionada; el valor de 2025 procede de AMECO.</p>
-          <p>Cada columna se calcula de forma independiente, sin interpolar tramos entre reformas. Las líneas claras marcan fronteras legales existentes. La subgráfica inferior conserva todos los tramos históricos y representa el <strong>tipo marginal estatal</strong> con una escala cromática exponencial. El tipo total incluye el tramo autonómico y varía según la comunidad autónoma.</p>`;
+          <p>Cada columna se calcula de forma independiente. Las líneas claras marcan fronteras legales; las líneas escalonadas del mismo color que cada tramo muestran su <strong>tipo marginal estatal</strong> en el eje derecho logarítmico, sin unir años en los que el tramo no existe. El número de tramo es ordinal: su intervalo de renta puede cambiar con cada reforma. El 0 % se señala aparte porque no tiene logaritmo. La altura de estas líneas no corresponde a euros. El tipo total incluye el tramo autonómico y varía según la comunidad autónoma.</p>`;
         return;
       }
       if (state.chartMode === 'effort') {
@@ -2434,7 +2375,6 @@
       getLimitSeries: index => getLimitSeries(index),
       getRateSeries: index => getRateSeries(index),
       getRateExtent: () => ({ ...RATE_EXTENT }),
-      getRateRatio: rate => rateRatio(rate),
       getEffortScope: () => state.effortScope,
       setEffortScope: scope => {
         state.effortScope = scope === 'stateOnly' ? 'stateOnly' : 'totalCcaa';

@@ -42,18 +42,20 @@ def check_dataset(page: Page) -> None:
           population: window.IRPF_TEST_API.getPopulationData(),
           t4: window.IRPF_TEST_API.getLimitSeries(4),
           t5: window.IRPF_TEST_API.getLimitSeries(5),
+          rate1: window.IRPF_TEST_API.getRateSeries(1),
           rate4: window.IRPF_TEST_API.getRateSeries(4),
+          rate5: window.IRPF_TEST_API.getRateSeries(5),
           extent: window.IRPF_TEST_API.getRateExtent(),
-          rateRatios: [0, 9.5, 12, 28, 53.5, 56].map(rate => window.IRPF_TEST_API.getRateRatio(rate)),
           effortScope: window.IRPF_TEST_API.getEffortScope(),
           effort: window.IRPF_TEST_API.getEffortData(),
-          legendMidpointPosition: Number.parseFloat(document.querySelector('.rateLegendTick[data-rate="28"]').style.left),
         })
         """
     )
     t4_by_year = {point["year"]: point for point in model["t4"]}
     t5_by_year = {point["year"]: point for point in model["t5"]}
+    rate1_by_year = {point["year"]: point for point in model["rate1"]}
     rate4_by_year = {point["year"]: point for point in model["rate4"]}
+    rate5_by_year = {point["year"]: point for point in model["rate5"]}
     population_by_year = {point["year"]: point for point in model["population"]}
     assert model["years"] == list(range(1990, 2026))
     assert sorted(population_by_year) == list(range(1990, 2026))
@@ -66,39 +68,16 @@ def check_dataset(page: Page) -> None:
             assert t5_by_year[year]["value"] is None
     assert rate4_by_year[2007]["exists"]
     assert rate4_by_year[2007]["rate"] == 27.13
+    assert rate1_by_year[1995]["rate"] == rate1_by_year[1996]["rate"] == 0
+    assert all(not rate5_by_year[year]["exists"] for year in range(2007, 2011))
+    assert all(rate5_by_year[year]["exists"] for year in range(2011, 2026))
     assert model["extent"] == {"min": 0, "max": 56}
-    expected_ratios = [math.expm1(2 * rate / 56) / math.expm1(2) for rate in (0, 9.5, 12, 28, 53.5, 56)]
-    assert all(abs(actual - expected) < 1e-12 for actual, expected in zip(model["rateRatios"], expected_ratios))
-    assert model["rateRatios"][5] - model["rateRatios"][4] > 4 * (
-        model["rateRatios"][2] - model["rateRatios"][1]
-    )
     assert model["effortScope"] == "totalCcaa"
     effort_by_year = {point["year"]: point for point in model["effort"]}
     assert effort_by_year[2023]["autonomousScheduleStatus"] == "ccaa_average"
     assert effort_by_year[2023]["autonomousScheduleCount"] >= 14
     assert effort_by_year[2025]["autonomousScheduleStatus"] == "valencia_reference_fallback"
     assert effort_by_year[2023]["totalNationalEffectiveRate"] != effort_by_year[2023]["stateNationalEffectiveRate"]
-    assert abs(model["legendMidpointPosition"] - 50) < 1e-4
-    assert page.locator('.rateLegendGradient[data-scale="exponential"]').count() == 1
-    assert "linear-gradient" in page.locator(".rateLegendGradient").get_attribute("style")
-    assert page.locator('.rateHeatLegendCell[data-scale="exponential"]').count() == 24
-    assert page.locator('.rateHeatLegendTick[data-rate="28"]').count() == 1
-    legend_label_gaps = page.evaluate(
-        """
-        () => {
-          const minimum = document.querySelector('.rateLegendTick[data-rate="0"]').getBoundingClientRect();
-          const midpoint = document.querySelector('.rateLegendTick[data-rate="28"]').getBoundingClientRect();
-          const maximum = document.querySelector('.rateLegendTick[data-rate="56"]').getBoundingClientRect();
-          return {
-            beforeMidpoint: midpoint.left - minimum.right,
-            afterMidpoint: maximum.left - midpoint.right,
-          };
-        }
-        """
-    )
-    assert legend_label_gaps["beforeMidpoint"] >= 2
-    assert legend_label_gaps["afterMidpoint"] >= 2
-
     assert page.locator('.fiscalSurfaceCell[data-year="2007"][data-tramo="4"]').count() == 1
     assert page.locator('.fiscalSurfaceCell[data-year="2007"][data-tramo="5"]').count() == 0
     assert page.locator(".fiscalSurfaceCell").count() > 0
@@ -111,14 +90,14 @@ def check_dataset(page: Page) -> None:
     assert page.locator('.fiscalAxisTick[data-value="500000"]').count() == 1
     assert page.locator('.fiscalAxisTick[data-value="1000000"]').count() == 0
     assert page.locator(".limitSeries, .openBracketPoint").count() == 0
-    assert page.locator('.rateHeatCell[data-year="2007"][data-tramo="4"]').count() == 1
-    assert page.locator('.rateHeatCell[data-year="2007"][data-tramo="5"]').count() == 0
-    assert page.locator('.rateHeatCell[data-year="2013"][data-tramo="7"]').count() == 1
-    assert page.locator('.rateHeatCell[data-year="1995"][data-tramo="18"]').count() == 1
-    heatmap_tramos = page.locator(".rateHeatCell").evaluate_all(
+    assert page.locator('.marginalRatePoint[data-year="2007"][data-tramo="4"]').count() == 1
+    assert page.locator('.marginalRatePoint[data-year="2007"][data-tramo="5"]').count() == 0
+    assert page.locator('.marginalRatePoint[data-year="2013"][data-tramo="7"]').count() == 1
+    assert page.locator('.marginalRatePoint[data-year="1995"][data-tramo="18"]').count() == 1
+    rate_tramos = page.locator(".marginalRateSeries").evaluate_all(
         "nodes => [...new Set(nodes.map(node => Number(node.dataset.tramo)))].sort((a, b) => a - b)"
     )
-    assert heatmap_tramos == list(range(1, 19))
+    assert rate_tramos == list(range(1, 19))
     surface_colors = page.evaluate(
         """
         () => {
@@ -144,17 +123,17 @@ def check_dataset(page: Page) -> None:
           .map(year => ({
             year: Number(year),
             cells: document.querySelectorAll(`.fiscalSurfaceCell[data-year="${year}"]`).length,
-            heatCells: document.querySelectorAll(`.rateHeatCell[data-year="${year}"]`).length,
+            ratePoints: document.querySelectorAll(`.marginalRatePoint[data-year="${year}"]`).length,
             boundaries: document.querySelectorAll(`.taxBoundary[data-year="${year}"]`).length,
             open: document.querySelectorAll(`.fiscalSurfaceCell[data-year="${year}"][data-open="true"]`).length,
           }))
         """
     )
     assert all(row["boundaries"] == row["cells"] - 1 for row in annual_structure)
-    assert all(row["heatCells"] == row["cells"] for row in annual_structure)
+    assert all(row["ratePoints"] == row["cells"] for row in annual_structure)
     assert all(row["open"] == 1 for row in annual_structure)
     assert page.locator('.fiscalSurfaceCell[data-year="2008"]').count() == 4
-    assert page.locator('.rateHeatCell[data-year="2008"]').count() == 4
+    assert page.locator('.marginalRatePoint[data-year="2008"]').count() == 4
     assert page.locator('.taxBoundary[data-year="2008"]').count() == 3
     open_2008 = page.locator('.fiscalSurfaceCell[data-year="2008"][data-tramo="4"]')
     assert open_2008.get_attribute("data-open") == "true"
@@ -173,7 +152,7 @@ def check_dataset(page: Page) -> None:
     )
     assert adjacency_2008["t4Top"] < adjacency_2008["t3Top"]
     assert abs(adjacency_2008["t4Bottom"] - adjacency_2008["t3Top"]) < 0.01
-    assert "Cada columna se calcula de forma independiente" in page.locator("#explanationContent").inner_text()
+    assert "tipo marginal estatal" in page.locator("#explanationContent").inner_text().lower()
     assert page.locator("#countButtons").count() == 0
 
     tooltip = normalized_text(
@@ -197,6 +176,96 @@ def check_dataset(page: Page) -> None:
     page.evaluate("() => window.IRPF_TEST_API.showLimitsTooltip(2007)")
 
 
+def check_marginal_overlay(page: Page) -> None:
+    assert page.locator(".rateHeatCell, .rateHeatLegendCell, .rateLegendGradient").count() == 0
+    assert page.locator(".rateZeroTick").count() == 1
+    assert "0" in (page.locator(".rateZeroTick").text_content() or "")
+    assert page.locator(".gdpSeries").count() == 1
+    assert page.locator(".gdpPoint").count() == 36
+
+    right_axis_position = page.evaluate(
+        """() => ({
+          surfaceRight: Math.max(...[...document.querySelectorAll('.fiscalSurfaceCell')]
+            .map(node => Number(node.getAttribute('x')) + Number(node.getAttribute('width')))),
+          tickLeft: Math.min(...[...document.querySelectorAll('.rateAxisTick')]
+            .map(node => Number(node.getAttribute('x')))),
+        })"""
+    )
+    assert right_axis_position["tickLeft"] > right_axis_position["surfaceRight"]
+
+    ticks = page.locator(".rateAxisTick").evaluate_all(
+        "nodes => nodes.map(node => ({rate: Number(node.dataset.rate), y: Number(node.getAttribute('y'))}))"
+    )
+    ticks.sort(key=lambda tick: tick["rate"])
+    assert len(ticks) >= 3, ticks
+    assert all(8 <= tick["rate"] <= 56 and math.isfinite(tick["y"]) for tick in ticks), ticks
+    assert all(left["y"] > right["y"] for left, right in zip(ticks, ticks[1:])), ticks
+    low_tick, high_tick = ticks[0], ticks[-1]
+    log_span = math.log(high_tick["rate"] / low_tick["rate"])
+    for tick in ticks[1:-1]:
+        expected_y = low_tick["y"] + (
+            math.log(tick["rate"] / low_tick["rate"]) / log_span
+        ) * (high_tick["y"] - low_tick["y"])
+        assert abs(tick["y"] - expected_y) < 1, (tick, expected_y)
+
+    points = page.locator(".marginalRatePoint").evaluate_all(
+        """nodes => nodes.map(node => ({
+          year: Number(node.dataset.year),
+          tramo: Number(node.dataset.tramo),
+          rate: Number(node.dataset.rate),
+          y: Number(node.getAttribute('cy')),
+        }))"""
+    )
+    assert len(points) == page.locator(".fiscalSurfaceCell").count()
+    zero_points = [point for point in points if point["rate"] == 0]
+    assert {(point["year"], point["tramo"]) for point in zero_points} == {
+        (1995, 1), (1996, 1)
+    }
+    positive_points = [point for point in points if point["rate"] > 0]
+    assert all(math.isfinite(point["y"]) for point in points)
+    assert min(point["y"] for point in zero_points) > max(
+        point["y"] for point in positive_points
+    )
+
+    positive_by_rate = {}
+    for point in positive_points:
+        positive_by_rate.setdefault(point["rate"], point["y"])
+        assert abs(point["y"] - positive_by_rate[point["rate"]]) < 0.01
+    low_rate, high_rate = min(positive_by_rate), max(positive_by_rate)
+    for rate, y in positive_by_rate.items():
+        expected_y = positive_by_rate[low_rate] + (
+            math.log(rate / low_rate) / math.log(high_rate / low_rate)
+        ) * (positive_by_rate[high_rate] - positive_by_rate[low_rate])
+        assert abs(y - expected_y) < 1, (rate, y, expected_y)
+
+    segments = page.locator(".marginalRateSeries").evaluate_all(
+        """nodes => nodes.map(node => ({
+          tramo: Number(node.dataset.tramo),
+          start: Number(node.dataset.yearStart),
+          end: Number(node.dataset.yearEnd),
+          path: node.getAttribute('d'),
+          stroke: node.getAttribute('stroke'),
+        }))"""
+    )
+    assert {segment["tramo"] for segment in segments} == set(range(1, 19))
+    legal_series = page.evaluate(
+        """() => Object.fromEntries(Array.from({length: 18}, (_, index) => [
+          index + 1,
+          Object.fromEntries(window.IRPF_TEST_API.getRateSeries(index + 1)
+            .map(point => [point.year, point.exists]))
+        ]))"""
+    )
+    for segment in segments:
+        tramo, start, end = segment["tramo"], segment["start"], segment["end"]
+        assert 1990 <= start <= end <= 2025 and segment["path"], segment
+        assert all(legal_series[str(tramo)][str(year)] for year in range(start, end + 1)), segment
+        surface_color = page.locator(
+            f'.fiscalSurfaceCell[data-tramo="{tramo}"]'
+        ).first.get_attribute("fill")
+        assert segment["stroke"] == surface_color, segment
+    assert len([segment for segment in segments if segment["tramo"] == 5]) == 2
+
+
 def check_layout(page: Page) -> None:
     metrics = page.evaluate(
         """
@@ -214,7 +283,15 @@ def check_layout(page: Page) -> None:
             chartHeight: chart.height,
             svgWidth: svgRect.width,
             surfaceCells: document.querySelectorAll('.fiscalSurfaceCell').length,
+            ratePoints: document.querySelectorAll('.marginalRatePoint').length,
+            rateSeries: document.querySelectorAll('.marginalRateSeries').length,
+            rateTicks: document.querySelectorAll('.rateAxisTick').length,
+            zeroTicks: document.querySelectorAll('.rateZeroTick').length,
             heatCells: document.querySelectorAll('.rateHeatCell').length,
+            plotHeight: Math.abs(
+              Number(document.querySelector('.fiscalAxisTick[data-value="1000"]').getAttribute('y')) -
+              Number(document.querySelector('.fiscalAxisTick[data-value="500000"]').getAttribute('y'))
+            ),
             preserveAspectRatio: svg.getAttribute('preserveAspectRatio'),
             scaleDifference: Math.abs(scaleX - scaleY),
             viewBoxAspect: viewBox.width / viewBox.height,
@@ -226,7 +303,10 @@ def check_layout(page: Page) -> None:
     assert metrics["overflow"] <= 1, metrics
     assert metrics["chartWidth"] > 250 and metrics["chartHeight"] > 300, metrics
     assert metrics["svgWidth"] > 250 and metrics["surfaceCells"] > 0, metrics
-    assert metrics["heatCells"] == metrics["surfaceCells"], metrics
+    assert metrics["ratePoints"] == metrics["surfaceCells"], metrics
+    assert metrics["rateSeries"] >= 18 and metrics["rateTicks"] >= 3, metrics
+    assert metrics["zeroTicks"] == 1 and metrics["heatCells"] == 0, metrics
+    assert metrics["plotHeight"] > 500, metrics
     assert metrics["preserveAspectRatio"] == "xMidYMid meet", metrics
     assert metrics["scaleDifference"] < 0.001, metrics
     assert abs(metrics["viewBoxAspect"] - metrics["renderedAspect"]) < 0.001, metrics
@@ -236,13 +316,15 @@ def check_all_visual_modes(page: Page) -> None:
     page.locator('#modeButtons button[data-key="real1990"]').click()
     page.wait_for_timeout(50)
     assert page.locator(".fiscalSurfaceCell").count() > 0
-    assert page.locator(".rateHeatCell").count() > 0
+    assert page.locator(".marginalRatePoint").count() > 0
+    assert page.locator(".rateAxisTick").count() >= 3
     assert page.locator('.fiscalSurfaceCell[data-year="2008"][data-tramo="4"]').count() == 1
 
     page.locator('#scaleButtons button[data-key="linear"]').click()
     page.wait_for_timeout(50)
     assert page.locator(".fiscalSurfaceCell").count() > 0
-    assert page.locator(".rateHeatCell").count() > 0
+    assert page.locator(".marginalRatePoint").count() > 0
+    assert page.locator(".rateAxisTick").count() >= 3
     assert page.locator('.fiscalAxisTick[data-value="500000"]').count() == 1
     page.locator('#scaleButtons button[data-key="log"]').click()
 
@@ -250,6 +332,7 @@ def check_all_visual_modes(page: Page) -> None:
     page.wait_for_timeout(50)
     assert "población adulta" in (page.locator("#chart").get_attribute("aria-label") or "")
     assert page.locator("#chart").bounding_box()["width"] > 250
+    assert page.locator(".marginalRatePoint, .rateAxisTick").count() == 0
     assert page.locator('.populationAxisTick[data-value="45000000"]').count() == 1
     assert page.locator('.populationAxisTick[data-value="50000000"]').count() == 0
     population_scale = page.evaluate(
@@ -265,11 +348,17 @@ def check_all_visual_modes(page: Page) -> None:
     )
     assert abs(population_scale["x"] - population_scale["y"]) < 0.001
 
+    page.locator("#btnChartEffort").click()
+    page.wait_for_timeout(50)
+    assert "Esfuerzo fiscal" in (page.locator("#chart").get_attribute("aria-label") or "")
+    assert page.locator(".effortSeries").count() == 7
+    assert page.locator(".marginalRatePoint, .rateAxisTick").count() == 0
+
     page.locator("#btnChartLimits").click()
     page.locator('#modeButtons button[data-key="nominal"]').click()
     page.wait_for_timeout(50)
     assert page.locator(".fiscalSurfaceCell").count() > 0
-    assert page.locator(".rateHeatCell").count() > 0
+    assert page.locator(".marginalRatePoint").count() > 0
 
 
 def main() -> None:
@@ -291,6 +380,7 @@ def main() -> None:
             assert desktop.get_by_text("Secuencia de datos", exact=True).count() == 0
             assert desktop.locator('a[href="irpf_escala_estatal_1990-2025.xml"]').count() == 1
             check_dataset(desktop)
+            check_marginal_overlay(desktop)
             check_all_visual_modes(desktop)
             check_layout(desktop)
             desktop.locator("#chartBox").dispatch_event("mouseleave")
@@ -304,6 +394,7 @@ def main() -> None:
             mobile.locator('.fiscalSurfaceCell[data-year="2008"][data-tramo="4"]').wait_for()
             assert mobile.get_by_text("Secuencia de datos", exact=True).count() == 0
             check_dataset(mobile)
+            check_marginal_overlay(mobile)
             check_all_visual_modes(mobile)
             check_layout(mobile)
             mobile.locator("#chartBox").dispatch_event("mouseleave")
