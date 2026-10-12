@@ -366,6 +366,43 @@ def check_all_visual_modes(page: Page) -> None:
     assert page.locator(".marginalRatePoint").count() > 0
 
 
+def check_data_popup_toggle(page: Page) -> None:
+    button = page.locator("#btnDataPopup")
+    tooltip = page.locator("#tooltip")
+    assert button.inner_text() == "Datos: ON"
+    assert button.get_attribute("aria-pressed") == "true"
+
+    def move_inside_chart() -> None:
+        chart = page.locator("#chart")
+        chart.scroll_into_view_if_needed()
+        box = chart.bounding_box()
+        assert box
+        page.mouse.move(
+            box["x"] + (box["width"] * 0.55),
+            box["y"] + (box["height"] * 0.5),
+        )
+        page.wait_for_timeout(30)
+
+    move_inside_chart()
+    assert tooltip.is_visible()
+    button.click()
+    assert button.inner_text() == "Datos: OFF"
+    assert button.get_attribute("aria-pressed") == "false"
+    assert not tooltip.is_visible()
+
+    for mode_button in ("#btnChartLimits", "#btnChartPopulation", "#btnChartEffort"):
+        page.locator(mode_button).click()
+        move_inside_chart()
+        assert not tooltip.is_visible(), mode_button
+
+    button.click()
+    assert button.inner_text() == "Datos: ON"
+    move_inside_chart()
+    assert tooltip.is_visible()
+    page.locator("#btnChartLimits").click()
+    page.locator("#chartBox").dispatch_event("mouseleave")
+
+
 def main() -> None:
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
     server, url = serve_repo()
@@ -387,6 +424,7 @@ def main() -> None:
             check_dataset(desktop)
             check_marginal_overlay(desktop)
             check_all_visual_modes(desktop)
+            check_data_popup_toggle(desktop)
             check_layout(desktop)
             desktop.locator("#chartBox").dispatch_event("mouseleave")
             desktop.screenshot(
@@ -401,6 +439,7 @@ def main() -> None:
             check_dataset(mobile)
             check_marginal_overlay(mobile)
             check_all_visual_modes(mobile)
+            check_data_popup_toggle(mobile)
             check_layout(mobile)
             mobile.locator("#chartBox").dispatch_event("mouseleave")
             mobile.screenshot(
