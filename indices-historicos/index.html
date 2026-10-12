@@ -695,7 +695,7 @@
             <div class="label">Modo</div>
             <div class="modeRow" id="modeRow"></div>
             <div class="modeHint">Retorno total: precio y dividendos reinvertidos. El modo real descuenta el IPC.</div>
-            <div class="modeHint" id="germanyHint">Alemania: pico original de 1922–23; desde 1924 enlaza con 1921.</div>
+            <div class="modeHint" id="germanyHint">Alemania real: serie original continua, sin empalme.</div>
           </div>
 
           <div class="field">
@@ -757,7 +757,7 @@
       </div>
     </section>
   </main>
-<script src="series-data.js?v=20261012-4"></script>
+<script src="series-data.js?v=20261012-5"></script>
 <script src="long-run-indices-data.js?v=20260816-2"></script>
 <script>
     const DATA = window.NG_SERIES_DATA;
@@ -781,6 +781,7 @@
       seriesGrid: document.getElementById('seriesGrid'),
       chart: document.getElementById('chart'),
       chartMeta: document.getElementById('chartMeta'),
+      germanyHint: document.getElementById('germanyHint'),
       btnHoverFocus: document.getElementById('btnHoverFocus'),
       selectorMeta: document.getElementById('selectorMeta'),
       historicalControls: document.getElementById('historicalControls'),
@@ -902,7 +903,7 @@
           serie.color = '#00D5FF';
           serie.width = Math.max(Number(serie.width) || 2, 2.6);
         }
-        if(serie.sid === GERMANY_SID){
+        if(mode === 'nominal' && serie.sid === GERMANY_SID){
           const before = serie.points.filter(point => yearFromMs(point.t) <= GERMANY_PRE_INFLATION_YEAR);
           const inflation = serie.points.filter(point => {
             const year = yearFromMs(point.t);
@@ -1688,19 +1689,23 @@
         return;
       }
       const germanyVisible = activeSeries().some(serie => serie.sid === GERMANY_SID);
+      els.germanyHint.textContent = state.mode === 'nominal'
+        ? 'Alemania nominal: pico original de 1922–23; desde 1924 enlaza con 1921 (ilustrativo).'
+        : 'Alemania real: serie original continua, sin empalme.';
       const germanyMeta = germanyVisible
         ? (state.mode === 'nominal'
             ? ' · Alemania: pico 1923 fuera de escala; 1924 enlazado'
-            : ' · Alemania: pico 1923 original; 1924 enlazado')
+            : ' · Alemania: serie real original y continua')
         : '';
       els.chartMeta.textContent = state.metric === 'annual'
         ? `Variación interanual · Escala simétrica logarítmica${germanyMeta}`
         : `Base 1900 = 100 · Escala logarítmica${germanyMeta}`;
+      const germanyDescription = !germanyVisible ? '' : state.mode === 'nominal'
+        ? ' con el pico alemán original de 1922 y 1923, y el tramo posterior enlazado desde 1924'
+        : ' con la serie real alemana original y continua, incluida la caída de 1923 a 1924';
       els.chart.setAttribute(
         'aria-label',
-        state.metric === 'annual'
-          ? `Gráfico de rendimientos anuales${germanyVisible ? ' con el pico alemán original de 1922 y 1923, y el tramo posterior enlazado desde 1924' : ''}`
-          : `Gráfico de índices históricos${germanyVisible ? ' con el pico alemán original de 1922 y 1923, y el tramo posterior enlazado desde 1924' : ''}`
+        `${state.metric === 'annual' ? 'Gráfico de rendimientos anuales' : 'Gráfico de índices históricos'}${germanyDescription}`
       );
     }
 
