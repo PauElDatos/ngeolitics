@@ -695,7 +695,7 @@
             <div class="label">Modo</div>
             <div class="modeRow" id="modeRow"></div>
             <div class="modeHint">Retorno total: precio y dividendos reinvertidos. El modo real descuenta el IPC.</div>
-            <div class="modeHint" id="germanyHint">Alemania: 1922–23 omitidos. En 1924 enlaza con 1921; serie ilustrativa.</div>
+            <div class="modeHint" id="germanyHint">Alemania: pico original de 1922–23; desde 1924 enlaza con 1921.</div>
           </div>
 
           <div class="field">
@@ -757,7 +757,7 @@
       </div>
     </section>
   </main>
-<script src="series-data.js?v=20261012-3"></script>
+<script src="series-data.js?v=20261012-4"></script>
 <script src="long-run-indices-data.js?v=20260816-2"></script>
 <script>
     const DATA = window.NG_SERIES_DATA;
@@ -904,14 +904,19 @@
         }
         if(serie.sid === GERMANY_SID){
           const before = serie.points.filter(point => yearFromMs(point.t) <= GERMANY_PRE_INFLATION_YEAR);
+          const inflation = serie.points.filter(point => {
+            const year = yearFromMs(point.t);
+            return year > GERMANY_PRE_INFLATION_YEAR && year < GERMANY_POST_INFLATION_YEAR;
+          });
           const afterRaw = serie.points.filter(point => yearFromMs(point.t) >= GERMANY_POST_INFLATION_YEAR);
-          if(before.length && afterRaw.length){
+          if(before.length && inflation.length && afterRaw.length){
             const anchor = before[before.length - 1].v;
             const factor = anchor / afterRaw[0].v;
             const after = afterRaw.map(point => ({t: point.t, v: point.v * factor}));
-            serie.segments = [before, after];
+            serie.inflationPoints = inflation;
+            serie.segments = [before, [before[before.length - 1], ...inflation], after];
             serie.points = [...before, ...after];
-            serie.source += ' · Serie enlazada: 1922–1923 omitidos; 1924 igual al nivel de 1921';
+            serie.source += ' · Pico original en 1922–1923; desde 1924 serie enlazada al nivel de 1921';
           }
         }
       }
@@ -1078,7 +1083,8 @@
       if(!Number.isFinite(xMin)) return null;
       if(xMin === xMax) xMax += 24 * 3600 * 1000;
       const tx = (t) => margin.left + ((t - xMin) / (xMax - xMin)) * plotW;
-      const axis = verticalAxis(plotted, state.metric, margin, plotH);
+      const otherCountries = plotted.filter(({serie}) => serie.sid !== GERMANY_SID);
+      const axis = verticalAxis(otherCountries.length ? otherCountries : plotted, state.metric, margin, plotH);
       if(!axis) return null;
       return {
         active, plotted, margin, plotW, plotH, xMin, xMax, tx,
@@ -1336,6 +1342,12 @@
       const hoveredSid = state.hoverFocusMode ? hoveredSeriesId(tr) : null;
       const focusSid = state.focusSid || hoveredSid;
       state.hoverSid = focusSid;
+      const germany = active.find(serie => serie.sid === GERMANY_SID);
+      const inflationReturns = germany?.segments?.[1]
+        ? (state.metric === 'annual' ? annualReturns(germany.segments[1]) : germany.inflationPoints)
+        : [];
+      const inflationPeak = inflationReturns.reduce((peak, point) => !peak || point.v > peak.v ? point : peak, null);
+      const peakOutsideScale = inflationPeak && ty(inflationPeak.v) < margin.top;
 
       ctx.fillStyle = 'rgba(0,0,0,.12)';
       ctx.strokeStyle = 'rgba(255,255,255,.16)';
@@ -1424,7 +1436,7 @@
         ctx.fillText(String(year), x, plotBottom + 18);
       }
 
-      if(active.some(serie => serie.sid === GERMANY_SID)){
+      if(germany){
         const breakStart = tx(Date.UTC(1922, 0, 1));
         const breakEnd = tx(Date.UTC(GERMANY_POST_INFLATION_YEAR, 0, 1));
         const breakWidth = Math.max(2, breakEnd - breakStart);
@@ -1440,19 +1452,16 @@
         ctx.lineTo(breakEnd, plotBottom);
         ctx.stroke();
         ctx.setLineDash([]);
-        ctx.translate(breakStart + breakWidth / 2, margin.top + 10);
-        ctx.rotate(-Math.PI / 2);
-        ctx.fillStyle = 'rgba(0,213,255,.92)';
-        ctx.font = width < 620 ? '700 9px Arial' : '700 10px Arial';
-        ctx.textAlign = 'right';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('Hyperinflación Alemana de 1923', 0, 0);
         ctx.restore();
       }
 
       const drawQueue = focusSid
         ? [...plotted.filter(item => item.serie.sid !== focusSid), ...plotted.filter(item => item.serie.sid === focusSid)]
         : plotted;
+      ctx.save();
+      ctx.beginPath();
+      ctx.rect(margin.left, margin.top, plotW, plotH);
+      ctx.clip();
       for(const {serie, segments} of drawQueue){
         ctx.save();
         ctx.globalAlpha = focusSid && serie.sid !== focusSid ? .12 : 1;
@@ -1467,6 +1476,37 @@
           traceSmoothSeries(projected);
           ctx.stroke();
         }
+        ctx.restore();
+      }
+      ctx.restore();
+
+      if(peakOutsideScale){
+        const peakX = tx(inflationPeak.t);
+        ctx.save();
+        ctx.fillStyle = germany.color;
+        ctx.beginPath();
+        ctx.moveTo(peakX, margin.top + 2);
+        ctx.lineTo(peakX - 5, margin.top + 12);
+        ctx.lineTo(peakX + 5, margin.top + 12);
+        ctx.closePath();
+        ctx.fill();
+        ctx.restore();
+      }
+
+      if(germany){
+        const breakStart = tx(Date.UTC(1922, 0, 1));
+        const breakEnd = tx(Date.UTC(GERMANY_POST_INFLATION_YEAR, 0, 1));
+        ctx.save();
+        ctx.translate((breakStart + breakEnd) / 2, margin.top + (peakOutsideScale ? 27 : 10));
+        ctx.rotate(-Math.PI / 2);
+        ctx.font = width < 620 ? '700 9px Arial' : '700 10px Arial';
+        ctx.textAlign = 'right';
+        ctx.textBaseline = 'middle';
+        ctx.strokeStyle = '#252525';
+        ctx.lineWidth = 3;
+        ctx.strokeText('Hyperinflación Alemana de 1923', 0, 0);
+        ctx.fillStyle = 'rgba(0,213,255,.96)';
+        ctx.fillText('Hyperinflación Alemana de 1923', 0, 0);
         ctx.restore();
       }
 
@@ -1648,14 +1688,19 @@
         return;
       }
       const germanyVisible = activeSeries().some(serie => serie.sid === GERMANY_SID);
+      const germanyMeta = germanyVisible
+        ? (state.mode === 'nominal'
+            ? ' · Alemania: pico 1923 fuera de escala; 1924 enlazado'
+            : ' · Alemania: pico 1923 original; 1924 enlazado')
+        : '';
       els.chartMeta.textContent = state.metric === 'annual'
-        ? `Variación interanual · Escala simétrica logarítmica${germanyVisible ? ' · Alemania: 1922–1924 omitidos' : ''}`
-        : `Base 1900 = 100 · Escala logarítmica${germanyVisible ? ' · Alemania: enlace 1921→1924' : ''}`;
+        ? `Variación interanual · Escala simétrica logarítmica${germanyMeta}`
+        : `Base 1900 = 100 · Escala logarítmica${germanyMeta}`;
       els.chart.setAttribute(
         'aria-label',
         state.metric === 'annual'
-          ? `Gráfico de rendimientos anuales${germanyVisible ? ' con la serie alemana interrumpida entre 1921 y 1924' : ''}`
-          : `Gráfico de índices históricos${germanyVisible ? ' con la serie alemana enlazada de 1921 a 1924' : ''}`
+          ? `Gráfico de rendimientos anuales${germanyVisible ? ' con el pico alemán original de 1922 y 1923, y el tramo posterior enlazado desde 1924' : ''}`
+          : `Gráfico de índices históricos${germanyVisible ? ' con el pico alemán original de 1922 y 1923, y el tramo posterior enlazado desde 1924' : ''}`
       );
     }
 
