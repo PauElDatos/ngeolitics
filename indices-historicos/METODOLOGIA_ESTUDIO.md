@@ -1,6 +1,6 @@
 # Estudio de mercados y cambios de hegemonía — metodología
 
-Actualizado: 2026-08-16
+Actualizado: 2026-10-12
 
 ## Pregunta
 
@@ -39,7 +39,9 @@ Variables:
 
 En el gráfico «Índices históricos», los modos nominal y real usan `eq_tr` para todos los países JST, con los dividendos reinvertidos. El modo nominal acumula ese retorno; el modo real aplica además el IPC del país. Así, entre ambos modos solo cambia el ajuste por inflación. Las series nominales de precio (`eq_capgain`) no se comparan con las series reales de retorno total.
 
-La hiperinflación alemana se conserva íntegramente en la serie nominal, incluido 1923. Para evitar que su magnitud comprima visualmente al resto de países, Alemania usa el eje derecho cuando se muestra junto a otras series; el resto usa el eje izquierdo. Ambos índices mantienen base 1900 = 100. El eje separado es una decisión gráfica y no rebasa ni corta la rentabilidad alemana.
+En el gráfico histórico, Alemania usa una **serie empalmada** para que la hiperinflación permanezca visible como hueco temporal sin dominar la escala. El último dato anterior al episodio es 1921; se omiten los retornos de 1922 y 1923, y 1924 se fija al valor de 1921. El retorno anual de 1924 tampoco se representa, pues 1924 es el nuevo punto de referencia. Desde 1925 se aplican las variaciones originales a partir del valor de 1924: `I_t,enlazado = I_1921 × (I_t,JST / I_1924,JST)` para `t ≥ 1924`. La línea se interrumpe entre 1921 y 1924, y todos los países comparten el eje izquierdo. Se aplica el mismo intervalo a los modos nominal y real. El índice alemán comienza en 100 en 1900, pero sus valores posteriores a 1924 **no representan la rentabilidad acumulada íntegra de una inversión desde 1900**; los datos JST originales se conservan en `series-data.js`.
+
+El BCE sitúa el inicio de la hiperinflación a mediados de 1922: https://www.ecb.europa.eu/press/key/date/2008/html/sp080620_1.de.html
 
 Identidad utilizada para el índice nominal de retorno total:
 
