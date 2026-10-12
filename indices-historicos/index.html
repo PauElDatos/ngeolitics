@@ -756,7 +756,7 @@
       </div>
     </section>
   </main>
-<script src="series-data.js"></script>
+<script src="series-data.js?v=20261012-2"></script>
 <script src="long-run-indices-data.js?v=20260816-2"></script>
 <script>
     const DATA = window.NG_SERIES_DATA;
@@ -979,18 +979,7 @@
     }
 
     function cumulativeSegments(serie){
-      if(state.mode !== 'nominal' || serie.sid !== GERMANY_SID){
-        return [serie.points];
-      }
-
-      const beforeBreak = serie.points.filter(point => yearFromMs(point.t) <= 1922);
-      const afterBreakRaw = serie.points.filter(point => yearFromMs(point.t) >= 1924);
-      const postBreakBase = afterBreakRaw[0]?.v;
-      const afterBreak = Number.isFinite(postBreakBase) && postBreakBase > 0
-        ? afterBreakRaw.map(point => ({t: point.t, v: (point.v / postBreakBase) * 100}))
-        : [];
-
-      return [beforeBreak, afterBreak].filter(segment => segment.length > 0);
+      return [serie.points];
     }
 
     function annualReturns(points){
@@ -1023,36 +1012,16 @@
       return `${value.toLocaleString('es-ES', {maximumFractionDigits: 0})}%`;
     }
 
-    function computeTransform(width, height){
-      const active = activeSeries();
-      if(active.length === 0) return null;
-      const plotted = active.map(serie => ({serie, segments: plotSegments(serie)}));
-      const margin = {
-        left: width < 620 ? (state.metric === 'annual' ? 82 : 58) : 88,
-        right: width < 620 ? 18 : 34,
-        top: width < 620 ? 50 : 52,
-        bottom: width < 620 ? 72 : 96
-      };
-      const plotW = Math.max(1, width - margin.left - margin.right);
-      const plotH = Math.max(1, height - margin.top - margin.bottom);
-      let xMin = Infinity, xMax = -Infinity, yMin = Infinity, yMax = -Infinity;
-      for(const {serie, segments} of plotted){
-        for(const point of serie.points){
-          xMin = Math.min(xMin, point.t);
-          xMax = Math.max(xMax, point.t);
-        }
-        for(const segment of segments){
-          for(const point of segment){
-            yMin = Math.min(yMin, point.v);
-            yMax = Math.max(yMax, point.v);
-          }
-        }
-      }
-      if(!Number.isFinite(xMin) || !Number.isFinite(yMin)) return null;
-      if(xMin === xMax) xMax += 24 * 3600 * 1000;
-      const tx = (t) => margin.left + ((t - xMin) / (xMax - xMin)) * plotW;
+    function axisValues(plotted){
+      return plotted.flatMap(({segments}) => segments.flatMap(segment => segment.map(point => point.v)));
+    }
 
-      if(state.metric === 'annual'){
+    function verticalAxis(plotted, metric, margin, plotH){
+      const values = axisValues(plotted).filter(Number.isFinite);
+      if(!values.length) return null;
+      const yMin = Math.min(...values);
+      const yMax = Math.max(...values);
+      if(metric === 'annual'){
         let transformedMin = symlog(yMin);
         let transformedMax = symlog(yMax);
         const transformedSpan = Math.max(.25, transformedMax - transformedMin);
@@ -1061,14 +1030,73 @@
         transformedMax += padding;
         const span = transformedMax - transformedMin;
         const ty = (value) => margin.top + (1 - ((symlog(value) - transformedMin) / span)) * plotH;
-        return {active, plotted, scale: 'symlog', margin, plotW, plotH, xMin, xMax, yMin, yMax, tx, ty};
+        return {scale: 'symlog', yMin, yMax, ty};
       }
-
-      const logMin = Math.floor(Math.log10(yMin));
-      const logMax = Math.ceil(Math.log10(yMax));
+      const positive = values.filter(value => value > 0);
+      if(!positive.length) return null;
+      const logMin = Math.floor(Math.log10(Math.min(...positive)));
+      const logMax = Math.ceil(Math.log10(Math.max(...positive)));
       const logSpan = Math.max(1, logMax - logMin);
       const ty = (value) => margin.top + (1 - ((Math.log10(value) - logMin) / logSpan)) * plotH;
-      return {active, plotted, scale: 'log', margin, plotW, plotH, xMin, xMax, yMin, yMax, logMin, logMax: logMin + logSpan, tx, ty};
+      return {scale: 'log', yMin, yMax, logMin, logMax: logMin + logSpan, ty};
+    }
+
+    function germanAnnualTicks(axis){
+      const ticks = [0, 10, 100];
+      const maxMagnitude = Math.max(Math.abs(axis.yMin), Math.abs(axis.yMax));
+      const maxExponent = Math.ceil(Math.log10(Math.max(100, maxMagnitude)));
+      for(let exponent = 4; exponent <= maxExponent; exponent += 2) ticks.push(10 ** exponent);
+      if(axis.yMin < 0){
+        ticks.push(-10, -100);
+        for(let exponent = 4; exponent <= maxExponent; exponent += 2) ticks.push(-(10 ** exponent));
+      }
+      return [...new Set(ticks)].filter(value => value >= axis.yMin && value <= axis.yMax).sort((a,b) => a - b);
+    }
+
+    function formatGermanAnnualTick(value){
+      if(Math.abs(value) < 10000) return formatAnnualTick(value);
+      const sign = value < 0 ? '−' : '';
+      return `${sign}10^${Math.round(Math.log10(Math.abs(value)))}%`;
+    }
+
+    function computeTransform(width, height){
+      const active = activeSeries();
+      if(active.length === 0) return null;
+      const plotted = active.map(serie => ({serie, segments: plotSegments(serie)}));
+      const germanyOwnScale = state.mode === 'nominal'
+        && active.some(serie => serie.sid === GERMANY_SID)
+        && active.some(serie => serie.sid !== GERMANY_SID);
+      const margin = {
+        left: width < 620 ? (state.metric === 'annual' ? 82 : 58) : 88,
+        right: germanyOwnScale ? (width < 620 ? 100 : 126) : (width < 620 ? 18 : 34),
+        top: width < 620 ? 50 : 52,
+        bottom: width < 620 ? 72 : 96
+      };
+      const plotW = Math.max(1, width - margin.left - margin.right);
+      const plotH = Math.max(1, height - margin.top - margin.bottom);
+      let xMin = Infinity, xMax = -Infinity;
+      for(const {serie, segments} of plotted){
+        for(const point of serie.points){
+          xMin = Math.min(xMin, point.t);
+          xMax = Math.max(xMax, point.t);
+        }
+      }
+      if(!Number.isFinite(xMin)) return null;
+      if(xMin === xMax) xMax += 24 * 3600 * 1000;
+      const tx = (t) => margin.left + ((t - xMin) / (xMax - xMin)) * plotW;
+      const leftPlotted = germanyOwnScale ? plotted.filter(({serie}) => serie.sid !== GERMANY_SID) : plotted;
+      const germanyPlotted = germanyOwnScale ? plotted.filter(({serie}) => serie.sid === GERMANY_SID) : [];
+      const leftAxis = verticalAxis(leftPlotted, state.metric, margin, plotH);
+      const germanyAxis = germanyOwnScale ? verticalAxis(germanyPlotted, state.metric, margin, plotH) : null;
+      if(!leftAxis) return null;
+      return {
+        active, plotted, margin, plotW, plotH, xMin, xMax, tx,
+        scale: leftAxis.scale,
+        logMin: leftAxis.logMin,
+        logMax: leftAxis.logMax,
+        ty: leftAxis.ty,
+        germanyAxis
+      };
     }
 
     function resizeCanvas(){
@@ -1312,7 +1340,7 @@
         if(els.status) els.status.textContent = 'Sin series visibles';
         return;
       }
-      const {margin, plotW, plotH, xMin, xMax, logMin, logMax, tx, ty, active, plotted, scale} = tr;
+      const {margin, plotW, plotH, xMin, xMax, logMin, logMax, tx, ty, active, plotted, scale, germanyAxis} = tr;
       const plotRight = width - margin.right;
       const plotBottom = height - margin.bottom;
       const hoveredSid = state.hoverFocusMode ? hoveredSeriesId(tr) : null;
@@ -1388,6 +1416,36 @@
         }
       }
 
+      if(germanyAxis){
+        ctx.save();
+        ctx.strokeStyle = 'rgba(0,213,255,.78)';
+        ctx.fillStyle = 'rgba(0,213,255,.96)';
+        ctx.lineWidth = 1.4;
+        ctx.beginPath();
+        ctx.moveTo(plotRight, margin.top);
+        ctx.lineTo(plotRight, plotBottom);
+        ctx.stroke();
+        ctx.font = width < 620 ? '10px Menlo, Consolas, monospace' : '12px Menlo, Consolas, monospace';
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        const rightTicks = germanyAxis.scale === 'log'
+          ? Array.from({length: germanyAxis.logMax - germanyAxis.logMin + 1}, (_, index) => ({
+              value: 10 ** (germanyAxis.logMin + index),
+              label: `10^${germanyAxis.logMin + index}`
+            }))
+          : germanAnnualTicks(germanyAxis).map(value => ({value, label: formatGermanAnnualTick(value)}));
+        for(const tick of rightTicks){
+          const y = germanyAxis.ty(tick.value);
+          if(y < margin.top - 1 || y > plotBottom + 1) continue;
+          ctx.beginPath();
+          ctx.moveTo(plotRight, y);
+          ctx.lineTo(plotRight + 6, y);
+          ctx.stroke();
+          ctx.fillText(tick.label, plotRight + 10, y);
+        }
+        ctx.restore();
+      }
+
       const firstYear = yearFromMs(xMin);
       const lastYear = yearFromMs(xMax);
       const step = (lastYear - firstYear > 180) ? 50 : 25;
@@ -1438,8 +1496,9 @@
       for(const {serie, segments} of drawQueue){
         ctx.save();
         ctx.globalAlpha = focusSid && serie.sid !== focusSid ? .12 : 1;
+        const seriesTy = germanyAxis && serie.sid === GERMANY_SID ? germanyAxis.ty : ty;
         for(const points of segments){
-          const projected = projectedSeriesPoints(points, tx, ty);
+          const projected = projectedSeriesPoints(points, tx, seriesTy);
           if(projected.length < 2) continue;
           ctx.beginPath();
           ctx.strokeStyle = serie.color;
@@ -1488,8 +1547,30 @@
       ctx.fillStyle = '#e3e3e3';
       ctx.font = '700 13px Arial';
       ctx.textAlign = 'center';
-      ctx.fillText(state.metric === 'annual' ? 'Rendimiento anual (%)' : 'Valor (log10)', 0, 0);
+      ctx.fillText(
+        state.metric === 'annual'
+          ? (germanyAxis ? 'Resto de países · Rendimiento anual (%)' : 'Rendimiento anual (%)')
+          : (germanyAxis ? 'Resto de países · Valor (log10)' : 'Valor (log10)'),
+        0,
+        0
+      );
       ctx.restore();
+
+      if(germanyAxis){
+        ctx.save();
+        ctx.translate(width - (width < 620 ? 10 : 16), margin.top + plotH / 2);
+        ctx.rotate(Math.PI / 2);
+        ctx.fillStyle = '#00D5FF';
+        ctx.font = width < 620 ? '700 10px Arial' : '700 13px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(
+          state.metric === 'annual' ? 'Alemania · Rendimiento anual (%)' : 'Alemania · Valor nominal (log10)',
+          0,
+          0
+        );
+        ctx.restore();
+      }
 
       if(state.hover){ updateHoverStatus(tr); }
       else updateSummaryStatus();
@@ -1539,7 +1620,7 @@
 
     function hoveredSeriesId(transform){
       if(!state.hover) return null;
-      const {margin, plotW, plotH, xMin, xMax, plotted, tx, ty} = transform;
+      const {margin, plotW, plotH, xMin, xMax, plotted, tx, ty, germanyAxis} = transform;
       if(
         state.hover.x < margin.left || state.hover.x > margin.left + plotW ||
         state.hover.y < margin.top || state.hover.y > margin.top + plotH
@@ -1549,7 +1630,8 @@
       let bestSid = null;
       let bestDistance = Infinity;
       for(const {serie, segments} of plotted){
-        const y = interpolatedSeriesY(segments, target, tx, ty);
+        const seriesTy = germanyAxis && serie.sid === GERMANY_SID ? germanyAxis.ty : ty;
+        const y = interpolatedSeriesY(segments, target, tx, seriesTy);
         if(y === null) continue;
         const distance = Math.abs(y - state.hover.y);
         if(distance < bestDistance){
@@ -1629,12 +1711,17 @@
         els.chart.setAttribute('aria-label', 'Comparación de los índices de precio del Reino Unido y Estados Unidos entre 1801 y 2026');
         return;
       }
+      const dualScale = state.mode === 'nominal'
+        && activeSeries().some(serie => serie.sid === GERMANY_SID)
+        && activeSeries().some(serie => serie.sid !== GERMANY_SID);
       els.chartMeta.textContent = state.metric === 'annual'
-        ? 'Variación interanual · Escala simétrica logarítmica'
-        : 'Base 1900 = 100 · Escala logarítmica';
+        ? `Variación interanual · Escala simétrica logarítmica${dualScale ? ' · Alemania: eje derecho' : ''}`
+        : `Base 1900 = 100 · Escala logarítmica${dualScale ? ' · Alemania: eje derecho' : ''}`;
       els.chart.setAttribute(
         'aria-label',
-        state.metric === 'annual' ? 'Gráfico de rendimientos anuales' : 'Gráfico de índices históricos'
+        state.metric === 'annual'
+          ? `Gráfico de rendimientos anuales${dualScale ? ' con eje derecho para Alemania' : ''}`
+          : `Gráfico de índices históricos${dualScale ? ' con eje derecho para Alemania' : ''}`
       );
     }
 
