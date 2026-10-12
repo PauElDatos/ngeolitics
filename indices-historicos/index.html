@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>N.Geolitics — Índices históricos</title>
-<meta content="Índices históricos de precio y retorno real, base 1900=100." name="description"/>
+<meta content="Índices históricos de retorno total nominal y real, con dividendos reinvertidos, base 1900=100." name="description"/>
 <link href="../assets/faviconNG.png" rel="icon"/>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
@@ -526,6 +526,11 @@
       color: rgba(0,0,0,.92);
       font-weight: 700;
     }
+    .modeHint {
+      color: var(--muted);
+      font-size: calc(11px * var(--uiScale));
+      line-height: 1.4;
+    }
     .seriesGrid {
       display: flex;
       flex-direction: column;
@@ -689,6 +694,7 @@
           <div class="field">
             <div class="label">Modo</div>
             <div class="modeRow" id="modeRow"></div>
+            <div class="modeHint">Retorno total: precio y dividendos reinvertidos. El modo real descuenta el IPC.</div>
           </div>
 
           <div class="field">
@@ -1400,7 +1406,7 @@
         ctx.fillText(String(year), x, plotBottom + 18);
       }
 
-      if(state.mode === 'nominal' && active.some(serie => serie.sid === GERMANY_SID)){
+      if(active.some(serie => serie.sid === GERMANY_SID)){
         const breakStart = tx(Date.UTC(1923, 0, 1));
         const breakEnd = tx(Date.UTC(1924, 0, 1));
         const breakWidth = Math.max(2, breakEnd - breakStart);
@@ -1587,7 +1593,7 @@
         const lastYear = Math.max(...points.map(p => yearFromMs(p.t)));
         const latest = active.map(s => ({s, p:s.points[s.points.length - 1], cg:cagr(s.points)})).sort((a,b) => b.p.v - a.p.v)[0];
         const fastest = active.map(s => ({s, p:s.points[s.points.length - 1], cg:cagr(s.points)})).sort((a,b) => b.cg - a.cg)[0];
-        cards.push(['Series activas', String(active.length), state.mode === 'real' ? 'JST en retorno total real.' : 'JST en precio nominal.']);
+        cards.push(['Series activas', String(active.length), state.mode === 'real' ? 'JST en retorno total real, con dividendos reinvertidos.' : 'JST en retorno total nominal, con dividendos reinvertidos.']);
         cards.push(['Periodo visible', `${firstYear}–${lastYear}`, 'Rango mínimo y máximo entre las series seleccionadas.']);
         cards.push(['Mayor último valor', formatValue(latest.p.v), latest.s.name]);
         cards.push(['Mayor CAGR', formatPct(fastest.cg), fastest.s.name]);

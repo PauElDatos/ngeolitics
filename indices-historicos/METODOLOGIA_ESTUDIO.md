@@ -37,6 +37,8 @@ Variables:
 - `eq_tr`: retorno total anual;
 - `cpi`: IPC.
 
+En el gráfico «Índices históricos», los modos nominal y real usan `eq_tr` para todos los países JST, con los dividendos reinvertidos. El modo nominal acumula ese retorno; el modo real aplica además el IPC del país. Así, entre ambos modos solo cambia el ajuste por inflación. Las series nominales de precio (`eq_capgain`) no se comparan con las series reales de retorno total.
+
 Identidad utilizada para el índice nominal de retorno total:
 
 `TR_t = TR_(t-1) × (1 + eq_tr_t)`
