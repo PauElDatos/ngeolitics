@@ -478,6 +478,51 @@
       gap: 10px;
     }
     .chartControls .btn { white-space: nowrap; }
+    .fiscalEncodingKeyBelow {
+      display: flex;
+      flex: 0 0 auto;
+      align-items: center;
+      gap: 12px 28px;
+      flex-wrap: wrap;
+      padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 8px;
+      background: rgba(15,15,15,.45);
+      color: #eeeeee;
+      font-size: calc(10px * var(--uiScale));
+      font-weight: 700;
+      line-height: 1.2;
+    }
+    .encodingKeyItem {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+    }
+    .encodingStripes {
+      display: inline-flex;
+      overflow: hidden;
+      width: 36px;
+      height: 12px;
+      border-radius: 2px;
+    }
+    .encodingStripes i { flex: 1 1 0; }
+    .encodingLinePoint {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      border-top: 2px solid #f0f0f0;
+    }
+    .encodingLinePoint::after {
+      content: '';
+      position: absolute;
+      left: 17px;
+      top: -5px;
+      width: 7px;
+      height: 7px;
+      border: 1px solid #151515;
+      border-radius: 50%;
+      background: #f0f0f0;
+    }
     .chartNotes {
       display: flex;
       flex: 0 0 auto;
@@ -538,14 +583,19 @@
       }
       .panelMeta { text-align: left; }
       .chartPanel {
-        height: 750px;
-        min-height: 750px;
+        height: 810px;
+        min-height: 810px;
       }
       .chartBox { min-height: 440px; }
       .chartControls .btn {
         flex: 1 1 calc(50% - 5px);
         width: auto;
         white-space: normal;
+      }
+      .fiscalEncodingKeyBelow {
+        gap: 8px 16px;
+        padding: 7px 9px;
+        font-size: calc(9px * var(--uiScale));
       }
       .chartNotes { flex-direction: column; }
       .tooltip { min-width: min(290px, calc(100vw - 64px)); }
@@ -634,6 +684,8 @@
           <svg id="chart" viewBox="0 0 1600 760" preserveAspectRatio="xMidYMid meet" aria-label="Gráfica de tramos del IRPF"></svg>
           <div class="tooltip" id="tooltip"></div>
         </div>
+
+        <div class="fiscalEncodingKeyBelow" id="fiscalEncodingKeyBelow" aria-label="Clave visual del mapa fiscal"></div>
 
         <div class="chartControls" aria-label="Controles del gráfico">
           <button class="btn active" id="btnPolitics" type="button" aria-pressed="true">Políticos: ON</button>
@@ -797,6 +849,7 @@
     const seriesLegend = document.getElementById('seriesLegend');
     const btnPolitics = document.getElementById('btnPolitics');
     const btnDataPopup = document.getElementById('btnDataPopup');
+    const fiscalEncodingKeyBelow = document.getElementById('fiscalEncodingKeyBelow');
     const rateEncodingNote = document.getElementById('rateEncodingNote');
     const btnChartLimits = document.getElementById('btnChartLimits');
     const btnChartPopulation = document.getElementById('btnChartPopulation');
@@ -808,6 +861,16 @@
     const sourceFooter = document.getElementById('sourceFooter');
     const explanationContent = document.getElementById('explanationContent');
     const chartPanel = document.querySelector('.chartPanel');
+
+    fiscalEncodingKeyBelow.innerHTML = `
+      <span class="encodingKeyItem">
+        <span class="encodingStripes" aria-hidden="true">${[1, 3, 5, 7].map(index => `<i style="background:${getColor(index)}"></i>`).join('')}</span>
+        <span>Franjas de color = tramos y límites (€)</span>
+      </span>
+      <span class="encodingKeyItem">
+        <span class="encodingLinePoint" aria-hidden="true"></span>
+        <span>Líneas con puntos = tipo marginal (%)</span>
+      </span>`;
 
     function money(value, digits = 0) {
       if (!Number.isFinite(value)) return '—';
@@ -1568,6 +1631,7 @@
       scaleField.classList.toggle('isHidden', !showLimits);
       effortMetricField.classList.toggle('isHidden', !showEffort);
       effortScopeField.classList.toggle('isHidden', !showEffort);
+      fiscalEncodingKeyBelow.classList.toggle('isHidden', !showLimits);
       chartPanel.classList.toggle('populationMode', !showLimits);
       document.body.classList.toggle('populationChartMode', !showLimits);
     }

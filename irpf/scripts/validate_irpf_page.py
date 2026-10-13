@@ -91,6 +91,11 @@ def check_dataset(page: Page) -> None:
     assert page.locator('.fiscalAxisTick[data-value="1000000"]').count() == 0
     assert "LÍMITES DE LOS TRAMOS (€)" in (page.locator(".fiscalAxisTitle").text_content() or "")
     assert page.locator(".fiscalEncodingKey").count() == 0
+    encoding_key = page.locator("#fiscalEncodingKeyBelow")
+    assert encoding_key.is_visible()
+    encoding_text = normalized_text(encoding_key.inner_text())
+    assert "Franjas de color = tramos y límites (€)" in encoding_text
+    assert "Líneas con puntos = tipo marginal (%)" in encoding_text
     assert page.locator(".limitSeries, .openBracketPoint").count() == 0
     assert page.locator('.marginalRatePoint[data-year="2007"][data-tramo="4"]').count() == 1
     assert page.locator('.marginalRatePoint[data-year="2007"][data-tramo="5"]').count() == 0
@@ -337,6 +342,7 @@ def check_all_visual_modes(page: Page) -> None:
 
     page.locator("#btnChartPopulation").click()
     page.wait_for_timeout(50)
+    assert not page.locator("#fiscalEncodingKeyBelow").is_visible()
     assert "población adulta" in (page.locator("#chart").get_attribute("aria-label") or "")
     assert page.locator("#chart").bounding_box()["width"] > 250
     assert page.locator(".marginalRatePoint, .rateAxisTick").count() == 0
@@ -357,11 +363,13 @@ def check_all_visual_modes(page: Page) -> None:
 
     page.locator("#btnChartEffort").click()
     page.wait_for_timeout(50)
+    assert not page.locator("#fiscalEncodingKeyBelow").is_visible()
     assert "Esfuerzo fiscal" in (page.locator("#chart").get_attribute("aria-label") or "")
     assert page.locator(".effortSeries").count() == 7
     assert page.locator(".marginalRatePoint, .rateAxisTick").count() == 0
 
     page.locator("#btnChartLimits").click()
+    assert page.locator("#fiscalEncodingKeyBelow").is_visible()
     page.locator('#modeButtons button[data-key="nominal"]').click()
     page.wait_for_timeout(50)
     assert page.locator(".fiscalSurfaceCell").count() > 0
