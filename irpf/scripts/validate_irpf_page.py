@@ -89,6 +89,11 @@ def check_dataset(page: Page) -> None:
     assert surface_tramos == list(range(1, 19))
     assert page.locator('.fiscalAxisTick[data-value="500000"]').count() == 1
     assert page.locator('.fiscalAxisTick[data-value="1000000"]').count() == 0
+    assert "LÍMITES DE LOS TRAMOS (€)" in (page.locator(".fiscalAxisTitle").text_content() or "")
+    assert page.locator(".fiscalEncodingKey").count() == 1
+    encoding_key = normalized_text(page.locator(".fiscalEncodingKey").text_content() or "")
+    assert "FRANJAS" in encoding_key and "TRAMOS" in encoding_key
+    assert "LÍNEAS" in encoding_key and "TIPO MARGINAL" in encoding_key
     assert page.locator(".limitSeries, .openBracketPoint").count() == 0
     assert page.locator('.marginalRatePoint[data-year="2007"][data-tramo="4"]').count() == 1
     assert page.locator('.marginalRatePoint[data-year="2007"][data-tramo="5"]').count() == 0

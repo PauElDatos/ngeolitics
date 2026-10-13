@@ -1850,6 +1850,31 @@
       return axis + lines + '</g>';
     }
 
+    function buildFiscalEncodingKey(plot, compact) {
+      const x = plot.x + (compact ? 7 : 12);
+      const y = plot.y + (compact ? 7 : 10);
+      const width = compact ? Math.min(plot.w - 14, 360) : Math.min(plot.w - 24, 530);
+      const height = compact ? 54 : 32;
+      const fontSize = compact ? 15 : 11;
+      const firstY = y + (compact ? 19 : 21);
+      const secondY = compact ? y + 41 : firstY;
+      const stripeX = x + 11;
+      const stripeY = firstY - (compact ? 11 : 9);
+      const stripeWidth = compact ? 8 : 7;
+      let key = `<g class="fiscalEncodingKey" aria-label="Clave visual del gráfico">`;
+      key += `<rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${compact ? 8 : 6}" fill="rgba(15,15,15,.84)" stroke="rgba(255,255,255,.26)" stroke-width="1"></rect>`;
+      [1, 3, 5, 7].forEach((tramo, index) => {
+        key += `<rect x="${stripeX + (index * stripeWidth)}" y="${stripeY}" width="${stripeWidth}" height="${compact ? 12 : 10}" fill="${getColor(tramo)}"></rect>`;
+      });
+      key += `<text x="${stripeX + (stripeWidth * 4) + 8}" y="${firstY}" fill="#f0f0f0" font-size="${fontSize}" font-weight="700">${compact ? 'FRANJAS = TRAMOS (€)' : 'FRANJAS DE COLOR = TRAMOS Y LÍMITES (€)'}</text>`;
+      const lineX = compact ? stripeX : x + 322;
+      const lineY = compact ? secondY - 5 : firstY - 4;
+      key += `<line x1="${lineX}" y1="${lineY}" x2="${lineX + (compact ? 34 : 38)}" y2="${lineY}" stroke="#f0f0f0" stroke-width="2.4"></line>`;
+      key += `<circle cx="${lineX + (compact ? 17 : 19)}" cy="${lineY}" r="3.2" fill="#f0f0f0" stroke="#151515" stroke-width="1"></circle>`;
+      key += `<text x="${lineX + (compact ? 43 : 47)}" y="${secondY}" fill="#f0f0f0" font-size="${fontSize}" font-weight="700">${compact ? 'LÍNEAS = TIPO MARGINAL (%)' : 'LÍNEAS CON PUNTOS = TIPO MARGINAL (%)'}</text>`;
+      return key + '</g>';
+    }
+
     function renderFiscalMap() {
       const { width, height, plot, compact } = getChartGeometry();
       const minYear = Math.min(...YEARS);
@@ -1931,6 +1956,9 @@
         out += `<line x1="${plot.x}" y1="${yy}" x2="${plot.x + plot.w}" y2="${yy}" stroke="rgba(0,0,0,.30)" stroke-width="1"></line>`;
         out += `<text class="fiscalAxisTick" data-value="${v}" x="${plot.x - 12}" y="${yy + (compact ? 7 : 4)}" text-anchor="end" fill="#d4d4d4" font-size="${axisFont}">${axisTickLabel(v)}</text>`;
       });
+      const leftTitleX = compact ? 21 : 17;
+      const leftTitleY = plot.y + (plot.h / 2);
+      out += `<text class="fiscalAxisTitle" x="${leftTitleX}" y="${leftTitleY}" transform="rotate(-90 ${leftTitleX} ${leftTitleY})" text-anchor="middle" fill="#e3e3e3" font-size="${compact ? 15 : 12}" font-weight="700">LÍMITES DE LOS TRAMOS (€) · ${state.scaleMode === 'log' ? 'LOG' : 'LINEAL'}</text>`;
 
       const approxLabelCount = compact ? 8 : YEARS.length;
       const step = Math.max(1, Math.ceil(YEARS.length / approxLabelCount));
@@ -1980,6 +2008,8 @@
         const hoverX = xEdge(state.hoverYear);
         out += `<rect class="hoverYearColumn" data-year="${state.hoverYear}" x="${hoverX}" y="${plot.y}" width="${bandWidth}" height="${plot.h}" fill="rgba(254,247,2,.05)" stroke="rgba(254,247,2,.85)" stroke-width="${compact ? 2.2 : 1.4}"></rect>`;
       }
+
+      out += buildFiscalEncodingKey(plot, compact);
 
       out += `<text x="${plot.x}" y="${compact ? 24 : 18}" fill="#FEF702" font-size="${titleFont}" font-weight="700">${compact ? 'IRPF · tramos y tipos marginales' : 'Mapa fiscal del IRPF: intervalos y fronteras de los tramos'}</text>`;
       if (!compact) {
