@@ -383,6 +383,21 @@
       font-size: calc(12px * var(--uiScale));
       line-height: 1.2;
     }
+    .legendItemText {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .legendChange {
+      color: var(--muted);
+      font-size: calc(9px * var(--uiScale));
+      font-weight: 700;
+      line-height: 1.15;
+    }
+    .legendChange.isUp { color: #76df8a; }
+    .legendChange.isDown { color: #ff8585; }
+    .legendChange.isFlat { color: #bdbdbd; }
     button.legendItem {
       width: 100%;
       color: inherit;
@@ -1478,6 +1493,45 @@
     const EFFORT_DATA = buildEffortRecords();
     const EFFORT_YEAR_MAP = new Map(EFFORT_DATA.map(d => [d.year, d]));
 
+    function effortLegendChange(groupKey) {
+      const firstRecord = EFFORT_DATA[0];
+      const lastRecord = EFFORT_DATA[EFFORT_DATA.length - 1];
+      const firstGroup = firstRecord?.groups.find(group => group.key === groupKey);
+      const lastGroup = lastRecord?.groups.find(group => group.key === groupKey);
+      const startValue = firstGroup ? effortGroupMetric(firstGroup) : NaN;
+      const endValue = lastGroup ? effortGroupMetric(lastGroup) : NaN;
+      const period = `${firstRecord?.year ?? ''}\u2013${lastRecord?.year ?? ''}`;
+
+      if (!Number.isFinite(startValue) || !Number.isFinite(endValue)) {
+        return { className: 'isFlat', text: `${period} \u00b7 sin datos`, startValue, endValue, change: NaN };
+      }
+
+      const delta = endValue - startValue;
+      const direction = delta > 1e-9 ? 'isUp' : delta < -1e-9 ? 'isDown' : 'isFlat';
+      const marker = direction === 'isUp' ? '\u25b2' : direction === 'isDown' ? '\u25bc' : '\u2022';
+      const formatNumber = value => new Intl.NumberFormat('es-ES', {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }).format(Math.abs(value));
+      const sign = delta > 1e-9 ? '+' : delta < -1e-9 ? '\u2212' : '';
+
+      if (Math.abs(startValue) < 1e-9) {
+        const pointChange = Math.abs(delta) < 1e-9
+          ? '0,0 %'
+          : `${sign}${new Intl.NumberFormat('es-ES', { minimumFractionDigits: 1, maximumFractionDigits: 3 }).format(Math.abs(delta))} pp`;
+        return { className: direction, text: `${period} \u00b7 ${marker} ${pointChange}`, startValue, endValue, change: delta };
+      }
+
+      const relativeChange = (delta / Math.abs(startValue)) * 100;
+      return {
+        className: direction,
+        text: `${period} \u00b7 ${marker} ${sign}${formatNumber(relativeChange)} %`,
+        startValue,
+        endValue,
+        change: relativeChange,
+      };
+    }
+
     function valueField(which) {
       return state.mode === 'real1990'
         ? `${which}_real_eur_1990`
@@ -1637,9 +1691,9 @@
     }
 
     function renderLegend() {
-      const legendItem = (key, swatch, label) => {
+      const legendItem = (key, swatch, label, detail = '') => {
         const isFocused = state.focusKey === key;
-        return `<button class="legendItem${isFocused ? ' isFocused' : ''}${state.focusKey && !isFocused ? ' isMuted' : ''}" type="button" data-focus-key="${key}" aria-pressed="${isFocused ? 'true' : 'false'}">${swatch}<span>${label}</span></button>`;
+        return `<button class="legendItem${isFocused ? ' isFocused' : ''}${state.focusKey && !isFocused ? ' isMuted' : ''}" type="button" data-focus-key="${key}" aria-pressed="${isFocused ? 'true' : 'false'}">${swatch}<span class="legendItemText"><span>${label}</span>${detail}</span></button>`;
       };
       if (state.chartMode === 'limits') {
         const tramoItems = Array.from({ length: MAX_TRAMOS }, (_, i) => i + 1)
@@ -1658,7 +1712,11 @@
           .join('');
       } else {
         seriesLegend.innerHTML = EFFORT_GROUP_DEFS
-          .map(group => legendItem(`effort-${group.key}`, `<span class="legendSwatch" style="background:${getColor(group.colorIndex)}"></span>`, group.label))
+          .map(group => {
+            const variation = effortLegendChange(group.key);
+            const detail = `<span class="legendChange ${variation.className}" data-group="${group.key}" data-start-value="${variation.startValue}" data-end-value="${variation.endValue}" data-change="${variation.change}">${variation.text}</span>`;
+            return legendItem(`effort-${group.key}`, `<span class="legendSwatch" style="background:${getColor(group.colorIndex)}"></span>`, group.label, detail);
+          })
           .join('') + legendItem('effort-average', '<span class="legendSwatch gdp"></span>', 'Media ponderada');
       }
       seriesLegend.querySelectorAll('[data-focus-key]').forEach(item => item.addEventListener('click', () => {
