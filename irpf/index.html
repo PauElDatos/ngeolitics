@@ -1700,7 +1700,7 @@
             const detail = `<span class="legendChange ${variation.className}" data-group="${group.key}" data-start-value="${variation.startValue}" data-end-value="${variation.endValue}" data-change="${variation.change}">${variation.text}</span>`;
             return legendItem(`effort-${group.key}`, `<span class="legendSwatch" style="background:${getColor(group.colorIndex)}"></span>`, group.label, detail);
           })
-          .join('') + legendItem('effort-average', '<span class="legendSwatch gdp"></span>', 'Media ponderada');
+          .join('');
       }
       seriesLegend.querySelectorAll('[data-focus-key]').forEach(item => item.addEventListener('click', () => {
         const key = item.dataset.focusKey;
@@ -2360,7 +2360,6 @@
       const xEdge = year => plot.x + (((year - minYear) / EFFORT_DATA.length) * plot.w);
       const xCenter = year => xEdge(year) + (bandWidth / 2);
       const allValues = EFFORT_DATA.flatMap(record => record.groups.map(group => effortGroupMetric(group)));
-      if (state.effortMetric === 'effective') allValues.push(...EFFORT_DATA.map(record => effortNationalRate(record)));
       const rawMax = Math.max(5, ...allValues.filter(Number.isFinite));
       const yStep = rawMax <= 20 ? 2.5 : rawMax <= 50 ? 5 : 10;
       const yMax = Math.ceil(rawMax / yStep) * yStep;
@@ -2404,12 +2403,6 @@
           out += `<circle class="effortPoint" data-group="${groupDef.key}" data-year="${point.year}" cx="${xCenter(point.year)}" cy="${y(point.value)}" r="${r}" fill="${getColor(groupDef.colorIndex)}" stroke="rgba(0,0,0,.5)" stroke-width=".8" opacity="${opacity}"></circle>`;
         });
       });
-
-      if (state.effortMetric === 'effective') {
-        const avgOpacity = state.focusKey && state.focusKey !== 'effort-average' ? .12 : 1;
-        const avgPoints = EFFORT_DATA.map(record => ({ year: record.year, value: effortNationalRate(record) }));
-        out += `<path class="effortAverage" d="${buildSmoothPath(avgPoints, xCenter, y)}" fill="none" stroke="#ffffff" stroke-width="${compact ? 4.6 : 3}" stroke-dasharray="10 6" opacity="${avgOpacity}"></path>`;
-      }
 
       const yearStep = compact ? 5 : 3;
       EFFORT_DATA.forEach((record, index) => {

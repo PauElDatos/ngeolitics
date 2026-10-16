@@ -369,6 +369,8 @@ def check_all_visual_modes(page: Page) -> None:
     assert "Esfuerzo fiscal" in (page.locator("#chart").get_attribute("aria-label") or "")
     assert "IRPF total" in (page.locator("#chart").get_attribute("aria-label") or "")
     assert page.locator(".effortSeries").count() == 7
+    assert page.locator(".effortAverage").count() == 0
+    assert page.get_by_text("Media ponderada", exact=True).count() == 0
     assert page.locator(".marginalRatePoint, .rateAxisTick").count() == 0
     legend_changes = page.locator(".legendChange")
     assert legend_changes.count() == 7
@@ -383,6 +385,8 @@ def check_all_visual_modes(page: Page) -> None:
     contribution_changes = page.locator(".legendChange").evaluate_all("items => items.map(item => item.dataset.change)")
     assert contribution_changes != effective_changes
     assert page.locator(".legendChange").count() == 7
+    assert page.locator(".effortAverage").count() == 0
+    assert page.get_by_text("Media ponderada", exact=True).count() == 0
 
     assert page.evaluate("window.IRPF_TEST_API.setEffortScope('stateOnly')") == "totalCcaa"
     assert "IRPF total" in (page.locator("#chart").get_attribute("aria-label") or "")
