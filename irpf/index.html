@@ -669,11 +669,6 @@
             <div class="segmented" id="effortMetricButtons"></div>
           </div>
 
-          <div class="field isHidden" id="effortScopeField">
-            <div class="label">Ámbito fiscal</div>
-            <div class="segmented" id="effortScopeButtons"></div>
-          </div>
-
           <div class="field">
             <div class="label">Leyenda</div>
             <div class="seriesLegend" id="seriesLegend"></div>
@@ -846,7 +841,6 @@
     const state = {
       chartMode: 'limits',
       effortMetric: 'effective',
-      effortScope: 'totalCcaa',
       mode: 'nominal',
       scaleMode: 'log',
       showPresBands: true,
@@ -872,7 +866,6 @@
     const amountField = document.getElementById('amountField');
     const scaleField = document.getElementById('scaleField');
     const effortMetricField = document.getElementById('effortMetricField');
-    const effortScopeField = document.getElementById('effortScopeField');
     const sourceFooter = document.getElementById('sourceFooter');
     const explanationContent = document.getElementById('explanationContent');
     const chartPanel = document.querySelector('.chartPanel');
@@ -1476,7 +1469,7 @@
     }
 
     function effortUsesTotalCcaa() {
-      return state.effortScope === 'totalCcaa';
+      return true;
     }
 
     function effortGroupMetric(group) {
@@ -1651,15 +1644,6 @@
         renderAll();
       });
 
-      buildSegmentedButtons('effortScopeButtons', [
-        { key: 'totalCcaa', label: 'Total · media CCAA' },
-        { key: 'stateOnly', label: 'Solo estatal' },
-      ], state.effortScope, key => {
-        state.effortScope = key;
-        resetChartInteraction();
-        renderAll();
-      });
-
     }
 
     function renderChartControls() {
@@ -1684,7 +1668,6 @@
       amountField.classList.toggle('isHidden', !showLimits);
       scaleField.classList.toggle('isHidden', !showLimits);
       effortMetricField.classList.toggle('isHidden', !showEffort);
-      effortScopeField.classList.toggle('isHidden', !showEffort);
       fiscalEncodingKeyBelow.classList.toggle('isHidden', !showLimits);
       chartPanel.classList.toggle('populationMode', !showLimits);
       document.body.classList.toggle('populationChartMode', !showLimits);
@@ -2481,7 +2464,7 @@
         const scopeText = totalScope ? 'IRPF total (Estado + media de CCAA)' : 'componente estatal del IRPF';
         sourceFooter.innerHTML = `Fuente: <a class="sourceLink" href="https://wid.world/" target="_blank" rel="noopener noreferrer">WID.world</a> (renta media por grupos, umbrales y población adulta), <a class="sourceLink" href="https://www.boe.es/buscar/" target="_blank" rel="noopener noreferrer">BOE</a> y AEAT (escalas, mínimos y reducciones), ${xmlSource}, <a class="sourceLink" href="irpf_autonomico_valencia_1997-2025.js">escala autonómica valenciana de continuidad histórica</a>, <a class="sourceLink" href="data_fuentes/IRPF_tablas_1990-2023.json">JSON normalizado de escalas autonómicas</a> y <a class="sourceLink" href="data_fuentes/raw_irpf.rtf">raw BOE aportado</a> · <span style="opacity:.9;">N.Geolitics</span>`;
         explanationContent.innerHTML = `
-          <p><strong>Esfuerzo fiscal estimado</strong> = cuota estimada / renta WID del grupo. Por defecto se suma la cuota estatal y la <strong>media simple de las escalas autonómicas disponibles</strong> para las comunidades de régimen común. Entre 1990 y 1996 la escala era nacional sin el desdoblamiento utilizado después. El selector «Solo estatal» permite comparar con la vista anterior.</p>
+          <p><strong>Esfuerzo fiscal estimado</strong> = cuota estimada / renta WID del grupo. La vista suma siempre la cuota estatal y la <strong>media simple de las escalas autonómicas disponibles</strong> para las comunidades de régimen común. Entre 1990 y 1996 la escala era nacional sin el desdoblamiento utilizado después.</p>
           <p>Cada muestra se liquida progresivamente bajo un <strong>contribuyente estándar</strong>: individual, menor de 65 años, sin hijos ni discapacidad y con la renta modelizada como rendimiento ordinario del trabajo. El modelo incorpora, según el año, gastos/reducciones generales del trabajo, deducción histórica por rendimientos del trabajo y mínimo personal. Desde 2007 se resta la cuota correspondiente al mínimo con la escala estatal y con la escala autonómica; desde 2015 se incorpora además el gasto general de 2.000 €.</p>
           <p>La media autonómica usa las escalas de las comunidades disponibles en el JSON normalizado, sin ponderarlas por población: para cada renta se calcula la cuota bajo cada escala y se promedia. Para los años sin tablas autonómicas completas en la fuente se conserva la serie valenciana como referencia de continuidad, y queda identificado en los datos de la página. Para <strong>2022 en adelante</strong>, el mínimo autonómico general de referencia del contribuyente estándar es 6.105 €.</p>
           <p>La distribución usa P20, P40, P60, P80, P90 y P99, las <strong>medias de renta WID</strong> de P0–20, P20–40, P40–60, P60–80, P80–90, P90–99 y P99–100 y la población adulta anual. «Aportación al IRPF» pondera además cuántos adultos hay en cada grupo.</p>
@@ -2553,11 +2536,10 @@
       getLimitSeries: index => getLimitSeries(index),
       getRateSeries: index => getRateSeries(index),
       getRateExtent: () => ({ ...RATE_EXTENT }),
-      getEffortScope: () => state.effortScope,
-      setEffortScope: scope => {
-        state.effortScope = scope === 'stateOnly' ? 'stateOnly' : 'totalCcaa';
+      getEffortScope: () => 'totalCcaa',
+      setEffortScope: () => {
         renderAll();
-        return state.effortScope;
+        return 'totalCcaa';
       },
       showLimitsTooltip(year) {
         const rect = chartBox.getBoundingClientRect();

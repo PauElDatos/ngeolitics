@@ -364,7 +364,10 @@ def check_all_visual_modes(page: Page) -> None:
     page.locator("#btnChartEffort").click()
     page.wait_for_timeout(50)
     assert not page.locator("#fiscalEncodingKeyBelow").is_visible()
+    assert page.locator("#effortScopeField, #effortScopeButtons").count() == 0
+    assert page.get_by_text("Solo estatal", exact=True).count() == 0
     assert "Esfuerzo fiscal" in (page.locator("#chart").get_attribute("aria-label") or "")
+    assert "IRPF total" in (page.locator("#chart").get_attribute("aria-label") or "")
     assert page.locator(".effortSeries").count() == 7
     assert page.locator(".marginalRatePoint, .rateAxisTick").count() == 0
     legend_changes = page.locator(".legendChange")
@@ -381,10 +384,8 @@ def check_all_visual_modes(page: Page) -> None:
     assert contribution_changes != effective_changes
     assert page.locator(".legendChange").count() == 7
 
-    page.locator('#effortScopeButtons button[data-key="stateOnly"]').click()
-    page.wait_for_timeout(50)
-    state_changes = page.locator(".legendChange").evaluate_all("items => items.map(item => item.dataset.change)")
-    assert state_changes != contribution_changes
+    assert page.evaluate("window.IRPF_TEST_API.setEffortScope('stateOnly')") == "totalCcaa"
+    assert "IRPF total" in (page.locator("#chart").get_attribute("aria-label") or "")
     assert page.locator(".legendChange").count() == 7
 
     page.locator("#btnChartLimits").click()
