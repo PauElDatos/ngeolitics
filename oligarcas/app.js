@@ -47,7 +47,7 @@ function setHead(kicker,title,sub,controls='') {
   $('#viewKicker').textContent=kicker; $('#viewTitle').textContent=title; $('#viewSubtitle').textContent=sub; $('#controls').innerHTML=controls;
 }
 function setFoot(text, c=state.country) {
-  $('#chartFoot').innerHTML=`${esc(countryName(c))} · 2024 · Adultos de 20 años o más, patrimonio repartido por igual dentro de las parejas (equal-split). Patrimonio neto: activos menos deudas. ${text} Fuente: ${sourceLink('wid:WID_'+c+'_data')}. Estimaciones publicadas/modelizadas, grado 0.`;
+  $('#chartFoot').innerHTML=`${esc(countryName(c))} · 2024 · Adultos de 20 años o más, patrimonio repartido por igual dentro de las parejas (equal-split). Patrimonio neto: activos menos deudas. ${text} Fuente: ${sourceLink('wid:WID_'+c+'_data')}. Distribución patrimonial: estimaciones publicadas/modelizadas, grado 0.`;
 }
 function setInternationalFoot(text) {
   $('#chartFoot').innerHTML=`Once países · 2024 · Adultos de 20 años o más, equal-split · Patrimonio neto, activos menos deudas. ${text} Fuente: World Inequality Database, <a href="#fuentes" data-view="fuentes">series originales de los once países ↗</a>. Estimaciones publicadas/modelizadas, grado 0.`;
@@ -89,23 +89,23 @@ function barRows(gs,metric='share',small=false) {
   return {html,min,max,zero};
 }
 function renderMoneyScene(detailed=false) {
-  setHead(detailed?'02 / Los intervalos detrás de las figuras':'01 / El reparto de un país','Cien adultos. Toda la riqueza.','Las columnas muestran patrimonio medio; bajo cada quintil aparece su proporción de la riqueza nacional.',segment([['split','1 % separado'],['full','Todos juntos']],state.sceneMode,'scene-mode')+`<label class="field">Escala vertical<select id="sceneScale"><option value="country" ${state.sceneScale==='country'?'selected':''}>Ajustada al país</option><option value="common" ${state.sceneScale==='common'?'selected':''}>Común a todos los países</option></select></label><button class="btn" id="wealthFullscreen">${document.fullscreenElement?'Salir de pantalla completa':'⛶ Pantalla completa'}</button><button class="btn" id="exportGraphic">Gráfica SVG ↓</button>`);
+  setHead(detailed?'02 / La población de cada intervalo':'01 / El reparto de un país','Toda la población adulta. Toda la riqueza.','El eje muestra adultos acumulados. Cada quintil indica su población estimada y su cuota de riqueza; las columnas conservan el patrimonio medio por adulto.',segment([['split','1 % separado'],['full','Todos juntos']],state.sceneMode,'scene-mode')+`<label class="field">Escala vertical<select id="sceneScale"><option value="country" ${state.sceneScale==='country'?'selected':''}>Ajustada al país</option><option value="common" ${state.sceneScale==='common'?'selected':''}>Común a todos los países</option></select></label><button class="btn" id="wealthFullscreen">${document.fullscreenElement?'Salir de pantalla completa':'⛶ Pantalla completa'}</button><button class="btn" id="exportGraphic">Gráfica SVG ↓</button>`);
   const scene=WealthScene.render({
-    name:countryName(state.country),country:state.country,
+    name:countryName(state.country),country:state.country,population:nat().population,
     percentiles:groups('percentile').sort((a,b)=>a.a-b.a),quintiles:groups('quintile'),top:group('p99p100'),
     allPercentiles:data.groups.filter(g=>g.category==='percentile'),silhouette:countrySilhouettes[state.country],
     split:state.sceneMode==='split',common:state.sceneScale==='common',
     formatMoney:money,formatCompact:compact,formatPercent:pct,formatNumber:v=>nfmt(v,0),
   });
   $('#visual').innerHTML=scene.html;
-  setFoot('Cien intervalos publicados por WID, sin interpolación propia. Bloques en EUR de 2025; escala lineal. La figura separada sigue siendo el último intervalo del 1 %. Las cuotas por quintil son las publicadas y no se renormalizan.');
+  setFoot(`Población adulta estimada: ${nfmt(nat().population,0)}. Recuento por grupo = población adulta WID × fracción del intervalo, redondeado para mostrarlo. Se conservan los intervalos del 1 % publicados: no son datos individuales. Bloques en EUR de 2025; escala lineal. El grupo separado corresponde al 1 % superior. Las cuotas por quintil son las publicadas y no se renormalizan.`);
 }
 function renderQuintiles() {
   const name=countryName(state.country),gs=groups('quintile'), n=nat();
   renderMoneyScene();
   const bottom=gs[0].share+gs[1].share, middle=gs[2].share+gs[3].share, top=gs[4].share, fifty=group('p0p50'),ninety=group('p0p90');
   const rank=data.countries.map(c=>({c:c.code,s:group('p80p100',c.code).share})).sort((a,b)=>b.s-a.s).findIndex(x=>x.c===state.country)+1;
-  $('#insights').innerHTML=insight('La población pesa lo mismo; su patrimonio, no.',`El 40 % inferior (Q1 + Q2) reúne <strong>${pct(bottom)}</strong>; el 40 % intermedio (Q3 + Q4), <strong>${pct(middle)}</strong>. El 20 % superior concentra <strong>${pct(top)}</strong>.`)+insight(`${name} en perspectiva`,`El 50 % inferior reúne <strong>${pct(fifty.share)}</strong> y el 90 % inferior, <strong>${pct(ninety.share)}</strong>. ${name} ocupa el puesto <strong>${rank} de 11</strong> por cuota del quintil superior, de mayor a menor concentración. La media nacional es ${n.median>0?'<strong>'+nfmt(n.mean/n.median,2)+' veces</strong> la mediana.':'incomparable con una mediana no positiva.'}`);
+  $('#insights').innerHTML=insight('La misma población; distinto patrimonio.',`Cada quintil agrupa aproximadamente <strong>${nfmt(gs[0].count,0)} adultos</strong>. El 40 % inferior (Q1 + Q2) reúne <strong>${pct(bottom)}</strong>; el 40 % intermedio (Q3 + Q4), <strong>${pct(middle)}</strong>. El 20 % superior concentra <strong>${pct(top)}</strong>.`)+insight(`${name} en perspectiva`,`El 50 % inferior reúne <strong>${pct(fifty.share)}</strong> y el 90 % inferior, <strong>${pct(ninety.share)}</strong>. ${name} ocupa el puesto <strong>${rank} de 11</strong> por cuota del quintil superior, de mayor a menor concentración. La media nacional es ${n.median>0?'<strong>'+nfmt(n.mean/n.median,2)+' veces</strong> la mediana.':'incomparable con una mediana no positiva.'}`);
   groupTable(gs,'Cuotas, importes y umbrales por quintil');
   $('#insights').insertAdjacentHTML('beforeend',insight('Qué significa un cero publicado','Una cuota de 0,00 % puede responder al redondeo de la fuente. No significa que todos los adultos del grupo tengan exactamente cero patrimonio. Una media negativa indica que las deudas del grupo superan sus activos en conjunto.'));
 }
@@ -261,7 +261,8 @@ function renderSources() {
     <h3>Grado 0: estimación publicada, no observación directa</h3><p>${esc(data.definitions.quality_0_distributed_wealth)} Las conclusiones describen las cifras del modelo publicado. El detalle de las colas superiores y los decimales no garantizan precisión empírica. El estudio no prueba por sí solo mecanismos de influencia política ni clasifica a cada integrante de un percentil como oligarca.</p>
     <h3>Fechas e importes</h3><p>El año del patrimonio (2024) difiere del año de precios (2025). Los importes se convierten a EUR con el tipo medio de mercado del BCE de 2025: <code>EUR = moneda local / unidades de moneda local por EUR</code>. No es una conversión por paridad de poder adquisitivo ni una actualización del dato a 2025.</p>
     <p>${n25?`Para ${countryName(state.country)}, el agregado nacional WID de <strong>2025</strong> es <strong>${compact(n25.total)}</strong>. La recopilación no contiene la distribución detallada equivalente de 2025; no aplicamos las cuotas de 2024 a ese agregado.`:''}</p>
-    <h3>Cómo se calculan las cifras</h3><p>Cuota en % = cuota publicada × 100. Patrimonio total de grupo = media del grupo × población adulta × fracción de población. Adultos representados = población adulta × fracción. La mediana de un grupo es el umbral percentilar de su punto central, cuando está disponible. Diferencia entre cuotas = 100 × (cuota A − cuota B), en puntos porcentuales. Cuota dentro del 1 % = cuota del subgrupo / cuota del 1 %. Media respecto a mediana = media del grupo / mediana nacional, sólo si esta última es positiva.</p>
+    <h3>Población del gráfico</h3><p>La base es la población de <strong>20 años o más publicada por WID para 2024</strong> (serie <code>npopuli992</code>), no una muestra de cien personas ni la población total de todas las edades. El eje horizontal muestra adultos acumulados. Cada columna agrupa un 1 % de esa población; cada quintil, un 20 %. Los recuentos se calculan a partir del total adulto y se muestran redondeados: no son registros individuales. Las alturas siguen mostrando patrimonio medio por adulto, no el patrimonio total de cada grupo.</p>
+    <h3>Cómo se calculan las cifras</h3><p>Cuota en % = cuota publicada × 100. Patrimonio total de grupo = media del grupo × población adulta × fracción de población. Adultos del grupo = población adulta × fracción. La mediana de un grupo es el umbral percentilar de su punto central, cuando está disponible. Diferencia entre cuotas = 100 × (cuota A − cuota B), en puntos porcentuales. Cuota dentro del 1 % = cuota del subgrupo / cuota del 1 %. Media respecto a mediana = media del grupo / mediana nacional, sólo si esta última es positiva.</p>
     <h3>Ceros, negativos y discrepancias</h3><p>Conservamos los negativos y los ceros publicados. Un grupo con media negativa no permite contar cuántos integrantes tienen patrimonio negativo. Los ceros redondeados no identifican personas con patrimonio exactamente cero. Las cuotas no se renormalizan; pequeñas diferencias entre sumas, medias y agregados se mantienen. En DWA existen comprobaciones de cuota del 10 % que exceden la tolerancia elegida: se conservan los indicadores originales y no se sustituyen unos por otros.</p>
     <h3>Datos oficiales recientes: una segunda lectura</h3><p>El JSON contiene <strong>4.921 observaciones oficiales</strong>. Hogares DWA/DFA, hogares privados ONS, familias económicas canadienses y las demás unidades nacionales conservan sus conceptos. La vista de composición indica periodo, fuente, unidad y denominador. Las fuentes nacionales no se combinan para generar una clasificación internacional de 2025–2026.</p>
     <details><summary>Cobertura 2025–2026 de ${esc(countryName(state.country))}</summary><pre>${esc(JSON.stringify(cov,null,2))}</pre></details>
@@ -294,15 +295,17 @@ function exportCSV() {
 }
 function exportWealthGraphic(){
   const svg=$('#wealthGraphic');if(!svg)return;
-  const copy=svg.cloneNode(true);copy.setAttribute('width','1440');copy.setAttribute('height','876');copy.setAttribute('viewBox','0 0 1440 876');
+  const copy=svg.cloneNode(true),{width,height}=svg.viewBox.baseVal,footerHeight=116;
+  copy.setAttribute('width',String(width));copy.setAttribute('height',String(height+footerHeight));copy.setAttribute('viewBox',`0 0 ${width} ${height+footerHeight}`);
   const ns='http://www.w3.org/2000/svg',background=document.createElementNS(ns,'rect');
-  background.setAttribute('x','0');background.setAttribute('y','786');background.setAttribute('width','1440');background.setAttribute('height','90');background.setAttribute('fill','#252825');copy.append(background);
+  background.setAttribute('x','0');background.setAttribute('y',String(height));background.setAttribute('width',String(width));background.setAttribute('height',String(footerHeight));background.setAttribute('fill','#252825');copy.append(background);
   const notes=[
     `${countryName(state.country)} · 2024 · Patrimonio neto por adulto de 20 años o más, equal-split · EUR a precios de 2025.`,
+    `Población adulta WID: ${nfmt(+svg.dataset.population,0)}. Recuentos por grupo estimados y redondeados; cada intervalo agrupa el 1 % de los adultos.`,
     `1 bloque = ${compact(+svg.dataset.blockUnit)} de patrimonio medio. Escala lineal ${state.sceneScale==='common'?'común a los once países':'ajustada al país'}. ${state.sceneMode==='split'?`El 1 % se reapila en ${svg.dataset.topColumns} columnas que suman su media.`:''}`,
-    `Fuente: World Inequality Database · Estimaciones publicadas/modelizadas, grado 0 · wid.world · Silueta: Natural Earth (dominio público).`,
+    `Fuente: World Inequality Database · Distribución patrimonial: estimaciones publicadas/modelizadas, grado 0 · Silueta: Natural Earth (dominio público).`,
   ];
-  notes.forEach((note,i)=>{const text=document.createElementNS(ns,'text');text.setAttribute('x','92');text.setAttribute('y',String(811+i*23));text.setAttribute('font-size','12');text.setAttribute('fill','#b0b7a6');text.textContent=note;copy.append(text);});
+  notes.forEach((note,i)=>{const text=document.createElementNS(ns,'text');text.setAttribute('x','92');text.setAttribute('y',String(height+25+i*23));text.setAttribute('font-size','12');text.setAttribute('fill','#b0b7a6');text.textContent=note;copy.append(text);});
   const u=URL.createObjectURL(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml;charset=utf-8'}));
   const a=document.createElement('a');a.href=u;a.download=`oligarcas_${state.country}_distribucion_2024.svg`;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
 }
