@@ -3,8 +3,9 @@
 const $ = s => document.querySelector(s);
 const colors = ['#67b6df', '#69c7ae', '#bdcd73', '#eeb55e', '#fef702'];
 const flags = { ES:'🇪🇸', US:'🇺🇸', DE:'🇩🇪', FR:'🇫🇷', IT:'🇮🇹', NL:'🇳🇱', JP:'🇯🇵', GB:'🇬🇧', CA:'🇨🇦', KR:'🇰🇷', MX:'🇲🇽' };
-const state = { country:'ES', view:'quintiles', metric:'share', scale:'linear', limit:100, ranking:'top20', compareStyle:'rank', compositionGroup:'p0p50', compositionSource:'recent' };
+const state = { country:'ES', view:'quintiles', sceneMode:'split', sceneScale:'country', ranking:'top20', compareStyle:'rank', compositionGroup:'p0p50', compositionSource:'recent' };
 let data;
+let countrySilhouettes={};
 let exportRows = [];
 const nfmt = (v, digits=1) => v == null || !Number.isFinite(v) ? 'No disponible' : new Intl.NumberFormat('es-ES', {maximumFractionDigits:digits, minimumFractionDigits:digits}).format(Object.is(v,-0)?0:v);
 const pct = v => v == null ? 'No disponible' : `${nfmt(v * 100, 2)} %`;
@@ -87,12 +88,21 @@ function barRows(gs,metric='share',small=false) {
   }).join('');
   return {html,min,max,zero};
 }
+function renderMoneyScene(detailed=false) {
+  setHead(detailed?'02 / Los intervalos detrás de las figuras':'01 / El reparto de un país','Cien adultos. Toda la riqueza.','Las columnas muestran patrimonio medio; bajo cada quintil aparece su proporción de la riqueza nacional.',segment([['split','1 % separado'],['full','Todos juntos']],state.sceneMode,'scene-mode')+`<label class="field">Escala vertical<select id="sceneScale"><option value="country" ${state.sceneScale==='country'?'selected':''}>Ajustada al país</option><option value="common" ${state.sceneScale==='common'?'selected':''}>Común a todos los países</option></select></label><button class="btn" id="wealthFullscreen">${document.fullscreenElement?'Salir de pantalla completa':'⛶ Pantalla completa'}</button><button class="btn" id="exportGraphic">Gráfica SVG ↓</button>`);
+  const scene=WealthScene.render({
+    name:countryName(state.country),country:state.country,
+    percentiles:groups('percentile').sort((a,b)=>a.a-b.a),quintiles:groups('quintile'),top:group('p99p100'),
+    allPercentiles:data.groups.filter(g=>g.category==='percentile'),silhouette:countrySilhouettes[state.country],
+    split:state.sceneMode==='split',common:state.sceneScale==='common',
+    formatMoney:money,formatCompact:compact,formatPercent:pct,formatNumber:v=>nfmt(v,0),
+  });
+  $('#visual').innerHTML=scene.html;
+  setFoot('Cien intervalos publicados por WID, sin interpolación propia. Bloques en EUR de 2025; escala lineal. La figura separada sigue siendo el último intervalo del 1 %. Las cuotas por quintil son las publicadas y no se renormalizan.');
+}
 function renderQuintiles() {
   const name=countryName(state.country),gs=groups('quintile'), n=nat();
-  setHead('01 / El reparto',`${name}: cinco grupos, la misma población`,'Cada quintil representa al 20 % de los adultos, ordenados de menor a mayor patrimonio.',segment([['share','Proporción de riqueza'],['mean','Patrimonio medio']],state.metric,'metric'));
-  const bars=barRows(gs,state.metric);
-  $('#visual').innerHTML=`<div class="distributionHeader"><strong>${state.metric==='share'?'¿Qué parte tiene cada quintil?':'¿Cuánto tiene de media cada adulto?'}</strong><span>${state.metric==='share'?'% del patrimonio nacional':'EUR de 2025 · escala común'}</span></div><div class="quintileChart">${bars.html}</div><div class="chartAxis">${[0,25,50,75,100].map(v=>`<span style="left:${bars.zero+(100-bars.zero)*v/100}%">${state.metric==='share'?v+' %':compact(bars.max*v/100)}</span>`).join('')}</div><div class="populationStrip">${gs.map((g,i)=>`<div class="populationQuintile"><div class="people" aria-hidden="true">${Array.from({length:20},()=>`<i class="person" style="background:${colors[i]}"></i>`).join('')}</div><span>Q${i+1} · 20 de cada 100</span></div>`).join('')}</div>`;
-  setFoot(`Cuotas publicadas sin renormalizar. Escala lineal común a los once países; los valores negativos se extienden a la izquierda del cero. ${state.metric==='mean'?'Media por adulto en EUR de 2025.':''}`);
+  renderMoneyScene();
   const bottom=gs[0].share+gs[1].share, middle=gs[2].share+gs[3].share, top=gs[4].share, fifty=group('p0p50'),ninety=group('p0p90');
   const rank=data.countries.map(c=>({c:c.code,s:group('p80p100',c.code).share})).sort((a,b)=>b.s-a.s).findIndex(x=>x.c===state.country)+1;
   $('#insights').innerHTML=insight('La población pesa lo mismo; su patrimonio, no.',`El 40 % inferior (Q1 + Q2) reúne <strong>${pct(bottom)}</strong>; el 40 % intermedio (Q3 + Q4), <strong>${pct(middle)}</strong>. El 20 % superior concentra <strong>${pct(top)}</strong>.`)+insight(`${name} en perspectiva`,`El 50 % inferior reúne <strong>${pct(fifty.share)}</strong> y el 90 % inferior, <strong>${pct(ninety.share)}</strong>. ${name} ocupa el puesto <strong>${rank} de 11</strong> por cuota del quintil superior, de mayor a menor concentración. La media nacional es ${n.median>0?'<strong>'+nfmt(n.mean/n.median,2)+' veces</strong> la mediana.':'incomparable con una mediana no positiva.'}`);
@@ -100,28 +110,8 @@ function renderQuintiles() {
   $('#insights').insertAdjacentHTML('beforeend',insight('Qué significa un cero publicado','Una cuota de 0,00 % puede responder al redondeo de la fuente. No significa que todos los adultos del grupo tengan exactamente cero patrimonio. Una media negativa indica que las deudas del grupo superan sus activos en conjunto.'));
 }
 function renderPeople() {
-  const gs=groups('percentile').filter(g=>g.b<=state.limit).sort((a,b)=>a.a-b.a);
-  setHead('02 / Cien partes de la población',`${countryName(state.country)}, reducido a 100 adultos`,'Una barra representa la media de un intervalo del 1 % de adultos; no una persona real.',segment([['linear','Lineal'],['symlog','Log. con signo']],state.scale,'scale')+`<label class="field">Ampliar tramo<select id="percentileLimit"><option value="100" ${state.limit===100?'selected':''}>P0–P100 · todos</option><option value="99" ${state.limit===99?'selected':''}>P0–P99 · excluye el 1 % superior</option><option value="90" ${state.limit===90?'selected':''}>P0–P90 · excluye el 10 % superior</option></select></label>`);
-  const W=1060,H=410,L=85,R=20,T=25,B=60,pw=W-L-R,ph=H-T-B;
-  const trans=v=>state.scale==='symlog'?Math.sign(v)*Math.log10(1+Math.abs(v)/10000):v;
-  const sameGroups=data.groups.filter(g=>g.category==='percentile'&&g.b<=state.limit);
-  const vMin=Math.min(0,...sameGroups.map(g=>g.mean)),vMax=Math.max(...sameGroups.map(g=>g.mean))*1.04;
-  const min=trans(vMin),max=trans(vMax),y=v=>T+ph-(trans(v)-min)/(max-min)*ph,zero=y(0),bw=pw/state.limit;
-  let grid='';
-  for(let i=0;i<=5;i++){
-    const tv=min+(max-min)*i/5;
-    const original=state.scale==='symlog'?Math.sign(tv)*(10**Math.abs(tv)-1)*10000:tv;
-    const yy=y(original);
-    grid+=`<line x1="${L}" x2="${W-R}" y1="${yy}" y2="${yy}" stroke="#434343" stroke-dasharray="3 5"/><text x="${L-12}" y="${yy+4}" fill="#aaa" text-anchor="end" font-size="11">${esc(compact(original))}</text>`;
-  }
-  const bars=gs.map(g=>{
-    const yy=y(g.mean),h=Math.abs(yy-zero),x=L+g.a*bw;
-    const tip=`${groupName(g.group)} · ${nfmt(g.count,0)} adultos|Media: ${money(g.mean)}|Cuota nacional: ${pct(g.share)}|Umbral de entrada: ${money(g.lower)}`;
-    return `<rect x="${x+1}" y="${Math.min(yy,zero)}" width="${Math.max(1,bw-2)}" height="${Math.max(.7,h)}" fill="${colors[Math.min(4,Math.floor(g.a/20))]}" tabindex="0" role="img" aria-label="${esc(tip.replaceAll('|','. '))}" data-tip="${esc(tip)}"/>`;
-  }).join('');
-  let labels='';for(let i=0;i<=state.limit;i+=10) labels+=`<text x="${L+i*bw}" y="${H-30}" fill="#aaa" text-anchor="middle" font-size="11">${i} %</text>`;
-  $('#visual').innerHTML=`<div class="legend">${colors.map((c,i)=>`<span><i class="dot" style="background:${c}"></i>Q${i+1}</span>`).join('')}<span>Patrimonio medio de cada intervalo · EUR de 2025</span></div><div class="hundredWrap"><svg class="svgChart percentileChart" viewBox="0 0 ${W} ${H}" role="img" aria-label="Patrimonio medio por percentil, con valores negativos bajo el cero"><title>Distribución en cien intervalos, ${esc(countryName(state.country))}</title>${grid}<line x1="${L}" x2="${W-R}" y1="${zero}" y2="${zero}" stroke="#aaa"/>${bars}${labels}<text x="${W/2}" y="${H-3}" text-anchor="middle" fill="#aaa" font-size="11">Adultos ordenados por patrimonio: de menos a más →</text></svg></div><p class="caption">${state.limit<100?`Ampliación: se muestra hasta P${state.limit}. El ${100-state.limit} % superior queda fuera de esta vista. `:''}${state.scale==='symlog'?'Escala logarítmica con signo: sign(x) × log₁₀(1 + |x| / 10.000 €). Comprime los extremos y conserva cero y negativos; las alturas no expresan proporciones lineales.':'Escala lineal: alturas proporcionales al patrimonio medio. La escala es común para los once países dentro del tramo mostrado.'}</p>`;
-  setFoot('Cien intervalos publicados por WID, sin interpolación propia. Las estimaciones de grado 0 permiten esta representación del modelo publicado; no son cien observaciones directas.');
+  const gs=groups('percentile').sort((a,b)=>a.a-b.a);
+  renderMoneyScene(true);
   const one=group('p99p100'),p=nat().population/100;
   $('#insights').innerHTML=insight('Una barra contiene a muchos adultos',`Cada intervalo del 1 % representa aproximadamente <strong>${nfmt(p,0)} adultos</strong>. La barra muestra su media, que puede ocultar diferencias muy grandes dentro del grupo.`)+insight('La última barra también oculta una distribución',`La media del 1 % superior es <strong>${money(one.mean)}</strong>, pero su umbral de entrada es <strong>${money(one.lower)}</strong>. Abre «Dentro del 1 %» para ampliar la parte superior hasta el 0,001 %.`);
   groupTable(gs,'Cien intervalos publicados de un punto percentil');
@@ -278,7 +268,7 @@ function renderSources() {
     <details><summary>Definiciones originales de las fuentes nacionales</summary><pre>${esc(JSON.stringify(data.official_definitions,null,2))}</pre></details>
     <details><summary>Auditoría de ensamblaje y validaciones</summary><pre>${esc(JSON.stringify(data.validation,null,2))}</pre></details>
     <h3>De la distribución a la idea de oligarquía</h3><p>La referencia narrativa de Johnny Harris y Jeffrey Winters invita a estudiar cómo la concentración de patrimonio puede convertirse en capacidad para defenderlo e influir. Aquí medimos la distribución patrimonial. La influencia política, los mecanismos fiscales y las relaciones causales requieren evidencias adicionales y no se deducen de una cuota de riqueza.</p>
-    <h3>Referencias visuales y de contexto</h3><p><a href="https://www.youtube.com/watch?v=2GxlL5-0m_g" target="_blank" rel="noopener">Politizane · Wealth Inequality in America (Updated 2026)</a>: secuencia de quintiles, cien representantes y ampliación de la cima. Se adopta esa lógica con las cifras de esta recopilación. <a href="https://www.youtube.com/watch?v=4S25FfbFw4M" target="_blank" rel="noopener">Johnny Harris · Oligarchy is worse than you think</a>: contexto conceptual. No se incorporan encuestas sobre el reparto percibido o ideal.</p>
+    <h3>Referencias visuales y de contexto</h3><p><a href="https://www.youtube.com/watch?v=2GxlL5-0m_g" target="_blank" rel="noopener">Politizane · Wealth Inequality in America (Updated 2026)</a>: secuencia de quintiles, cien representantes y ampliación de la cima. Se adopta esa lógica con las cifras de esta recopilación. <a href="https://www.youtube.com/watch?v=4S25FfbFw4M" target="_blank" rel="noopener">Johnny Harris · Oligarchy is worse than you think</a>: contexto conceptual. No se incorporan encuestas sobre el reparto percibido o ideal.</p><p>Siluetas cartográficas simplificadas: <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth · Admin 0, escala 1:110m</a> (dominio público). Se muestran el territorio principal y las islas próximas como fondo decorativo.</p>
     <h3>Fuentes originales de la recopilación</h3><ul class="sourceList">${data.sources.map(s=>`<li>${sourceLink(s.id)}<small>${esc(s.family)} · ${esc(s.country || 'Internacional')} · ${esc(s.retrieval_date || s.retrieved_at || 'Fecha no disponible')}</small></li>`).join('')}</ul>
     <details><summary>Reproducibilidad y origen del archivo</summary><p>El archivo web se genera con <code>build-data.mjs</code> a partir del JSON original. Conserva el valor numérico original, los identificadores de entradas, el estado y las fórmulas por métrica; las fuentes enlazan los datos originales publicados. SHA-256 del JSON de entrada: <code>${esc(data.source_sha256)}</code>.</p></details>
   </div>`;
@@ -289,7 +279,8 @@ function render() {
   if(!data)return;
   $('#tooltip').hidden=true;
   document.querySelectorAll('.tabs button').forEach(b=>{const on=b.dataset.view===state.view;b.classList.toggle('on',on);on?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current');});
-  $('#countries').innerHTML=data.countries.map(c=>`<button class="country ${c.code===state.country?'on':''}" data-country="${c.code}" aria-pressed="${c.code===state.country}"><span class="countryCode">${c.code}</span><span>${esc(c.name)}</span><span class="arrow" aria-hidden="true">→</span></button>`).join('');
+  if(!$('#countries .country'))$('#countries').innerHTML=data.countries.map(c=>`<button class="country" data-country="${c.code}"><span class="countryCode">${c.code}</span><span>${esc(c.name)}</span><span class="arrow" aria-hidden="true">→</span></button>`).join('');
+  document.querySelectorAll('.country').forEach(b=>{const selected=b.dataset.country===state.country;b.classList.toggle('on',selected);b.setAttribute('aria-pressed',String(selected));});
   $('#detailPanel .tracePanel')?.remove();
   renderStats();
   ({quintiles:renderQuintiles,personas:renderPeople,cima:renderTop,comparar:renderCompare,'espana-usa':renderPair,nivel:renderLevel,composicion:renderComposition,fuentes:renderSources})[state.view]();
@@ -301,20 +292,38 @@ function exportCSV() {
   const u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');
   a.href=u;a.download=`oligarcas_${state.country}_${state.view}_2024.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
 }
+function exportWealthGraphic(){
+  const svg=$('#wealthGraphic');if(!svg)return;
+  const copy=svg.cloneNode(true);copy.setAttribute('width','1440');copy.setAttribute('height','876');copy.setAttribute('viewBox','0 0 1440 876');
+  const ns='http://www.w3.org/2000/svg',background=document.createElementNS(ns,'rect');
+  background.setAttribute('x','0');background.setAttribute('y','786');background.setAttribute('width','1440');background.setAttribute('height','90');background.setAttribute('fill','#252825');copy.append(background);
+  const notes=[
+    `${countryName(state.country)} · 2024 · Patrimonio neto por adulto de 20 años o más, equal-split · EUR a precios de 2025.`,
+    `1 bloque = ${compact(+svg.dataset.blockUnit)} de patrimonio medio. Escala lineal ${state.sceneScale==='common'?'común a los once países':'ajustada al país'}. ${state.sceneMode==='split'?`El 1 % se reapila en ${svg.dataset.topColumns} columnas que suman su media.`:''}`,
+    `Fuente: World Inequality Database · Estimaciones publicadas/modelizadas, grado 0 · wid.world · Silueta: Natural Earth (dominio público).`,
+  ];
+  notes.forEach((note,i)=>{const text=document.createElementNS(ns,'text');text.setAttribute('x','92');text.setAttribute('y',String(811+i*23));text.setAttribute('font-size','12');text.setAttribute('fill','#b0b7a6');text.textContent=note;copy.append(text);});
+  const u=URL.createObjectURL(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml;charset=utf-8'}));
+  const a=document.createElement('a');a.href=u;a.download=`oligarcas_${state.country}_distribucion_2024.svg`;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
 document.addEventListener('click',e=>{
   const el=e.target.closest('button,a');if(!el)return;
   if(el.dataset.view){e.preventDefault();activate(el.dataset.view);return;}
   if(el.dataset.country){state.country=el.dataset.country;history.replaceState(null,'',`#${state.view}?pais=${state.country}`);render();return;}
-  if(el.dataset.metric){state.metric=el.dataset.metric;render();return;}
-  if(el.dataset.scale){state.scale=el.dataset.scale;render();return;}
+  if(el.dataset.sceneMode){state.sceneMode=el.dataset.sceneMode;render();return;}
   if(el.dataset.compareStyle){state.compareStyle=el.dataset.compareStyle;render();return;}
   if(el.dataset.compositionSource){state.compositionSource=el.dataset.compositionSource;render();return;}
   if(el.id==='export')exportCSV();
+  if(el.id==='exportGraphic')exportWealthGraphic();
+  if(el.id==='wealthFullscreen'){
+    const action=document.fullscreenElement?document.exitFullscreen():$('.vizPanel').requestFullscreen?.();
+    action?.catch(()=>{});
+  }
   if(el.id==='print')window.print();
 });
 document.addEventListener('change',e=>{
   if(e.target.id==='ranking')state.ranking=e.target.value;
-  else if(e.target.id==='percentileLimit')state.limit=+e.target.value;
+  else if(e.target.id==='sceneScale')state.sceneScale=e.target.value;
   else if(e.target.id==='compositionGroup')state.compositionGroup=e.target.value;
   else return;
   render();
@@ -328,11 +337,18 @@ document.addEventListener('pointermove',e=>{const el=e.target.closest('[data-tip
 document.addEventListener('focusin',e=>{const el=e.target.closest('[data-tip]');if(el){const r=el.getBoundingClientRect();showTip(el,r.x,r.y+r.height/2);}});
 document.addEventListener('focusout',()=>$('#tooltip').hidden=true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#tooltip').hidden=true;});
+document.addEventListener('fullscreenchange',()=>{const b=$('#wealthFullscreen');if(b)b.textContent=document.fullscreenElement?'Salir de pantalla completa':'⛶ Pantalla completa';});
 window.addEventListener('scroll',()=>$('#tooltip').hidden=true,{passive:true});
 window.addEventListener('hashchange',()=>readHash());
 function readHash(){const [v,params]=location.hash.slice(1).split('?');const c=new URLSearchParams(params).get('pais');if(data.countries.some(x=>x.code===c))state.country=c;activate(v||'quintiles',false);}
 async function init(){
-  try{const response=await fetch('data/estudio.json');if(!response.ok)throw Error('HTTP '+response.status);data=await response.json();$('#status').hidden=true;$('#study').hidden=false;readHash();}
+  try{
+    const [study,maps]=await Promise.all([
+      fetch('data/estudio.json').then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json();}),
+      fetch('data/country-silhouettes.json').then(r=>r.ok?r.json():{}).catch(()=>({})),
+    ]);
+    data=study;countrySilhouettes=maps.countries??{};$('#status').hidden=true;$('#study').hidden=false;readHash();
+  }
   catch(e){$('#status').innerHTML='No se han podido cargar los datos. <button class="btn" id="reload">Reintentar</button> <a href="data/grupos_2024.csv">Descargar CSV</a>';$('#reload').onclick=init;console.error(e);}
 }
 init();
