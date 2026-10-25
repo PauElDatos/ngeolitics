@@ -2,7 +2,7 @@
 
 window.WealthScene = (() => {
   const palette=['#67b6df','#69c7ae','#bdcd73','#eeb55e','#fef702'];
-  const ROWS=100,DX=10,DY=5,L=92;
+  const ROWS=100,DX=10,DY=5,L=92,HEADING_INSET=32;
   let sceneObserver;
   const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const precise=v=>new Intl.NumberFormat('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2}).format(v)+' €';
@@ -50,7 +50,7 @@ window.WealthScene = (() => {
   }
   function frame({width,height,name,population,unit,T,zero,debtRows,silhouette,formatCompact,attributes,header,extraHeader='',body,description,positiveRows=ROWS,singleBars=false,richestValue=0}) {
     const logicalTop=Math.min(0,zero-Math.ceil(richestValue/unit)*DY-65);
-    return `<svg id="wealthGraphic" class="moneyScene fixedBlockScene" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="--scene-width:${width}px" data-logical-top="${logicalTop}" data-logical-bottom="${height}" data-zero="${zero}" data-population="${population}" data-block-unit="${unit}" data-stack-capacity="${unit*ROWS}" data-block-rows="${ROWS}" data-plot-rows="${positiveRows}" data-block-width="8" data-block-height="${DY-1}" data-row-step="${DY}" data-upper="${unit*positiveRows}" data-lower="${-debtRows*unit}" ${attributes} role="group" aria-label="${escape(name)}: patrimonio en bloques monetarios de valor fijo" font-family="Arial, sans-serif"><desc>${escape(description)} Un bloque verde o dorado tiene idéntico tamaño y vale ${escape(precise(unit))}. La fortuna Forbes utiliza los mismos bloques: una barra vertical en el reparto general y torres laterales de 100 bloques dentro del 1 %. La cifra original se publica en USD de 2026 y la conversión a EUR es nominal, no EUR de 2025. ${singleBars?'Cada intervalo del eje principal forma una sola barra vertical.':'Las columnas laterales completas contienen 100 bloques.'} Las marcas naranjas son restos menores que un bloque, no unidades completas.</desc>${defs()}<rect id="wealthBackground" width="${width}" height="${height}" fill="#252825"/><g id="wealthVirtualGrid"></g><g id="wealthSceneContent">${map(silhouette,zero-ROWS*DY,width)}${grid(width,zero,unit,debtRows,formatCompact,positiveRows)}${body}${extraHeader}</g><g id="wealthRichestVisible"></g><g id="wealthSceneHeading"><rect x="${L-16}" y="18" width="790" height="112" rx="8" fill="#252825" fill-opacity=".94"/>${header}</g></svg>`;
+    return `<svg id="wealthGraphic" class="moneyScene fixedBlockScene" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="--scene-width:${width}px" data-logical-top="${logicalTop}" data-logical-bottom="${height}" data-zero="${zero}" data-population="${population}" data-block-unit="${unit}" data-stack-capacity="${unit*ROWS}" data-block-rows="${ROWS}" data-plot-rows="${positiveRows}" data-block-width="8" data-block-height="${DY-1}" data-row-step="${DY}" data-upper="${unit*positiveRows}" data-lower="${-debtRows*unit}" ${attributes} role="group" aria-label="${escape(name)}: patrimonio en bloques monetarios de valor fijo" font-family="Arial, sans-serif"><desc>${escape(description)} Un bloque verde o dorado tiene idéntico tamaño y vale ${escape(precise(unit))}. La fortuna Forbes utiliza los mismos bloques: una barra vertical en el reparto general y torres laterales de 100 bloques dentro del 1 %. La cifra original se publica en USD de 2026 y la conversión a EUR es nominal, no EUR de 2025. ${singleBars?'Cada intervalo del eje principal forma una sola barra vertical.':'Las columnas laterales completas contienen 100 bloques.'} Las marcas naranjas son restos menores que un bloque, no unidades completas.</desc>${defs()}<rect id="wealthBackground" width="${width}" height="${height}" fill="#252825"/><g id="wealthVirtualGrid"></g><g id="wealthSceneContent">${map(silhouette,zero-ROWS*DY,width)}${grid(width,zero,unit,debtRows,formatCompact,positiveRows)}${body}${extraHeader}</g><g id="wealthRichestVisible"></g><g id="wealthSceneHeading" transform="translate(${HEADING_INSET},0)"><rect x="${L-16}" y="18" width="790" height="112" rx="8" fill="#252825" fill-opacity=".94"/>${header}</g></svg>`;
   }
   function reference(unit,formatMoney) {
     return `<div class="blockReference"><span><i class="cashKey"></i>= ${escape(formatMoney(unit))}</span><span class="blockRemainderKey"><i></i>resto menor que un bloque</span><span><i class="richestKey"></i>fortuna Forbes 2026</span></div>`;
@@ -203,7 +203,7 @@ window.WealthScene = (() => {
       const y=logicalTop+offset;
       svg.setAttribute('viewBox',`0 0 ${svg.getAttribute('width')} ${viewport}`);
       svg.dataset.windowTop=y;svg.dataset.windowBottom=y+viewport;
-      svg.querySelector('#wealthSceneHeading').setAttribute('transform',`translate(${wrap.scrollLeft/zoom},0)`);
+      svg.querySelector('#wealthSceneHeading').setAttribute('transform',`translate(${wrap.scrollLeft/zoom+HEADING_INSET},0)`);
       if(separatedHeading)separatedHeading.setAttribute('transform',`translate(0,${Math.max(0,bottom-viewport)})`);
       svg.querySelector('#wealthBackground').setAttribute('height',viewport);
       content.setAttribute('display',y+viewport<worldTop?'none':'inline');
