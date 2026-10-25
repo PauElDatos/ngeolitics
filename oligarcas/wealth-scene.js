@@ -59,7 +59,7 @@ window.WealthScene = (() => {
     scrollable=scrollable||richest;
     const viewport=`<div class="wealthSceneWrap${tail?' tailSceneWrap':scrollable?' verticalSceneWrap':''}${singleBars&&!split?' joinedSceneWrap':''}" tabindex="0" role="region" aria-label="Pilas monetarias de tamaño fijo; desplazamiento horizontal${tail?'':' y vertical'}">${svg}</div>`;
     if(singleBars)return `<div class="nationalScene">${viewport}<aside class="sceneSidebar" aria-label="Controles y leyenda del reparto">${actions?`<section class="sceneControlGroup"><h3>Vista del reparto</h3><div class="sceneViewControls" role="group" aria-label="Disposición y ampliación de las barras">${actions}</div></section>`:''}<section class="sceneLegendGroup"><h3>Leyenda</h3>${reference(unit,formatMoney)}</section><section class="sceneControlGroup"><h3>Recorrer la altura</h3><div class="fixedSceneNavigation"><button class="btn" data-scene-scroll="top">↑ Ir a la cima</button><button class="btn" data-scene-scroll="base">↓ Ir a la base</button></div></section></aside></div>`;
-    return reference(unit,formatMoney)+viewport+`<div class="sceneActions">${actions}</div>`;
+    return `<div class="tailSceneToolbar">${reference(unit,formatMoney)}<div class="tailSceneActions">${actions}</div></div>`+viewport;
   }
 
   // Use the same local origin and geometry as pile(), so a block is never split

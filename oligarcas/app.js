@@ -47,9 +47,19 @@ function activate(view, push=true) {
 function segment(values, selected, action) {
   return `<div class="segment">${values.map(([value,label]) => `<button data-${action}="${value}" class="${selected===value?'on':''}" aria-pressed="${selected===value}">${label}</button>`).join('')}</div>`;
 }
-function setHead(kicker,title,sub,controls='') {
-  $('#viewKicker').textContent=kicker; $('#viewTitle').textContent=title; $('#viewSubtitle').textContent=sub; $('#controls').innerHTML=controls;
-  $('#viewKicker').hidden=!kicker;$('#viewSubtitle').hidden=!sub;$('#controls').hidden=!controls;
+function setHead(title,sub='',controls='') {
+  $('#viewTitle').textContent=title; $('#viewSubtitle').textContent=sub; $('#controls').innerHTML=controls;
+  $('#viewSubtitle').hidden=!sub;$('#controls').hidden=!controls;
+}
+function placeSideControls() {
+  const visual=$('#visual'),controls=$('#controls');
+  controls.hidden=!controls.children.length;
+  if(controls.hidden)return;
+  const layout=document.createElement('div'),plot=document.createElement('div'),sidebar=document.createElement('aside'),group=document.createElement('section'),title=document.createElement('h3');
+  layout.className='chartWithSidebar';plot.className='chartPlot';sidebar.className='sceneSidebar chartSidebar';group.className='sceneControlGroup';
+  sidebar.setAttribute('aria-label','Opciones del gráfico');title.textContent='Opciones del gráfico';
+  while(visual.firstChild)plot.append(visual.firstChild);
+  group.append(title,controls);sidebar.append(group);layout.append(plot,sidebar);visual.append(layout);
 }
 function setFoot(text, c=state.country) {
   $('#chartFoot').innerHTML=`${esc(countryName(c))} · 2024 · Adultos de 20 años o más, patrimonio repartido por igual dentro de las parejas (equal-split). Patrimonio neto: activos menos deudas. ${text} Fuente: ${sourceLink('wid:WID_'+c+'_data')}. Distribución patrimonial: estimaciones publicadas/modelizadas, grado 0.`;
@@ -103,7 +113,7 @@ function distributionMethodology() {
     <p><a href="${safeURL(richestSource.forbes_url)}" target="_blank" rel="noopener">Forbes ↗</a> · <a href="${safeURL(richestSource.fx_url)}" target="_blank" rel="noopener">BCE ↗</a>. Fuente: ${sourceLink('wid:WID_'+state.country+'_data')}. Distribución patrimonial: estimaciones publicadas/modelizadas, grado 0.</p>`;
 }
 function renderMoneyScene() {
-  setHead('','Toda la población adulta. Toda la riqueza.','');
+  setHead('Toda la población adulta. Toda la riqueza.');
   const scene=WealthScene.render({
     name:countryName(state.country),country:state.country,population:nat().population,
     percentiles:groups('percentile').sort((a,b)=>a.a-b.a),quintiles:groups('quintile'),top:group('p99p100'),
@@ -113,6 +123,7 @@ function renderMoneyScene() {
     formatMoney:money,formatCompact:compact,formatPercent:pct,formatNumber:v=>nfmt(v,0),
   });
   $('#visual').innerHTML=scene.html;
+  $('.sceneSidebar > .sceneControlGroup').after($('#stats'));
   WealthScene.mount($('#visual'));
   $('#chartFoot').replaceChildren();
 }
@@ -133,7 +144,7 @@ function renderPeople() {
 function renderTop() {
   const ids=['p99p100','p99.9p100','p99.99p100','p99.999p100'],gs=ids.map(id=>group(id)),base=gs[0];
   const exclusive=groups('top_nonoverlapping').sort((a,b)=>a.a-b.a);
-  setHead('','Dentro del 1 % más rico','');
+  setHead('Dentro del 1 % más rico');
   $('#visual').innerHTML=WealthScene.renderTop({
     name:countryName(state.country),population:nat().population,base,intervals:exclusive,
     silhouette:countrySilhouettes[state.country],unit:BLOCK_UNIT,richestMan:richestMen[state.country],richestSource,
@@ -158,7 +169,7 @@ const rankings = {
 };
 function renderCompare() {
   const r=rankings[state.ranking],ns=data.countries.map(c=>({...c,v:r.value(c.code)})).sort((a,b)=>(b.v??-Infinity)-(a.v??-Infinity));
-  setHead('04 / La misma medida', 'Once países, una comparación',`Orden de mayor a menor: ${r.label.toLowerCase()}. El país seleccionado aparece destacado.`,segment([['rank','Clasificación'],['quintiles','Todos los quintiles']],state.compareStyle,'compare-style')+`<label class="field">Ordenar por<select id="ranking">${Object.entries(rankings).map(([k,v])=>`<option value="${k}" ${k===state.ranking?'selected':''}>${v.label}</option>`).join('')}</select></label>`);
+  setHead('Once países, una comparación','',segment([['rank','Clasificación'],['quintiles','Todos los quintiles']],state.compareStyle,'compare-style')+`<label class="field">Ordenar por<select id="ranking">${Object.entries(rankings).map(([k,v])=>`<option value="${k}" ${k===state.ranking?'selected':''}>${v.label}</option>`).join('')}</select></label>`);
   const min=Math.min(0,...ns.map(c=>c.v??0)),max=Math.max(...ns.map(c=>c.v??0))*1.06,range=max-min,zero=-min/range*100;
   $('#visual').innerHTML=`<div class="distributionHeader"><strong>${r.label}</strong><span>${state.ranking==='gini'?'Índice de 0 a 1':state.ranking==='median'?'EUR de 2025':state.ranking==='ratio'?'Veces la mediana':'% del patrimonio nacional'}</span></div><div class="rankChart">${ns.map((c,i)=>`<div class="rankRow ${c.code===state.country?'selected':''}"><div class="rankCountry"><span class="rankNumber">${i+1}</span>${esc(c.name)}</div><div class="barTrack" data-tip="${esc(`${c.name}|${r.label}: ${r.format(c.v)}`)}" tabindex="0"><span class="zero" style="left:${zero}%"></span><span class="bar" style="background:${c.code===state.country?'#fef702':'#899a9e'};left:${c.v<0?zero-Math.abs(c.v)/range*100:zero}%;width:${Math.abs(c.v??0)/range*100}%"></span></div><span class="value ${c.v<0?'negative':''}">${r.format(c.v)}</span></div>`).join('')}</div>`;
   if(state.compareStyle==='quintiles') {
@@ -173,7 +184,7 @@ function renderCompare() {
   exportRows=[['pais','periodo','Q1','Q2','Q3','Q4','Q5','bottom50','top1','mediana_EUR_2025','gini'],...ns.map(c=>[c.code,2024,...groups('quintile',c.code).map(g=>g.share),group('p0p50',c.code).share,group('p99p100',c.code).share,nat(c.code).median,nat(c.code).gini])];
 }
 function renderLevel() {
-  setHead('06 / Cuánto patrimonio','La media no cuenta toda la historia','Media y mediana nacionales por adulto, en euros a precios de 2025.');
+  setHead('La media no cuenta toda la historia','Media y mediana nacionales por adulto, en euros a precios de 2025.');
   const ns=data.countries.map(c=>({...c,n:nat(c.code)})).sort((a,b)=>b.n.median-a.n.median),max=Math.max(...ns.map(c=>c.n.mean))*1.04;
   $('#visual').innerHTML=`<div class="legend"><span><i class="dot" style="background:#fef702"></i>Media</span><span><i class="dot" style="background:#67b6df"></i>Mediana</span><span>Escala lineal común · EUR de 2025</span></div><div class="rankChart">${ns.map(c=>`<div class="rankRow ${c.code===state.country?'selected':''}"><div class="rankCountry">${esc(c.name)}</div><div style="display:grid;gap:5px"><div class="barTrack" style="height:12px" tabindex="0" data-tip="${esc(`${c.name}|Media: ${money(c.n.mean)}|Mediana: ${money(c.n.median)}`)}"><span class="bar" style="left:0;width:${c.n.mean/max*100}%;background:#fef702"></span></div><div class="barTrack" style="height:12px"><span class="bar" style="left:0;width:${Math.max(0,c.n.median)/max*100}%;background:#67b6df"></span></div></div><span style="font-size:10px;color:#bbb;text-align:right">${compact(c.n.mean)}<br>${compact(c.n.median)}</span></div>`).join('')}</div>`;
   setInternationalFoot('Orden descendente de mediana. Importes en EUR de 2025; no son euros ajustados por poder adquisitivo.');
@@ -190,7 +201,7 @@ function renderComposition() {
   const publishedShares=obs.filter(o=>['component_share_of_net_wealth','component_share_of_financial_assets','component_share_of_real_assets'].includes(o.indicator));
   const sourceChoice=isDwa&&publishedShares.length?segment([['recent','DWA reciente'],['survey','Encuesta nacional']],state.compositionSource,'composition-source'):'';
   if(sourceChoice&&state.compositionSource==='survey'){
-    setHead('07 / De qué está hecha la riqueza',`${countryName(state.country)}: activos y deudas`,'Composición publicada por la encuesta nacional.');
+    setHead(`${countryName(state.country)}: activos y deudas`,'Composición publicada por la encuesta nacional.');
     renderPublishedComposition(publishedShares);
     $('#controls').insertAdjacentHTML('afterbegin',sourceChoice);
     return;
@@ -202,7 +213,7 @@ function renderComposition() {
   const current=relevant.filter(o=>o.period===period);
   const options=[...new Set(current.filter(o=>o.indicator==='total_assets_total'||o.indicator==='assets_total').map(o=>o.group))].sort((a,b)=>{const x=a.match(/[\d.]+/g).map(Number),y=b.match(/[\d.]+/g).map(Number);return x[0]-y[0]||y[1]-x[1];});
   if(!options.includes(state.compositionGroup))state.compositionGroup=options.includes('p0p50')?'p0p50':options[0];
-  setHead('07 / De qué está hecha la riqueza',`${countryName(state.country)}: activos y deudas`,'Fuente nacional disponible. Las definiciones y los años pueden diferir de la comparación WID.',sourceChoice+(options.length?`<label class="field">Grupo patrimonial<select id="compositionGroup">${options.map(g=>`<option value="${g}" ${g===state.compositionGroup?'selected':''}>${groupName(g)}</option>`).join('')}</select></label>`:''));
+  setHead(`${countryName(state.country)}: activos y deudas`,'Fuente nacional disponible. Las definiciones y los años pueden diferir de la comparación WID.',sourceChoice+(options.length?`<label class="field">Grupo patrimonial<select id="compositionGroup">${options.map(g=>`<option value="${g}" ${g===state.compositionGroup?'selected':''}>${groupName(g)}</option>`).join('')}</select></label>`:''));
   if(!period){
     if(['JP','KR','MX'].includes(state.country) && obs.some(o=>o.component && /asset_or_debt_component/.test(o.indicator))){renderNationalComponents(obs);return;}
     // Some national sources only publish composition as percentages, with a source-specific denominator.
@@ -261,7 +272,7 @@ function renderNationalComponents(obs) {
   exportRows=[['pais','periodo','grupo','componente','valor_nominal_con_signo','moneda','denominador','porcentaje_activos','registro'],...comps.map(o=>[o.country,o.period,o.group,o.component,o.signed,o.currency,denominator,o.signed/denominator*100,o.id])];
 }
 function renderSources() {
-  setHead('08 / Leer los datos','Fuentes, método y límites','La trazabilidad forma parte del estudio. Base WID descargada el 18 de octubre de 2026; referencia individual Forbes 2026.');
+  setHead('Fuentes, método y límites','La trazabilidad forma parte del estudio. Base WID descargada el 18 de octubre de 2026; referencia individual Forbes 2026.');
   const cov=data.coverage.filter(o=>o.country===state.country);
   const n25=nat(state.country,2025);
   $('#visual').innerHTML=`<div class="downloads"><a class="btn primary" href="data/estudio.json" download>Datos y trazabilidad · JSON ↓</a><a class="btn" href="data/hombres-mas-ricos-2026.json" download>Fortunas Forbes 2026 · JSON ↓</a><a class="btn" href="data/grupos_2024.csv" download>Todos los grupos · CSV ↓</a><a class="btn" href="metodologia.pdf" target="_blank" rel="noopener">Metodología · PDF ↗</a><button class="btn" id="print">Imprimir estudio</button></div><div class="prose">
@@ -293,15 +304,18 @@ function renderSources() {
 }
 function render() {
   if(!data)return;
+  $('.primaryView').prepend($('#stats'));
+  $('.vizPanel > .panelTitle').append($('#controls'));
   $('#main').dataset.view=state.view;
   $('.vizPanel').hidden=state.view==='personas';$('#stats').hidden=state.view==='personas';$('#insights').hidden=state.view==='personas';
   $('#tooltip').hidden=true;
   document.querySelectorAll('.tabs button').forEach(b=>{const on=b.dataset.view===state.view;b.classList.toggle('on',on);on?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current');});
-  if(!$('#countries .country'))$('#countries').innerHTML=data.countries.map(c=>`<button class="country" data-country="${c.code}"><span class="countryCode">${c.code}</span><span>${esc(c.name)}</span><span class="arrow" aria-hidden="true">→</span></button>`).join('');
+  if(!$('#countries .country'))$('#countries').innerHTML=data.countries.map(c=>`<button class="country" data-country="${c.code}">${esc(c.name)}</button>`).join('');
   document.querySelectorAll('.country').forEach(b=>{const selected=b.dataset.country===state.country;b.classList.toggle('on',selected);b.setAttribute('aria-pressed',String(selected));});
   $('#detailPanel .tracePanel')?.remove();
   renderStats();
   ({quintiles:renderQuintiles,personas:renderPeople,cima:renderTop,comparar:renderCompare,nivel:renderLevel,composicion:renderComposition,fuentes:renderSources})[state.view]();
+  if(['comparar','composicion'].includes(state.view))placeSideControls();
   document.title=`${countryName(state.country)} · Oligarcas — N.Geolitics`;
 }
 function exportCSV() {

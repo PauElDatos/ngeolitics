@@ -75,8 +75,6 @@ body { min-height: 100dvh; overflow-x: hidden; font-family: var(--fontText); }
   line-height: 1.3;
 }
 .country.on { border-color: rgba(254,247,2,.35); background: rgba(254,247,2,.08); }
-.countryCode { flex: none; width: 28px; height: 24px; font-size: 10px; }
-.country .arrow { display: none; }
 .sidebarFoot { flex: none; padding: 12px; font-size: 12.15px; }
 .sidebarFoot p { margin: 6px 0; line-height: 1.45; }
 #main { min-width: 0; min-height: 0; }
@@ -87,13 +85,15 @@ body { min-height: 100dvh; overflow-x: hidden; font-family: var(--fontText); }
 .statCard .k { font-size: 12.15px; letter-spacing: .35px; }
 .statCard .v { font-size: 29px; margin: 6px 0 4px; }
 .statCard .s { font-size: 12.15px; }
-.panelTitle { min-height: 44px; padding: 12px; gap: 12px; background: rgba(255,255,255,.02); }
+.panelTitle { flex: 0 0 auto; min-height: 44px; padding: 12px; gap: 12px; background: rgba(255,255,255,.02); }
+.panelTitle > div:first-child { min-width: 0; }
 .panelTitle h2 {
   margin: 0;
   color: var(--accent);
   font: 700 17.55px/1.3 var(--fontTitle);
   letter-spacing: .35px;
   text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 .panelTitle p { font-size: 13px; }
 .btn { padding: 8px 10px; border-radius: 10px; font-size: 14px; }
@@ -114,7 +114,11 @@ body { min-height: 100dvh; overflow-x: hidden; font-family: var(--fontText); }
   min-height: 440px;
 }
 .nationalScene > .wealthSceneWrap { min-width: 0; contain: size; }
+.chartWithSidebar { display: grid; grid-template-columns: minmax(0,1fr) clamp(440px,22vw,560px); align-items: start; gap: 12px; }
+.chartPlot { min-width: 0; }
+.chartPlot .distributionHeader { flex-wrap: wrap; }
 .sceneSidebar { display: flex; flex-direction: column; align-self: start; min-width: 0; gap: 16px; }
+.sceneSidebar > .statsGrid { grid-template-columns: repeat(2,minmax(0,1fr)); }
 .sceneSidebar h3 { margin: 0 0 12px; color: var(--accent); font: 700 13px/1.3 var(--fontTitle); letter-spacing: .35px; text-transform: uppercase; }
 .sceneControlGroup { min-width: 0; padding: 12px; border: 1px solid var(--stroke); border-radius: 10px; background: rgba(255,255,255,.02); }
 .sceneViewControls { display: grid; grid-template-columns: 1fr 1.1fr 1.1fr; gap: 8px; }
@@ -126,6 +130,15 @@ body { min-height: 100dvh; overflow-x: hidden; font-family: var(--fontText); }
 .sceneSidebar .blockReference i { flex: none; }
 .sceneSidebar .fixedSceneNavigation { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin: 0; }
 .sceneSidebar .fixedSceneNavigation .btn { min-height: 52px; padding: 12px 10px; font-size: 15px; }
+.chartSidebar .controls { display: grid; width: 100%; min-width: 0; gap: 16px; }
+.chartSidebar .field { min-width: 0; font-size: 14px; }
+.chartSidebar select { width: 100%; min-height: 44px; font-size: 14px; }
+.chartSidebar .segment { min-width: 0; }
+.chartSidebar .segment button { flex: 1 1 auto; min-height: 44px; font-size: 14px; }
+.tailSceneToolbar { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.tailSceneToolbar .blockReference { flex: 1 1 auto; min-width: 0; margin: 0; }
+.tailSceneActions { flex: none; }
+.detailPanel > .tracePanel { flex: none; }
 .insight { padding: 12px; }
 footer { margin: 12px 0 0; padding: 12px 2px; }
 
@@ -133,15 +146,14 @@ footer { margin: 12px 0 0; padding: 12px 2px; }
   body { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
   .page { flex: 1 1 auto; overflow: hidden; }
   .layout, .sidebar, #main { height: 100%; }
-  #main { overflow: auto; scrollbar-width: thin; scrollbar-gutter: stable; }
-  #main[data-view="quintiles"] #study { display: block; height: 100%; }
+  #main { overflow: auto; scrollbar-width: thin; scrollbar-gutter: stable; container-type: size; }
+  #main[data-view="quintiles"] #study { display: block; }
   #main[data-view="quintiles"] .primaryView {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    min-height: 100%;
+    min-height: 100cqh;
   }
-  #main[data-view="quintiles"] .primaryView > .statsGrid { flex: none; }
   #main[data-view="quintiles"] .vizPanel:not(:fullscreen) {
     display: flex;
     flex-direction: column;
@@ -171,12 +183,14 @@ footer { margin: 12px 0 0; padding: 12px 2px; }
   #main[data-view="personas"] .primaryView { display: none; }
   #main[data-view="personas"] .detailPanel { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
   #main[data-view="personas"] .tableWrap { flex: 1 1 auto; min-height: 0; max-height: none; }
+  #main[data-view="personas"] .studyNote { flex: none; }
 }
 
 @media (max-width: 1300px) {
-  .nationalScene { grid-template-columns: minmax(0,1fr); }
+  .nationalScene, .chartWithSidebar { grid-template-columns: minmax(0,1fr); }
   .sceneSidebar { grid-row: 1; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
   .sceneSidebar > .sceneControlGroup:first-child { grid-column: 1 / -1; }
+  .sceneSidebar > .statsGrid { grid-column: 1 / -1; }
   #main[data-view="quintiles"] .vizPanel .nationalScene > .wealthSceneWrap { height: 70dvh; min-height: 440px; }
 }
 @media (max-width: 900px) {
@@ -189,7 +203,6 @@ footer { margin: 12px 0 0; padding: 12px 2px; }
   .sidebarFoot { display: none; }
   #countries { flex-direction: row; gap: 8px; padding: 10px; }
   .country { width: auto; min-height: 40px; padding: 8px 10px; white-space: nowrap; font-size: 13px; }
-  .countryCode { width: 24px; height: 22px; }
   .wealthSceneWrap.virtualSceneWrap { height: 70dvh; min-height: 360px; max-height: none; }
 }
 @media (max-width: 620px) {
@@ -206,11 +219,13 @@ footer { margin: 12px 0 0; padding: 12px 2px; }
   .sceneSidebar { display: flex; }
   .sceneViewControls { display: flex; overflow-x: auto; padding-bottom: 3px; }
   .sceneViewControls .btn { flex: 1 0 130px; min-height: 50px; font-size: 14px; }
+  .tailSceneToolbar { flex-wrap: wrap; justify-content: flex-end; }
+  .tailSceneToolbar .blockReference { flex-basis: 100%; }
   #main[data-view="quintiles"] .vizPanel .nationalScene > .wealthSceneWrap { min-height: 360px; }
 }
 @media print {
   body { display: block; height: auto; overflow: visible; }
-  .page, #main { height: auto; overflow: visible; }
+  .page, #main { height: auto; overflow: visible; container-type: normal; }
   .layout { display: block; height: auto; }
   #main[data-view="quintiles"] .primaryView { display: block; height: auto; min-height: 0; }
 }
