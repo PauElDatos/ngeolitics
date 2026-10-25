@@ -145,7 +145,7 @@ test('All 99 country/unit/depth top-tail layouts retain exact values and 100-blo
   }
 });
 
-test('Every country keeps complete fortunes in the same 10k-block scene, with joined bars adjacent', () => {
+test('National charts keep complete fortunes in 10k blocks, with joined bars adjacent', () => {
   for (const country of study.countries) {
     const args=inputs(country,10000),person=richest.countries[country.code];
     assert.ok(person.name && person.usd_billions>0,country.code);
@@ -154,8 +154,6 @@ test('Every country keeps complete fortunes in the same 10k-block scene, with jo
     for(const html of [
       scene.render({...common,split:true}).html,
       scene.render({...common,split:false}).html,
-      scene.renderTop({...common,base}).html,
-      scene.renderTop({...common,base,split:false}).html,
     ]){
       assert.equal(+attribute(html,'data-block-unit'),10000,country.code);
       const panel=html.match(/<g id="wealthRichestPanel"[^>]+>/)?.[0];
@@ -176,15 +174,34 @@ test('Every country keeps complete fortunes in the same 10k-block scene, with jo
       if(attribute(panel,'data-joined')==='true'){
         const last=[...html.matchAll(/<g class="wealth-stack-column"[^>]+>/g)].at(-1)[0];
         const lastX=+attribute(last,'transform').match(/translate\(([^,]+)/)[1];
-        assert.equal(+attribute(panel,'data-x')-lastX,11,country.code);
+        assert.equal(+attribute(panel,'data-x')-lastX,10,country.code);
         assert.equal(+attribute(gold,'height'),Math.floor(amount/10000)*5);
       }
       const patterns=['wealth-cash','wealth-richest-cash'].map(id=>html.match(new RegExp(`<pattern id="${id}"[^>]*>(.*?)</pattern>`))[1]);
       const geometry=p=>p.replace(/fill="[^"]+"|stroke="[^"]+"|opacity="[^"]+"/g,'');
       assert.equal(geometry(patterns[0]),geometry(patterns[1]),country.code);
       assert.doesNotMatch(html,/rotura|interrumpida|data-scale-break/,country.code);
-      assert.match(html,/Persona más rica →/,country.code);
+      assert.deepEqual([...html.matchAll(/data-scene-scroll="([^"]+)"/g)].map(m=>m[1]),['top','base']);
       assert.doesNotMatch(html,/referencia, no límite de altura/,country.code);
     }
+  }
+});
+
+test('Top-one-percent fortunes fill horizontal 100-block towers without losing their remainder', () => {
+  for(const country of study.countries){
+    const args=inputs(country,10000),person=richest.countries[country.code];
+    const base=study.groups.find(g=>g.country===country.code&&g.category==='cumulative'&&g.group==='p99p100');
+    const html=scene.renderTop({...args,base,richestMan:person,richestSource:richest.source}).html;
+    const panel=html.match(/<g id="wealthRichestPanel"[^>]+>/)[0];
+    const amount=person.usd_billions*1e9/richest.source.usd_per_eur;
+    assert.equal(attribute(panel,'data-layout'),'wrapped');
+    const full=+attribute(panel,'data-full-columns'),last=+attribute(panel,'data-last-blocks'),rest=+attribute(panel,'data-remainder');
+    assert.ok(Math.abs(full*1000000+last*10000+rest-amount)<.001);
+    assert.ok(last>=0&&last<100);
+    assert.ok(rest>=0&&rest<10000);
+    const towers=html.match(/<rect class="wealth-richest-full-towers"[^>]+>/)[0];
+    assert.equal(+attribute(towers,'height'),500);
+    assert.equal(+attribute(towers,'width'),full*10);
+    assert.doesNotMatch(html,/data-scene-scroll|data-scene-mode|data-top-depth/);
   }
 });

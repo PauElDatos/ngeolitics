@@ -50,15 +50,14 @@ window.WealthScene = (() => {
   }
   function frame({width,height,name,population,unit,T,zero,debtRows,silhouette,formatCompact,attributes,header,body,description,positiveRows=ROWS,singleBars=false,richestValue=0}) {
     const logicalTop=Math.min(0,zero-Math.ceil(richestValue/unit)*DY-65);
-    return `<svg id="wealthGraphic" class="moneyScene fixedBlockScene" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="--scene-width:${width}px" data-logical-top="${logicalTop}" data-logical-bottom="${height}" data-zero="${zero}" data-population="${population}" data-block-unit="${unit}" data-stack-capacity="${unit*ROWS}" data-block-rows="${ROWS}" data-plot-rows="${positiveRows}" data-block-width="8" data-block-height="${DY-1}" data-row-step="${DY}" data-upper="${unit*positiveRows}" data-lower="${-debtRows*unit}" ${attributes} role="group" aria-label="${escape(name)}: patrimonio en bloques monetarios de valor fijo" font-family="Arial, sans-serif"><title>${escape(name)}: bloques de ${escape(precise(unit))}</title><desc>${escape(description)} Un bloque verde o dorado tiene idéntico tamaño y vale ${escape(precise(unit))}. La fortuna Forbes ocupa una sola barra vertical de altura completa, recorrible con Cima y Base. La cifra original se publica en USD de 2026 y la conversión a EUR es nominal, no EUR de 2025. ${singleBars?'Cada intervalo del eje principal forma una sola barra vertical.':'Las columnas laterales completas contienen 100 bloques.'} Las marcas naranjas son restos menores que un bloque, no unidades completas.</desc>${defs()}<rect id="wealthBackground" width="${width}" height="${height}" fill="#252825"/><g id="wealthVirtualGrid"></g><g id="wealthSceneContent">${map(silhouette,zero-ROWS*DY,width)}${grid(width,zero,unit,debtRows,formatCompact,positiveRows)}${header}${body}</g><g id="wealthRichestVisible"></g></svg>`;
+    return `<svg id="wealthGraphic" class="moneyScene fixedBlockScene" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="--scene-width:${width}px" data-logical-top="${logicalTop}" data-logical-bottom="${height}" data-zero="${zero}" data-population="${population}" data-block-unit="${unit}" data-stack-capacity="${unit*ROWS}" data-block-rows="${ROWS}" data-plot-rows="${positiveRows}" data-block-width="8" data-block-height="${DY-1}" data-row-step="${DY}" data-upper="${unit*positiveRows}" data-lower="${-debtRows*unit}" ${attributes} role="group" aria-label="${escape(name)}: patrimonio en bloques monetarios de valor fijo" font-family="Arial, sans-serif"><title>${escape(name)}: bloques de ${escape(precise(unit))}</title><desc>${escape(description)} Un bloque verde o dorado tiene idéntico tamaño y vale ${escape(precise(unit))}. La fortuna Forbes utiliza los mismos bloques: una barra vertical en el reparto general y torres laterales de 100 bloques dentro del 1 %. La cifra original se publica en USD de 2026 y la conversión a EUR es nominal, no EUR de 2025. ${singleBars?'Cada intervalo del eje principal forma una sola barra vertical.':'Las columnas laterales completas contienen 100 bloques.'} Las marcas naranjas son restos menores que un bloque, no unidades completas.</desc>${defs()}<rect id="wealthBackground" width="${width}" height="${height}" fill="#252825"/><g id="wealthVirtualGrid"></g><g id="wealthSceneContent">${map(silhouette,zero-ROWS*DY,width)}${grid(width,zero,unit,debtRows,formatCompact,positiveRows)}${body}</g><g id="wealthRichestVisible"></g><g id="wealthSceneHeading"><rect x="${L-16}" y="18" width="790" height="112" rx="8" fill="#252825" fill-opacity=".94"/>${header}</g></svg>`;
   }
-  function reference(unit,formatMoney,singleBars=false) {
-    return `<div class="blockReference"><strong><i class="cashKey"></i>1 bloque entero = ${escape(formatMoney(unit))}</strong><span>100 bloques = ${escape(formatMoney(unit*ROWS))}</span><span class="blockRemainderKey"><i></i>Marca naranja = resto menor que un bloque, importe en el detalle</span><span><i class="richestKey"></i>Dorado = fortuna Forbes 2026 · mismos bloques que los verdes</span><small>EUR de 2025 por adulto en WID · Misma unidad en todos los países y vistas · Fortuna Forbes 2026: USD original y EUR nominal convertido</small></div>`;
+  function reference(unit,formatMoney) {
+    return `<div class="blockReference"><span><i class="cashKey"></i>= ${escape(formatMoney(unit))}</span><span class="blockRemainderKey"><i></i>resto menor que un bloque</span><span><i class="richestKey"></i>fortuna Forbes 2026</span></div>`;
   }
-  function wrap(svg,unit,formatMoney,note,button,{singleBars=false,scrollable=false,split=false,richest=false}={}) {
+  function wrap(svg,unit,formatMoney,note,button,{singleBars=false,scrollable=false,split=false,richest=false,tail=false}={}) {
     scrollable=scrollable||richest;
-    const hint=singleBars?`Cada barra crece hacia arriba con bloques de ${escape(formatMoney(unit))}.${split?' El 1 % separado se apila lateralmente.':' Todos juntos: la dorada está inmediatamente al lado de la última verde.'} Usa Cima y Base para recorrer la altura completa.`:'Desplaza la gráfica ↔ para recorrer las columnas; Cima y Base recorren la altura de la barra dorada.';
-    return reference(unit,formatMoney,singleBars)+`<div class="fixedSceneNavigation"><p class="fixedSceneHint">${hint}</p><button class="btn" data-scene-scroll="start">← Inicio</button><button class="btn" data-scene-scroll="end">${singleBars?(split?'1 % separado →':'1 % →'):'Última columna →'}</button>${richest?'<button class="btn" data-scene-scroll="richest">Persona más rica →</button>':''}${scrollable?'<button class="btn" data-scene-scroll="top">↑ Cima</button><button class="btn" data-scene-scroll="base">↓ Base</button>':''}</div><div class="wealthSceneWrap${scrollable?' verticalSceneWrap':''}${singleBars&&!split?' joinedSceneWrap':''}" tabindex="0" role="region" aria-label="Pilas monetarias de tamaño fijo; desplazamiento horizontal y vertical">${svg}</div><div class="sceneActions"><p class="caption">${escape(note)}</p>${button}</div>`;
+    return reference(unit,formatMoney)+`${tail?'':`<div class="fixedSceneNavigation"><button class="btn" data-scene-scroll="top">↑ Cima</button><button class="btn" data-scene-scroll="base">↓ Base</button></div>`}<div class="wealthSceneWrap${tail?' tailSceneWrap':scrollable?' verticalSceneWrap':''}${singleBars&&!split?' joinedSceneWrap':''}" tabindex="0" role="region" aria-label="Pilas monetarias de tamaño fijo; desplazamiento horizontal${tail?'':' y vertical'}">${svg}</div><div class="sceneActions">${note?'<p class="caption">'+escape(note)+'</p>':''}${button}</div>`;
   }
 
   // Use the same local origin and geometry as pile(), so a block is never split
@@ -70,7 +69,7 @@ window.WealthScene = (() => {
     const cx=x+DX/2,labelX=labelsX??(joined?x+30:cx),topLabelX=joined?x+30:cx,anchor=joined?'start':'middle',usd=formatNumber(person.usd_billions*1000)+' M$';
     const top=zero-Math.ceil(totalBlocks)*DY;
     const details=`${person.name} · Forbes, 1-3-2026|USD originales: ${formatNumber(person.usd_billions*1000)} M$|Conversión a EUR nominales: ${formatCompact(amount)}; 1 € = ${source.usd_per_eur} $ (BCE, 27-2-2026)|${formatNumber(blocks)} bloques enteros de ${formatMoney(unit)}${remainder?' + resto '+precise(remainder):''}|Una sola barra vertical: misma anchura y altura por bloque que los verdes|Según ciudadanía Forbes, no residencia. No es WID 2024 ni EUR de 2025${person.includes_family?'|Forbes atribuye la cifra al hombre y su familia':''}`;
-    return `<g id="wealthRichestPanel" class="wealth-richest" data-name="${escape(person.name)}" data-usd-billions="${person.usd_billions}" data-eur-nominal="${amount}" data-total-blocks="${totalBlocks}" data-true-height="${realHeight}" data-source-year="2026" data-x="${x}" data-top="${top}" data-joined="${joined}" tabindex="0" role="img" aria-label="${escape(details.replaceAll('|','. '))}" data-tip="${escape(details)}">${joined?'':`<line x1="${x-135}" x2="${x-135}" y1="30" y2="${height-12}" stroke="#8c7542" stroke-dasharray="4 6"/>`}<g class="wealth-richest-stack" transform="translate(${x},${zero})"><rect class="wealth-richest-column" data-blocks="${blocks}" x="0" y="${-blocks*DY}" width="${DX}" height="${blocks*DY}" fill="url(#wealth-richest-cash)"/>${remainder?`<rect class="wealth-remainder" data-value="${remainder}" x="1" y="${-blocks*DY-DY+.5}" width="8" height="${DY-1}" fill="url(#wealth-rest)" stroke="#f3b865" stroke-width=".6"/>`:''}</g><text x="${topLabelX}" y="${top-30}" text-anchor="${anchor}" fill="#ffd766" font-size="17">${escape(person.name)} · ${usd}</text><text x="${topLabelX}" y="${top-10}" text-anchor="${anchor}" fill="#efd696" font-size="12">≈ ${escape(formatCompact(amount))} · ${escape(formatNumber(blocks))} bloques enteros</text><text x="${labelX}" y="${panelY+22}" text-anchor="${anchor}" fill="#e8ede2" font-size="13">${escape(person.name)}</text><text x="${labelX}" y="${panelY+44}" text-anchor="${anchor}" fill="#ffd766" font-size="18" font-weight="700">${usd}</text><text x="${labelX}" y="${panelY+64}" text-anchor="${anchor}" fill="#efd696" font-size="12">≈ ${escape(formatCompact(amount))}</text><text x="${labelX}" y="${panelY+82}" text-anchor="${anchor}" fill="#bcb8a8" font-size="11">Forbes 2026 · una persona${person.includes_family?' y familia':''}</text></g>`;
+    return `<g id="wealthRichestPanel" class="wealth-richest" data-name="${escape(person.name)}" data-usd-billions="${person.usd_billions}" data-eur-nominal="${amount}" data-total-blocks="${totalBlocks}" data-true-height="${realHeight}" data-source-year="2026" data-x="${x}" data-top="${top}" data-joined="${joined}" tabindex="0" role="img" aria-label="${escape(details.replaceAll('|','. '))}" data-tip="${escape(details)}">${joined?'':`<line x1="${x-20}" x2="${x-20}" y1="30" y2="${height-12}" stroke="#8c7542" stroke-dasharray="4 6"/>`}<g class="wealth-richest-stack" transform="translate(${x},${zero})"><rect class="wealth-richest-column" data-blocks="${blocks}" x="0" y="${-blocks*DY}" width="${DX}" height="${blocks*DY}" fill="url(#wealth-richest-cash)"/>${remainder?`<rect class="wealth-remainder" data-value="${remainder}" x="1" y="${-blocks*DY-DY+.5}" width="8" height="${DY-1}" fill="url(#wealth-rest)" stroke="#f3b865" stroke-width=".6"/>`:''}</g><text x="${topLabelX}" y="${top-30}" text-anchor="${anchor}" fill="#ffd766" font-size="17">${escape(person.name)} · ${usd}</text><text x="${topLabelX}" y="${top-10}" text-anchor="${anchor}" fill="#efd696" font-size="12">≈ ${escape(formatCompact(amount))} · ${escape(formatNumber(blocks))} bloques enteros</text><text x="${labelX}" y="${panelY+22}" text-anchor="${anchor}" fill="#e8ede2" font-size="13">${escape(person.name)}</text><text x="${labelX}" y="${panelY+44}" text-anchor="${anchor}" fill="#ffd766" font-size="18" font-weight="700">${usd}</text><text x="${labelX}" y="${panelY+64}" text-anchor="${anchor}" fill="#efd696" font-size="12">≈ ${escape(formatCompact(amount))}</text><text x="${labelX}" y="${panelY+82}" text-anchor="${anchor}" fill="#bcb8a8" font-size="11">Forbes 2026 · una persona${person.includes_family?' y familia':''}</text></g>`;
   }
 
 
@@ -88,6 +87,18 @@ window.WealthScene = (() => {
     }).join('');
   }
 
+  function richestTowers({person,source,x,zero,panelY,unit,formatMoney,formatCompact,formatNumber}) {
+    if(!person)return {html:'',width:0};
+    const amount=person.usd_billions*1e9/source.usd_per_eur,blocks=Math.floor(amount/unit),remainder=amount-blocks*unit;
+    const fullColumns=Math.floor(blocks/ROWS),lastBlocks=blocks%ROWS,hasLast=lastBlocks>0||remainder>0;
+    const columns=fullColumns+(hasLast?1:0),width=columns*DX;
+    const usd=formatNumber(person.usd_billions*1000)+' M$';
+    const tip=`${person.name} · Forbes 2026|USD originales: ${usd}|Equivalencia nominal: ${formatMoney(amount)}|${formatNumber(fullColumns)} torres completas de ${ROWS} bloques${hasLast?' + última torre con '+formatNumber(lastBlocks)+' bloques enteros':''}${remainder?' + resto '+precise(remainder):''}|Un bloque = ${formatMoney(unit)}|1 € = ${source.usd_per_eur} $ · BCE, 27-2-2026${person.includes_family?'|Forbes atribuye la cifra al hombre y su familia':''}`;
+    const full=fullColumns?`<rect class="wealth-richest-full-towers" data-columns="${fullColumns}" x="0" y="${-ROWS*DY}" width="${fullColumns*DX}" height="${ROWS*DY}" fill="url(#wealth-richest-cash)"/>`:'';
+    const last=hasLast?`<g class="wealth-richest-last-tower" transform="translate(${fullColumns*DX},0)"><rect class="wealth-richest-column" x="0" y="${-lastBlocks*DY}" width="${DX}" height="${lastBlocks*DY}" fill="url(#wealth-richest-cash)"/>${remainder?`<rect class="wealth-remainder" data-value="${remainder}" x="1" y="${-lastBlocks*DY-DY+.5}" width="8" height="${DY-1}" fill="url(#wealth-rest)" stroke="#f3b865" stroke-width=".6"/>`:''}</g>`:'';
+    return {width,html:`<g id="wealthRichestPanel" class="wealth-richest" data-layout="wrapped" data-name="${escape(person.name)}" data-usd-billions="${person.usd_billions}" data-eur-nominal="${amount}" data-total-blocks="${amount/unit}" data-full-columns="${fullColumns}" data-last-blocks="${lastBlocks}" data-remainder="${remainder}" data-column-count="${columns}" data-x="${x}" tabindex="0" role="img" aria-label="${escape(tip.replaceAll('|','. '))}" data-tip="${escape(tip)}"><line x1="${x-10}" x2="${x-10}" y1="138" y2="${panelY+130}" stroke="#8c7542" stroke-dasharray="4 6"/><text x="${x+16}" y="151" fill="#e7c766" font-size="13">${escape(person.name)}</text><text x="${x+16}" y="176" fill="#e9ece3" font-size="20" font-weight="600">${usd} · ≈ ${escape(formatCompact(amount))}</text><g class="wealth-richest-stack" transform="translate(${x},${zero})">${full}${last}<rect x="0" y="${-ROWS*DY}" width="${width}" height="${ROWS*DY}" fill="transparent"/></g><rect x="${x}" y="${zero+23}" width="${width}" height="8" fill="#e7c766" opacity=".8"/><text x="${x+16}" y="${panelY+22}" fill="#e7c766" font-size="16">${escape(person.name)}</text><text x="${x+16}" y="${panelY+49}" fill="#ffd766" font-size="22" font-weight="600">${usd}</text><text x="${x+16}" y="${panelY+73}" fill="#e4e8dc" font-size="14">≈ ${escape(formatCompact(amount))}</text><text x="${x+16}" y="${panelY+100}" fill="#aab19f" font-size="11">${escape(formatNumber(columns))} torres · Forbes 2026</text></g>`};
+  }
+
   function render({name,population,percentiles,quintiles,top,allPercentiles,silhouette,split=true,unit=10000,richestMan,richestSource,formatMoney,formatCompact,formatPercent,formatNumber}) {
     // All principal intervals grow upwards. Only the intentionally separated top
     // 1% wraps sideways. A common ceiling preserves cross-country comparison.
@@ -100,11 +111,11 @@ window.WealthScene = (() => {
     const debtRows=Math.ceil(Math.ceil(Math.max(0,...percentiles.map(g=>-g.mean))/unit)/5)*5;
     const bottom=zero+debtRows*DY,bandY=bottom+23,axisY=bandY+39,panelY=axisY+44,height=panelY+112;
     let cursor=L;
-    const positions=main.map(g=>{const width=DX+1,pos={g,x:cursor,width,single:true};cursor+=width;return pos;});
-    const mainRight=cursor,sideX=mainRight+50;
-    const topPack=decompose(top.mean,unit),sideWidth=Math.max(198,topPack.columns.length*DX+32);
-    const richestX=split?sideX+sideWidth+207:mainRight;
-    const width=Math.max(1440,richestMan?richestX+310:split?sideX+sideWidth+32:mainRight+32);
+    const positions=main.map(g=>{const width=DX,pos={g,x:cursor,width,single:true};cursor+=width;return pos;});
+    const mainRight=cursor,sideX=mainRight+18;
+    const topPack=decompose(top.mean,unit),sideWidth=Math.max(126,topPack.columns.length*DX+20);
+    const richestX=split?sideX+sideWidth+52:mainRight;
+    const width=Math.max(1480,richestMan?richestX+118:split?sideX+sideWidth+32:mainRight+32);
     const hint=(g,single=true)=>`≈ ${formatNumber(g.count)} adultos · ${g.a}–${g.b} % de la población adulta|Patrimonio medio por adulto: ${formatMoney(g.mean)}|${packing(g.mean,unit,formatNumber,formatMoney,single)}|Patrimonio total del grupo: ${formatCompact(g.total)}|Cuota del patrimonio nacional: ${formatPercent(g.share)}|Entrada desde ${formatMoney(g.lower)}|${name} · 2024 · Recuento estimado WID`;
     let body=positions.map(({g,x})=>pile(g,x,zero,unit,hint(g),g.b===100,true)).join('');
     const samples=split?[9,29,49,69,84,94,98]:[9,29,49,69,84,94,99];
@@ -129,31 +140,29 @@ window.WealthScene = (() => {
     return {html:wrap(svg,unit,formatMoney,note,'<button class="btn" data-view="cima">Ampliar el 1 % →</button>',{singleBars:true,scrollable:positiveRows>ROWS,split,richest:!!richestMan})};
   }
 
-  function renderTop({name,population,base,intervals,silhouette,unit=10000,split=true,richestMan,richestSource,formatMoney,formatCompact,formatPercent,formatNumber,formatGroup}) {
+  function renderTop({name,population,base,intervals,silhouette,unit=10000,richestMan,richestSource,formatMoney,formatCompact,formatPercent,formatNumber,formatGroup}) {
     const T=188,zero=T+ROWS*DY,bandY=zero+23,panelY=bandY+42,height=panelY+142;
     const parts=intervals.filter(g=>g.a>=base.a),top=parts.at(-1),focusLabel=fraction(base.fraction),topLabel=fraction(top.fraction);
-    const widths=parts.map(g=>split?Math.max(248,decompose(g.mean,unit).columns.length*DX+32):DX+1);
-    const spare=split?Math.max(0,1440-L-32-widths.reduce((a,b)=>a+b,0)):0;
+    const widths=parts.map(g=>Math.max(248,decompose(g.mean,unit).columns.length*DX+32));
+    const spare=Math.max(0,1440-L-32-widths.reduce((a,b)=>a+b,0));
     let cursor=L;
-    const positions=parts.map((g,i)=>{const w=widths[i]+spare/parts.length,p={g,x:cursor,width:w};cursor+=w;return p;});
-    const richestX=split?cursor+207:cursor,width=Math.max(1440,richestMan?(split?richestX+310:L+parts.length*290+310):cursor+32);
-    const hint=g=>`${formatGroup(g.group)} · ≈ ${formatNumber(g.count)} adultos|Patrimonio medio por adulto: ${formatMoney(g.mean)}|${packing(g.mean,unit,formatNumber,formatMoney,!split)}|Patrimonio total del tramo: ${formatCompact(g.total)}|${formatPercent(g.share)} de la riqueza nacional|${formatPercent(g.share/base.share)} de la riqueza del ${focusLabel} superior|Entrada desde ${formatMoney(g.lower)}${g.upper==null?' · Sin límite superior':' · Hasta '+formatMoney(g.upper)}|Intervalo sin interpolación individual · WID 2024`;
+    const positions=parts.map((g,i)=>{const width=widths[i]+spare/parts.length,pos={g,x:cursor,width};cursor+=width;return pos;});
+    const richestX=cursor+24;
+    const towers=richestTowers({person:richestMan,source:richestSource,x:richestX,zero,panelY,unit,formatMoney,formatCompact,formatNumber});
+    const width=richestMan?richestX+Math.max(400,towers.width)+32:cursor+32;
     let body='';
     positions.forEach(({g,x,width:w},i)=>{
-      const p=decompose(g.mean,unit),c=palette[intervals.indexOf(g)+1],tx=x+16;
-      if(split)body+=`<line x1="${x-1}" x2="${x-1}" y1="138" y2="${height-12}" stroke="#555c4e" stroke-dasharray="4 6"/><text x="${tx}" y="151" fill="${c}" font-size="13">${i+1} · ${escape(formatGroup(g.group))}</text><text x="${tx}" y="176" fill="#e9ece3" font-size="20" font-weight="600">${escape(formatCompact(g.mean))} por adulto</text>`;
-      body+=pile(g,split?tx:x,zero,unit,hint(g),i===parts.length-1,!split);
-      const cardX=split?x:L+i*290,cardWidth=split?w:290,cardText=cardX+16;
-      body+=`<rect x="${x}" y="${bandY}" width="${split?w-3:DX}" height="8" fill="${c}" opacity=".8"/><g class="wealth-tail-summary" data-group="${escape(g.group)}" data-count="${g.count}"><rect x="${cardX}" y="${panelY}" width="${cardWidth-3}" height="130" fill="${c}" opacity=".04"/><text x="${cardText}" y="${panelY+22}" fill="#e4e8dc" font-size="14">${escape(formatGroup(g.group))} · ≈ ${escape(formatNumber(g.count))} adultos</text><text x="${cardText}" y="${panelY+49}" fill="${c}" font-size="22" font-weight="600">${escape(formatPercent(g.share))}</text><text x="${cardText}" y="${panelY+65}" fill="#aab19f" font-size="10">de la riqueza nacional</text><text x="${cardText}" y="${panelY+89}" fill="#d1d8c7" font-size="12">${escape(formatPercent(g.share/base.share))} de la riqueza del ${escape(focusLabel)} superior</text><text x="${cardText}" y="${panelY+113}" fill="#aab19f" font-size="11">${escape(formatCompact(g.mean))} por adulto</text></g>`;
+      const c=palette[intervals.indexOf(g)+1],tx=x+16;
+      const tip=`${formatGroup(g.group)} · ≈ ${formatNumber(g.count)} adultos|Patrimonio medio por adulto: ${formatMoney(g.mean)}|${packing(g.mean,unit,formatNumber,formatMoney)}|Patrimonio total del tramo: ${formatCompact(g.total)}|${formatPercent(g.share)} de la riqueza nacional|${formatPercent(g.share/base.share)} de la riqueza del ${focusLabel} superior|Entrada desde ${formatMoney(g.lower)}${g.upper==null?' · Sin límite superior':' · Hasta '+formatMoney(g.upper)}|Intervalo sin interpolación individual · WID 2024`;
+      body+=`<line x1="${x-1}" x2="${x-1}" y1="138" y2="${height-12}" stroke="#555c4e" stroke-dasharray="4 6"/><text x="${tx}" y="151" fill="${c}" font-size="13">${i+1} · ${escape(formatGroup(g.group))}</text><text x="${tx}" y="176" fill="#e9ece3" font-size="20" font-weight="600">${escape(formatCompact(g.mean))} por adulto</text>`;
+      body+=pile(g,tx,zero,unit,tip,i===parts.length-1);
+      body+=`<rect x="${x}" y="${bandY}" width="${w-3}" height="8" fill="${c}" opacity=".8"/><g class="wealth-tail-summary" data-group="${escape(g.group)}" data-count="${g.count}"><rect x="${x}" y="${panelY}" width="${w-3}" height="130" fill="${c}" opacity=".04"/><text x="${tx}" y="${panelY+22}" fill="#e4e8dc" font-size="14">≈ ${escape(formatNumber(g.count))} adultos</text><text x="${tx}" y="${panelY+49}" fill="${c}" font-size="22" font-weight="600">${escape(formatPercent(g.share))}</text><text x="${tx}" y="${panelY+65}" fill="#aab19f" font-size="10">de la riqueza nacional</text><text x="${tx}" y="${panelY+89}" fill="#d1d8c7" font-size="12">${escape(formatPercent(g.share/base.share))} de la riqueza del ${escape(focusLabel)} superior</text><text x="${tx}" y="${panelY+113}" fill="#aab19f" font-size="11">${escape(formatCompact(g.mean))} por adulto</text></g>`;
     });
-    body+=richestPanel({person:richestMan,source:richestSource,x:richestX,T,zero,panelY,height,unit,formatMoney,formatCompact,formatNumber,joined:!split,labelsX:split?undefined:L+parts.length*290+24});
-    const headerX=split?L:cursor+60;
-    const header=`<text x="${headerX}" y="55" fill="#e9ece3" font-size="37" font-weight="700" letter-spacing="1.6">${escape(name.toLocaleUpperCase('es'))}</text><text class="wealth-population-total" x="${headerX}" y="80" fill="#bdc5b2" font-size="13">DENTRO DEL ${escape(focusLabel)} SUPERIOR · ≈ ${escape(formatNumber(base.count))} ADULTOS · 2024</text><text x="${headerX}" y="109" fill="#d2d9c5" font-size="13">Media del grupo: ${escape(formatCompact(base.mean))} · Entrada desde ${escape(formatCompact(base.lower))} · ${escape(formatPercent(base.share))} de la riqueza nacional</text>`;
+    body+=towers.html;
+    const header=`<text x="${L}" y="55" fill="#e9ece3" font-size="37" font-weight="700" letter-spacing="1.6">${escape(name.toLocaleUpperCase('es'))}</text><text class="wealth-population-total" x="${L}" y="80" fill="#bdc5b2" font-size="13">DENTRO DEL ${escape(focusLabel)} SUPERIOR · ≈ ${escape(formatNumber(base.count))} ADULTOS · 2024</text><text x="${L}" y="109" fill="#d2d9c5" font-size="13">Media del grupo: ${escape(formatCompact(base.mean))} · Entrada desde ${escape(formatCompact(base.lower))} · ${escape(formatPercent(base.share))} de la riqueza nacional</text>`;
     const topPack=decompose(top.mean,unit);
-    const maximum=Math.max(...parts.map(g=>g.mean),richestMan?richestMan.usd_billions*1e9/richestSource.usd_per_eur:0);
-    const svg=frame({width,height,name,population,unit,T,zero,debtRows:0,silhouette,formatCompact,header,body,singleBars:!split,richestValue:split?(richestMan?richestMan.usd_billions*1e9/richestSource.usd_per_eur:0):maximum,attributes:`data-kind="top" data-focus-population="${base.count}" data-focus-label="${escape(focusLabel)}" data-focus-group="${escape(base.group)}" data-top-label="${escape(topLabel)}" data-top-columns="${split?topPack.columns.length:1}" data-top-value="${top.mean}" data-split="${split}" data-scene-main-end="${positions.at(-1).x}" ${richestMan?'data-richest-x="'+richestX+'"':''}`,description:'Tramos exclusivos del grupo más rico. Cada pila muestra el patrimonio medio por adulto de su tramo; el ancho monetario no representa población.'});
-    const note=`La unidad de ${formatMoney(unit)} es idéntica en bloques verdes y dorados. ${split?'Los tramos WID se apilan lateralmente en columnas de 100 bloques.':'Todos juntos: una barra vertical por tramo y la dorada inmediatamente al lado de la última verde.'} Usa Cima y Base para recorrer las barras enteras. Forbes publica USD de 2026; su conversión a EUR nominal no es un dato WID 2024 ni está ajustada a precios de 2025.`;
-    return {html:wrap(svg,unit,formatMoney,note,'<button class="btn" data-view="quintiles">← Volver al reparto</button>',{singleBars:!split,scrollable:!split,split,richest:!!richestMan})};
+    const svg=frame({width,height,name,population,unit,T,zero,debtRows:0,silhouette,formatCompact,header,body,attributes:`data-kind="top" data-focus-population="${base.count}" data-focus-label="${escape(focusLabel)}" data-focus-group="${escape(base.group)}" data-top-label="${escape(topLabel)}" data-top-columns="${topPack.columns.length}" data-top-value="${top.mean}" data-split="true" data-richest-x="${richestX}"`,description:'Tramos exclusivos del 1 % y fortuna individual en torres laterales de 100 bloques de 10.000 €. Cada pila WID muestra el patrimonio medio por adulto de su tramo; su ancho monetario no representa población.'});
+    return {html:wrap(svg,unit,formatMoney,'','<button class="btn" data-view="quintiles">← Volver al reparto</button>',{tail:true})};
   }
   // A fortune can exceed the browser's maximum element height. Keep the scene
   // in monetary coordinates and move a fixed-size SVG window over its full
@@ -162,7 +171,10 @@ window.WealthScene = (() => {
     sceneObserver?.disconnect();
     const wrap=root.querySelector('.wealthSceneWrap'),svg=root.querySelector('#wealthGraphic');
     if(!wrap||!svg)return;
+    if(svg.dataset.kind==='top')return;
     const logicalTop=Number(svg.dataset.logicalTop),bottom=Number(svg.dataset.logicalBottom);
+    const sceneWidth=Number(svg.getAttribute('width'));
+    const scale=()=>window.innerWidth>850?Math.min(1,wrap.clientWidth/sceneWidth):1;
     const surface=document.createElement('div');
     surface.className='wealthSceneSurface';surface.style.width=svg.getAttribute('width')+'px';
     wrap.classList.add('virtualSceneWrap');svg.before(surface);surface.append(svg);
@@ -179,11 +191,14 @@ window.WealthScene = (() => {
     }
     let offset=0,lastScroll=-1,viewport=0;
     function paint(){
-      viewport=wrap.clientHeight;
-      svg.setAttribute('height',viewport);svg.style.height=viewport+'px';
+      const zoom=scale(),pixels=wrap.clientHeight;
+      viewport=pixels/zoom;
+      svg.setAttribute('height',pixels);svg.style.height=pixels+'px';
+      svg.style.width=sceneWidth*zoom+'px';svg.style.minWidth=sceneWidth*zoom+'px';surface.style.width=sceneWidth*zoom+'px';
       const y=logicalTop+offset;
       svg.setAttribute('viewBox',`0 0 ${svg.getAttribute('width')} ${viewport}`);
       svg.dataset.windowTop=y;svg.dataset.windowBottom=y+viewport;
+      svg.querySelector('#wealthSceneHeading').setAttribute('transform',`translate(${wrap.scrollLeft/zoom},0)`);
       svg.querySelector('#wealthBackground').setAttribute('height',viewport);
       content.setAttribute('display',y+viewport<worldTop?'none':'inline');
       content.setAttribute('transform',`translate(0,${-y})`);
@@ -192,7 +207,7 @@ window.WealthScene = (() => {
       let extra='';
       for(let n=Math.max(first,Math.ceil(rows/ROWS));n<=last;n++){
         const yy=zero-n*DY*ROWS-y,value=n*ROWS*unit;
-        const axisX=Math.max(L-12,wrap.scrollLeft+80);
+        const axisX=Math.max(L-12,wrap.scrollLeft/zoom+80);
         extra+=`<line x1="${L}" x2="${width-32}" y1="${yy}" y2="${yy}" stroke="#43483f" stroke-width=".8"/><text x="${axisX}" y="${yy+4}" fill="#a1a59c" text-anchor="end" font-size="12">${escape(new Intl.NumberFormat('es-ES',{maximumFractionDigits:2}).format(value/1e6))} M€</text>`;
       }
       svg.querySelector('#wealthVirtualGrid').innerHTML=extra;
@@ -211,20 +226,20 @@ window.WealthScene = (() => {
       }
     }
     function move(next){
-      viewport=wrap.clientHeight;
+      viewport=wrap.clientHeight/scale();
       offset=Math.max(0,Math.min(logicalHeight-viewport,next));
-      wrap.scrollTop=offset/Math.max(1,logicalHeight-viewport)*Math.max(0,physicalHeight-viewport);
+      wrap.scrollTop=offset/Math.max(1,logicalHeight-viewport)*Math.max(0,physicalHeight-wrap.clientHeight);
       lastScroll=wrap.scrollTop;paint();
     }
     wrap.addEventListener('scroll',()=>{
       if(Math.abs(wrap.scrollTop-lastScroll)<.1){paint();return;}
       lastScroll=wrap.scrollTop;
-      offset=wrap.scrollTop/Math.max(1,physicalHeight-wrap.clientHeight)*Math.max(0,logicalHeight-wrap.clientHeight);
+      offset=wrap.scrollTop/Math.max(1,physicalHeight-wrap.clientHeight)*Math.max(0,logicalHeight-viewport);
       paint();
     });
     wrap.addEventListener('wheel',event=>{
       if(event.ctrlKey||event.shiftKey||Math.abs(event.deltaX)>Math.abs(event.deltaY))return;
-      const delta=event.deltaY*(event.deltaMode===1?16:event.deltaMode===2?viewport:1);
+      const delta=event.deltaY*(event.deltaMode===1?16/scale():event.deltaMode===2?viewport:1/scale());
       const next=Math.max(0,Math.min(logicalHeight-viewport,offset+delta));
       if(next===offset)return;
       event.preventDefault();move(next);
