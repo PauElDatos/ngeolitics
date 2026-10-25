@@ -145,7 +145,7 @@ test('All 99 country/unit/depth top-tail layouts retain exact values and 100-blo
   }
 });
 
-test('Every country shows a sourced richest-man bar in both scenes with a visible scale break', () => {
+test('Every country shows the full linear fortune beside WID bars in both views', () => {
   for (const country of study.countries) {
     const args=inputs(country,10000),person=richest.countries[country.code];
     assert.ok(person.name && person.usd_billions>0,country.code);
@@ -160,10 +160,17 @@ test('Every country shows a sourced richest-man bar in both scenes with a visibl
       const panel=html.match(/<g id="wealthRichestPanel"[^>]+>/)?.[0];
       assert.ok(panel,country.code);
       assert.equal(attribute(panel,'data-name'),person.name.replaceAll('&','&amp;'),country.code);
-      assert.equal(+attribute(panel,'data-visible-blocks'),100,country.code);
-      assert.equal(+attribute(panel,'data-total-blocks'),Math.floor(person.usd_billions*1e9/richest.source.usd_per_eur/10000),country.code);
-      assert.equal(attribute(panel,'data-scale-break'),'true',country.code);
-      assert.equal((html.match(/class="wealth-richest-block"/g)??[]).length,100,country.code);
+      const amount=person.usd_billions*1e9/richest.source.usd_per_eur;
+      assert.equal(+attribute(panel,'data-eur-nominal'),amount,country.code);
+      assert.equal(+attribute(panel,'data-total-blocks'),amount/10000,country.code);
+      assert.equal(+attribute(panel,'data-true-height'),amount/10000*5,country.code);
+      assert.match(html,/fill="url\(#wealth-richest-cash\)"/,country.code);
+      const overview=html.match(/<svg id="wealthOverviewGraphic"[^>]+>/)?.[0];
+      assert.ok(overview,country.code);
+      assert.equal(+attribute(overview,'data-eur-nominal'),amount,country.code);
+      const richestBar=html.match(/<rect class="wealth-overview-richest"[^>]+>/)?.[0];
+      assert.equal(+attribute(richestBar,'data-height'),amount*(+attribute(overview,'data-scale')),country.code);
+      assert.doesNotMatch(html,/rotura|interrumpida|data-scale-break/,country.code);
       assert.match(html,/Persona más rica →/,country.code);
       assert.doesNotMatch(html,/referencia, no límite de altura/,country.code);
     }
