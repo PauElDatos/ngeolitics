@@ -105,7 +105,7 @@ body { min-height: 100dvh; overflow-x: hidden; font-family: var(--fontText); }
 .fixedSceneNavigation { flex: none; margin: 0 0 8px; }
 .sceneActions { flex: none; padding-top: 8px; }
 .sceneActions .caption { margin: 8px 0 0; }
-.wealthSceneWrap { border-radius: 10px; }
+.wealthSceneWrap { border-radius: 10px; overscroll-behavior: contain; }
 .nationalScene {
   display: grid;
   grid-template-columns: minmax(0,1fr) clamp(440px,22vw,560px);

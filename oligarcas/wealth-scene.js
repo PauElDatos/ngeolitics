@@ -247,10 +247,14 @@ window.WealthScene = (() => {
     });
     wrap.addEventListener('wheel',event=>{
       if(event.ctrlKey||event.shiftKey||Math.abs(event.deltaX)>Math.abs(event.deltaY))return;
+      // Keep vertical wheel gestures inside the chart even at its limits. Without
+      // this, the browser chains the unused delta to the page once the chart has
+      // reached its top or base.
+      event.preventDefault();
       const delta=event.deltaY*(event.deltaMode===1?16/scale():event.deltaMode===2?viewport:1/scale());
       const next=Math.max(0,Math.min(logicalHeight-viewport,offset+delta));
       if(next===offset)return;
-      event.preventDefault();move(next);
+      move(next);
     },{passive:false});
     wrap.addEventListener('keydown',event=>{
       const deltas={ArrowUp:-40,ArrowDown:40,PageUp:-viewport*.9,PageDown:viewport*.9,Home:-logicalHeight,End:logicalHeight};
