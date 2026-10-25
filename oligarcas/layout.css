@@ -100,11 +100,32 @@ body { min-height: 100dvh; overflow-x: hidden; font-family: var(--fontText); }
 .segment button { font-size: 12px; }
 .visual { padding: 12px; }
 .chartFoot { padding: 10px 12px; font-size: 12px; line-height: 1.5; }
+.chartFoot:empty { display: none; }
 .blockReference { flex: none; padding: 10px 12px; margin-bottom: 8px; font-size: 12.15px; }
 .fixedSceneNavigation { flex: none; margin: 0 0 8px; }
 .sceneActions { flex: none; padding-top: 8px; }
 .sceneActions .caption { margin: 8px 0 0; }
 .wealthSceneWrap { border-radius: 10px; }
+.nationalScene {
+  display: grid;
+  grid-template-columns: minmax(0,1fr) clamp(440px,22vw,560px);
+  gap: 12px;
+  flex: 1 1 auto;
+  min-height: 440px;
+}
+.nationalScene > .wealthSceneWrap { min-width: 0; contain: size; }
+.sceneSidebar { display: flex; flex-direction: column; align-self: start; min-width: 0; gap: 16px; }
+.sceneSidebar h3 { margin: 0 0 12px; color: var(--accent); font: 700 13px/1.3 var(--fontTitle); letter-spacing: .35px; text-transform: uppercase; }
+.sceneControlGroup { min-width: 0; padding: 12px; border: 1px solid var(--stroke); border-radius: 10px; background: rgba(255,255,255,.02); }
+.sceneViewControls { display: grid; grid-template-columns: 1fr 1.1fr 1.1fr; gap: 8px; }
+.sceneViewControls .btn { min-width: 0; min-height: 54px; padding: 12px 10px; font-size: 15px; font-weight: 600; white-space: nowrap; }
+.sceneModeButton.on { border-color: var(--accent); background: var(--accent); color: #161616; }
+.sceneZoomButton { border-color: rgba(254,247,2,.4); color: var(--accent); }
+.sceneSidebar .blockReference { display: grid; gap: 16px; margin: 0; padding: 16px; font-size: 14px; }
+.sceneSidebar .blockReference > span { min-height: 22px; gap: 10px; }
+.sceneSidebar .blockReference i { flex: none; }
+.sceneSidebar .fixedSceneNavigation { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; margin: 0; }
+.sceneSidebar .fixedSceneNavigation .btn { min-height: 52px; padding: 12px 10px; font-size: 15px; }
 .insight { padding: 12px; }
 footer { margin: 12px 0 0; padding: 12px 2px; }
 
@@ -135,9 +156,8 @@ footer { margin: 12px 0 0; padding: 12px 2px; }
     min-height: auto;
   }
   #main[data-view="quintiles"] .vizPanel:not(:fullscreen) .wealthSceneWrap.virtualSceneWrap {
-    flex: 1 1 auto;
-    height: 0;
-    min-height: 320px;
+    height: auto;
+    min-height: 440px;
     max-height: none;
   }
   #main[data-view="quintiles"] .vizPanel:not(:fullscreen) > .chartFoot {
@@ -153,6 +173,12 @@ footer { margin: 12px 0 0; padding: 12px 2px; }
   #main[data-view="personas"] .tableWrap { flex: 1 1 auto; min-height: 0; max-height: none; }
 }
 
+@media (max-width: 1300px) {
+  .nationalScene { grid-template-columns: minmax(0,1fr); }
+  .sceneSidebar { grid-row: 1; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+  .sceneSidebar > .sceneControlGroup:first-child { grid-column: 1 / -1; }
+  #main[data-view="quintiles"] .vizPanel .nationalScene > .wealthSceneWrap { height: 70dvh; min-height: 440px; }
+}
 @media (max-width: 900px) {
   .page { padding: 12px 12px 18px; }
   .layout { display: block; }
@@ -177,6 +203,10 @@ footer { margin: 12px 0 0; padding: 12px 2px; }
   .visual { padding: 10px; }
   .btn { font-size: 12px; }
   .chartFoot { font-size: 10px; }
+  .sceneSidebar { display: flex; }
+  .sceneViewControls { display: flex; overflow-x: auto; padding-bottom: 3px; }
+  .sceneViewControls .btn { flex: 1 0 130px; min-height: 50px; font-size: 14px; }
+  #main[data-view="quintiles"] .vizPanel .nationalScene > .wealthSceneWrap { min-height: 360px; }
 }
 @media print {
   body { display: block; height: auto; overflow: visible; }

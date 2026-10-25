@@ -93,21 +93,28 @@ function barRows(gs,metric='share',small=false) {
   }).join('');
   return {html,min,max,zero};
 }
-function blockControls() {
-  return `<button class="btn" id="wealthFullscreen">${document.fullscreenElement?'Salir de pantalla completa':'⛶ Pantalla completa'}</button><button class="btn" id="exportGraphic">Gráfica SVG ↓</button>`;
+function moneySceneControls() {
+  return `<button class="btn sceneModeButton ${state.sceneMode==='split'?'on':''}" data-scene-mode="split" aria-pressed="${state.sceneMode==='split'}" title="Mostrar el 1 % superior en un grupo separado">Separar el 1 %</button><button class="btn sceneModeButton ${state.sceneMode==='full'?'on':''}" data-scene-mode="full" aria-pressed="${state.sceneMode==='full'}" title="Mostrar todas las barras verticales juntas">Juntar las barras</button><button class="btn sceneZoomButton" data-view="cima" title="Explorar cómo se reparte la riqueza dentro del 1 % superior">Ampliar el 1 % →</button>`;
+}
+function distributionMethodology() {
+  return `<p>${esc(countryName(state.country))} · 2024 · Adultos de 20 años o más, patrimonio repartido por igual dentro de las parejas (equal-split). Patrimonio neto: activos menos deudas. Población adulta estimada: ${nfmt(nat().population,0)}. Recuento por grupo = población adulta WID × fracción del intervalo, redondeado para mostrarlo. Se conservan los intervalos del 1 % publicados: no son datos individuales.</p>
+    <p>Un bloque entero = ${money(BLOCK_UNIT)} en todos los países y vistas. Cada intervalo del eje principal forma una sola barra vertical, sin límite de 100 bloques ni sobrantes a la derecha. Solo «Separar el 1 %» conserva el apilado lateral de ese grupo; «Juntar las barras» lo muestra vertical como los demás. Las marcas naranjas identifican restos menores que un bloque. Las cuotas por quintil son las publicadas y no se renormalizan.</p>
+    <p>La barra individual adicional utiliza Forbes (1-3-2026) y el cambio BCE (27-2-2026), no WID; cada bloque dorado vale ${money(BLOCK_UNIT)} y tiene el mismo tamaño que uno verde. Cima y Base recorren su altura completa. En «Juntar las barras», la dorada queda inmediatamente al lado de la última verde.</p>
+    <p><a href="${safeURL(richestSource.forbes_url)}" target="_blank" rel="noopener">Forbes ↗</a> · <a href="${safeURL(richestSource.fx_url)}" target="_blank" rel="noopener">BCE ↗</a>. Fuente: ${sourceLink('wid:WID_'+state.country+'_data')}. Distribución patrimonial: estimaciones publicadas/modelizadas, grado 0.</p>`;
 }
 function renderMoneyScene() {
-  setHead('','Toda la población adulta. Toda la riqueza.','',segment([['split','1 % separado'],['full','Todos juntos']],state.sceneMode,'scene-mode')+blockControls());
+  setHead('','Toda la población adulta. Toda la riqueza.','');
   const scene=WealthScene.render({
     name:countryName(state.country),country:state.country,population:nat().population,
     percentiles:groups('percentile').sort((a,b)=>a.a-b.a),quintiles:groups('quintile'),top:group('p99p100'),
     allPercentiles:data.groups.filter(g=>g.category==='percentile'),silhouette:countrySilhouettes[state.country],
     split:state.sceneMode==='split',unit:BLOCK_UNIT,richestMan:richestMen[state.country],richestSource,
+    sceneControls:moneySceneControls(),
     formatMoney:money,formatCompact:compact,formatPercent:pct,formatNumber:v=>nfmt(v,0),
   });
   $('#visual').innerHTML=scene.html;
   WealthScene.mount($('#visual'));
-  setFoot(`Población adulta estimada: ${nfmt(nat().population,0)}. Recuento por grupo = población adulta WID × fracción del intervalo, redondeado para mostrarlo. Se conservan los intervalos del 1 % publicados: no son datos individuales. Un bloque entero = ${money(BLOCK_UNIT)} en todos los países y vistas. Cada intervalo del eje principal forma una sola barra vertical, sin límite de 100 bloques ni sobrantes a la derecha. Solo «1 % separado» conserva el apilado lateral de ese grupo; «Todos juntos» lo muestra vertical como los demás. Las marcas naranjas identifican restos menores que un bloque. Las cuotas por quintil son las publicadas y no se renormalizan. La barra individual adicional utiliza Forbes (1-3-2026) y el cambio BCE (27-2-2026), no WID; cada bloque dorado vale 10.000 € y tiene el mismo tamaño que uno verde. Cima y Base recorren su altura completa. En «Todos juntos», la dorada queda inmediatamente al lado de la última verde. <a href="${safeURL(richestSource.forbes_url)}" target="_blank" rel="noopener">Forbes ↗</a> · <a href="${safeURL(richestSource.fx_url)}" target="_blank" rel="noopener">BCE ↗</a>.`);
+  $('#chartFoot').replaceChildren();
 }
 function renderQuintiles() {
   const name=countryName(state.country),gs=groups('quintile'), n=nat();
@@ -258,6 +265,7 @@ function renderSources() {
   const cov=data.coverage.filter(o=>o.country===state.country);
   const n25=nat(state.country,2025);
   $('#visual').innerHTML=`<div class="downloads"><a class="btn primary" href="data/estudio.json" download>Datos y trazabilidad · JSON ↓</a><a class="btn" href="data/hombres-mas-ricos-2026.json" download>Fortunas Forbes 2026 · JSON ↓</a><a class="btn" href="data/grupos_2024.csv" download>Todos los grupos · CSV ↓</a><a class="btn" href="metodologia.pdf" target="_blank" rel="noopener">Metodología · PDF ↗</a><button class="btn" id="print">Imprimir estudio</button></div><div class="prose">
+    <h3>Ficha del reparto de ${esc(countryName(state.country))}</h3>${distributionMethodology()}
     <h3>Unidad, precios y moneda</h3><p>EUR de 2025 por adulto en WID · Misma unidad en todos los países y vistas · Fortuna Forbes 2026: USD original y EUR nominal convertido.</p>
     <h3>Qué comparamos</h3><p>La base internacional contiene <strong>1.397 registros de grupo, 127 por país</strong>: quintiles, deciles, percentiles, grupos acumulados e intervalos exclusivos. Corresponden a <strong>2024</strong>. Los 100 percentiles son intervalos publicados; no se han interpolado quintiles. Las categorías se solapan y no deben sumarse entre sí.</p>
     <p>Unidad: <strong>adultos de 20 años o más, equal-split</strong>; el patrimonio de las parejas se reparte por igual según el concepto WID. Incluye activos financieros y no financieros menos deudas. Los activos de pensiones y seguros que incluye WID no equivalen a derechos futuros sobre pensiones públicas.</p>
@@ -266,8 +274,8 @@ function renderSources() {
     <p>${n25?`Para ${countryName(state.country)}, el agregado nacional WID de <strong>2025</strong> es <strong>${compact(n25.total)}</strong>. La recopilación no contiene la distribución detallada equivalente de 2025; no aplicamos las cuotas de 2024 a ese agregado.`:''}</p>
     <h3>Población del gráfico</h3><p>La base es la población de <strong>20 años o más publicada por WID para 2024</strong> (serie <code>npopuli992</code>), no una muestra de cien personas ni la población total de todas las edades. Cada intervalo del reparto general agrupa un 1 % de esa población; cada quintil, un 20 %. Los recuentos se calculan a partir del total adulto y se muestran redondeados: no son registros individuales. El número de columnas monetarias no indica adultos. Las pilas suman patrimonio medio por adulto, no patrimonio total del grupo.</p>
     <h3>Unidad monetaria fija y restos</h3><p><strong>Un bloque entero equivale siempre a 10.000 €</strong>; 100 bloques equivalen a 1.000.000 €. La unidad se conserva entre países y entre el reparto general y el interior del 1 %; no se adapta al máximo del país. Todos los bloques enteros tienen las mismas dimensiones y las pilas WID no se reducen para caber. Cada intervalo del eje principal forma una sola barra vertical y todos sus bloques continúan hacia arriba, sin añadir columnas a su derecha. Un resto inferior a la unidad se identifica con una marca naranja diferenciada y su importe en el detalle. No se redondea el dato del JSON a la unidad gráfica. Las pilas negativas conservan el signo y usan bloques rojos bajo el cero.</p>
-    <p>En «1 % separado», únicamente el grupo P99–P100 conserva el apilado lateral de 100 bloques por columna. En «Todos juntos», también ese grupo se muestra como una única barra vertical, igual que todos los demás intervalos. El eje se amplía con el máximo de los once países para cada modo. Si las barras exceden la pantalla, se recorren verticalmente con «Cima» y «Base».</p>
-    <h3>Fortuna individual: otra fuente y otra fecha</h3><p>La barra del hombre más rico según nacionalidad publicada por <a href="${safeURL(richestSource.forbes_url)}" target="_blank" rel="noopener">Forbes 2026 ↗</a> utiliza sus estimaciones en USD del <strong>1 de marzo de 2026</strong>; «& familia» se conserva donde Forbes así atribuye la cifra. Se divide por <strong>${nfmt(richestSource.usd_per_eur,4)} USD/EUR</strong>, referencia del <a href="${safeURL(richestSource.fx_url)}" target="_blank" rel="noopener">BCE del 27 de febrero de 2026 ↗</a>, día hábil anterior. La conversión a euros es nominal: <strong>no está ajustada a precios de 2025</strong>. Los bloques dorados y verdes tienen idéntica forma, tamaño y valor de 10.000 €. En el reparto general, la barra dorada conserva su altura completa y «Todos juntos» la coloca al lado de las barras verdes. Dentro del 1 %, su fortuna se distribuye en torres laterales de 100 bloques, igual que las medias WID. Esta estimación individual no se suma a los intervalos WID ni se presenta como una observación de 2024.</p>
+    <p>En «Separar el 1 %», únicamente el grupo P99–P100 conserva el apilado lateral de 100 bloques por columna. En «Juntar las barras», también ese grupo se muestra como una única barra vertical, igual que todos los demás intervalos. El eje se amplía con el máximo de los once países para cada modo. Si las barras exceden la pantalla, se recorren verticalmente con «Cima» y «Base».</p>
+    <h3>Fortuna individual: otra fuente y otra fecha</h3><p>La barra del hombre más rico según nacionalidad publicada por <a href="${safeURL(richestSource.forbes_url)}" target="_blank" rel="noopener">Forbes 2026 ↗</a> utiliza sus estimaciones en USD del <strong>1 de marzo de 2026</strong>; «& familia» se conserva donde Forbes así atribuye la cifra. Se divide por <strong>${nfmt(richestSource.usd_per_eur,4)} USD/EUR</strong>, referencia del <a href="${safeURL(richestSource.fx_url)}" target="_blank" rel="noopener">BCE del 27 de febrero de 2026 ↗</a>, día hábil anterior. La conversión a euros es nominal: <strong>no está ajustada a precios de 2025</strong>. Los bloques dorados y verdes tienen idéntica forma, tamaño y valor de 10.000 €. En el reparto general, la barra dorada conserva su altura completa y «Juntar las barras» la coloca al lado de las barras verdes. Dentro del 1 %, su fortuna se distribuye en torres laterales de 100 bloques, igual que las medias WID. Esta estimación individual no se suma a los intervalos WID ni se presenta como una observación de 2024.</p>
     <p>En «Dentro del 1 %» se muestran cuatro intervalos exclusivos: P99–P99,9, P99,9–P99,99, P99,99–P99,999 y el 0,001 % superior. Las medias y cuotas de los tres primeros se obtienen por diferencia de grupos acumulados, conservando las fórmulas del JSON. El ancho de cada pila depende de sus columnas monetarias, no de su población, que figura aparte.</p>
     <h3>Cómo se calculan las cifras</h3><p>Cuota en % = cuota publicada × 100. Patrimonio total de grupo = media del grupo × población adulta × fracción de población. Adultos del grupo = población adulta × fracción. La mediana de un grupo es el umbral percentilar de su punto central, cuando está disponible. Diferencia entre cuotas = 100 × (cuota A − cuota B), en puntos porcentuales. Cuota dentro del 1 % = cuota del subgrupo / cuota del 1 %. Media respecto a mediana = media del grupo / mediana nacional, sólo si esta última es positiva.</p>
     <h3>Ceros, negativos y discrepancias</h3><p>Conservamos los negativos y los ceros publicados. Un grupo con media negativa no permite contar cuántos integrantes tienen patrimonio negativo. Los ceros redondeados no identifican personas con patrimonio exactamente cero. Las cuotas no se renormalizan; pequeñas diferencias entre sumas, medias y agregados se mantienen. En DWA existen comprobaciones de cuota del 10 % que exceden la tolerancia elegida: se conservan los indicadores originales y no se sustituyen unos por otros.</p>
@@ -302,25 +310,6 @@ function exportCSV() {
   const u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');
   a.href=u;a.download=`oligarcas_${state.country}_${state.view}_2024.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
 }
-function exportWealthGraphic(){
-  const svg=$('#wealthGraphic');if(!svg)return;
-  const tail=svg.dataset.kind==='top';
-  const copy=svg.cloneNode(true),{width,height,y}=svg.viewBox.baseVal,footerHeight=140;
-  copy.style.position='static';copy.style.height='auto';copy.style.width=width+'px';copy.style.minWidth='0';
-  copy.setAttribute('width',String(width));copy.setAttribute('height',String(height+footerHeight));copy.setAttribute('viewBox',`0 ${y} ${width} ${height+footerHeight}`);
-  const ns='http://www.w3.org/2000/svg',background=document.createElementNS(ns,'rect');
-  background.setAttribute('x','0');background.setAttribute('y',String(y+height));background.setAttribute('width',String(width));background.setAttribute('height',String(footerHeight));background.setAttribute('fill','#252825');copy.append(background);
-  const notes=[
-    `${countryName(state.country)} · 2024 · Patrimonio neto por adulto de 20 años o más, equal-split · EUR a precios de 2025.`,
-    tail?`Dentro del ${svg.dataset.focusLabel} superior: ≈ ${nfmt(+svg.dataset.focusPopulation,0)} adultos. Anchos monetarios, no proporcionales a población.`:`Población adulta WID: ${nfmt(+svg.dataset.population,0)}. Recuentos por grupo estimados y redondeados; cada intervalo agrupa el 1 % de los adultos.`,
-    `1 bloque entero = ${money(+svg.dataset.blockUnit)}. ${tail&&svg.dataset.split==='true'?'100 bloques por columna = '+money(+svg.dataset.stackCapacity)+'.':'Una barra vertical por intervalo, sin límite de 100 bloques; '+(svg.dataset.split==='true'?'solo el 1 % separado se apila lateralmente.':'incluido el 1 % superior.')} Unidad común; naranja = resto menor que un bloque.`,
-    `Fuente: World Inequality Database · Distribución patrimonial: estimaciones publicadas/modelizadas, grado 0 · Silueta: Natural Earth (dominio público).`,
-    `Fortuna individual: Forbes, 1-3-2026, USD nominal / ${richestSource.usd_per_eur} (BCE, 27-2-2026). Bloques verdes y dorados de 10.000 EUR; exportación de la ventana visible; la conversión nominal no comparte la base de precios WID.`,
-  ];
-  notes.forEach((note,i)=>{const text=document.createElementNS(ns,'text');text.setAttribute('x','92');text.setAttribute('y',String(y+height+25+i*23));text.setAttribute('font-size','12');text.setAttribute('fill','#b0b7a6');text.textContent=note;copy.append(text);});
-  const u=URL.createObjectURL(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml;charset=utf-8'}));
-  const a=document.createElement('a');a.href=u;a.download=`oligarcas_${state.country}_${tail?'cima':'distribucion'}_2024.svg`;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
-}
 document.addEventListener('click',e=>{
   const el=e.target.closest('button,a');if(!el)return;
   if(el.dataset.view){e.preventDefault();activate(el.dataset.view);return;}
@@ -330,11 +319,6 @@ document.addEventListener('click',e=>{
   if(el.dataset.compareStyle){state.compareStyle=el.dataset.compareStyle;render();return;}
   if(el.dataset.compositionSource){state.compositionSource=el.dataset.compositionSource;render();return;}
   if(el.id==='export')exportCSV();
-  if(el.id==='exportGraphic')exportWealthGraphic();
-  if(el.id==='wealthFullscreen'){
-    const action=document.fullscreenElement?document.exitFullscreen():$('.vizPanel').requestFullscreen?.();
-    action?.catch(()=>{});
-  }
   if(el.id==='print')window.print();
 });
 document.addEventListener('change',e=>{
@@ -352,7 +336,6 @@ document.addEventListener('pointermove',e=>{const el=e.target.closest('[data-tip
 document.addEventListener('focusin',e=>{const el=e.target.closest('[data-tip]');if(el){const r=el.getBoundingClientRect();showTip(el,r.x,r.y+r.height/2);}});
 document.addEventListener('focusout',()=>$('#tooltip').hidden=true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#tooltip').hidden=true;});
-document.addEventListener('fullscreenchange',()=>{const b=$('#wealthFullscreen');if(b)b.textContent=document.fullscreenElement?'Salir de pantalla completa':'⛶ Pantalla completa';});
 window.addEventListener('scroll',()=>$('#tooltip').hidden=true,{passive:true});
 $('#main').addEventListener('scroll',()=>$('#tooltip').hidden=true,{passive:true});
 window.addEventListener('hashchange',()=>readHash());
