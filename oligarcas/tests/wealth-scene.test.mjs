@@ -145,7 +145,7 @@ test('All 99 country/unit/depth top-tail layouts retain exact values and 100-blo
   }
 });
 
-test('Every country shows the full linear fortune beside WID bars in both views', () => {
+test('Every country keeps complete fortunes in the same 10k-block scene, with joined bars adjacent', () => {
   for (const country of study.countries) {
     const args=inputs(country,10000),person=richest.countries[country.code];
     assert.ok(person.name && person.usd_billions>0,country.code);
@@ -155,6 +155,7 @@ test('Every country shows the full linear fortune beside WID bars in both views'
       scene.render({...common,split:true}).html,
       scene.render({...common,split:false}).html,
       scene.renderTop({...common,base}).html,
+      scene.renderTop({...common,base,split:false}).html,
     ]){
       assert.equal(+attribute(html,'data-block-unit'),10000,country.code);
       const panel=html.match(/<g id="wealthRichestPanel"[^>]+>/)?.[0];
@@ -165,11 +166,22 @@ test('Every country shows the full linear fortune beside WID bars in both views'
       assert.equal(+attribute(panel,'data-total-blocks'),amount/10000,country.code);
       assert.equal(+attribute(panel,'data-true-height'),amount/10000*5,country.code);
       assert.match(html,/fill="url\(#wealth-richest-cash\)"/,country.code);
-      const overview=html.match(/<svg id="wealthOverviewGraphic"[^>]+>/)?.[0];
-      assert.ok(overview,country.code);
-      assert.equal(+attribute(overview,'data-eur-nominal'),amount,country.code);
-      const richestBar=html.match(/<rect class="wealth-overview-richest"[^>]+>/)?.[0];
-      assert.equal(+attribute(richestBar,'data-height'),amount*(+attribute(overview,'data-scale')),country.code);
+      assert.doesNotMatch(html,/wealthOverview|Escala completa|gráfica superior/,country.code);
+      assert.ok(+attribute(html,'data-logical-top')<+attribute(panel,'data-top'),country.code);
+      const gold=html.match(/<rect class="wealth-richest-column"[^>]+>/)?.[0];
+      assert.equal(+attribute(gold,'height'),Math.floor(amount/10000)*5,country.code);
+      assert.equal(+attribute(gold,'width'),10,country.code);
+      assert.equal(+attribute(gold,'x'),0,country.code);
+      assert.equal(+attribute(gold,'y'),-Math.floor(amount/10000)*5,country.code);
+      if(attribute(panel,'data-joined')==='true'){
+        const last=[...html.matchAll(/<g class="wealth-stack-column"[^>]+>/g)].at(-1)[0];
+        const lastX=+attribute(last,'transform').match(/translate\(([^,]+)/)[1];
+        assert.equal(+attribute(panel,'data-x')-lastX,11,country.code);
+        assert.equal(+attribute(gold,'height'),Math.floor(amount/10000)*5);
+      }
+      const patterns=['wealth-cash','wealth-richest-cash'].map(id=>html.match(new RegExp(`<pattern id="${id}"[^>]*>(.*?)</pattern>`))[1]);
+      const geometry=p=>p.replace(/fill="[^"]+"|stroke="[^"]+"|opacity="[^"]+"/g,'');
+      assert.equal(geometry(patterns[0]),geometry(patterns[1]),country.code);
       assert.doesNotMatch(html,/rotura|interrumpida|data-scale-break/,country.code);
       assert.match(html,/Persona más rica →/,country.code);
       assert.doesNotMatch(html,/referencia, no límite de altura/,country.code);
