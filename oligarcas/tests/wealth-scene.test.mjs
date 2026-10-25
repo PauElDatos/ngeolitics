@@ -5,6 +5,7 @@ import vm from 'node:vm';
 
 const root = new URL('../', import.meta.url);
 const study = JSON.parse(readFileSync(new URL('data/estudio.json', root), 'utf8'));
+const richest = JSON.parse(readFileSync(new URL('data/hombres-mas-ricos-2026.json', root), 'utf8'));
 const context = vm.createContext({ window: {} });
 vm.runInContext(readFileSync(new URL('wealth-scene.js', root), 'utf8'), context);
 const scene = context.window.WealthScene;
@@ -38,11 +39,12 @@ function attribute(html, name) {
   return match[1];
 }
 
-test('Only the three requested block amounts are offered', () => {
+test('The application fixes every scene at 10,000 EUR without a selector', () => {
   const app = readFileSync(new URL('app.js', root), 'utf8');
-  const allowed = app.match(/const blockUnits = (\[[^;]+\]);/);
-  assert.deepEqual(JSON.parse(allowed[1]), units);
-  assert.match(app, /blockUnits\.includes\(value\)/);
+  assert.match(app, /const BLOCK_UNIT = 10000;/);
+  assert.doesNotMatch(app, /id="blockUnit"|state\.blockUnit|blockUnits/);
+  assert.equal(richest.source.usd_per_eur, 1.1805);
+  assert.deepEqual(Object.keys(richest.countries).sort(),study.countries.map(c=>c.code).sort());
 });
 
 test('Complete columns and remainders preserve every amount at all three units', () => {
@@ -139,6 +141,31 @@ test('All 99 country/unit/depth top-tail layouts retain exact values and 100-blo
           assert.ok(html.includes(`data-group="${group.group}" data-count="${group.count}" data-value="${group.mean}"`));
         }
       }
+    }
+  }
+});
+
+test('Every country shows a sourced richest-man bar in both scenes with a visible scale break', () => {
+  for (const country of study.countries) {
+    const args=inputs(country,10000),person=richest.countries[country.code];
+    assert.ok(person.name && person.usd_billions>0,country.code);
+    const common={...args,richestMan:person,richestSource:richest.source};
+    const base=study.groups.find(g=>g.country===country.code && g.category==='cumulative' && g.group==='p99p100');
+    for(const html of [
+      scene.render({...common,split:true}).html,
+      scene.render({...common,split:false}).html,
+      scene.renderTop({...common,base}).html,
+    ]){
+      assert.equal(+attribute(html,'data-block-unit'),10000,country.code);
+      const panel=html.match(/<g id="wealthRichestPanel"[^>]+>/)?.[0];
+      assert.ok(panel,country.code);
+      assert.equal(attribute(panel,'data-name'),person.name.replaceAll('&','&amp;'),country.code);
+      assert.equal(+attribute(panel,'data-visible-blocks'),100,country.code);
+      assert.equal(+attribute(panel,'data-total-blocks'),Math.floor(person.usd_billions*1e9/richest.source.usd_per_eur/10000),country.code);
+      assert.equal(attribute(panel,'data-scale-break'),'true',country.code);
+      assert.equal((html.match(/class="wealth-richest-block"/g)??[]).length,100,country.code);
+      assert.match(html,/Persona más rica →/,country.code);
+      assert.doesNotMatch(html,/referencia, no límite de altura/,country.code);
     }
   }
 });

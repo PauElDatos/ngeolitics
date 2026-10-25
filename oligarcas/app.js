@@ -3,10 +3,12 @@
 const $ = s => document.querySelector(s);
 const colors = ['#67b6df', '#69c7ae', '#bdcd73', '#eeb55e', '#fef702'];
 const flags = { ES:'🇪🇸', US:'🇺🇸', DE:'🇩🇪', FR:'🇫🇷', IT:'🇮🇹', NL:'🇳🇱', JP:'🇯🇵', GB:'🇬🇧', CA:'🇨🇦', KR:'🇰🇷', MX:'🇲🇽' };
-const blockUnits = [10000, 50000, 100000];
-const state = { country:'ES', view:'quintiles', sceneMode:'split', blockUnit:50000, topDepth:0, ranking:'top20', compareStyle:'rank', compositionGroup:'p0p50', compositionSource:'recent' };
+const BLOCK_UNIT = 10000;
+const state = { country:'ES', view:'quintiles', sceneMode:'split', topDepth:0, ranking:'top20', compareStyle:'rank', compositionGroup:'p0p50', compositionSource:'recent' };
 let data;
 let countrySilhouettes={};
+let richestMen={};
+let richestSource={};
 let exportRows = [];
 const nfmt = (v, digits=1) => v == null || !Number.isFinite(v) ? 'No disponible' : new Intl.NumberFormat('es-ES', {maximumFractionDigits:digits, minimumFractionDigits:digits}).format(Object.is(v,-0)?0:v);
 const pct = v => v == null ? 'No disponible' : `${nfmt(v * 100, 2)} %`;
@@ -90,7 +92,7 @@ function barRows(gs,metric='share',small=false) {
   return {html,min,max,zero};
 }
 function blockControls() {
-  return `<label class="field">Valor de un bloque · EUR de 2025<select id="blockUnit">${blockUnits.map(value=>`<option value="${value}" ${state.blockUnit===value?'selected':''}>${money(value)}</option>`).join('')}</select></label><button class="btn" id="wealthFullscreen">${document.fullscreenElement?'Salir de pantalla completa':'⛶ Pantalla completa'}</button><button class="btn" id="exportGraphic">Gráfica SVG ↓</button>`;
+  return `<button class="btn" id="wealthFullscreen">${document.fullscreenElement?'Salir de pantalla completa':'⛶ Pantalla completa'}</button><button class="btn" id="exportGraphic">Gráfica SVG ↓</button>`;
 }
 function renderMoneyScene(detailed=false) {
   setHead(detailed?'02 / La población de cada intervalo':'01 / El reparto de un país','Toda la población adulta. Toda la riqueza.','La misma unidad monetaria para todos los países y quintiles. Cada pila muestra patrimonio medio por adulto; la población y las cuotas figuran aparte.',segment([['split','1 % separado'],['full','Todos juntos']],state.sceneMode,'scene-mode')+blockControls());
@@ -98,13 +100,13 @@ function renderMoneyScene(detailed=false) {
     name:countryName(state.country),country:state.country,population:nat().population,
     percentiles:groups('percentile').sort((a,b)=>a.a-b.a),quintiles:groups('quintile'),top:group('p99p100'),
     allPercentiles:data.groups.filter(g=>g.category==='percentile'),silhouette:countrySilhouettes[state.country],
-    split:state.sceneMode==='split',unit:state.blockUnit,
+    split:state.sceneMode==='split',unit:BLOCK_UNIT,richestMan:richestMen[state.country],richestSource,
     formatMoney:money,formatCompact:compact,formatPercent:pct,formatNumber:v=>nfmt(v,0),
   });
   $('#visual').innerHTML=scene.html;
   const wrap=$('.wealthSceneWrap');
   if(wrap.classList.contains('verticalSceneWrap'))wrap.scrollTop=wrap.scrollHeight;
-  setFoot(`Población adulta estimada: ${nfmt(nat().population,0)}. Recuento por grupo = población adulta WID × fracción del intervalo, redondeado para mostrarlo. Se conservan los intervalos del 1 % publicados: no son datos individuales. Un bloque entero = ${money(state.blockUnit)}. Cada intervalo del eje principal forma una sola barra vertical, sin límite de 100 bloques ni sobrantes a la derecha. Solo «1 % separado» conserva el apilado lateral de ese grupo; «Todos juntos» lo muestra vertical como los demás. La unidad es común a todos los países y vistas y solo cambia manualmente. Las marcas naranjas identifican restos menores que un bloque. Las cuotas por quintil son las publicadas y no se renormalizan.`);
+  setFoot(`Población adulta estimada: ${nfmt(nat().population,0)}. Recuento por grupo = población adulta WID × fracción del intervalo, redondeado para mostrarlo. Se conservan los intervalos del 1 % publicados: no son datos individuales. Un bloque entero = ${money(BLOCK_UNIT)} en todos los países y vistas. Cada intervalo del eje principal forma una sola barra vertical, sin límite de 100 bloques ni sobrantes a la derecha. Solo «1 % separado» conserva el apilado lateral de ese grupo; «Todos juntos» lo muestra vertical como los demás. Las marcas naranjas identifican restos menores que un bloque. Las cuotas por quintil son las publicadas y no se renormalizan. La barra individual adicional utiliza Forbes (1-3-2026) y el cambio BCE (27-2-2026), no WID; su eje se interrumpe explícitamente porque la altura completa no cabe. <a href="${safeURL(richestSource.forbes_url)}" target="_blank" rel="noopener">Forbes ↗</a> · <a href="${safeURL(richestSource.fx_url)}" target="_blank" rel="noopener">BCE ↗</a>.`);
 }
 function renderQuintiles() {
   const name=countryName(state.country),gs=groups('quintile'), n=nat();
@@ -129,10 +131,10 @@ function renderTop() {
   setHead('03 / Ampliar la cima',`Dentro del ${labels[state.topDepth]} más rico`,'Mismo valor y tamaño de los bloques que en el reparto general. En esta ampliación se apilan lateralmente en columnas de 100 bloques; los anchos no representan población.',`<div class="field">Ampliar grupo${segment([['0','1 %'],['1','0,1 %'],['2','0,01 %']],String(state.topDepth),'top-depth')}</div>`+blockControls());
   $('#visual').innerHTML=WealthScene.renderTop({
     name:countryName(state.country),population:nat().population,base,intervals:exclusive,
-    silhouette:countrySilhouettes[state.country],unit:state.blockUnit,
+    silhouette:countrySilhouettes[state.country],unit:BLOCK_UNIT,richestMan:richestMen[state.country],richestSource,
     formatMoney:money,formatCompact:compact,formatPercent:pct,formatNumber:v=>nfmt(v,0),formatGroup:groupName,
   }).html;
-  setFoot('Dentro del 1 % se dispone de cuatro intervalos sin solapamiento; los tres inferiores se calculan restando los grupos acumulados, sin interpolación propia. Se apila la media por adulto de cada tramo con la misma unidad del reparto general: 100 bloques por columna completa, llenadas de izquierda a derecha, y el resto en la última. Una marca naranja representa el resto menor que un bloque, no una unidad completa. La anchura monetaria no representa población. La tabla conserva los grupos acumulados (no sumarlos) y los exclusivos. Recuentos estimados de adultos = población adulta × fracción del grupo.');
+  setFoot('Dentro del 1 % se dispone de cuatro intervalos sin solapamiento; los tres inferiores se calculan restando los grupos acumulados, sin interpolación propia. Se apila la media por adulto de cada tramo con la unidad fija de 10.000 €: 100 bloques por columna completa, llenadas de izquierda a derecha, y el resto en la última. Una marca naranja representa el resto menor que un bloque, no una unidad completa. La anchura monetaria no representa población. La barra individual es una estimación Forbes de 2026 convertida con el BCE, no un tramo adicional ni un dato WID. Su corte de escala está marcado. <a href="${safeURL(richestSource.forbes_url)}" target="_blank" rel="noopener">Forbes ↗</a> · <a href="${safeURL(richestSource.fx_url)}" target="_blank" rel="noopener">BCE ↗</a>.');
   const ratio=nat().median>0?gs[3].mean/nat().median:null;
   $('#insights').innerHTML=insight('La concentración continúa dentro de la cima',`El 0,1 % superior posee <strong>${pct(gs[1].share/gs[0].share)}</strong> de la riqueza del 1 % superior. El 0,001 % representa una de cada 100.000 personas adultas y reúne <strong>${pct(gs[3].share)}</strong> del patrimonio nacional.`)+insight('Media y umbral responden a preguntas distintas',`La media del 0,001 % es <strong>${compact(gs[3].mean)}</strong>; se entra desde <strong>${compact(gs[3].lower)}</strong>. ${ratio!==null?'Su media equivale a <strong>'+nfmt(ratio,0)+' veces</strong> la mediana nacional.':'La mediana nacional no permite calcular un ratio interpretable.'} Las colas extremas dependen especialmente de la modelización.`);
   groupTable([group('p90p100'),group('p95p100'),...gs,...exclusive],'Grupos acumulados e intervalos exclusivos (no sumarlos)');
@@ -263,18 +265,19 @@ function renderNationalComponents(obs) {
   exportRows=[['pais','periodo','grupo','componente','valor_nominal_con_signo','moneda','denominador','porcentaje_activos','registro'],...comps.map(o=>[o.country,o.period,o.group,o.component,o.signed,o.currency,denominator,o.signed/denominator*100,o.id])];
 }
 function renderSources() {
-  setHead('08 / Leer los datos','Fuentes, método y límites','La trazabilidad forma parte del estudio. Datos descargados el 18 de octubre de 2026.');
+  setHead('08 / Leer los datos','Fuentes, método y límites','La trazabilidad forma parte del estudio. Base WID descargada el 18 de octubre de 2026; referencia individual Forbes 2026.');
   const cov=data.coverage.filter(o=>o.country===state.country);
   const n25=nat(state.country,2025);
-  $('#visual').innerHTML=`<div class="downloads"><a class="btn primary" href="data/estudio.json" download>Datos y trazabilidad · JSON ↓</a><a class="btn" href="data/grupos_2024.csv" download>Todos los grupos · CSV ↓</a><a class="btn" href="metodologia.pdf" target="_blank" rel="noopener">Metodología · PDF ↗</a><button class="btn" id="print">Imprimir estudio</button></div><div class="prose">
+  $('#visual').innerHTML=`<div class="downloads"><a class="btn primary" href="data/estudio.json" download>Datos y trazabilidad · JSON ↓</a><a class="btn" href="data/hombres-mas-ricos-2026.json" download>Fortunas Forbes 2026 · JSON ↓</a><a class="btn" href="data/grupos_2024.csv" download>Todos los grupos · CSV ↓</a><a class="btn" href="metodologia.pdf" target="_blank" rel="noopener">Metodología · PDF ↗</a><button class="btn" id="print">Imprimir estudio</button></div><div class="prose">
     <h3>Qué comparamos</h3><p>La base internacional contiene <strong>1.397 registros de grupo, 127 por país</strong>: quintiles, deciles, percentiles, grupos acumulados e intervalos exclusivos. Corresponden a <strong>2024</strong>. Los 100 percentiles son intervalos publicados; no se han interpolado quintiles. Las categorías se solapan y no deben sumarse entre sí.</p>
     <p>Unidad: <strong>adultos de 20 años o más, equal-split</strong>; el patrimonio de las parejas se reparte por igual según el concepto WID. Incluye activos financieros y no financieros menos deudas. Los activos de pensiones y seguros que incluye WID no equivalen a derechos futuros sobre pensiones públicas.</p>
     <h3>Grado 0: estimación publicada, no observación directa</h3><p>${esc(data.definitions.quality_0_distributed_wealth)} Las conclusiones describen las cifras del modelo publicado. El detalle de las colas superiores y los decimales no garantizan precisión empírica. El estudio no prueba por sí solo mecanismos de influencia política ni clasifica a cada integrante de un percentil como oligarca.</p>
     <h3>Fechas e importes</h3><p>El año del patrimonio (2024) difiere del año de precios (2025). Los importes se convierten a EUR con el tipo medio de mercado del BCE de 2025: <code>EUR = moneda local / unidades de moneda local por EUR</code>. No es una conversión por paridad de poder adquisitivo ni una actualización del dato a 2025.</p>
     <p>${n25?`Para ${countryName(state.country)}, el agregado nacional WID de <strong>2025</strong> es <strong>${compact(n25.total)}</strong>. La recopilación no contiene la distribución detallada equivalente de 2025; no aplicamos las cuotas de 2024 a ese agregado.`:''}</p>
     <h3>Población del gráfico</h3><p>La base es la población de <strong>20 años o más publicada por WID para 2024</strong> (serie <code>npopuli992</code>), no una muestra de cien personas ni la población total de todas las edades. Cada intervalo del reparto general agrupa un 1 % de esa población; cada quintil, un 20 %. Los recuentos se calculan a partir del total adulto y se muestran redondeados: no son registros individuales. El número de columnas monetarias no indica adultos. Las pilas suman patrimonio medio por adulto, no patrimonio total del grupo.</p>
-    <h3>Unidad monetaria fija y restos</h3><p>Por defecto, <strong>un bloque entero equivale a 50.000 € de 2025 por adulto</strong>; 100 bloques equivalen a 5.000.000 €, como referencia, no como límite de altura de las barras del reparto general. La unidad elegida manualmente se conserva entre países y entre el reparto general y el interior del 1 %; no se adapta al máximo del país. Todos los bloques enteros tienen las mismas dimensiones y las pilas no se reducen para caber. Cada intervalo del eje principal forma una sola barra vertical y todos sus bloques continúan hacia arriba, sin añadir columnas a su derecha. Los bloques enteros no se recortan: un resto inferior a la unidad se identifica con una marca naranja diferenciada y su importe en el detalle. No se redondea el dato del JSON a la unidad gráfica. Las pilas negativas conservan el signo y usan bloques rojos bajo el cero.</p>
-    <p>En «1 % separado», únicamente el grupo P99–P100 conserva el apilado lateral de 100 bloques por columna. En «Todos juntos», también ese grupo se muestra como una única barra vertical, igual que todos los demás intervalos. El eje se amplía con el máximo de los once países para cada modo y unidad seleccionada; no cambia el tamaño ni el valor de los bloques. Si las barras exceden la pantalla, se recorren verticalmente con «Cima» y «Base».</p>
+    <h3>Unidad monetaria fija y restos</h3><p><strong>Un bloque entero equivale siempre a 10.000 €</strong>; 100 bloques equivalen a 1.000.000 €. La unidad se conserva entre países y entre el reparto general y el interior del 1 %; no se adapta al máximo del país. Todos los bloques enteros tienen las mismas dimensiones y las pilas WID no se reducen para caber. Cada intervalo del eje principal forma una sola barra vertical y todos sus bloques continúan hacia arriba, sin añadir columnas a su derecha. Un resto inferior a la unidad se identifica con una marca naranja diferenciada y su importe en el detalle. No se redondea el dato del JSON a la unidad gráfica. Las pilas negativas conservan el signo y usan bloques rojos bajo el cero.</p>
+    <p>En «1 % separado», únicamente el grupo P99–P100 conserva el apilado lateral de 100 bloques por columna. En «Todos juntos», también ese grupo se muestra como una única barra vertical, igual que todos los demás intervalos. El eje se amplía con el máximo de los once países para cada modo. Si las barras exceden la pantalla, se recorren verticalmente con «Cima» y «Base».</p>
+    <h3>Fortuna individual: otra fuente y otra fecha</h3><p>La barra del hombre más rico según nacionalidad publicada por <a href="${safeURL(richestSource.forbes_url)}" target="_blank" rel="noopener">Forbes 2026 ↗</a> utiliza sus estimaciones en USD del <strong>1 de marzo de 2026</strong>; «& familia» se conserva donde Forbes así atribuye la cifra. Se divide por <strong>${nfmt(richestSource.usd_per_eur,4)} USD/EUR</strong>, referencia del <a href="${safeURL(richestSource.fx_url)}" target="_blank" rel="noopener">BCE del 27 de febrero de 2026 ↗</a>, día hábil anterior. La conversión a euros es nominal: <strong>no está ajustada a precios de 2025</strong>. En la barra dorada se dibujan solo los primeros 100 bloques de 10.000 €; una rotura y el número de bloques equivalentes señalan la parte no dibujada. Dibujar la altura total de centenares de miles de millones produciría decenas de millones de bloques y excedería el tamaño manejable de una página web. Esta estimación individual no se suma a los intervalos WID ni se presenta como una observación de 2024.</p>
     <p>En «Dentro del 1 %» se muestran cuatro intervalos exclusivos: P99–P99,9, P99,9–P99,99, P99,99–P99,999 y el 0,001 % superior. Las medias y cuotas de los tres primeros se obtienen por diferencia de grupos acumulados, conservando las fórmulas del JSON. Las ampliaciones del 0,1 % y del 0,01 % reutilizan los mismos intervalos, sin añadir observaciones. El ancho de cada pila depende de sus columnas monetarias, no de su población, que figura aparte.</p>
     <h3>Cómo se calculan las cifras</h3><p>Cuota en % = cuota publicada × 100. Patrimonio total de grupo = media del grupo × población adulta × fracción de población. Adultos del grupo = población adulta × fracción. La mediana de un grupo es el umbral percentilar de su punto central, cuando está disponible. Diferencia entre cuotas = 100 × (cuota A − cuota B), en puntos porcentuales. Cuota dentro del 1 % = cuota del subgrupo / cuota del 1 %. Media respecto a mediana = media del grupo / mediana nacional, sólo si esta última es positiva.</p>
     <h3>Ceros, negativos y discrepancias</h3><p>Conservamos los negativos y los ceros publicados. Un grupo con media negativa no permite contar cuántos integrantes tienen patrimonio negativo. Los ceros redondeados no identifican personas con patrimonio exactamente cero. Las cuotas no se renormalizan; pequeñas diferencias entre sumas, medias y agregados se mantienen. En DWA existen comprobaciones de cuota del 10 % que exceden la tolerancia elegida: se conservan los indicadores originales y no se sustituyen unos por otros.</p>
@@ -310,7 +313,7 @@ function exportCSV() {
 function exportWealthGraphic(){
   const svg=$('#wealthGraphic');if(!svg)return;
   const tail=svg.dataset.kind==='top';
-  const copy=svg.cloneNode(true),{width,height}=svg.viewBox.baseVal,footerHeight=116;
+  const copy=svg.cloneNode(true),{width,height}=svg.viewBox.baseVal,footerHeight=140;
   copy.setAttribute('width',String(width));copy.setAttribute('height',String(height+footerHeight));copy.setAttribute('viewBox',`0 0 ${width} ${height+footerHeight}`);
   const ns='http://www.w3.org/2000/svg',background=document.createElementNS(ns,'rect');
   background.setAttribute('x','0');background.setAttribute('y',String(height));background.setAttribute('width',String(width));background.setAttribute('height',String(footerHeight));background.setAttribute('fill','#252825');copy.append(background);
@@ -319,6 +322,7 @@ function exportWealthGraphic(){
     tail?`Dentro del ${svg.dataset.focusLabel} superior: ≈ ${nfmt(+svg.dataset.focusPopulation,0)} adultos. Anchos monetarios, no proporcionales a población.`:`Población adulta WID: ${nfmt(+svg.dataset.population,0)}. Recuentos por grupo estimados y redondeados; cada intervalo agrupa el 1 % de los adultos.`,
     `1 bloque entero = ${money(+svg.dataset.blockUnit)}. ${tail?'100 bloques por columna = '+money(+svg.dataset.stackCapacity)+'.':'Una barra vertical por intervalo, sin límite de 100 bloques; '+(svg.dataset.split==='true'?'solo el 1 % separado se apila lateralmente.':'incluido el 1 % superior.')} Unidad común; naranja = resto menor que un bloque.`,
     `Fuente: World Inequality Database · Distribución patrimonial: estimaciones publicadas/modelizadas, grado 0 · Silueta: Natural Earth (dominio público).`,
+    `Fortuna individual: Forbes, 1-3-2026, USD nominal / ${richestSource.usd_per_eur} (BCE, 27-2-2026). Barra interrumpida; no comparable directamente con EUR de 2025.`,
   ];
   notes.forEach((note,i)=>{const text=document.createElementNS(ns,'text');text.setAttribute('x','92');text.setAttribute('y',String(height+25+i*23));text.setAttribute('font-size','12');text.setAttribute('fill','#b0b7a6');text.textContent=note;copy.append(text);});
   const u=URL.createObjectURL(new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n'+new XMLSerializer().serializeToString(copy)],{type:'image/svg+xml;charset=utf-8'}));
@@ -329,7 +333,7 @@ document.addEventListener('click',e=>{
   if(el.dataset.view){e.preventDefault();activate(el.dataset.view);return;}
   if(el.dataset.country){state.country=el.dataset.country;history.replaceState(null,'',`#${state.view}?pais=${state.country}`);render();return;}
   if(el.dataset.sceneMode){state.sceneMode=el.dataset.sceneMode;render();return;}
-  if(el.dataset.sceneScroll){const wrap=$('.wealthSceneWrap');if(wrap){if(el.dataset.sceneScroll==='top')wrap.scrollTop=0;else if(el.dataset.sceneScroll==='base')wrap.scrollTop=wrap.scrollHeight;else wrap.scrollLeft=el.dataset.sceneScroll==='end'?wrap.scrollWidth:0;}return;}
+  if(el.dataset.sceneScroll){const wrap=$('.wealthSceneWrap');if(wrap){if(el.dataset.sceneScroll==='top')wrap.scrollTop=0;else if(el.dataset.sceneScroll==='base')wrap.scrollTop=wrap.scrollHeight;else if(el.dataset.sceneScroll==='richest')wrap.scrollLeft=Math.max(0,Number($('#wealthGraphic')?.dataset.richestX??0)-40);else wrap.scrollLeft=el.dataset.sceneScroll==='end'?Number($('#wealthGraphic')?.dataset.sceneMainEnd??wrap.scrollWidth):0;}return;}
   if(el.dataset.topDepth!==undefined){state.topDepth=Number(el.dataset.topDepth);render();return;}
   if(el.dataset.compareStyle){state.compareStyle=el.dataset.compareStyle;render();return;}
   if(el.dataset.compositionSource){state.compositionSource=el.dataset.compositionSource;render();return;}
@@ -343,11 +347,6 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('change',e=>{
   if(e.target.id==='ranking')state.ranking=e.target.value;
-  else if(e.target.id==='blockUnit'){
-    const value=Number(e.target.value);
-    if(!blockUnits.includes(value))return;
-    state.blockUnit=value;
-  }
   else if(e.target.id==='compositionGroup')state.compositionGroup=e.target.value;
   else return;
   render();
@@ -367,11 +366,12 @@ window.addEventListener('hashchange',()=>readHash());
 function readHash(){const [v,params]=location.hash.slice(1).split('?');const c=new URLSearchParams(params).get('pais');if(data.countries.some(x=>x.code===c))state.country=c;activate(v||'quintiles',false);}
 async function init(){
   try{
-    const [study,maps]=await Promise.all([
+    const [study,maps,richest]=await Promise.all([
       fetch('data/estudio.json').then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json();}),
       fetch('data/country-silhouettes.json').then(r=>r.ok?r.json():{}).catch(()=>({})),
+      fetch('data/hombres-mas-ricos-2026.json').then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json();}),
     ]);
-    data=study;countrySilhouettes=maps.countries??{};$('#status').hidden=true;$('#study').hidden=false;readHash();
+    data=study;countrySilhouettes=maps.countries??{};richestSource=richest.source;richestMen=richest.countries;$('#status').hidden=true;$('#study').hidden=false;readHash();
   }
   catch(e){$('#status').innerHTML='No se han podido cargar los datos. <button class="btn" id="reload">Reintentar</button> <a href="data/grupos_2024.csv">Descargar CSV</a>';$('#reload').onclick=init;console.error(e);}
 }

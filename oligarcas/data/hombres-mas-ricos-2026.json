@@ -1,0 +1,27 @@
+{
+  "source": {
+    "forbes_title": "The Richest Billionaire In Each Country (Forbes 2026)",
+    "forbes_url": "https://www.forbes.com/sites/asia-alexander/2026/03/11/the-richest-billionaire-in-each-country/",
+    "wealth_date": "2026-03-01",
+    "currency": "USD nominal",
+    "country_definition": "Ciudadanía atribuida por Forbes; no lugar de residencia ni ciudadanía de la población WID.",
+    "fx_title": "Tipo de referencia del euro del BCE, 27 de febrero de 2026",
+    "fx_url": "https://www.bancaditalia.it/compiti/operazioni-cambi/cambio/cambi_rif_20260227/?com.dotmarketing.htmlpage.language=1",
+    "fx_date": "2026-02-27",
+    "usd_per_eur": 1.1805,
+    "conversion": "EUR nominal = USD nominal / 1.1805; no ajustado a precios de 2025"
+  },
+  "countries": {
+    "ES": { "name": "Amancio Ortega", "usd_billions": 148 },
+    "US": { "name": "Elon Musk", "usd_billions": 839 },
+    "DE": { "name": "Dieter Schwarz", "usd_billions": 67.2 },
+    "FR": { "name": "Bernard Arnault y familia", "usd_billions": 171, "includes_family": true },
+    "IT": { "name": "Giancarlo Devasini", "usd_billions": 89.3 },
+    "NL": { "name": "Jean-Louis van der Velde", "usd_billions": 38 },
+    "JP": { "name": "Tadashi Yanai y familia", "usd_billions": 61.8, "includes_family": true },
+    "GB": { "name": "Michael Platt", "usd_billions": 20.9 },
+    "CA": { "name": "Changpeng Zhao", "usd_billions": 110 },
+    "KR": { "name": "Jay Y. Lee", "usd_billions": 27 },
+    "MX": { "name": "Carlos Slim Helú y familia", "usd_billions": 125, "includes_family": true }
+  }
+}
