@@ -3,6 +3,7 @@
 const $ = s => document.querySelector(s);
 const colors = ['#67b6df', '#69c7ae', '#bdcd73', '#eeb55e', '#fef702'];
 const flags = { ES:'🇪🇸', US:'🇺🇸', DE:'🇩🇪', FR:'🇫🇷', IT:'🇮🇹', NL:'🇳🇱', JP:'🇯🇵', GB:'🇬🇧', CA:'🇨🇦', KR:'🇰🇷', MX:'🇲🇽' };
+const blockUnits = [10000, 50000, 100000];
 const state = { country:'ES', view:'quintiles', sceneMode:'split', blockUnit:50000, topDepth:0, ranking:'top20', compareStyle:'rank', compositionGroup:'p0p50', compositionSource:'recent' };
 let data;
 let countrySilhouettes={};
@@ -89,7 +90,7 @@ function barRows(gs,metric='share',small=false) {
   return {html,min,max,zero};
 }
 function blockControls() {
-  return `<label class="field">Valor de un bloque · EUR de 2025<select id="blockUnit">${[10000,50000,500000,5000000].map(value=>`<option value="${value}" ${state.blockUnit===value?'selected':''}>${money(value)} · ${money(value*100)} / columna</option>`).join('')}</select></label><button class="btn" id="wealthFullscreen">${document.fullscreenElement?'Salir de pantalla completa':'⛶ Pantalla completa'}</button><button class="btn" id="exportGraphic">Gráfica SVG ↓</button>`;
+  return `<label class="field">Valor de un bloque · EUR de 2025<select id="blockUnit">${blockUnits.map(value=>`<option value="${value}" ${state.blockUnit===value?'selected':''}>${money(value)}</option>`).join('')}</select></label><button class="btn" id="wealthFullscreen">${document.fullscreenElement?'Salir de pantalla completa':'⛶ Pantalla completa'}</button><button class="btn" id="exportGraphic">Gráfica SVG ↓</button>`;
 }
 function renderMoneyScene(detailed=false) {
   setHead(detailed?'02 / La población de cada intervalo':'01 / El reparto de un país','Toda la población adulta. Toda la riqueza.','La misma unidad monetaria para todos los países y quintiles. Cada pila muestra patrimonio medio por adulto; la población y las cuotas figuran aparte.',segment([['split','1 % separado'],['full','Todos juntos']],state.sceneMode,'scene-mode')+blockControls());
@@ -341,7 +342,11 @@ document.addEventListener('click',e=>{
 });
 document.addEventListener('change',e=>{
   if(e.target.id==='ranking')state.ranking=e.target.value;
-  else if(e.target.id==='blockUnit')state.blockUnit=Number(e.target.value);
+  else if(e.target.id==='blockUnit'){
+    const value=Number(e.target.value);
+    if(!blockUnits.includes(value))return;
+    state.blockUnit=value;
+  }
   else if(e.target.id==='compositionGroup')state.compositionGroup=e.target.value;
   else return;
   render();
