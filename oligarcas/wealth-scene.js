@@ -18,7 +18,7 @@ window.WealthScene = (() => {
   }
   function packing(value,unit,formatNumber,formatMoney,single=false) {
     const p=decompose(value,unit);
-    if(single)return `Una sola barra vertical: ${formatNumber(p.blocks)} bloques enteros de ${formatMoney(unit)}${p.remainder?' + resto '+precise(p.remainder):''}. Conserva el importe de las ${p.columns.length} columnas laterales`;
+    if(single)return `Una sola barra vertical: ${formatNumber(p.blocks)} bloques enteros de ${formatMoney(unit)}${p.remainder?' + resto '+precise(p.remainder):''}. Sin límite de 100 bloques ni desbordamiento lateral${p.negative?' (deuda neta)':''}`;
     return `${formatNumber(p.fullColumns)} columnas completas de ${formatMoney(p.capacity)}${p.columns.length>p.fullColumns?' + una última con '+precise(p.columns.at(-1).value):''}. ${formatNumber(p.blocks)} bloques enteros de ${formatMoney(unit)}${p.remainder?' + resto '+precise(p.remainder):''}${p.negative?' (deuda neta)':''}`;
   }
   function pile(g,x,zero,unit,tip,top=false,single=false) {
@@ -47,21 +47,22 @@ window.WealthScene = (() => {
   function map(silhouette,T,width) {
     return silhouette?`<svg x="${L+100}" y="${T+20}" width="${Math.min(1050,width-L-150)}" height="${ROWS*DY-20}" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet" aria-hidden="true"><path d="${escape(silhouette.d)}" fill="#b1b8a2" opacity=".085"/></svg>`:'';
   }
-  function frame({width,height,name,population,unit,T,zero,debtRows,silhouette,formatCompact,attributes,header,body,description,positiveRows=ROWS}) {
-    return `<svg id="wealthGraphic" class="moneyScene fixedBlockScene" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="--scene-width:${width}px" data-population="${population}" data-block-unit="${unit}" data-stack-capacity="${unit*ROWS}" data-block-rows="${ROWS}" data-plot-rows="${positiveRows}" data-block-width="8" data-block-height="${DY-1}" data-row-step="${DY}" data-upper="${unit*positiveRows}" data-lower="${-debtRows*unit}" ${attributes} role="group" aria-label="${escape(name)}: patrimonio en bloques monetarios de valor fijo" font-family="Arial, sans-serif"><title>${escape(name)}: bloques de ${escape(precise(unit))}</title><desc>${escape(description)} Todos los países y vistas comparten la unidad elegida manualmente. Las columnas laterales completas contienen 100 bloques; en «Todos juntos», el 1 % se reúne en una sola barra vertical sin ese límite de altura. Las marcas naranjas son restos menores que un bloque, no unidades completas.</desc>${defs()}<rect width="${width}" height="${height}" fill="#252825"/>${map(silhouette,zero-ROWS*DY,width)}${grid(width,zero,unit,debtRows,formatCompact,positiveRows)}${header}${body}</svg>`;
+  function frame({width,height,name,population,unit,T,zero,debtRows,silhouette,formatCompact,attributes,header,body,description,positiveRows=ROWS,singleBars=false}) {
+    return `<svg id="wealthGraphic" class="moneyScene fixedBlockScene" xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}" viewBox="0 0 ${width} ${height}" style="--scene-width:${width}px" data-population="${population}" data-block-unit="${unit}" data-stack-capacity="${unit*ROWS}" data-block-rows="${ROWS}" data-plot-rows="${positiveRows}" data-block-width="8" data-block-height="${DY-1}" data-row-step="${DY}" data-upper="${unit*positiveRows}" data-lower="${-debtRows*unit}" ${attributes} role="group" aria-label="${escape(name)}: patrimonio en bloques monetarios de valor fijo" font-family="Arial, sans-serif"><title>${escape(name)}: bloques de ${escape(precise(unit))}</title><desc>${escape(description)} Todos los países y vistas comparten la unidad elegida manualmente. ${singleBars?'Cada intervalo del eje principal forma una sola barra vertical, sin límite de altura ni columnas adicionales a su derecha. Solo el 1 % separado conserva el apilado lateral.':'Las columnas laterales completas contienen 100 bloques.'} Las marcas naranjas son restos menores que un bloque, no unidades completas.</desc>${defs()}<rect width="${width}" height="${height}" fill="#252825"/>${map(silhouette,zero-ROWS*DY,width)}${grid(width,zero,unit,debtRows,formatCompact,positiveRows)}${header}${body}</svg>`;
   }
-  function reference(unit,formatMoney) {
-    return `<div class="blockReference"><strong><i class="cashKey"></i>1 bloque entero = ${escape(formatMoney(unit))}</strong><span>100 bloques por columna lateral = ${escape(formatMoney(unit*ROWS))}</span><span class="blockRemainderKey"><i></i>Marca naranja = resto menor que un bloque, importe en el detalle</span><small>EUR de 2025 por adulto · Misma unidad en todos los países y vistas · Sin ajuste automático</small></div>`;
+  function reference(unit,formatMoney,singleBars=false) {
+    return `<div class="blockReference"><strong><i class="cashKey"></i>1 bloque entero = ${escape(formatMoney(unit))}</strong><span>100 bloques${singleBars?' (referencia, no límite de altura)':' por columna lateral'} = ${escape(formatMoney(unit*ROWS))}</span><span class="blockRemainderKey"><i></i>Marca naranja = resto menor que un bloque, importe en el detalle</span><small>EUR de 2025 por adulto · Misma unidad en todos los países y vistas · Sin ajuste automático</small></div>`;
   }
-  function wrap(svg,unit,formatMoney,note,button,joined=false,joinedValue='') {
-    return reference(unit,formatMoney)+`<div class="fixedSceneNavigation"><p class="fixedSceneHint">${joined?'Todos juntos: el 1 % forma una sola barra ('+escape(joinedValue)+' por adulto), apilada hacia arriba con los mismos bloques. Desplázate ↕ para ver su altura completa.':'Desplaza la gráfica ↔: el dinero que supera una columna continúa en la siguiente. Las pilas no se encogen para caber.'}</p><button class="btn" data-scene-scroll="start">← Inicio</button><button class="btn" data-scene-scroll="end">${joined?'1 % →':'Última columna →'}</button>${joined?'<button class="btn" data-scene-scroll="top">↑ Cima</button><button class="btn" data-scene-scroll="base">↓ Base</button>':''}</div><div class="wealthSceneWrap${joined?' joinedSceneWrap':''}" tabindex="0" role="region" aria-label="Pilas monetarias de tamaño fijo; desplazamiento horizontal${joined?' y vertical':''}">${svg}</div><div class="sceneActions"><p class="caption">${escape(note)}</p>${button}</div>`;
+  function wrap(svg,unit,formatMoney,note,button,{singleBars=false,scrollable=false,split=false}={}) {
+    const hint=singleBars?`Cada intervalo crece en una sola barra vertical, sin cortes ni sobrantes a la derecha.${split?' Solo el 1 % separado se apila lateralmente.':''}${scrollable?' Desplázate ↕ para ver las barras completas.':''}`:'Desplaza la gráfica ↔: el dinero que supera una columna continúa en la siguiente. Las pilas no se encogen para caber.';
+    return reference(unit,formatMoney,singleBars)+`<div class="fixedSceneNavigation"><p class="fixedSceneHint">${hint}</p><button class="btn" data-scene-scroll="start">← Inicio</button><button class="btn" data-scene-scroll="end">${singleBars?(split?'1 % separado →':'1 % →'):'Última columna →'}</button>${scrollable?'<button class="btn" data-scene-scroll="top">↑ Cima</button><button class="btn" data-scene-scroll="base">↓ Base</button>':''}</div><div class="wealthSceneWrap${scrollable?' verticalSceneWrap':''}${singleBars&&!split?' joinedSceneWrap':''}" tabindex="0" role="region" aria-label="Pilas monetarias de tamaño fijo; desplazamiento horizontal${scrollable?' y vertical':''}">${svg}</div><div class="sceneActions"><p class="caption">${escape(note)}</p>${button}</div>`;
   }
 
   function sampleLabels(positions,samples,zero,unit,formatCompact) {
     const placed=[];
     return samples.filter(i=>i<positions.length).map(i=>{
       const {g,x,width,single}=positions[i];
-      const text=(single?'1 % · ':'')+formatCompact(g.mean),anchor=i>=98?'end':'middle',cx=x+width/2;
+      const text=(g.b===100?'1 % · ':'')+formatCompact(g.mean),anchor=i>=98?'end':'middle',cx=x+width/2;
       const slots=single?Math.ceil(Math.abs(g.mean)/unit):Math.min(ROWS,Math.ceil(Math.abs(g.mean)/unit));
       const labelWidth=text.length*6.5+8,left=anchor==='end'?cx-labelWidth:cx-labelWidth/2;
       let y=g.mean<0?zero-12:zero-slots*DY-12;
@@ -72,7 +73,10 @@ window.WealthScene = (() => {
   }
 
   function render({name,population,percentiles,quintiles,top,allPercentiles,silhouette,split=true,unit=50000,formatMoney,formatCompact,formatPercent,formatNumber}) {
-    const positiveRows=split?ROWS:Math.max(ROWS,Math.ceil(Math.max(...allPercentiles.map(g=>g.mean))/(unit*ROWS))*ROWS);
+    // All principal intervals grow upwards. Only the intentionally separated top
+    // 1% wraps sideways. A common ceiling preserves cross-country comparison.
+    const referencePercentiles=allPercentiles.filter(g=>!split||g.b<100);
+    const positiveRows=Math.max(ROWS,Math.ceil(Math.max(...referencePercentiles.map(g=>g.mean))/(unit*ROWS))*ROWS);
     const T=166,zero=T+positiveRows*DY;
     const main=split?percentiles.slice(0,-1):percentiles;
     // Other countries' debts must not create a large empty area below this chart.
@@ -80,13 +84,12 @@ window.WealthScene = (() => {
     const debtRows=Math.ceil(Math.ceil(Math.max(0,...percentiles.map(g=>-g.mean))/unit)/5)*5;
     const bottom=zero+debtRows*DY,bandY=bottom+23,axisY=bandY+39,panelY=axisY+44,height=panelY+112;
     let cursor=L;
-    const positions=main.map(g=>{const single=!split&&g.b===100,count=single?1:Math.max(1,decompose(g.mean,unit).columns.length),width=count*DX+(count>1?5:1);const pos={g,x:cursor,width,single,count};cursor+=width;return pos;});
+    const positions=main.map(g=>{const width=DX+1,pos={g,x:cursor,width,single:true};cursor+=width;return pos;});
     const mainRight=cursor,sideX=mainRight+50;
     const topPack=decompose(top.mean,unit),sideWidth=Math.max(198,topPack.columns.length*DX+32);
     const width=Math.max(1440,split?sideX+sideWidth+32:mainRight+32);
-    const hint=g=>`≈ ${formatNumber(g.count)} adultos · ${g.a}–${g.b} % de la población adulta|Patrimonio medio por adulto: ${formatMoney(g.mean)}|${packing(g.mean,unit,formatNumber,formatMoney,!split&&g.b===100)}|Patrimonio total del grupo: ${formatCompact(g.total)}|Cuota del patrimonio nacional: ${formatPercent(g.share)}|Entrada desde ${formatMoney(g.lower)}|${name} · 2024 · Recuento estimado WID`;
-    let body=positions.map(({g,x,single})=>pile(g,x,zero,unit,hint(g),single,single)).join('');
-    body+=positions.filter(p=>p.count>1).map(({g,x,count})=>`<path class="wealth-overflow-guide" data-group="${escape(g.group)}" d="M${x} ${T-2}v-5h${count*DX}v5" fill="none" stroke="#aab19f" stroke-width=".8"/>`).join('');
+    const hint=(g,single=true)=>`≈ ${formatNumber(g.count)} adultos · ${g.a}–${g.b} % de la población adulta|Patrimonio medio por adulto: ${formatMoney(g.mean)}|${packing(g.mean,unit,formatNumber,formatMoney,single)}|Patrimonio total del grupo: ${formatCompact(g.total)}|Cuota del patrimonio nacional: ${formatPercent(g.share)}|Entrada desde ${formatMoney(g.lower)}|${name} · 2024 · Recuento estimado WID`;
+    let body=positions.map(({g,x})=>pile(g,x,zero,unit,hint(g),g.b===100,true)).join('');
     const samples=split?[9,29,49,69,84,94,98]:[9,29,49,69,84,94,99];
     body+=sampleLabels(positions,samples,zero,unit,formatCompact);
     body+=quintiles.map((g,i)=>{
@@ -95,17 +98,17 @@ window.WealthScene = (() => {
     }).join('');
     for(let i=0;i<=main.length;i+=10){const x=i===main.length?mainRight:positions[i].x;body+=`<text class="wealth-population-tick" data-count="${population*i/100}" x="${x}" y="${axisY}" fill="#b0b4a9" font-size="12" text-anchor="middle">${escape(formatNumber(population*i/100))}</text>`;}
     if(split)body+=`<text class="wealth-population-tick" data-count="${population*.99}" x="${mainRight}" y="${axisY}" fill="#b0b4a9" font-size="12" text-anchor="middle">${escape(formatNumber(population*.99))}</text>`;
-    body+=`<text x="${(L+mainRight)/2}" y="${axisY+26}" fill="#aab19f" font-size="10" text-anchor="middle">Adultos acumulados por intervalos · Las columnas adicionales representan dinero, no más población</text>`;
+    body+=`<text x="${(L+mainRight)/2}" y="${axisY+26}" fill="#aab19f" font-size="10" text-anchor="middle">Adultos acumulados por intervalos · Una sola barra vertical por intervalo</text>`;
     if(split){
       const cx=sideX+sideWidth/2;
       body+=`<line x1="${sideX-24}" x2="${sideX-24}" y1="30" y2="${height-12}" stroke="#555c4e" stroke-dasharray="4 6"/><text x="${cx}" y="35" text-anchor="middle" fill="#cdd2c4" font-size="13">EL 1 % SUPERIOR</text><text class="wealth-top-count" x="${cx}" y="60" text-anchor="middle" fill="#e4e8dc" font-size="17">≈ ${escape(formatNumber(top.count))} adultos</text><text x="${cx}" y="93" text-anchor="middle" fill="#fef702" font-size="29" font-weight="700">${escape(formatCompact(top.mean))}</text><text x="${cx}" y="115" text-anchor="middle" fill="#b1b9a5" font-size="11">${topPack.fullColumns} completas${topPack.columns.length>topPack.fullColumns?' + última con resto':''}</text>`;
-      body+=pile(top,cx-topPack.columns.length*DX/2,zero,unit,hint(top),true);
+      body+=pile(top,cx-topPack.columns.length*DX/2,zero,unit,hint(top,false),true);
       body+=`<text x="${cx}" y="${panelY+44}" fill="#fef702" text-anchor="middle" font-size="25" font-weight="600">${escape(formatPercent(top.share))}</text><text x="${cx}" y="${panelY+67}" fill="#b0b6a7" text-anchor="middle" font-size="11">de la riqueza nacional</text>`;
     }
     const header=`<text x="${L}" y="55" fill="#e9ece3" font-size="37" font-weight="700" letter-spacing="1.6">${escape(name.toLocaleUpperCase('es'))}</text><text class="wealth-population-total" x="${L}" y="80" fill="#bdc5b2" font-size="13">${escape(formatNumber(population))} ADULTOS DE 20 AÑOS O MÁS · 2024</text><text x="${L}" y="112" fill="#b2b9a8" font-size="13">Cada intervalo agrupa ≈ ${escape(formatNumber(percentiles[0].count))} adultos, ordenados por patrimonio →</text>`;
-    const svg=frame({width,height,name,population,unit,T,zero,debtRows,silhouette,formatCompact,header,body,positiveRows,attributes:`data-kind="national" data-split="${split}" data-top-layout="${split?'wrapped':'single'}" data-top-columns="${split?topPack.columns.length:1}" data-unfolded-top-columns="${topPack.columns.length}" data-top-value="${top.mean}"`,description:'Intervalos del 1 % de adultos, con su patrimonio medio. La población se indica en cifras, no por el número de columnas monetarias.'});
-    const note=`Referencia fija: ${formatMoney(unit)} por bloque entero; ${formatMoney(unit*ROWS)} por columna lateral completa. ${split?'Se llenan las columnas de izquierda a derecha; no se igualan sus alturas.':'Todos juntos: las columnas laterales del 1 % se apilan en una sola barra vertical, sin el límite de 100 bloques y sin cambiar el valor ni el tamaño de los bloques. El eje vertical se amplía con la misma referencia para los once países.'} Los corchetes agrupan las columnas adicionales de un mismo intervalo: no son caídas de patrimonio ni más población. Una marca naranja indica el resto menor que un bloque, detallado al pasar el cursor o enfocar la pila. No se modifican ni redondean los importes del JSON a la unidad gráfica. Los bloques rojos son deuda neta. ${split?'Q5 incluye el 1 % separado.':'Cada quintil incluye todos sus intervalos.'}`;
-    return {html:wrap(svg,unit,formatMoney,note,'<button class="btn" data-view="cima">Ampliar el 1 % →</button>',!split,formatCompact(top.mean))};
+    const svg=frame({width,height,name,population,unit,T,zero,debtRows,silhouette,formatCompact,header,body,positiveRows,singleBars:true,attributes:`data-kind="national" data-main-layout="single" data-split="${split}" data-top-layout="${split?'wrapped':'single'}" data-top-columns="${split?topPack.columns.length:1}" data-unfolded-top-columns="${topPack.columns.length}" data-top-value="${top.mean}"`,description:'Intervalos del 1 % de adultos, con su patrimonio medio. La población se indica en cifras, no por el número de columnas monetarias.'});
+    const note=`Referencia fija: ${formatMoney(unit)} por bloque entero. Cada intervalo del eje principal forma una sola barra vertical: todos sus bloques crecen hacia arriba, sin límite de 100 bloques y sin pasar el sobrante a la derecha. El eje vertical comparte el máximo de los once países para cada modo y unidad; el tamaño y el valor de los bloques no cambian. ${split?'Únicamente el 1 % separado se reparte en columnas laterales de 100 bloques; Q5 lo incluye.':'Todos juntos incluye el 1 % en una sola barra, igual que los demás intervalos.'} Una marca naranja indica el resto menor que un bloque, detallado al pasar el cursor o enfocar la pila. No se modifican ni redondean los importes del JSON a la unidad gráfica. Los bloques rojos son deuda neta.`;
+    return {html:wrap(svg,unit,formatMoney,note,'<button class="btn" data-view="cima">Ampliar el 1 % →</button>',{singleBars:true,scrollable:positiveRows>ROWS,split})};
   }
 
   function renderTop({name,population,base,intervals,silhouette,unit=50000,formatMoney,formatCompact,formatPercent,formatNumber,formatGroup}) {

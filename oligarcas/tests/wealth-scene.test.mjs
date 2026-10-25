@@ -65,7 +65,7 @@ test('Complete columns and remainders preserve every amount at all three units',
   }
 });
 
-test('National layouts preserve money and block size in all 66 country/unit/mode combinations', () => {
+test('All 66 national layouts grow every principal interval in a single vertical bar', () => {
   for (const country of study.countries) {
     for (const unit of units) {
       for (const split of [true, false]) {
@@ -77,28 +77,49 @@ test('National layouts preserve money and block size in all 66 country/unit/mode
         assert.equal(+attribute(html, 'data-stack-capacity'), unit * 100, label);
         assert.equal(+attribute(html, 'data-block-height'), 4, label);
         assert.equal(+attribute(html, 'data-row-step'), 5, label);
+        assert.equal(attribute(html, 'data-main-layout'), 'single', label);
         assert.equal(+attribute(html, 'data-top-value'), args.top.mean, label);
         const debtRows = Math.ceil(Math.ceil(Math.max(0, ...args.percentiles.map(g => -g.mean)) / unit) / 5) * 5;
         assert.equal(+attribute(html, 'data-lower'), debtRows ? -debtRows * unit : 0, label);
         assert.equal(+attribute(html, 'data-top-columns'), split ? Math.ceil(args.top.mean / (unit * 100)) : 1, label);
         assert.equal((html.match(/class="wealth-interval wealth-pile/g) ?? []).length, 100, label);
+        const reference = allPercentiles.filter(g => !split || g.b < 100);
+        const positiveRows = Math.max(100, Math.ceil(Math.max(...reference.map(g => g.mean)) / (unit * 100)) * 100);
+        assert.equal(+attribute(html, 'data-plot-rows'), positiveRows, label);
+        const piles = [...html.matchAll(/<g class="wealth-interval wealth-pile(?: wealth-top)?"[^>]+>/g)].map(m => m[0]);
         for (const group of args.percentiles) {
-          assert.ok(html.includes(`data-group="${group.group}" data-count="${group.count}" data-value="${group.mean}"`), label);
+          const pile = piles.find(p => attribute(p, 'data-group') === group.group);
+          assert.equal(+attribute(pile, 'data-value'), group.mean, label);
+          const single = !split || group.b < 100;
+          assert.equal(attribute(pile, 'data-layout'), single ? 'single' : 'wrapped', label);
+          if (single) {
+            assert.equal(+attribute(pile, 'data-column-count'), group.mean === 0 ? 0 : 1, label);
+            const blockHeight = Math.floor(Math.abs(group.mean) / unit) * 5;
+            const y = group.mean < 0 ? 0 : -blockHeight;
+            if (group.mean !== 0) assert.ok(html.includes(`data-group="${group.group}" data-value="${group.mean}" x="0" y="${y}" width="10" height="${blockHeight}"`), `${label}/${group.group}: full vertical height`);
+            assert.ok(Math.ceil(Math.max(0, group.mean) / unit) <= positiveRows, `${label}: bar fits vertically`);
+          }
         }
       }
     }
   }
 });
 
-test('10,000 EUR uses US debt bounds, not Italy debt bounds, and labels sit above wrapped stacks', () => {
+test('10,000 EUR never wraps a principal bar after 100 blocks in either mode', () => {
   const args = inputs(study.countries.find(c => c.code === 'US'), 10000);
-  const html = scene.render({ ...args, split: true }).html;
-  assert.equal(+attribute(html, 'data-lower'), -50000);
-  assert.ok(+attribute(html, 'height') < 1000);
-  assert.match(html, /class="wealth-overflow-guide" data-group="p98p99"/);
-  for (const group of ['p94p95', 'p98p99']) {
-    const label = html.match(new RegExp(`<text class="wealth-sample-label" data-group="${group}"[^>]*>`))[0];
-    assert.ok(+attribute(label, 'y') < 166);
+  for (const split of [true, false]) {
+    const html = scene.render({ ...args, split }).html;
+    assert.equal(+attribute(html, 'data-lower'), -50000);
+    assert.ok(+attribute(html, 'data-plot-rows') >= 400);
+    assert.match(html, /verticalSceneWrap/);
+    assert.doesNotMatch(html, /wealth-overflow-guide/);
+    for (const id of ['p94p95', 'p98p99']) {
+      const pile = html.match(new RegExp(`<g class="wealth-interval wealth-pile"[^>]*data-group="${id}"[^>]*>`))[0];
+      assert.equal(attribute(pile, 'data-layout'), 'single');
+      assert.equal(+attribute(pile, 'data-column-count'), 1);
+      assert.ok(+attribute(pile, 'data-block-count') > 100);
+      assert.doesNotMatch(pile, /columnas completas/);
+    }
   }
 });
 
