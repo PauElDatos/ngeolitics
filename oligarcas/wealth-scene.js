@@ -112,10 +112,10 @@ window.WealthScene = (() => {
     const bottom=zero+debtRows*DY,bandY=bottom+23,axisY=bandY+39,panelY=axisY+44,height=panelY+112;
     let cursor=L;
     const positions=main.map(g=>{const width=DX,pos={g,x:cursor,width,single:true};cursor+=width;return pos;});
-    const mainRight=cursor,sideX=mainRight+18;
-    const topPack=decompose(top.mean,unit),sideWidth=Math.max(126,topPack.columns.length*DX+20);
-    const richestX=split?sideX+sideWidth+52:mainRight;
-    const width=Math.max(1480,richestMan?richestX+118:split?sideX+sideWidth+32:mainRight+32);
+    const mainRight=cursor,sideX=mainRight+32;
+    const topPack=decompose(top.mean,unit),sideWidth=Math.max(180,topPack.columns.length*DX+48);
+    const richestX=split?sideX+sideWidth+96:mainRight;
+    const width=Math.max(1600,richestMan?richestX+140:split?sideX+sideWidth+32:mainRight+32);
     const hint=(g,single=true)=>`≈ ${formatNumber(g.count)} adultos · ${g.a}–${g.b} % de la población adulta|Patrimonio medio por adulto: ${formatMoney(g.mean)}|${packing(g.mean,unit,formatNumber,formatMoney,single)}|Patrimonio total del grupo: ${formatCompact(g.total)}|Cuota del patrimonio nacional: ${formatPercent(g.share)}|Entrada desde ${formatMoney(g.lower)}|${name} · 2024 · Recuento estimado WID`;
     let body=positions.map(({g,x})=>pile(g,x,zero,unit,hint(g),g.b===100,true)).join('');
     const samples=split?[9,29,49,69,84,94,98]:[9,29,49,69,84,94,99];
