@@ -11,6 +11,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="assets/section-header.css?v=1">
 
   <style>
     :root{
@@ -64,7 +65,8 @@
 
     /* Header: estética del ejemplo, pero fondo negro */
     header.top{
-      padding:14px 16px;
+      min-height:64px;
+      padding:12px 20px;
       border:1px solid var(--stroke);
       border-radius:var(--radius);
       background: #000;
@@ -79,6 +81,7 @@
       display:flex;
       align-items:center;
       min-width: 0;
+      gap: 20px;
     }
 
     /* Título sencillo: Afacad SOLO aquí */
@@ -86,7 +89,7 @@
       margin:0;
       font-family: var(--fontBrand);
       color: #fff;
-      font-size: calc(34px * var(--uiScale));
+      font-size: 34px;
       letter-spacing:.2px;
       white-space:nowrap;
       font-weight: 400;
@@ -103,8 +106,8 @@
 
     /* Icon buttons con estética del ejemplo */
     .iconBtn{
-      width: 44px;
-      height: 44px;
+      width: 38px;
+      height: 38px;
       display:flex;
       align-items:center;
       justify-content:center;
@@ -269,7 +272,14 @@
       .card{ flex-direction:column; }
       .cardBody{ padding-right: 0; }
       .arrow{ right: 14px; bottom: 14px; }
-      .brandText .t{ font-size: calc(28px * var(--uiScale)); }
+      .brandText .t{ font-size: 34px; }
+    }
+    @media (max-width: 600px){
+      header.top{ flex-wrap:wrap; padding:10px 12px; }
+      .brand{ flex:1 1 100%; gap:10px; }
+      .brandText .t{ font-size:27px; }
+      .topActions{ width:100%; }
+      .iconBtn{ width:34px; height:34px; }
     }
   </style>
 </head>
@@ -282,6 +292,8 @@
         <div class="brandText">
           <h1 class="t">N.Geolitics</h1>
         </div>
+        <span class="ng-section-divider" aria-hidden="true"></span>
+        <span class="ng-section-title">Análisis</span>
       </div>
 
       <div class="topActions" aria-label="Redes sociales">
