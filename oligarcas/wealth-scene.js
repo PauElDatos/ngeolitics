@@ -178,7 +178,7 @@ window.WealthScene = (() => {
     if(svg.dataset.kind==='top')return;
     const logicalTop=Number(svg.dataset.logicalTop),bottom=Number(svg.dataset.logicalBottom);
     const sceneWidth=Number(svg.getAttribute('width'));
-    const scale=()=>window.innerWidth>850?Math.min(1,wrap.clientWidth/sceneWidth):1;
+    const scale=()=>window.innerWidth>900?wrap.clientWidth/sceneWidth:1;
     const surface=document.createElement('div');
     surface.className='wealthSceneSurface';surface.style.width=svg.getAttribute('width')+'px';
     wrap.classList.add('virtualSceneWrap');svg.before(surface);surface.append(svg);
@@ -193,7 +193,7 @@ window.WealthScene = (() => {
       topLabels.forEach(t=>t.setAttribute('display','none'));
       gold.setAttribute('class','wealth-richest');gold.setAttribute('data-tip',panel.dataset.tip);
     }
-    let offset=0,lastScroll=-1,viewport=0;
+    let offset=0,lastScroll=-1,viewport=0,pinnedToBase=true;
     function paint(){
       const zoom=scale(),pixels=wrap.clientHeight;
       viewport=pixels/zoom;
@@ -233,6 +233,7 @@ window.WealthScene = (() => {
     function move(next){
       viewport=wrap.clientHeight/scale();
       offset=Math.max(0,Math.min(logicalHeight-viewport,next));
+      pinnedToBase=offset>=logicalHeight-viewport-.001;
       wrap.scrollTop=offset/Math.max(1,logicalHeight-viewport)*Math.max(0,physicalHeight-wrap.clientHeight);
       lastScroll=wrap.scrollTop;paint();
     }
@@ -240,6 +241,7 @@ window.WealthScene = (() => {
       if(Math.abs(wrap.scrollTop-lastScroll)<.1){paint();return;}
       lastScroll=wrap.scrollTop;
       offset=wrap.scrollTop/Math.max(1,physicalHeight-wrap.clientHeight)*Math.max(0,logicalHeight-viewport);
+      pinnedToBase=wrap.scrollTop>=physicalHeight-wrap.clientHeight-.1;
       paint();
     });
     wrap.addEventListener('wheel',event=>{
@@ -259,7 +261,7 @@ window.WealthScene = (() => {
       else if(action==='richest')wrap.scrollLeft=Math.max(0,Number(svg.dataset.richestX)-wrap.clientWidth/2);
       else wrap.scrollLeft=action==='end'?Math.max(0,Number(svg.dataset.sceneMainEnd)-wrap.clientWidth/2):0;
     };
-    sceneObserver=new ResizeObserver(()=>move(offset));sceneObserver.observe(wrap);
+    sceneObserver=new ResizeObserver(()=>move(pinnedToBase?logicalHeight:offset));sceneObserver.observe(wrap);
     move(logicalHeight);
   }
   return {render,renderTop,decompose,mount};

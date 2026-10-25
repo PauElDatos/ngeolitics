@@ -11,51 +11,51 @@
   <link href="https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/section-header.css?v=1">
   <link rel="stylesheet" href="styles.css?v=centered-headings-6">
-  <script src="wealth-scene.js?v=scrolling-top-heading-7" defer></script>
-  <script src="app.js?v=centered-headings-6" defer></script>
+  <link rel="stylesheet" href="layout.css?v=dashboard-1">
+  <script src="wealth-scene.js?v=dashboard-1" defer></script>
+  <script src="app.js?v=dashboard-1" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Saltar al estudio</a>
+  <div class="ng-section-bar" role="banner">
+    <div class="ng-section-identity"><a class="ng-section-brand" href="../index.html">N.Geolitics</a><span class="ng-section-divider" aria-hidden="true"></span><h1 class="ng-section-title">Oligarcas</h1></div>
+    <a class="ng-section-return" href="../index.html">← Volver a análisis</a>
+  </div>
+  <nav class="tabs sectionTabs" aria-label="Vistas del estudio">
+    <button data-view="quintiles" class="on" aria-current="page">Reparto visual</button>
+    <button data-view="personas">Datos por percentil</button>
+    <button data-view="cima">Dentro del 1 %</button>
+    <button data-view="comparar">Comparar países</button>
+    <button data-view="nivel">Media y mediana</button>
+    <button data-view="composicion">Composición</button>
+    <button data-view="fuentes">Fuentes y datos</button>
+  </nav>
   <div class="page">
-    <div class="ng-section-bar ng-section-bar--contained" role="banner">
-      <div class="ng-section-identity"><a class="ng-section-brand" href="../index.html">N.Geolitics</a><span class="ng-section-divider" aria-hidden="true"></span><span class="ng-section-title">Oligarcas</span></div>
-      <a class="ng-section-return" href="../index.html">← Volver a análisis</a>
-    </div>
     <div class="layout">
       <aside class="panel sidebar" aria-label="Países del estudio">
-        <div class="sidebarHead"><span class="eyebrow">Selecciona un país</span><h2>Once países.<br>Un mismo enfoque.</h2></div>
+        <div class="sidebarHead"><h2>Países</h2><span class="sidebarMeta">11 países · 2024</span></div>
         <nav id="countries" aria-label="País seleccionado"><p class="loading">Cargando países…</p></nav>
         <div class="sidebarFoot"><span class="liveDot"></span> Base comparable · 2024<p>Adultos de 20 años o más.<br>Patrimonio neto · WID.</p><a href="#fuentes" data-view="fuentes">Ver metodología ↗</a></div>
       </aside>
       <main id="main" tabindex="-1">
-        <section class="panel studyHead">
-          <div class="titleRow"><div><div class="eyebrow">Quién tiene qué</div><h1>Oligarcas</h1></div><span class="edition">11 países · 2024 / 2025–2026</span></div>
-          <nav class="tabs" aria-label="Vistas del estudio">
-            <button data-view="quintiles" class="on" aria-current="page">Reparto visual</button>
-            <button data-view="personas">Datos por percentil</button>
-            <button data-view="cima">Dentro del 1 %</button>
-            <button data-view="comparar">Comparar países</button>
-            <button data-view="nivel">Media y mediana</button>
-            <button data-view="composicion">Composición</button>
-            <button data-view="fuentes">Fuentes y datos</button>
-          </nav>
-        </section>
         <div id="status" role="status" class="loading panel">Cargando el estudio y sus fuentes…</div>
         <div id="study" hidden>
-          <section class="statsGrid" id="stats" aria-label="Indicadores del país"></section>
-          <section class="panel vizPanel" aria-labelledby="viewTitle">
-            <div class="panelTitle"><div><div class="eyebrow" id="viewKicker"></div><h2 id="viewTitle"></h2><p id="viewSubtitle"></p></div><div id="controls" class="controls"></div></div>
-            <div id="visual" class="visual"></div>
-            <div class="chartFoot" id="chartFoot"></div>
-          </section>
+          <div class="primaryView">
+            <section class="statsGrid" id="stats" aria-label="Indicadores del país"></section>
+            <section class="panel vizPanel" aria-labelledby="viewTitle">
+              <div class="panelTitle"><div><div class="eyebrow" id="viewKicker"></div><h2 id="viewTitle"></h2><p id="viewSubtitle"></p></div><div id="controls" class="controls"></div></div>
+              <div id="visual" class="visual"></div>
+              <div class="chartFoot" id="chartFoot"></div>
+            </section>
+          </div>
           <section id="insights" class="insightGrid" aria-label="Cómo leer los resultados"></section>
           <section class="panel detailPanel" id="detailPanel"><div class="panelTitle"><div><div class="eyebrow">Las cifras detrás del gráfico</div><h2 id="tableTitle">Datos por grupo</h2></div><button id="export" class="btn">Descargar esta tabla ↓</button></div><div class="tableWrap" id="table"></div></section>
           <p class="studyNote">Comparación internacional: estimaciones WID de 2024, grado de calidad 0 según la descarga. Importes en euros a precios de 2025, convertidos a tipos de mercado del BCE; no ajustados por poder adquisitivo. <a href="#fuentes" data-view="fuentes">Cómo interpretar los datos ↗</a></p>
         </div>
         <noscript><p class="panel loading">Activa JavaScript para explorar el estudio. También puedes <a href="data/grupos_2024.csv">descargar los datos por grupo</a> y <a href="metodologia.pdf">consultar la metodología</a>.</p></noscript>
+        <footer> N.Geolitics <span>La información es poder.</span><a href="data/estudio.json" download>Datos del estudio ↓</a></footer>
       </main>
     </div>
-    <footer> N.Geolitics <span>La información es poder.</span><a href="data/estudio.json" download>Datos del estudio ↓</a></footer>
   </div>
   <div id="tooltip" class="tooltip" hidden></div>
 </body>

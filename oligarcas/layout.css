@@ -1,0 +1,186 @@
+/* Page shell shared with the site's other analytical sections. */
+:root {
+  --fontTitle: "Futura", "Trebuchet MS", system-ui, sans-serif;
+  --fontText: Arial, system-ui, sans-serif;
+  --uiScale: 1.35;
+  --radius: 14px;
+}
+body { min-height: 100dvh; overflow-x: hidden; font-family: var(--fontText); }
+.page { width: 100%; max-width: none; margin: 0; padding: 12px 12px 18px; min-height: 0; }
+.sectionTabs {
+  flex: none;
+  gap: 10px;
+  margin: 12px 18px 0;
+  padding: 0 0 2px;
+  border: 0;
+  min-width: 0;
+}
+.sectionTabs button {
+  flex: none;
+  padding: 9px 12px;
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 999px;
+  background: rgba(255,255,255,.04);
+  color: #ddd;
+  font-size: 14.85px;
+}
+.sectionTabs button.on {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #161616;
+  font-weight: 700;
+}
+.layout { grid-template-columns: 340px minmax(0,1fr); gap: 12px; align-items: stretch; min-height: 0; }
+.sidebar { position: static; display: flex; flex-direction: column; min-height: 0; }
+.sidebarHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: none;
+  gap: 10px;
+  min-height: 44px;
+  padding: 12px 12px 10px;
+  border-bottom: 1px solid var(--stroke);
+  background: rgba(255,255,255,.02);
+}
+.sidebarHead h2 {
+  display: block;
+  margin: 0;
+  color: var(--accent);
+  font: 700 17.55px/1.2 var(--fontTitle);
+  letter-spacing: .35px;
+  text-transform: uppercase;
+}
+.sidebarMeta { color: var(--muted); font-size: 14.85px; line-height: 1.2; text-align: right; }
+#countries {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  gap: 8px;
+  min-height: 0;
+  padding: 12px;
+  overflow: auto;
+  scrollbar-width: thin;
+}
+.country {
+  flex: none;
+  min-height: 44px;
+  margin: 0;
+  padding: 10px;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 10px;
+  background: rgba(255,255,255,.02);
+  gap: 10px;
+  font-size: 16.2px;
+  line-height: 1.3;
+}
+.country.on { border-color: rgba(254,247,2,.35); background: rgba(254,247,2,.08); }
+.countryCode { flex: none; width: 28px; height: 24px; font-size: 10px; }
+.country .arrow { display: none; }
+.sidebarFoot { flex: none; padding: 12px; font-size: 12.15px; }
+.sidebarFoot p { margin: 6px 0; line-height: 1.45; }
+#main { min-width: 0; min-height: 0; }
+#study { gap: 12px; margin-top: 0; }
+.primaryView { display: contents; }
+.statsGrid { gap: 12px; }
+.statCard { padding: 12px; border-radius: var(--radius); }
+.statCard .k { font-size: 12.15px; letter-spacing: .35px; }
+.statCard .v { font-size: 29px; margin: 6px 0 4px; }
+.statCard .s { font-size: 12.15px; }
+.panelTitle { min-height: 44px; padding: 12px; gap: 12px; background: rgba(255,255,255,.02); }
+.panelTitle h2 {
+  margin: 0;
+  color: var(--accent);
+  font: 700 17.55px/1.3 var(--fontTitle);
+  letter-spacing: .35px;
+  text-transform: uppercase;
+}
+.panelTitle p { font-size: 13px; }
+.btn { padding: 8px 10px; border-radius: 10px; font-size: 14px; }
+.segment button { font-size: 12px; }
+.visual { padding: 12px; }
+.chartFoot { padding: 10px 12px; font-size: 12px; line-height: 1.5; }
+.blockReference { flex: none; padding: 10px 12px; margin-bottom: 8px; font-size: 12.15px; }
+.fixedSceneNavigation { flex: none; margin: 0 0 8px; }
+.sceneActions { flex: none; padding-top: 8px; }
+.sceneActions .caption { margin: 8px 0 0; }
+.wealthSceneWrap { border-radius: 10px; }
+.insight { padding: 12px; }
+footer { margin: 12px 0 0; padding: 12px 2px; }
+
+@media (min-width: 901px) {
+  body { display: flex; flex-direction: column; height: 100dvh; overflow: hidden; }
+  .page { flex: 1 1 auto; overflow: hidden; }
+  .layout, .sidebar, #main { height: 100%; }
+  #main { overflow: auto; scrollbar-width: thin; scrollbar-gutter: stable; }
+  #main[data-view="quintiles"] #study { display: block; height: 100%; }
+  #main[data-view="quintiles"] .primaryView {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 100%;
+  }
+  #main[data-view="quintiles"] .primaryView > .statsGrid { flex: none; }
+  #main[data-view="quintiles"] .vizPanel:not(:fullscreen) {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: auto;
+  }
+  #main[data-view="quintiles"] .vizPanel:not(:fullscreen) > .panelTitle { flex: none; }
+  #main[data-view="quintiles"] .vizPanel:not(:fullscreen) > .visual {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: auto;
+  }
+  #main[data-view="quintiles"] .vizPanel:not(:fullscreen) .wealthSceneWrap.virtualSceneWrap {
+    flex: 1 1 auto;
+    height: 0;
+    min-height: 320px;
+    max-height: none;
+  }
+  #main[data-view="quintiles"] .vizPanel:not(:fullscreen) > .chartFoot {
+    flex: none;
+    max-height: 76px;
+    overflow: auto;
+    scrollbar-width: thin;
+  }
+  #main[data-view="quintiles"] .primaryView ~ * { margin-top: 12px; }
+  #main[data-view="personas"] #study { display: flex; flex-direction: column; height: 100%; }
+  #main[data-view="personas"] .primaryView { display: none; }
+  #main[data-view="personas"] .detailPanel { display: flex; flex-direction: column; flex: 1 1 auto; min-height: 0; }
+  #main[data-view="personas"] .tableWrap { flex: 1 1 auto; min-height: 0; max-height: none; }
+}
+
+@media (max-width: 900px) {
+  .page { padding: 12px 12px 18px; }
+  .layout { display: block; }
+  .sidebar { margin-bottom: 12px; }
+  .sidebarHead { display: flex; padding: 10px 12px; }
+  .sidebarHead h2 { font-size: 15px; }
+  .sidebarMeta { font-size: 12px; }
+  .sidebarFoot { display: none; }
+  #countries { flex-direction: row; gap: 8px; padding: 10px; }
+  .country { width: auto; min-height: 40px; padding: 8px 10px; white-space: nowrap; font-size: 13px; }
+  .countryCode { width: 24px; height: 22px; }
+  .wealthSceneWrap.virtualSceneWrap { height: 70dvh; min-height: 360px; max-height: none; }
+}
+@media (max-width: 620px) {
+  .page { padding: 10px; }
+  .sectionTabs { margin: 10px 10px 0; gap: 8px; }
+  .sectionTabs button { padding: 8px 10px; font-size: 12px; }
+  .statsGrid { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  .statCard .k, .statCard .s { font-size: 10px; }
+  .statCard .v { font-size: 25px; }
+  .panelTitle h2 { font-size: 16px; }
+  .visual { padding: 10px; }
+  .btn { font-size: 12px; }
+  .chartFoot { font-size: 10px; }
+}
+@media print {
+  body { display: block; height: auto; overflow: visible; }
+  .page, #main { height: auto; overflow: visible; }
+  .layout { display: block; height: auto; }
+  #main[data-view="quintiles"] .primaryView { display: block; height: auto; min-height: 0; }
+}

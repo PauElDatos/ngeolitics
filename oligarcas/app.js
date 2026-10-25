@@ -38,9 +38,11 @@ function groupName(id) {
 }
 function activate(view, push=true) {
   if (!['quintiles','personas','cima','comparar','nivel','composicion','fuentes'].includes(view)) view='quintiles';
+  const changed=state.view!==view;
   state.view=view;
   if (push) history.replaceState(null,'',`#${view}?pais=${state.country}`);
   render();
+  if(changed)$('#main').scrollTop=0;
 }
 function segment(values, selected, action) {
   return `<div class="segment">${values.map(([value,label]) => `<button data-${action}="${value}" class="${selected===value?'on':''}" aria-pressed="${selected===value}">${label}</button>`).join('')}</div>`;
@@ -283,6 +285,7 @@ function renderSources() {
 }
 function render() {
   if(!data)return;
+  $('#main').dataset.view=state.view;
   $('.vizPanel').hidden=state.view==='personas';$('#stats').hidden=state.view==='personas';$('#insights').hidden=state.view==='personas';
   $('#tooltip').hidden=true;
   document.querySelectorAll('.tabs button').forEach(b=>{const on=b.dataset.view===state.view;b.classList.toggle('on',on);on?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current');});
@@ -351,6 +354,7 @@ document.addEventListener('focusout',()=>$('#tooltip').hidden=true);
 document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#tooltip').hidden=true;});
 document.addEventListener('fullscreenchange',()=>{const b=$('#wealthFullscreen');if(b)b.textContent=document.fullscreenElement?'Salir de pantalla completa':'⛶ Pantalla completa';});
 window.addEventListener('scroll',()=>$('#tooltip').hidden=true,{passive:true});
+$('#main').addEventListener('scroll',()=>$('#tooltip').hidden=true,{passive:true});
 window.addEventListener('hashchange',()=>readHash());
 function readHash(){const [v,params]=location.hash.slice(1).split('?');const c=new URLSearchParams(params).get('pais');if(data.countries.some(x=>x.code===c))state.country=c;activate(v||'quintiles',false);}
 async function init(){
