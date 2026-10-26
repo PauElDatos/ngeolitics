@@ -172,14 +172,14 @@ window.WealthScene = (() => {
   // A fortune can exceed the browser's maximum element height. Keep the scene
   // in monetary coordinates and move a fixed-size SVG window over its full
   // extent; the native scrollbar navigates that extent without scaling blocks.
-  function mount(root) {
+  function mount(root,options={}) {
     sceneObserver?.disconnect();
     const wrap=root.querySelector('.wealthSceneWrap'),svg=root.querySelector('#wealthGraphic');
     if(!wrap||!svg)return;
     if(svg.dataset.kind==='top')return;
-    const logicalTop=Number(svg.dataset.logicalTop),bottom=Number(svg.dataset.logicalBottom);
+    const logicalTop=Number(svg.dataset.logicalTop),bottom=options.bottom??Number(svg.dataset.logicalBottom);
     const sceneWidth=Number(svg.getAttribute('width'));
-    const scale=()=>window.innerWidth>900?wrap.clientWidth/sceneWidth:1;
+    const scale=()=>options.scale?options.scale(wrap,sceneWidth):window.innerWidth>900?wrap.clientWidth/sceneWidth:1;
     const surface=document.createElement('div');
     surface.className='wealthSceneSurface';surface.style.width=svg.getAttribute('width')+'px';
     wrap.classList.add('virtualSceneWrap');svg.before(surface);surface.append(svg);
@@ -230,6 +230,7 @@ window.WealthScene = (() => {
         }
         gold.innerHTML=visible;
       }
+      options.onPaint?.({zoom,top:y,zero,viewport,pixels,unit});
     }
     function move(next){
       viewport=wrap.clientHeight/scale();
@@ -268,6 +269,10 @@ window.WealthScene = (() => {
     };
     sceneObserver=new ResizeObserver(()=>move(pinnedToBase?logicalHeight:offset));sceneObserver.observe(wrap);
     move(logicalHeight);
+    return {
+      refresh:()=>move(pinnedToBase?logicalHeight:offset),
+      pan:(x,y)=>{wrap.scrollLeft+=x;move(offset+y/scale());},
+    };
   }
   return {render,renderTop,decompose,mount};
 })();

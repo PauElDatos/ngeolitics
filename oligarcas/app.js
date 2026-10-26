@@ -124,7 +124,13 @@ function renderMoneyScene() {
   });
   $('#visual').innerHTML=scene.html;
   $('.sceneSidebar > .sceneControlGroup').after($('#stats'));
-  WealthScene.mount($('#visual'));
+  const mobile=window.MobileWealthScene?.mount($('#visual'),{
+    name:countryName(state.country),population:nat().population,
+    quintiles:groups('quintile'),top:group('p99p100'),
+    richestMan:richestMen[state.country],richestSource,
+    formatMoney:money,formatCompact:compact,formatPercent:pct,formatNumber:v=>nfmt(v,0),
+  });
+  if(!mobile)WealthScene.mount($('#visual'));
   $('#chartFoot').replaceChildren();
 }
 function renderQuintiles() {
@@ -342,6 +348,7 @@ document.addEventListener('change',e=>{
   render();
 });
 function showTip(el,x,y) {
+  if(el.closest('.mobileWealthScene'))return;
   const t=$('#tooltip'),parts=el.dataset.tip.split('|');
   t.innerHTML=`<strong>${esc(parts[0])}</strong>${parts.slice(1).map(p=>`<small>${esc(p)}</small>`).join('')}`;t.hidden=false;
   const rect=t.getBoundingClientRect();t.style.left=Math.max(8,Math.min(x+14,window.innerWidth-rect.width-10))+'px';t.style.top=Math.max(8,Math.min(y+14,window.innerHeight-rect.height-10))+'px';
@@ -353,6 +360,7 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape')$('#tooltip').hidden
 window.addEventListener('scroll',()=>$('#tooltip').hidden=true,{passive:true});
 $('#main').addEventListener('scroll',()=>$('#tooltip').hidden=true,{passive:true});
 window.addEventListener('hashchange',()=>readHash());
+window.matchMedia('(max-width: 620px), (max-width: 900px) and (hover: none) and (pointer: coarse)').addEventListener('change',()=>{if(data)render();});
 function readHash(){const [v,params]=location.hash.slice(1).split('?');const c=new URLSearchParams(params).get('pais');if(data.countries.some(x=>x.code===c))state.country=c;activate(v||'quintiles',false);}
 async function init(){
   try{
