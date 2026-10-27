@@ -1,0 +1,90 @@
+.wealth-quintile { cursor: pointer; }
+.wealth-quintile:hover .wealth-quintile-card,
+.wealth-quintile:focus .wealth-quintile-card { opacity: .1; }
+.wealth-quintile:focus { outline: none; }
+.wealth-quintile:focus-visible .wealth-quintile-card { stroke: #fef702; stroke-width: 1.5; }
+.wealth-quintile[aria-expanded="true"] .wealth-quintile-arrow path { transform: rotate(180deg); }
+.quintileDialog {
+  --quintile-color: #fef702;
+  box-sizing: border-box;
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  padding: 0 20px 18px;
+  max-width: calc(100vw - 24px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  transform: translate(-50%,-50%);
+  border: 1px solid #59634f;
+  border-radius: 16px;
+  background: #252a23;
+  color: #e8ecdf;
+  box-shadow: 0 20px 80px #0009;
+  font: 13px/1.45 Arial, system-ui, sans-serif;
+}
+.quintileDialog::backdrop { background: #0008; }
+.quintileDialogHeader { position: sticky; top: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: 0 -2px; padding: 16px 2px 12px; background: #252a23; }
+.quintileDialogCountry { margin: 0 0 4px; color: #aeb9a4; font-size: 11px; }
+.quintileDialogHeader h2 { margin: 0; color: var(--quintile-color); font-size: 23px; line-height: 1.2; }
+.quintileDialogClose { flex: none; min-height: 40px; }
+.quintileDialogTabs { display: flex; gap: 6px; margin: 0 0 10px; }
+.quintileDialogTabs button { flex: 1; min-height: 35px; padding: 6px 10px; border: 1px solid #4a5343; border-radius: 8px; background: #2d322a; color: #dce4d3; }
+.quintileDialogTabs button[aria-pressed="true"] { border-color: var(--quintile-color); color: var(--quintile-color); background: #33392e; font-weight: 700; }
+.quintileDialogSummary { margin: 0 0 12px; color: #bac4af; font-size: 12px; }
+.quintileMetrics { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; }
+.quintileMetric { min-width: 0; padding: 12px; border: 1px solid #48503f; border-radius: 10px; background: #2b3027; }
+.quintileMetric h3 { margin: 0 0 8px; color: #b7c0ad; font-size: 11px; line-height: 1.4; font-weight: 400; }
+.quintileMetric strong { display: block; color: #ecf0e5; font-size: 20px; line-height: 1.2; overflow-wrap: anywhere; font-variant-numeric: tabular-nums; }
+.quintileMetric p { margin: 6px 0 0; color: #aeb9a1; font-size: 10px; }
+.quintileMetricMean { border-color: var(--quintile-color); }
+.quintileMetricMean strong { color: var(--quintile-color); }
+.quintileMetric[data-value=""] strong { font-size: 16px; }
+.quintileCurvePanel { margin-top: 12px; padding: 12px 10px 9px; border: 1px solid #414a39; border-radius: 10px; background: #22271f; }
+.quintileCurveHeading { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+.quintileCurveHeading h3 { margin: 0; color: #e0e8d7; font-size: 14px; }
+.quintileCurveHeading > span { flex: none; color: #a4af98; font-size: 10px; }
+.quintileCurve { width: 100%; min-width: 0; height: 230px; }
+.quintileCurve svg { display: block; max-width: 100%; overflow: visible; }
+.quintileCurve text { fill: #aeb9a4; font: 11px Arial, system-ui, sans-serif; }
+.quintileCurveGrid { stroke: #414a38; stroke-width: .7; }
+.quintileCurveLine { fill: none; stroke: #b6c7a6; stroke-width: 2.2; stroke-linejoin: round; }
+.quintileCurve circle { fill: #b6c7a6; stroke: #22271f; stroke-width: .8; }
+.quintileCurveMean { stroke: var(--quintile-color); stroke-width: 1.8; stroke-dasharray: 5 4; }
+.quintileCurveOpen { fill: none; stroke: #b6c7a6; stroke-width: 1.5; stroke-dasharray: 3 2; }
+.quintileCurveLegend { display: flex; flex-wrap: wrap; gap: 8px 18px; margin: 4px 0 0 3px; color: #aebaa2; font-size: 10px; }
+.quintileCurveLegend i { display: inline-block; width: 18px; margin-right: 5px; border-top: 2px solid #b6c7a6; vertical-align: middle; }
+.quintileCurveLegend .quintileMeanKey { border-color: var(--quintile-color); border-top-style: dashed; }
+.quintileMilestones { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 6px; margin-top: 10px; }
+.quintileMilestones > div { padding: 9px; border: 1px solid #414b37; border-radius: 8px; }
+.quintileMilestones span { display: block; color: #afbaa2; font-size: 10px; }
+.quintileMilestones strong { display: block; margin-top: 5px; color: var(--quintile-color); font-size: 14px; }
+.quintileSpread { margin: 10px 0; color: #c5d0b8; font-size: 12px; }
+.quintileSpread strong { color: var(--quintile-color); }
+.quintileForbes { display: grid; grid-template-columns: 1fr auto; gap: 8px 14px; margin-top: 12px; padding: 12px; border: 1px solid #74623a; border-radius: 10px; background: #302d21; }
+.quintileForbes span { display: block; color: #beb595; font-size: 10px; }
+.quintileForbes strong { display: block; margin: 4px 0; color: #e7c766; font-size: 18px; }
+.quintileForbes > div:nth-child(2) { text-align: right; }
+.quintileForbes p { grid-column: 1/-1; margin: 0; color: #b9b098; font-size: 10px; }
+.quintileForbes a { color: #e7c766; text-decoration: underline; }
+.quintileSourceNote { margin: 12px 0 0; color: #9fae93; font-size: 10px; line-height: 1.6; }
+.quintileSourceNote a { color: #dce5cb; text-decoration: underline; }
+@media (max-width: 620px) {
+  .quintileDialog { padding: 0 12px 14px; }
+  .quintileDialogHeader h2 { font-size: 19px; }
+  .quintileDialogHeader { gap: 8px; }
+  .quintileDialogClose { min-height: 44px; padding: 8px; font-size: 12px; }
+  .quintileDialogTabs button { min-height: 40px; }
+  .quintileMetrics { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .quintileMetricMean { grid-column: 1/-1; grid-row: 1; }
+  .quintileMetric { padding: 10px; }
+  .quintileMetric strong { font-size: 17px; }
+  .quintileMetricMean strong { font-size: 25px; }
+  .quintileCurvePanel { padding: 10px 5px; }
+  .quintileCurveHeading { padding: 0 3px; }
+  .quintileCurveHeading h3 { font-size: 12px; }
+  .quintileCurve text { font-size: 9px; }
+  .quintileMilestones { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .quintileForbes { grid-template-columns: 1fr; }
+  .quintileForbes > div:nth-child(2) { text-align: left; }
+  .mobileQuintileRow[aria-expanded="true"] .mobileQuintileArrow { transform: rotate(180deg); }
+}

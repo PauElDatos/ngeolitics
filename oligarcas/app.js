@@ -131,6 +131,13 @@ function renderMoneyScene() {
     formatMoney:money,formatCompact:compact,formatPercent:pct,formatNumber:v=>nfmt(v,0),
   });
   if(!mobile)WealthScene.mount($('#visual'));
+  window.QuintileDetail?.mount($('#visual'),{
+    country:state.country,name:countryName(state.country),quintiles:groups('quintile'),
+    percentiles:groups('percentile'),cumulative:groups('cumulative'),
+    richestMan:richestMen[state.country],richestSource,
+    formatMoney:money,formatCompact:compact,formatPercent:pct,formatNumber:v=>nfmt(v,0),
+    sourceHTML:sourceLink('wid:WID_'+state.country+'_data'),
+  });
   $('#chartFoot').replaceChildren();
 }
 function renderQuintiles() {
@@ -310,6 +317,7 @@ function renderSources() {
 }
 function render() {
   if(!data)return;
+  window.QuintileDetail?.dispose();
   $('.primaryView').prepend($('#stats'));
   $('.vizPanel > .panelTitle').append($('#controls'));
   $('#main').dataset.view=state.view;
@@ -322,13 +330,13 @@ function render() {
   renderStats();
   ({quintiles:renderQuintiles,personas:renderPeople,cima:renderTop,comparar:renderCompare,nivel:renderLevel,composicion:renderComposition,fuentes:renderSources})[state.view]();
   if(['comparar','composicion'].includes(state.view))placeSideControls();
-  document.title=`${countryName(state.country)} · Oligarcas — N.Geolitics`;
+  document.title=`${countryName(state.country)} · Brecha entre ricos y pobres — N.Geolitics`;
 }
 function exportCSV() {
   if(!exportRows.length)return;
   const csv='\uFEFF'+exportRows.map(row=>row.map(v=>`"${String(v??'').replaceAll('"','""')}"`).join(';')).join('\r\n');
   const u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'})),a=document.createElement('a');
-  a.href=u;a.download=`oligarcas_${state.country}_${state.view}_2024.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
+  a.href=u;a.download=`brecha_ricos_pobres_${state.country}_${state.view}_2024.csv`;a.click();setTimeout(()=>URL.revokeObjectURL(u),1000);
 }
 document.addEventListener('click',e=>{
   const el=e.target.closest('button,a');if(!el)return;
