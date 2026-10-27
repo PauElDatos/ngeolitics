@@ -40,9 +40,9 @@ window.WealthScene = (() => {
     let html='';
     for(let i=0;i<=5;i++){
       const blocks=positiveRows*i/5,y=zero-blocks*DY;
-      html+=`<line x1="${L}" x2="${width-32}" y1="${y}" y2="${y}" stroke="${i?'#43483f':'#7b8177'}" stroke-width="${i?.8:1.2}"/><text x="${L-12}" y="${y+4}" fill="#a1a59c" text-anchor="end" font-size="12">${escape(formatCompact(blocks*unit))}</text>`;
+      html+=`<line x1="${L}" x2="${width-32}" y1="${y}" y2="${y}" stroke="${i?'#43483f':'#7b8177'}" stroke-width="${i?.8:1.2}"/><text class="wealth-axis-label" x="${L-12}" y="${y+4}" fill="#a1a59c" text-anchor="end" font-size="12">${escape(formatCompact(blocks*unit))}</text>`;
     }
-    if(debtRows)html+=`<line x1="${L}" x2="${width-32}" y1="${zero+debtRows*DY}" y2="${zero+debtRows*DY}" stroke="#704e4b" stroke-dasharray="3 5"/><text x="${L-12}" y="${zero+debtRows*DY+4}" fill="#dc9991" text-anchor="end" font-size="11">−${escape(formatCompact(debtRows*unit))}</text>`;
+    if(debtRows)html+=`<line x1="${L}" x2="${width-32}" y1="${zero+debtRows*DY}" y2="${zero+debtRows*DY}" stroke="#704e4b" stroke-dasharray="3 5"/><text class="wealth-axis-label" x="${L-12}" y="${zero+debtRows*DY+4}" fill="#dc9991" text-anchor="end" font-size="11">−${escape(formatCompact(debtRows*unit))}</text>`;
     return html;
   }
   function map(silhouette,T,width) {
@@ -130,14 +130,14 @@ window.WealthScene = (() => {
     }).join('');
     for(let i=0;i<=main.length;i+=10){const x=i===main.length?mainRight:positions[i].x;body+=`<text class="wealth-population-tick" data-count="${population*i/100}" x="${x}" y="${axisY}" fill="#b0b4a9" font-size="12" text-anchor="middle">${escape(formatNumber(population*i/100))}</text>`;}
     if(split)body+=`<text class="wealth-population-tick" data-count="${population*.99}" x="${mainRight}" y="${axisY}" fill="#b0b4a9" font-size="12" text-anchor="middle">${escape(formatNumber(population*.99))}</text>`;
-    body+=`<text x="${(L+mainRight)/2}" y="${axisY+26}" fill="#aab19f" font-size="10" text-anchor="middle">Adultos acumulados por intervalos · Una sola barra vertical por intervalo</text>`;
+    body+=`<text class="wealth-population-caption" x="${(L+mainRight)/2}" y="${axisY+26}" fill="#aab19f" font-size="10" text-anchor="middle">Adultos acumulados por intervalos · Una sola barra vertical por intervalo</text>`;
     let extraHeader='';
     if(split){
       const cx=topCenter;
       body+=`<line class="wealth-top-divider" x1="${topDividerX}" x2="${topDividerX}" y1="30" y2="${height-12}" stroke="#555c4e" stroke-dasharray="4 6"/>`;
       extraHeader=`<g id="wealthSeparatedHeading"><rect x="${topDividerX+8}" y="18" width="${richestDividerX-topDividerX-16}" height="112" rx="8" fill="#252825" fill-opacity=".94"/><text x="${cx}" y="35" text-anchor="middle" fill="#cdd2c4" font-size="13">EL 1 % SUPERIOR</text><text class="wealth-top-count" x="${cx}" y="60" text-anchor="middle" fill="#e4e8dc" font-size="17">≈ ${escape(formatNumber(top.count))} adultos</text><text x="${cx}" y="93" text-anchor="middle" fill="#fef702" font-size="29" font-weight="700">${escape(formatCompact(top.mean))}</text><text x="${cx}" y="115" text-anchor="middle" fill="#b1b9a5" font-size="11">${topPack.fullColumns} completas${topPack.columns.length>topPack.fullColumns?' + última con resto':''}</text></g>`;
       body+=pile(top,cx-topPack.columns.length*DX/2,zero,unit,hint(top,false),true);
-      body+=`<text x="${cx}" y="${panelY+44}" fill="#fef702" text-anchor="middle" font-size="25" font-weight="600">${escape(formatPercent(top.share))}</text><text x="${cx}" y="${panelY+67}" fill="#b0b6a7" text-anchor="middle" font-size="11">de la riqueza nacional</text>`;
+      body+=`<g class="wealth-top-share"><text x="${cx}" y="${panelY+44}" fill="#fef702" text-anchor="middle" font-size="25" font-weight="600">${escape(formatPercent(top.share))}</text><text x="${cx}" y="${panelY+67}" fill="#b0b6a7" text-anchor="middle" font-size="11">de la riqueza nacional</text></g>`;
     }
     body+=richestPanel({person:richestMan,source:richestSource,x:richestX,T,zero,panelY,height,unit,formatMoney,formatCompact,formatNumber,joined:!split,separatorX:richestDividerX});
     const header=`<text x="${L}" y="55" fill="#e9ece3" font-size="37" font-weight="700" letter-spacing="1.6">${escape(name.toLocaleUpperCase('es'))}</text><text class="wealth-population-total" x="${L}" y="80" fill="#bdc5b2" font-size="13">${escape(formatNumber(population))} ADULTOS DE 20 AÑOS O MÁS · 2024</text>`;
@@ -177,14 +177,14 @@ window.WealthScene = (() => {
     const wrap=root.querySelector('.wealthSceneWrap'),svg=root.querySelector('#wealthGraphic');
     if(!wrap||!svg)return;
     if(svg.dataset.kind==='top')return;
-    const logicalTop=Number(svg.dataset.logicalTop),bottom=options.bottom??Number(svg.dataset.logicalBottom);
+    let logicalTop=Number(svg.dataset.logicalTop),bottom=options.bottom??Number(svg.dataset.logicalBottom);
     const sceneWidth=Number(svg.getAttribute('width'));
-    const scale=()=>options.scale?options.scale(wrap,sceneWidth):window.innerWidth>900?wrap.clientWidth/sceneWidth:1;
+    const labels=!options.scale?window.WealthSceneLabels?.mount(svg,{left:L}):null;
+    const scale=()=>options.scale?options.scale(wrap,sceneWidth):window.innerWidth>900?(labels?Math.min(wrap.clientWidth/sceneWidth,(wrap.clientWidth-labels.gutter)/(sceneWidth-L)):wrap.clientWidth/sceneWidth):1;
     const surface=document.createElement('div');
     surface.className='wealthSceneSurface';surface.style.width=svg.getAttribute('width')+'px';
     wrap.classList.add('virtualSceneWrap');svg.before(surface);surface.append(svg);
-    const logicalHeight=bottom-logicalTop,physicalHeight=Math.min(1000000,logicalHeight);
-    surface.style.height=physicalHeight+'px';
+    let logicalHeight=bottom-logicalTop,physicalHeight=Math.min(1000000,logicalHeight);
     const content=svg.querySelector('#wealthSceneContent'),separatedHeading=svg.querySelector('#wealthSeparatedHeading'),panel=svg.querySelector('#wealthRichestPanel'),gold=svg.querySelector('#wealthRichestVisible');
     const zero=Number(svg.dataset.zero),unit=Number(svg.dataset.blockUnit);
     const worldTop=Math.min(0,...[...svg.querySelectorAll('.wealth-pile')].map(g=>zero-Math.ceil(Math.max(0,Number(g.dataset.value))/unit)*(g.dataset.layout==='single'?DY:0)-20));
@@ -196,25 +196,30 @@ window.WealthScene = (() => {
     }
     let offset=0,lastScroll=-1,viewport=0,pinnedToBase=true;
     function paint(){
+      if(!wrap.isConnected||!wrap.clientWidth||!wrap.clientHeight)return;
       const zoom=scale(),pixels=wrap.clientHeight;
       viewport=pixels/zoom;
+      const inset=labels?Math.max(0,labels.gutter-L*zoom):0,width=sceneWidth*zoom+inset;
       svg.setAttribute('height',pixels);svg.style.height=pixels+'px';
-      svg.style.width=sceneWidth*zoom+'px';svg.style.minWidth=sceneWidth*zoom+'px';surface.style.width=sceneWidth*zoom+'px';
+      svg.style.width=width+'px';svg.style.minWidth=width+'px';surface.style.width=width+'px';
       const y=logicalTop+offset;
-      svg.setAttribute('viewBox',`0 0 ${svg.getAttribute('width')} ${viewport}`);
+      svg.setAttribute('viewBox',`${-inset/zoom} 0 ${width/zoom} ${viewport}`);
       svg.dataset.windowTop=y;svg.dataset.windowBottom=y+viewport;
       svg.querySelector('#wealthSceneHeading').setAttribute('transform',`translate(${wrap.scrollLeft/zoom+HEADING_INSET},0)`);
       if(separatedHeading)separatedHeading.setAttribute('transform',`translate(0,${Math.max(0,bottom-viewport)})`);
-      svg.querySelector('#wealthBackground').setAttribute('height',viewport);
+      const background=svg.querySelector('#wealthBackground');
+      background.setAttribute('height',viewport);background.setAttribute('x',-inset/zoom);background.setAttribute('width',width/zoom);
       content.setAttribute('display',y+viewport<worldTop?'none':'inline');
       content.setAttribute('transform',`translate(0,${-y})`);
-      const rows=Number(svg.dataset.plotRows),width=Number(svg.getAttribute('width'));
+      const rows=Number(svg.dataset.plotRows);
       const first=Math.ceil((zero-y-viewport)/(DY*ROWS)),last=Math.floor((zero-y)/(DY*ROWS));
-      let extra='';
+      let extra='';const virtualTicks=[];
       for(let n=Math.max(first,Math.ceil(rows/ROWS));n<=last;n++){
         const yy=zero-n*DY*ROWS-y,value=n*ROWS*unit;
         const axisX=Math.max(L-12,wrap.scrollLeft/zoom+80);
-        extra+=`<line x1="${L}" x2="${width-32}" y1="${yy}" y2="${yy}" stroke="#43483f" stroke-width=".8"/><text x="${axisX}" y="${yy+4}" fill="#a1a59c" text-anchor="end" font-size="12">${escape(new Intl.NumberFormat('es-ES',{maximumFractionDigits:2}).format(value/1e6))} M€</text>`;
+        const label=new Intl.NumberFormat('es-ES',{maximumFractionDigits:2}).format(value/1e6)+' M€';
+        virtualTicks.push({y:yy,label});
+        extra+=`<line x1="${L}" x2="${sceneWidth-32}" y1="${yy}" y2="${yy}" stroke="#43483f" stroke-width=".8"/>${labels?'':`<text x="${axisX}" y="${yy+4}" fill="#a1a59c" text-anchor="end" font-size="12">${escape(label)}</text>`}`;
       }
       svg.querySelector('#wealthVirtualGrid').innerHTML=extra;
       if(panel){
@@ -223,13 +228,14 @@ window.WealthScene = (() => {
         const start=zero+firstRow*DY-y,marker=zero-(blocks+1)*DY+.5-y;
         let visible=lastRow>firstRow?`<g transform="translate(${x},${start})"><rect class="wealth-richest-column" x="0" y="0" width="${DX}" height="${(lastRow-firstRow)*DY}" fill="url(#wealth-richest-cash)"/></g>`:'';
         if(remainder&&marker>-DY&&marker<viewport)visible+=`<rect class="wealth-remainder" x="${x+1}" y="${marker}" width="8" height="${DY-1}" fill="url(#wealth-rest)" stroke="#f3b865" stroke-width=".6"/>`;
-        for(const label of topLabels){
+        for(const label of labels?[]:topLabels){
           const localY=Number(label.getAttribute('y'))-y;
           if(localY<0||localY>viewport)continue;
           const clone=label.cloneNode(true);clone.removeAttribute('display');clone.setAttribute('y',localY);visible+=clone.outerHTML;
         }
         gold.innerHTML=visible;
       }
+      labels?.paint({zoom,top:y,zero,viewport,pixels,width,visibleWidth:wrap.clientWidth,inset,scrollLeft:wrap.scrollLeft,bottom,virtualTicks});
       options.onPaint?.({zoom,top:y,zero,viewport,pixels,unit});
     }
     function move(next){
@@ -267,10 +273,27 @@ window.WealthScene = (() => {
       else if(action==='richest')wrap.scrollLeft=Math.max(0,Number(svg.dataset.richestX)-wrap.clientWidth/2);
       else wrap.scrollLeft=action==='end'?Math.max(0,Number(svg.dataset.sceneMainEnd)-wrap.clientWidth/2):0;
     };
-    sceneObserver=new ResizeObserver(()=>move(pinnedToBase?logicalHeight:offset));sceneObserver.observe(wrap);
-    move(logicalHeight);
+    function refresh(){
+      if(!wrap.isConnected||!wrap.clientWidth||!wrap.clientHeight)return;
+      const worldY=logicalTop+offset,atBase=pinnedToBase;
+      function resizeExtent(){
+        if(labels){
+          bottom=labels.bottom(scale());logicalTop=labels.top(scale());
+          content.querySelectorAll('.wealth-top-divider,.wealth-richest-divider').forEach(line=>line.setAttribute('y2',bottom-12/scale()));
+        }
+        logicalHeight=bottom-logicalTop;physicalHeight=Math.min(1000000,logicalHeight);
+        surface.style.height=physicalHeight+'px';
+        move(atBase?logicalHeight:worldY-logicalTop);
+      }
+      resizeExtent();
+      // Wrapped captions can need extra space on a narrow laptop. Their measured
+      // height changes the footer, never the monetary scale or bar coordinates.
+      if(labels&&Math.abs(bottom-labels.bottom(scale()))>.01)resizeExtent();
+    }
+    sceneObserver=new ResizeObserver(refresh);sceneObserver.observe(wrap);
+    refresh();
     return {
-      refresh:()=>move(pinnedToBase?logicalHeight:offset),
+      refresh,
       pan:(x,y)=>{wrap.scrollLeft+=x;move(offset+y/scale());},
     };
   }

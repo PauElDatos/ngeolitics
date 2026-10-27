@@ -186,6 +186,11 @@ footer { margin: 12px 0 0; padding: 12px 2px; }
   #main[data-view="personas"] .studyNote { flex: none; }
 }
 
+/* On laptops, leave more room for readable chart captions, without changing the
+   wide desktop layout or the independent phone presentation. */
+@media (min-width: 1301px) and (max-width: 1600px) {
+  .layout { grid-template-columns: 240px minmax(0,1fr); }
+}
 @media (max-width: 1300px) {
   .nationalScene, .chartWithSidebar { grid-template-columns: minmax(0,1fr); }
   .sceneSidebar { grid-row: 1; display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
