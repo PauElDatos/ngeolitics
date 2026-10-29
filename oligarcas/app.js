@@ -8,10 +8,18 @@ let data;
 let countrySilhouettes={};
 let richestMen={};
 let richestSource={};
+let presentationFX=[];
 let exportRows = [];
 const nfmt = (v, digits=1) => v == null || !Number.isFinite(v) ? 'No disponible' : new Intl.NumberFormat('es-ES', {maximumFractionDigits:digits, minimumFractionDigits:digits}).format(Object.is(v,-0)?0:v);
 const pct = v => v == null ? 'No disponible' : `${nfmt(v * 100, 2)} %`;
 const money = v => v == null ? 'No disponible' : `${nfmt(v,0)} €`;
+const euroValue=(observation,value=observation.value)=>WealthScene.toEUR(value,observation.currency,observation.period,[...data.fx.rates,...presentationFX]);
+const presentOfficial=observation=>({...observation,value:euroValue(observation),currency:'EUR',unit:'EUR',original_currency:observation.currency,original_unit:observation.unit,presentation_rate:WealthScene.exchangeRate(observation.currency,observation.period,[...data.fx.rates,...presentationFX])});
+function compositionFX(observation){
+  if((observation.original_currency??observation.currency)==='EUR')return 'Importes nominales en euros, sin actualización de precios.';
+  const rate=observation.presentation_rate??WealthScene.exchangeRate(observation.currency,observation.period,[...data.fx.rates,...presentationFX]);
+  return rate?`Importes nominales convertidos a euros con el tipo medio de mercado del BCE de ${esc(rate.period)}. La conversión no actualiza los precios ni cambia los porcentajes de composición.`:'Importes en euros no disponibles: falta un tipo de cambio verificado para el periodo de la fuente.';
+}
 function compact(v) {
   if (v == null) return 'No disponible';
   const a = Math.abs(v);
@@ -115,7 +123,7 @@ function distributionMethodology() {
 function renderMoneyScene() {
   setHead('Toda la población adulta. Toda la riqueza.');
   const scene=WealthScene.render({
-    name:countryName(state.country),country:state.country,population:nat().population,
+    name:countryName(state.country),country:state.country,population:nat().population,nationalTotal:nat().total,
     percentiles:groups('percentile').sort((a,b)=>a.a-b.a),quintiles:groups('quintile'),top:group('p99p100'),
     allPercentiles:data.groups.filter(g=>g.category==='percentile'),silhouette:countrySilhouettes[state.country],
     split:state.sceneMode==='split',unit:BLOCK_UNIT,richestMan:richestMen[state.country],richestSource,
@@ -125,14 +133,14 @@ function renderMoneyScene() {
   $('#visual').innerHTML=scene.html;
   $('.sceneSidebar > .sceneControlGroup').after($('#stats'));
   const mobile=window.MobileWealthScene?.mount($('#visual'),{
-    name:countryName(state.country),population:nat().population,
+    name:countryName(state.country),population:nat().population,nationalTotal:nat().total,
     quintiles:groups('quintile'),top:group('p99p100'),
     richestMan:richestMen[state.country],richestSource,
     formatMoney:money,formatCompact:compact,formatPercent:pct,formatNumber:v=>nfmt(v,0),
   });
   if(!mobile)WealthScene.mount($('#visual'));
   window.QuintileDetail?.mount($('#visual'),{
-    country:state.country,name:countryName(state.country),quintiles:groups('quintile'),
+    country:state.country,name:countryName(state.country),nationalTotal:nat().total,quintiles:groups('quintile'),
     percentiles:groups('percentile'),cumulative:groups('cumulative'),
     richestMan:richestMen[state.country],richestSource,
     formatMoney:money,formatCompact:compact,formatPercent:pct,formatNumber:v=>nfmt(v,0),
@@ -159,12 +167,12 @@ function renderTop() {
   const exclusive=groups('top_nonoverlapping').sort((a,b)=>a.a-b.a);
   setHead('Dentro del 1 % más rico');
   $('#visual').innerHTML=WealthScene.renderTop({
-    name:countryName(state.country),population:nat().population,base,intervals:exclusive,
+    name:countryName(state.country),population:nat().population,nationalTotal:nat().total,base,intervals:exclusive,
     silhouette:countrySilhouettes[state.country],unit:BLOCK_UNIT,richestMan:richestMen[state.country],richestSource,
     formatMoney:money,formatCompact:compact,formatPercent:pct,formatNumber:v=>nfmt(v,0),formatGroup:groupName,
   }).html;
   WealthScene.mount($('#visual'));
-  setFoot(`Los cuatro intervalos WID son exclusivos. Cada bloque vale 10.000 €; las torres completas contienen 100 bloques y la última conserva el resto. La fortuna individual utiliza Forbes 2026 y el cambio del BCE. <a href="${safeURL(richestSource.forbes_url)}" target="_blank" rel="noopener">Forbes ↗</a> · <a href="${safeURL(richestSource.fx_url)}" target="_blank" rel="noopener">BCE ↗</a>.`);
+  setFoot(`Los cuatro intervalos WID son exclusivos. Cada bloque vale 10.000 €; las torres completas contienen 100 bloques y la última conserva el resto. La fortuna individual se muestra en euros nominales con Forbes 2026 y el cambio del BCE. ${WealthScene.comparisonNote} <a href="${safeURL(richestSource.forbes_url)}" target="_blank" rel="noopener">Forbes ↗</a> · <a href="${safeURL(richestSource.fx_url)}" target="_blank" rel="noopener">BCE ↗</a>.`);
   const ratio=nat().median>0?gs[3].mean/nat().median:null;
   $('#insights').innerHTML=insight('La concentración continúa dentro de la cima',`El 0,1 % superior posee <strong>${pct(gs[1].share/gs[0].share)}</strong> de la riqueza del 1 % superior. El 0,001 % representa una de cada 100.000 personas adultas y reúne <strong>${pct(gs[3].share)}</strong> del patrimonio nacional.`)+insight('Media y umbral responden a preguntas distintas',`La media del 0,001 % es <strong>${compact(gs[3].mean)}</strong>; se entra desde <strong>${compact(gs[3].lower)}</strong>. ${ratio!==null?'Su media equivale a <strong>'+nfmt(ratio,0)+' veces</strong> la mediana nacional.':'La mediana nacional no permite calcular un ratio interpretable.'} Las colas extremas dependen especialmente de la modelización.`);
   groupTable([group('p90p100'),group('p95p100'),...gs,...exclusive],'Grupos acumulados e intervalos exclusivos (no sumarlos)');
@@ -237,20 +245,24 @@ function renderComposition() {
     $('#insights').innerHTML=insight('La ausencia afecta a esta pregunta','Se puede estudiar cuánto patrimonio tiene cada grupo con WID 2024. Esta fuente no permite determinar qué parte de ese patrimonio es vivienda, empresas o activos financieros en todos los países.')+insight('Dos proporciones diferentes','La composición mide qué parte de los activos de un grupo es vivienda, por ejemplo. La propiedad nacional mide qué parte de todas las viviendas posee ese grupo. Sus denominadores son distintos.');
     $('#detailPanel').hidden=true;return;
   }
-  const selected=current.filter(o=>o.group===state.compositionGroup),get=k=>selected.find(o=>o.indicator===k),total=get(isDwa?'total_assets_total':'assets_total');
+  const selected=current.filter(o=>o.group===state.compositionGroup).map(presentOfficial),get=k=>selected.find(o=>o.indicator===k),total=get(isDwa?'total_assets_total':'assets_total');
   const components=(isDwa?dwaComponents:usComponents).map(([key,label])=>{const o=get(key);return o?{...o,label,signed:isUS&&key==='liabilities_total'?-o.value:o.value}:null;}).filter(Boolean);
+  if(total?.value==null||components.some(o=>o.value==null)){
+    $('#visual').innerHTML='<p class="empty">No se pueden mostrar los importes en euros: falta un tipo de cambio verificado para este periodo.</p>';
+    $('#chartFoot').textContent='No se sustituye un tipo ausente por el de otro año.';$('#insights').innerHTML='';$('#detailPanel').hidden=true;return;
+  }
   const denominator=total.value;
   const net=get('net_wealth_total');
   const negative=Math.min(0,...components.map(o=>o.signed/denominator*100)),range=100-negative,zero=-negative/range*100;
   $('#viewSubtitle').textContent=`${period} · ${groupName(state.compositionGroup)} · Hogares ordenados por patrimonio neto · ${isDwa?'BCE / SEBC, DWA':'Reserva Federal, DFA'}`;
   $('#visual').innerHTML=`<div class="officialBadge">Fuente oficial · ${esc(period)} · estimación publicada</div><div class="distributionHeader"><strong>Composición de los activos del grupo</strong><span>% de los activos brutos del propio grupo</span></div><div class="compositionRows">${components.map((o,i)=>{const v=o.signed/denominator*100,w=Math.abs(v)/range*100;return `<div class="compositionRow"><span>${o.label}</span><div class="barTrack" tabindex="0" data-tip="${esc(`${o.label}|${nfmt(v,2)} % de los activos del grupo|${nfmt(o.signed,0)} ${o.currency}|Registro: ${o.id}`)}"><span class="zero" style="left:${zero}%"></span><span class="bar" style="left:${v<0?zero-w:zero}%;width:${w}%;background:${v<0?'#f08b8b':colors[i%5]}"></span></div><span class="value ${v<0?'negative':''}">${nfmt(v,2)} %</span></div>`;}).join('')}</div><div class="compositionNote">Denominador: activos brutos del grupo (${nfmt(denominator,0)} ${esc(total.currency)}). Las deudas se muestran con signo negativo sobre ese mismo denominador. ${isDwa?'El concepto DWA excluye derechos sobre pensiones ocupacionales y públicas; la partida de seguros de vida no cubre todas las pensiones privadas.':'DFA incluye bienes duraderos y pensiones privadas. «Otros activos» conserva el agregado de la fuente; no se interpreta como una medida aislada de patrimonio empresarial.'}</div>`;
-  $('#chartFoot').innerHTML=`${esc(countryName(state.country))} · ${esc(period)} · ${esc(total.statistical_unit)} · ${groupName(state.compositionGroup)}. Composición derivada: componente / activos brutos del grupo × 100. Importes nominales del periodo, en ${esc(total.currency)}. Fuente: ${sourceLink(total.source_reference)}. ${isDwa?'DWA publica estimaciones experimentales reconciliadas con cuentas nacionales.':'DFA combina encuestas y cuentas financieras.'} No comparar estas cifras directamente con adultos WID.`;
+  $('#chartFoot').innerHTML=`${esc(countryName(state.country))} · ${esc(period)} · ${esc(total.statistical_unit)} · ${groupName(state.compositionGroup)}. Composición derivada: componente / activos brutos del grupo × 100. ${compositionFX(total)} Fuente: ${sourceLink(total.source_reference)}. ${isDwa?'DWA publica estimaciones experimentales reconciliadas con cuentas nacionales.':'DFA combina encuestas y cuentas financieras.'} No comparar estas cifras directamente con adultos WID.`;
   const housing=components.find(o=>o.indicator===(isDwa?'real_estate_total':'assets_real_estate'));
   const financialKeys=isDwa?['listed_shares_total','investment_fund_shares_total','unlisted_shares_and_other_equity_total']:['assets_equities_mutual_funds'];
   const shareFinancial=components.filter(o=>financialKeys.includes(o.indicator)).reduce((s,o)=>s+o.value,0)/denominator;
   $('#insights').innerHTML=insight('El peso de la vivienda',`Los inmuebles representan <strong>${housing?pct(housing.value/denominator):'No disponible'}</strong> de los activos del ${groupName(state.compositionGroup).toLowerCase()}. ${isDwa?'La fuente agrupa vivienda habitual y otros inmuebles.':'Incluye la categoría inmobiliaria publicada en DFA.'}`)+insight('Participaciones y activos financieros',`${isDwa?'Acciones, fondos y participaciones empresariales no cotizadas':'Acciones y fondos'} reúnen <strong>${pct(shareFinancial)}</strong> de los activos brutos del grupo. El patrimonio neto del grupo es ${net?'<strong>'+nfmt(net.value,0)+' '+esc(net.currency)+'</strong>':'no disponible'}. Cambia de grupo para explorar el contraste.`);
   table(['Componente','Importe nominal del grupo','% de activos brutos','Registro de origen'],components.map(o=>({cells:[o.label,`${nfmt(o.signed,0)} ${o.currency}`,nfmt(o.signed/denominator*100,2)+' %',`<a href="${safeURL(o.source_url || src(o.source_reference)?.url)}" target="_blank" rel="noopener" class="trace">${esc(o.id)}</a>`]})),`Composición oficial · ${period} · ${groupName(state.compositionGroup)}`);
-  exportRows=[['pais','periodo','grupo','componente','importe_nominal_con_signo','moneda','activos_brutos_denominador','porcentaje_activos','registro'],...components.map(o=>[o.country,o.period,o.group,o.indicator,o.signed,o.currency,denominator,o.signed/denominator*100,o.id])];
+  exportRows=[['pais','periodo','grupo','componente','importe_nominal_con_signo','moneda','activos_brutos_denominador','porcentaje_activos','registro','periodo_cambio_BCE'],...components.map(o=>[o.country,o.period,o.group,o.indicator,o.signed,o.currency,denominator,o.signed/denominator*100,o.id,o.original_currency==='EUR'?'sin conversión':o.presentation_rate?.period])];
 }
 function renderPublishedComposition(obs) {
   const period=[...new Set(obs.map(o=>o.period))].sort().at(-1),current=obs.filter(o=>o.period===period), opts=[...new Set(current.map(o=>o.group))];
@@ -272,17 +284,17 @@ function renderNationalComponents(obs) {
   const items=obs.filter(o=>/asset_or_debt_component/.test(o.indicator)),period=[...new Set(items.map(o=>o.period))].sort().at(-1),current=items.filter(o=>o.period===period),opts=[...new Set(current.map(o=>o.group))];
   if(!opts.includes(state.compositionGroup))state.compositionGroup=opts.includes('p0p100')?'p0p100':opts[0];
   $('#controls').innerHTML=`<label class="field">Grupo de la fuente<select id="compositionGroup">${opts.map(g=>`<option value="${g}" ${g===state.compositionGroup?'selected':''}>${groupName(g)}</option>`).join('')}</select></label>`;
-  const selected=current.filter(o=>o.group===state.compositionGroup),get=k=>selected.find(o=>o.component===k);
+  const selected=current.filter(o=>o.group===state.compositionGroup).map(presentOfficial),get=k=>selected.find(o=>o.component===k);
   const keys=state.country==='JP'?['main_residence_and_land','other_housing_and_land','financial_assets','total_financial_debt']:state.country==='KR'?['main_residence','other_real_estate','other_real_assets','financial_savings','rental_deposits_paid_asset','total_debt']:['nonfinancial_assets','financial_assets','mortgage_debt','nonmortgage_debt'];
   const comps=keys.map(k=>get(k)).filter(Boolean).map(o=>({...o,signed:/debt/.test(o.component)?-Math.abs(o.value):o.value}));
   const denominator=state.country==='JP'?(get('financial_assets')?.value??0)+(get('residential_property_land')?.value??0):state.country==='KR'?get('gross_assets')?.value:comps.filter(o=>o.signed>0).reduce((s,o)=>s+o.signed,0);
   const low=Math.min(0,...comps.map(o=>o.signed/denominator*100)),range=100-low,zero=-low/range*100;
   $('#viewSubtitle').textContent=`${countryName(state.country)} · ${period} · ${groupName(state.compositionGroup)} · Hogares · ${state.country==='MX'?'importes agregados':'medias por hogar'}`;
   $('#visual').innerHTML=`<div class="officialBadge">Fuente nacional · ${esc(period)} · ${state.country==='MX'?'ENFIH':'encuesta de hogares'}</div><div class="distributionHeader"><strong>Composición del grupo</strong><span>% de sus activos brutos cubiertos</span></div><div class="compositionRows">${comps.map((o,i)=>{const v=o.signed/denominator*100,w=Math.abs(v)/range*100;return `<div class="compositionRow"><span>${componentLabel(o.component)}</span><div class="barTrack" data-tip="${esc(`${componentLabel(o.component)}|${nfmt(o.signed,0)} ${o.currency}|${nfmt(v,2)} % de los activos cubiertos|Registro: ${o.id}`)}" tabindex="0"><span class="zero" style="left:${zero}%"></span><span class="bar" style="left:${v<0?zero-w:zero}%;width:${w}%;background:${v<0?'#f08b8b':colors[i%5]}"></span></div><span class="value ${v<0?'negative':''}">${nfmt(v,2)} %</span></div>`;}).join('')}</div><div class="compositionNote">Denominador: ${nfmt(denominator,0)} ${esc(comps[0].currency)} ${state.country==='MX'?'de activos agregados':'de activos medios por hogar'}. ${state.country==='JP'?'La cobertura incluye activos financieros y vivienda/suelo residencial. Excluye otras categorías empresariales y bienes duraderos; los grupos de distribución excluyen hogares con patrimonio desconocido.':state.country==='KR'?'Los depósitos de alquiler entregados son activos; las obligaciones por depósitos recibidos forman parte de las deudas. Se evitan las sumas entre agregados y sus subcomponentes.':'Dato de 2019: es la cobertura histórica disponible de ENFIH. No se presenta como un dato de 2025–2026.'}</div>`;
-  $('#chartFoot').innerHTML=`${esc(countryName(state.country))} · ${period} · ${esc(comps[0].statistical_unit)} · ${groupName(state.compositionGroup)}. ${state.country==='MX'?'Totales del grupo':'Medias por hogar'}, precios nominales del periodo, ${esc(comps[0].currency)}. Cuotas calculadas: componente / activos brutos cubiertos × 100. Fuente: ${sourceLink(comps[0].source_reference)}. Las deudas se presentan con signo negativo.`;
-  $('#insights').innerHTML=insight('Una fuente y un denominador propios','El gráfico utiliza componentes compatibles de una misma fuente, periodo y grupo. Conserva la moneda local para mostrar los importes nominales de la encuesta. La composición describe la cartera del grupo, no su propiedad sobre un activo nacional.')+insight('Las categorías cambian entre países','Los componentes reflejan la cobertura de la encuesta nacional. Las categorías agregadas y sus subcomponentes no se suman entre sí. Esta vista complementa la distribución WID; sus grupos y cantidades no se trasladan a los adultos WID de 2024.');
+  $('#chartFoot').innerHTML=`${esc(countryName(state.country))} · ${period} · ${esc(comps[0].statistical_unit)} · ${groupName(state.compositionGroup)}. ${state.country==='MX'?'Totales del grupo':'Medias por hogar'}. ${compositionFX(comps[0])} Cuotas calculadas: componente / activos brutos cubiertos × 100. Fuente: ${sourceLink(comps[0].source_reference)}. Las deudas se presentan con signo negativo.`;
+  $('#insights').innerHTML=insight('Una fuente y un denominador propios','El gráfico utiliza componentes compatibles de una misma fuente, periodo y grupo. Los importes de presentación se convierten a euros nominales con tipos medios del BCE del año o trimestre correspondiente. Los registros descargables conservan sus importes originales. La composición describe la cartera del grupo, no su propiedad sobre un activo nacional.')+insight('Las categorías cambian entre países','Los componentes reflejan la cobertura de la encuesta nacional. Las categorías agregadas y sus subcomponentes no se suman entre sí. Esta vista complementa la distribución WID; sus grupos y cantidades no se trasladan a los adultos WID de 2024.');
   table(['Componente',state.country==='MX'?'Importe agregado':'Media por hogar','% de activos cubiertos','Registro'],comps.map(o=>({cells:[componentLabel(o.component),`${nfmt(o.signed,0)} ${o.currency}`,nfmt(o.signed/denominator*100,2)+' %',esc(o.id)]})),`Composición nacional · ${period}`);
-  exportRows=[['pais','periodo','grupo','componente','valor_nominal_con_signo','moneda','denominador','porcentaje_activos','registro'],...comps.map(o=>[o.country,o.period,o.group,o.component,o.signed,o.currency,denominator,o.signed/denominator*100,o.id])];
+  exportRows=[['pais','periodo','grupo','componente','valor_nominal_con_signo','moneda','denominador','porcentaje_activos','registro','periodo_cambio_BCE'],...comps.map(o=>[o.country,o.period,o.group,o.component,o.signed,o.currency,denominator,o.signed/denominator*100,o.id,o.original_currency==='EUR'?'sin conversión':o.presentation_rate?.period])];
 }
 function renderSources() {
   setHead('Fuentes, método y límites','La trazabilidad forma parte del estudio. Base WID descargada el 18 de octubre de 2026; referencia individual Forbes 2026.');
@@ -290,7 +302,9 @@ function renderSources() {
   const n25=nat(state.country,2025);
   $('#visual').innerHTML=`<div class="downloads"><a class="btn primary" href="data/estudio.json" download>Datos y trazabilidad · JSON ↓</a><a class="btn" href="data/hombres-mas-ricos-2026.json" download>Fortunas Forbes 2026 · JSON ↓</a><a class="btn" href="data/grupos_2024.csv" download>Todos los grupos · CSV ↓</a><a class="btn" href="metodologia.pdf" target="_blank" rel="noopener">Metodología · PDF ↗</a><button class="btn" id="print">Imprimir estudio</button></div><div class="prose">
     <h3>Ficha del reparto de ${esc(countryName(state.country))}</h3>${distributionMethodology()}
-    <h3>Unidad, precios y moneda</h3><p>EUR de 2025 por adulto en WID · Misma unidad en todos los países y vistas · Fortuna Forbes 2026: USD original y EUR nominal convertido.</p>
+    <h3>Unidad, precios y moneda</h3><p>Todos los importes de la interfaz se muestran en euros: EUR de 2025 por adulto en WID; euros nominales convertidos para Forbes 2026 y las fuentes de composición. La conversión no iguala las fechas ni las bases de precios. Los registros originales descargables conservan las monedas de sus fuentes.</p>
+    <p>${WealthScene.comparisonNote} Fórmula: fortuna individual en euros nominales / agregado nacional WID de 2024 expresado en euros de 2025 × 100.</p>
+    <p>Las conversiones de composición utilizan medias del BCE del trimestre de la observación, si están verificadas, o del mismo año; nunca se sustituye un cambio ausente por el de otro año. <a href="data/presentation-fx.json" download>Tipos de cambio adicionales y enlaces a las series BCE ↓</a>.</p>
     <h3>Qué comparamos</h3><p>La base internacional contiene <strong>1.397 registros de grupo, 127 por país</strong>: quintiles, deciles, percentiles, grupos acumulados e intervalos exclusivos. Corresponden a <strong>2024</strong>. Los 100 percentiles son intervalos publicados; no se han interpolado quintiles. Las categorías se solapan y no deben sumarse entre sí.</p>
     <p>Unidad: <strong>adultos de 20 años o más, equal-split</strong>; el patrimonio de las parejas se reparte por igual según el concepto WID. Incluye activos financieros y no financieros menos deudas. Los activos de pensiones y seguros que incluye WID no equivalen a derechos futuros sobre pensiones públicas.</p>
     <h3>Grado 0: estimación publicada, no observación directa</h3><p>${esc(data.definitions.quality_0_distributed_wealth)} Las conclusiones describen las cifras del modelo publicado. El detalle de las colas superiores y los decimales no garantizan precisión empírica. El estudio no prueba por sí solo mecanismos de influencia política ni clasifica a cada integrante de un percentil como oligarca.</p>
@@ -372,12 +386,13 @@ window.matchMedia('(max-width: 620px), (max-width: 900px) and (hover: none) and 
 function readHash(){const [v,params]=location.hash.slice(1).split('?');const c=new URLSearchParams(params).get('pais');if(data.countries.some(x=>x.code===c))state.country=c;activate(v||'quintiles',false);}
 async function init(){
   try{
-    const [study,maps,richest]=await Promise.all([
+    const [study,maps,richest,fx]=await Promise.all([
       fetch('data/estudio.json').then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json();}),
       fetch('data/country-silhouettes.json').then(r=>r.ok?r.json():{}).catch(()=>({})),
       fetch('data/hombres-mas-ricos-2026.json').then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json();}),
+      fetch('data/presentation-fx.json').then(r=>{if(!r.ok)throw Error('HTTP '+r.status);return r.json();}),
     ]);
-    data=study;countrySilhouettes=maps.countries??{};richestSource=richest.source;richestMen=richest.countries;$('#status').hidden=true;$('#study').hidden=false;readHash();
+    data=study;countrySilhouettes=maps.countries??{};richestSource=richest.source;richestMen=richest.countries;presentationFX=fx.rates;$('#status').hidden=true;$('#study').hidden=false;readHash();
   }
   catch(e){$('#status').innerHTML='No se han podido cargar los datos. <button class="btn" id="reload">Reintentar</button> <a href="data/grupos_2024.csv">Descargar CSV</a>';$('#reload').onclick=init;console.error(e);}
 }

@@ -1,0 +1,34 @@
+{
+  "retrieved_on": "2026-10-29",
+  "source": "European Central Bank, EXR",
+  "policy": "Presentation-only conversion to nominal euros. Use the observation quarter when available, otherwise the observation year. Do not change the source amounts, composition shares or price basis.",
+  "rates": [
+    {
+      "currency": "USD",
+      "denominator": "EUR",
+      "period": "2026-Q2",
+      "local_currency_per_eur": 1.162883870967742,
+      "series": "EXR.Q.USD.EUR.SP00.A",
+      "rate_type": "market_quarterly_average",
+      "source_url": "https://data-api.ecb.europa.eu/service/data/EXR/Q.USD.EUR.SP00.A?startPeriod=2026-Q2&endPeriod=2026-Q2&format=jsondata"
+    },
+    {
+      "currency": "JPY",
+      "denominator": "EUR",
+      "period": "2024",
+      "local_currency_per_eur": 163.8519140625,
+      "series": "EXR.A.JPY.EUR.SP00.A",
+      "rate_type": "market_annual_average",
+      "source_url": "https://data-api.ecb.europa.eu/service/data/EXR/A.JPY.EUR.SP00.A?startPeriod=2024&endPeriod=2024&format=jsondata"
+    },
+    {
+      "currency": "MXN",
+      "denominator": "EUR",
+      "period": "2019",
+      "local_currency_per_eur": 21.5565423529412,
+      "series": "EXR.A.MXN.EUR.SP00.A",
+      "rate_type": "market_annual_average",
+      "source_url": "https://data-api.ecb.europa.eu/service/data/EXR/A.MXN.EUR.SP00.A?startPeriod=2019&endPeriod=2019&format=jsondata"
+    }
+  ]
+}

@@ -25,6 +25,7 @@ function inputs(country, unit) {
   return {
     ...format, name: country.name, unit,
     population: study.national.find(n => n.country === country.code && n.period === 2024).population,
+    nationalTotal: study.national.find(n => n.country === country.code && n.period === 2024).total,
     percentiles: groups.filter(g => g.category === 'percentile').sort((a, b) => a.a - b.a),
     quintiles: groups.filter(g => g.category === 'quintile'),
     top: groups.find(g => g.category === 'cumulative' && g.group === 'p99p100'),
@@ -45,6 +46,36 @@ test('The application fixes every scene at 10,000 EUR without a selector', () =>
   assert.doesNotMatch(app, /id="blockUnit"|state\.blockUnit|blockUnits/);
   assert.equal(richest.source.usd_per_eur, 1.1805);
   assert.deepEqual(Object.keys(richest.countries).sort(),study.countries.map(c=>c.code).sort());
+});
+
+test('Every fortune is displayed in euros with an explicitly approximate national comparison',()=>{
+  for(const country of study.countries){
+    const args=inputs(country,10000),person=richest.countries[country.code];
+    const result=scene.fortune(person,richest.source,args.nationalTotal);
+    assert.equal(result.amount,person.usd_billions*1e9/richest.source.usd_per_eur);
+    assert.equal(result.share,result.amount/args.nationalTotal);
+    for(const html of [scene.render({...args,richestMan:person,richestSource:richest.source}).html,scene.renderTop({...args,base:args.top,richestMan:person,richestSource:richest.source}).html]){
+      assert.doesNotMatch(html,/M\$|USD originales|\d \$/);
+      assert.equal(+attribute(html,'data-national-share'),result.share);
+      assert.match(html,/del patrimonio nacional¹/);
+      assert.match(html,/Comparación orientativa/);
+    }
+  }
+  assert.equal(scene.fortune(richest.countries.US,richest.source,null).share,null);
+  assert.equal(scene.fortune(richest.countries.US,richest.source,0).share,null);
+});
+
+test('Official euro conversions use verified periods and preserve zeros and negative values',()=>{
+  const extra=JSON.parse(readFileSync(new URL('data/presentation-fx.json',root),'utf8'));
+  const rates=[...study.fx.rates,...extra.rates];
+  assert.equal(scene.toEUR(1162883.870967742,'USD','2026-Q2',rates),1000000);
+  assert.equal(scene.toEUR(0,'JPY','2024-10-31',rates),0);
+  assert.equal(scene.toEUR(-1638519.140625,'JPY','2024-10-31',rates),-10000);
+  assert.equal(scene.toEUR(21556542.3529412,'MXN','2019',rates),1000000);
+  assert.equal(scene.toEUR(42,'EUR','2026-Q2',rates),42);
+  assert.equal(scene.toEUR(100,'USD','2027-Q2',rates),null);
+  assert.equal(scene.toEUR(100,'GBP','2020-04/2022-03',rates),null);
+  assert.equal(scene.toEUR(null,'USD','2026-Q2',rates),null);
 });
 
 test('Complete columns and remainders preserve every amount at all three units', () => {

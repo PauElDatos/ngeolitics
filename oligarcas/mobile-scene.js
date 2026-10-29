@@ -6,7 +6,7 @@ window.MobileWealthScene=(()=>{
   const colors=['#67b6df','#69c7ae','#bdcd73','#eeb55e','#fef702'];
   const escape=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 
-  function mount(root,{name,population,quintiles,top,richestMan,richestSource,formatMoney,formatCompact,formatPercent,formatNumber}){
+  function mount(root,{name,population,nationalTotal,quintiles,top,richestMan,richestSource,formatMoney,formatCompact,formatPercent,formatNumber}){
     if(!phone.matches)return false;
     const wrap=root.querySelector('.wealthSceneWrap'),svg=root.querySelector('#wealthGraphic');
     if(!wrap||svg?.dataset.kind!=='national')return false;
@@ -14,7 +14,7 @@ window.MobileWealthScene=(()=>{
     const stats=root.querySelector('#stats'),reference=root.querySelector('.blockReference');
     const layout=document.createElement('div');
     layout.className='mobileWealthScene';
-    const richestEUR=richestMan?richestMan.usd_billions*1e9/richestSource.usd_per_eur:0;
+    const fortune=window.WealthScene.fortune(richestMan,richestSource,nationalTotal);
     layout.innerHTML=`
       <header class="mobileSceneHeading"><h2>${escape(name)}</h2><p>${escape(formatNumber(population))} adultos de 20 años o más · 2024</p></header>
       <div class="mobileSceneModes"></div>
@@ -26,8 +26,9 @@ window.MobileWealthScene=(()=>{
       </section>
       <section class="mobileSceneHighlights" aria-label="El uno por ciento y la fortuna individual">
         <article><h3>El 1 % superior</h3><strong>${escape(formatPercent(top.share))}</strong><p>de la riqueza nacional</p><small>≈ ${escape(formatNumber(top.count))} adultos<br>${escape(formatCompact(top.mean))} por adulto</small></article>
-        ${richestMan?`<article class="mobileRichest"><h3>${escape(richestMan.name)}</h3><strong>${escape(formatNumber(richestMan.usd_billions*1000))} M$</strong><p>≈ ${escape(formatCompact(richestEUR))}</p><small>Forbes 2026 · una persona${richestMan.includes_family?' y familia':''}</small></article>`:''}
+        ${richestMan?`<article class="mobileRichest"><h3>${escape(richestMan.name)}</h3><strong>≈ ${escape(formatCompact(fortune.amount))}</strong><p class="wealth-richest-national-share">≈ ${escape(formatPercent(fortune.share))} del patrimonio nacional¹</p><small>Forbes 2026 · una persona${richestMan.includes_family?' y familia':''}</small></article>`:''}
       </section>
+      ${richestMan?`<p class="fortuneComparisonNote">${escape(window.WealthScene.comparisonNote)}</p>`:''}
       <details class="mobileSceneLegend"><summary>Leyenda · cada bloque = 10.000 €</summary></details>
       <dialog class="mobileSceneDetails" aria-label="Datos del grupo seleccionado"><button class="btn mobileSceneClose" type="button" aria-label="Cerrar los datos">Cerrar ×</button><div class="mobileSceneDetailContent"></div></dialog>`;
     modes.querySelector('[data-scene-mode="split"]').textContent='1 % separado';

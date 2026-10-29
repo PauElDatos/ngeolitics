@@ -83,10 +83,13 @@ window.WealthSceneLabels=(()=>{
       topShare=[...content.querySelectorAll('.wealth-top-share text')].map((source,i)=>label(footer,source,i?12:25));
     }
     const richest=panel?node('g',{class:'wealth-readable-richest'},footer):null;
-    const richestSources=panel?[...panel.querySelectorAll('text')].slice(-4):[];
+    const richestSources=panel?[...panel.querySelectorAll('.wealth-richest-caption text')]:[];
     const richestTexts=richestSources.map((source,i)=>label(richest,source,i===1?18:12));
+    richestTexts[2]?.classList.add('wealth-richest-national-share');
     const summit=panel?node('g',{class:'wealth-readable-summit'},layer):null;
-    const summitTexts=panel?[...panel.querySelectorAll('text')].slice(0,3).map((source,i)=>label(summit,source,i===1?18:12)):[];
+    const summitTexts=panel?[...panel.querySelectorAll('.wealth-richest-top-caption text')].map((source,i)=>label(summit,source,i===1?18:12)):[];
+    const divider=panel?.querySelector('.wealth-richest-divider');
+    const rightBoundary=divider?+divider.getAttribute('x1'):null;
     const virtual=node('g',{},layer);
     // Keep the fixed heading above annotations, but never over the euro axis.
     layer.append(heading);
@@ -95,8 +98,9 @@ window.WealthSceneLabels=(()=>{
     let layoutKey='';
     return {
       gutter:88,
+      rightBoundary,rightMinimum:176,
       bottom:zoom=>moneyBottom+footerHeight/zoom,
-      top:zoom=>panel?Math.min(+svg.dataset.logicalTop,+panel.dataset.top-140/zoom):+svg.dataset.logicalTop,
+      top:zoom=>panel?Math.min(+svg.dataset.logicalTop,+panel.dataset.top-180/zoom):+svg.dataset.logicalTop,
       paint({zoom,top,viewport,pixels,width,visibleWidth,inset,scrollLeft,bottom,virtualTicks}){
         at(layer,{transform:`translate(${-inset/zoom},0) scale(${1/zoom})`});
         const x=value=>value*zoom+inset;
@@ -131,9 +135,9 @@ window.WealthSceneLabels=(()=>{
         if(summit){
           const yy=(+panel.dataset.top-top)*zoom;
           const joined=panel.dataset.joined==='true';
-          const xx=x(+panel.dataset.x)+(joined?16:5*zoom);
-          const available=joined?width-xx-8:Math.max(80,(width-xx-8)*2);
-          let baseline=yy-76;
+          const xx=joined?x(+panel.dataset.x)+16:(x(rightBoundary)+width)/2;
+          const available=joined?width-xx-16:width-x(rightBoundary)-32;
+          let baseline=yy-126;
           summitTexts.forEach((text,i)=>{
             text.setAttribute('text-anchor',joined?'start':'middle');
             baseline+=lines(text,text.dataset.label,xx,baseline,available,i===1?18:12)+3;
@@ -158,7 +162,8 @@ window.WealthSceneLabels=(()=>{
           at(card.stripe,{x:xx,y:0,width:w,height:6});
           at(card.background,{x:xx,y:cardY,width:w,height:cardHeight});
           at(card.rule,{x1:xx,x2:xx+w,y1:cardY,y2:cardY});
-          lines(card.captions[0],card.texts[0].textContent,cx,cardY+32,w-8,12,14);
+          const quintileLabel=w<95?card.texts[0].textContent.replace(/ %$/,'%'):card.texts[0].textContent;
+          lines(card.captions[0],quintileLabel,cx,cardY+32,w-8,12,14);
           if(card.captions[0].children.length===1)card.captions[0].setAttribute('y',cardY+38);
           const count=card.captions[1];count.textContent=compactCounts?'≈ '+number.format(+card.original.dataset.count):card.texts[1].textContent;
           at(count,{x:cx,y:cardY+68,'font-size':countSize,'aria-label':card.texts[1].textContent});
@@ -197,15 +202,14 @@ window.WealthSceneLabels=(()=>{
         }
         if(richest){
           const joined=panel.dataset.joined==='true';
-          const xx=x(+panel.dataset.x)+(joined?16:5*zoom);
-          const divider=panel.querySelector('.wealth-richest-divider');
-          const w=joined?width-xx-8:width-x(+divider.getAttribute('x1'))-12;
+          const xx=joined?x(+panel.dataset.x)+16:(x(rightBoundary)+width)/2;
+          const w=joined?width-xx-16:width-x(rightBoundary)-32;
           let baseline=cardY+28;
           richestTexts.forEach((text,i)=>{
             text.setAttribute('text-anchor',joined?'start':'middle');
             const value=richestSources[i].textContent;
-            const size=i===1?fit(text,value,w-8,19,14):12;
-            baseline+=lines(text,value,xx,baseline,w-8,size,i===1?23:16)+3;
+            const size=i===1||i===2?fit(text,value,w,i===1?19:20,14):12;
+            baseline+=lines(text,value,xx,baseline,w,size,i===1||i===2?24:16)+5;
           });
         }
         footerHeight=Math.max(270,Math.ceil(footer.getBBox().y+footer.getBBox().height)+32);

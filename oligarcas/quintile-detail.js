@@ -27,7 +27,7 @@ window.QuintileDetail=(()=>{
 
   function mount(root,context){
     dispose();
-    const {name,country,quintiles,percentiles,cumulative,richestMan,richestSource,formatMoney,formatCompact,formatPercent,formatNumber,sourceHTML}=context;
+    const {name,country,nationalTotal,quintiles,percentiles,cumulative,richestMan,richestSource,formatMoney,formatCompact,formatPercent,formatNumber,sourceHTML}=context;
     active=new AbortController();
     const {signal}=active;
     const dialog=document.createElement('dialog');
@@ -98,7 +98,8 @@ window.QuintileDetail=(()=>{
       const milestones=tail.length?`<section class="quintileMilestones" aria-label="Umbrales dentro de la parte más rica">${tail.map(group=>`<div><span>Entrada al ${percentile(group.fraction*100)} % superior</span><strong>${escape(formatCompact(group.lower))}</strong></div>`).join('')}</section>`:'';
       const highest=tail.at(-1);
       const spread=highest&&q.lower>0?`El umbral del ${percentile(highest.fraction*100)} % superior es <strong>${escape(formatNumber(highest.lower/q.lower))} veces</strong> el umbral de entrada a Q5.`:Number.isFinite(q.upper)&&Number.isFinite(q.lower)?`Entre los dos límites hay <strong>${escape(formatMoney(q.upper-q.lower))}</strong> de diferencia.`:'';
-      const richest=q.b===100&&richestMan?`<aside class="quintileForbes"><div><span>Referencia de la cima · Forbes 2026</span><strong>${escape(richestMan.name)}${richestMan.includes_family?' y familia':''}</strong></div><div><strong>≈ ${escape(formatCompact(richestMan.usd_billions*1e9/richestSource.usd_per_eur))}</strong><span>${escape(formatNumber(richestMan.usd_billions*1000))} M$ originales</span></div><p>Estimación individual del 1-3-2026; conversión a EUR nominales con el BCE del 27-2-2026. Se muestra aparte de la curva WID de 2024 en EUR de 2025. <a href="${escape(richestSource.forbes_url)}" target="_blank" rel="noopener">Forbes ↗</a> · <a href="${escape(richestSource.fx_url)}" target="_blank" rel="noopener">BCE ↗</a></p></aside>`:'';
+      const fortune=window.WealthScene.fortune(richestMan,richestSource,nationalTotal);
+      const richest=q.b===100&&richestMan?`<aside class="quintileForbes"><div><span>Referencia de la cima · Forbes 2026</span><strong>${escape(richestMan.name)}</strong></div><div><strong>≈ ${escape(formatCompact(fortune.amount))}</strong><span class="wealth-richest-national-share">≈ ${escape(formatPercent(fortune.share))} del patrimonio nacional¹</span></div><p>Estimación individual del 1-3-2026; conversión a EUR nominales con el BCE del 27-2-2026. ${escape(window.WealthScene.comparisonNote)} <a href="${escape(richestSource.forbes_url)}" target="_blank" rel="noopener">Forbes ↗</a> · <a href="${escape(richestSource.fx_url)}" target="_blank" rel="noopener">BCE ↗</a></p></aside>`:'';
       body.innerHTML=`<p class="quintileDialogSummary">≈ ${escape(formatNumber(q.count))} adultos · ${escape(formatPercent(q.share))} de la riqueza nacional</p>
         <section class="quintileMetrics" aria-label="Límites y promedio del quintil">
           ${metric('Mínimo · umbral de entrada',q.lower,`Límite de P${percentile(q.a)}`,'lower')}
