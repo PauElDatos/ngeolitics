@@ -100,6 +100,23 @@ test('Every country retains unclipped captions in both national layouts',async()
   await page.close();
 });
 
+test('Country headings have no background and do not intercept the bars beneath them',async()=>{
+  const page=await browser.newPage({viewport:{width:1680,height:1050}});
+  await open(page,'US');
+  assert.equal(await page.locator('.wealth-readable-heading rect,#wealthSceneHeading rect').count(),0);
+  assert.equal(await page.locator('.wealth-readable-heading text').count(),2);
+  const group=await page.evaluate(()=>{
+    const bar=document.querySelector('.wealth-pile[data-group="p98p99"] .wealth-column').getBoundingClientRect();
+    const plot=document.querySelector('.wealthSceneWrap').getBoundingClientRect();
+    return document.elementFromPoint(bar.left+bar.width/2,plot.top+58)?.closest('.wealth-pile')?.dataset.group;
+  });
+  assert.equal(group,'p98p99','The bar remains interactive in the former heading background area');
+  await page.locator('.sectionTabs [data-view="cima"]').click();await frames(page);
+  assert.equal(await page.locator('#wealthSceneHeading rect').count(),0);
+  assert.equal(await page.locator('#wealthSceneHeading text').count(),3);
+  await page.close();
+});
+
 test('Responsive quintiles keep keyboard dialogs, isolated scrolling and summit/base navigation',async()=>{
   const page=await browser.newPage({viewport:{width:1680,height:1050}});
   await open(page);

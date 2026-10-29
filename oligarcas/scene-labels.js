@@ -44,7 +44,7 @@ window.WealthSceneLabels=(()=>{
     // Do not leave duplicate keyboard controls or duplicated accessible labels.
     sourceHeading.setAttribute('display','none');sourceHeading.setAttribute('aria-hidden','true');
     content.querySelectorAll('text').forEach(text=>text.style.display='none');
-    const heading=node('g',{class:'wealth-readable-heading'},layer),headingBackground=node('rect',{rx:8,fill:'#252825','fill-opacity':'.95'},heading);
+    const heading=node('g',{class:'wealth-readable-heading','pointer-events':'none'},layer);
     const title=label(heading,sourceHeading.querySelector('text'),30,'start');
     const population=label(heading,sourceHeading.querySelectorAll('text')[1],12,'start');
     const axis=[...content.querySelectorAll('.wealth-axis-label')].map(source=>({source,text:label(layer,source,12,'end')}));
@@ -119,7 +119,6 @@ window.WealthSceneLabels=(()=>{
         }
         // Place sample values in screen space and resolve collisions at that size.
         const placed=[];
-        const headingBottom=Number(headingBackground.getAttribute('y'))+Number(headingBackground.getAttribute('height'))+12;
         for(const {source,text} of samples){
           text.setAttribute('display','inline');
           let y=(+source.getAttribute('y')-top)*zoom;
@@ -127,8 +126,7 @@ window.WealthSceneLabels=(()=>{
           const start=source.getAttribute('text-anchor')==='end'?xx-w:xx-w/2;
           while(placed.some(p=>start<p.end+6&&start+w>p.start-6&&Math.abs(y-p.y)<18))y-=18;
           placed.push({start,end:start+w,y});
-          const behindHeading=y<headingBottom;
-          at(text,{x:xx,y,display:y<14||y>pixels-8||behindHeading?'none':'inline'});
+          at(text,{x:xx,y,display:y<14||y>pixels-8?'none':'inline'});
         }
         if(summit){
           const yy=(+panel.dataset.top-top)*zoom;
@@ -149,8 +147,7 @@ window.WealthSceneLabels=(()=>{
         const headingSize=Math.max(26,Math.min(34,width/28));
         const titleHeight=lines(title,sourceHeading.querySelector('text').textContent,headingX,36,headingWidth,headingSize,headingSize+3);
         const subtitleY=36+titleHeight+1;
-        const subtitleHeight=lines(population,sourceHeading.querySelectorAll('text')[1].textContent,headingX,subtitleY,headingWidth,12,16);
-        at(headingBackground,{x:headingX-8,y:10,width:headingWidth+16,height:subtitleY+subtitleHeight-12});
+        lines(population,sourceHeading.querySelectorAll('text')[1].textContent,headingX,subtitleY,headingWidth,12,16);
         const countSize=Math.min(...cards.map(card=>card.width*zoom))<115?12:15;
         const compactCounts=cards.some(card=>{
           const count=card.captions[1];count.textContent=card.texts[1].textContent;count.setAttribute('font-size',countSize);
