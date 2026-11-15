@@ -69,7 +69,6 @@ summary { cursor: pointer; color: var(--ink); }
 .table-preview { pointer-events: none; }
 .table-preview table { height: 186px; font-size: 17px; line-height: 1.2; background: var(--surface); color: var(--ink); }
 .table-preview th, .table-preview td { position: static; padding: 2px 6px; }
-.table-preview .effective-rate { font-size: inherit; color: inherit; }
 .explanations { border-top: 1px solid var(--edge); }
 .explanations .panel-head h2 { font-size: clamp(23px,1.75vw,29px); }
 .explanation-copy { padding: 14px; }
@@ -77,15 +76,20 @@ summary { cursor: pointer; color: var(--ink); }
 .explanation-copy p { margin: 0; color: #d1d1d1; font-size: 14px; line-height: 1.5; }
 .table-wrap { min-height: 0; overflow: auto; scrollbar-width: thin; flex: 1; }
 table { width: 100%; min-width: 620px; font-size: clamp(12px,.9vw,16px); font-variant-numeric: tabular-nums; border-spacing: 0; }
+#comparison-table table { min-width: 1350px; }
 th, td { padding: 12px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid #393939; }
-.after-irpf, .effective-rate { display: block; }
-.after-irpf { font-size: clamp(12px,.95vw,17px); font-weight: 700; }
+.after-irpf { font-size: inherit; font-weight: 700; }
 .after-irpf-same { color: var(--ink); }
-.effective-rate { margin-top: 2px; color: var(--muted); font-size: 11px; font-weight: 400; }
 thead th { position: sticky; top: 0; z-index: 2; background: #303030; color: #c8c8c8; }
 thead th span { font-size: inherit !important; }
+#comparison-table .scenario-groups th { height: 42px; }
+#comparison-table .scenario-group { text-align: center; border-left: 1px solid #474747; }
+#comparison-table .scenario-fields th { top: 42px; color: var(--muted); font-size: 11px; }
+#comparison-table .rate-heading, #comparison-table .rate-cell { border-left: 1px solid #474747; }
+#comparison-table .scenario-fields th:first-child { left: auto; text-align: right; }
 th:first-child { text-align: left; position: sticky; left: 0; padding-left: 10px; background: #292929; }
 thead th:first-child { z-index: 3; background: #303030; }
+#comparison-table .gross-heading { z-index: 4; }
 tbody th { font-weight: 500; }
 td:last-child, th:last-child { padding-right: 10px; }
 tbody tr:nth-child(even) { background: rgb(255 255 255 / .022); }

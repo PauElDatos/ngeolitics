@@ -7,9 +7,9 @@
   <meta name="description" content="Compara el IRPF actual con la reforma de VOX y las alternativas TIPO A, B y C por salario bruto anual.">
   <link rel="icon" href="../assets/faviconNG.png">
   <link rel="stylesheet" href="../assets/section-header.css?v=1">
-  <link rel="stylesheet" href="styles.css?v=6">
+  <link rel="stylesheet" href="styles.css?v=7">
   <script src="data.js?v=1" defer></script>
-  <script src="app.js?v=7" defer></script>
+  <script src="app.js?v=8" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Saltar al contenido principal</a>
@@ -40,10 +40,10 @@
         <div id="values" class="values"></div>
       </div>
       <p id="chart-note" class="chart-note"></p>
-      <section class="table-view" id="table-view" aria-label="Tabla de salario anual tras IRPF y tipos efectivos" hidden>
+      <section class="table-view" id="table-view" aria-label="Tabla de tipos efectivos y salarios tras IRPF" hidden>
         <div class="table-toolbar">
           <div class="table-toolbar-copy">
-            <p>Salario anual que queda tras restar el IRPF al bruto. El tipo efectivo aparece debajo de cada importe. Desliza la tabla horizontalmente para ver todos los modelos.</p>
+            <p>Tipo efectivo de IRPF según el salario bruto anual y, a su lado, el salario que queda tras restar ese impuesto. Desliza la tabla horizontalmente para ver todos los modelos.</p>
             <div class="table-legend" aria-label="Comparación con el modelo actual">
               <span class="table-legend-up">↑ Más que con el tipo actual</span>
               <span class="table-legend-down">↓ Menos que con el tipo actual</span>
@@ -51,7 +51,7 @@
           </div>
           <button type="button" id="export-data" aria-label="Descargar tabla en CSV">CSV ↓</button>
         </div>
-        <div class="table-wrap" id="comparison-table" tabindex="0" role="region" aria-label="Salario anual tras IRPF y tipos efectivos por salario bruto"></div>
+        <div class="table-wrap" id="comparison-table" tabindex="0" role="region" aria-label="Tipos efectivos y salarios tras IRPF por salario bruto"></div>
         <p class="table-note">Salario tras IRPF = bruto anual − IRPF simulado. No se descuentan las cotizaciones sociales.</p>
       </section>
     </main>

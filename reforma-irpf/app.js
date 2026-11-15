@@ -167,7 +167,7 @@
     $('inspector').hidden = true;
     $('chart-note').hidden = true;
     $('table-view').hidden = false;
-    $('chart-title').textContent = 'Salario anual tras IRPF';
+    $('chart-title').textContent = 'Tipos efectivos por salario';
     $('chart-count').textContent = '5 modelos';
     renderThumbnails();
   }
@@ -180,22 +180,32 @@
 
   function renderTable() {
     const table = el('table');
-    const caption = el('caption', 'sr-only', 'Salario anual tras IRPF y tipo efectivo por salario bruto anual. Comparación del modelo actual, VOX y las alternativas TIPO A, B y C.');
+    const caption = el('caption', 'sr-only', 'Tipo efectivo de IRPF y salario anual tras IRPF por salario bruto anual. Comparación del modelo actual, VOX y las alternativas TIPO A, B y C.');
     const head = el('thead');
-    const headers = el('tr');
-    const salaryHeader = el('th', '', 'Bruto anual');
-    salaryHeader.scope = 'col';
-    headers.append(salaryHeader);
+    const groups = el('tr', 'scenario-groups');
+    const fields = el('tr', 'scenario-fields');
+    const grossHeader = el('th', 'gross-heading', 'Bruto anual');
+    grossHeader.scope = 'col';
+    grossHeader.rowSpan = 2;
+    groups.append(grossHeader);
     Object.keys(labels).forEach(id => {
-      const th = el('th');
-      th.scope = 'col';
-      th.dataset.scenario = id;
+      const group = el('th', 'scenario-group');
+      group.scope = 'colgroup';
+      group.colSpan = 2;
+      group.dataset.scenario = id;
       const span = el('span', 'series-label', labels[id]);
       span.style.setProperty('--series-color', colors[id]);
-      th.append(span);
-      headers.append(th);
+      group.append(span);
+      groups.append(group);
+      const rateHeader = el('th', 'rate-heading', 'Tipo efectivo');
+      rateHeader.scope = 'col';
+      rateHeader.dataset.scenario = id;
+      const salaryHeader = el('th', 'salary-heading-cell', 'Salario tras IRPF');
+      salaryHeader.scope = 'col';
+      salaryHeader.dataset.scenario = id;
+      fields.append(rateHeader, salaryHeader);
     });
-    head.append(headers);
+    head.append(groups, fields);
     const body = el('tbody');
     data.table.forEach(row => {
       const tr = el('tr');
@@ -204,31 +214,51 @@
       tr.append(th);
       const actualAfterIrpf = afterIrpf(row.salary, row.actual);
       Object.keys(labels).forEach(id => {
-        const td = el('td');
-        td.dataset.scenario = id;
+        const rateCell = el('td', 'rate-cell', percent(row[id]));
+        rateCell.dataset.scenario = id;
+        const salaryCell = el('td', 'salary-cell');
+        salaryCell.dataset.scenario = id;
         const remaining = afterIrpf(row.salary, row[id]);
         const difference = Math.round(remaining) - Math.round(actualAfterIrpf);
         const comparison = id === 'actual' || difference === 0 ? 'same' : difference > 0 ? 'up' : 'down';
         const indicator = comparison === 'up' ? '↑ ' : comparison === 'down' ? '↓ ' : '';
-        td.append(
-          el('strong', `after-irpf after-irpf-${comparison}`, indicator + money(remaining)),
-          el('span', 'effective-rate', `${percent(row[id])} IRPF`)
-        );
-        tr.append(td);
+        salaryCell.append(el('strong', `after-irpf after-irpf-${comparison}`, indicator + money(remaining)));
+        tr.append(rateCell, salaryCell);
       });
       body.append(tr);
     });
     table.append(caption, head, body);
     $('comparison-table').replaceChildren(table);
     const preview = el('table');
+    const previewHead = el('thead');
+    const previewHeaders = el('tr');
+    const previewGrossHeader = el('th', '', 'Bruto anual');
+    previewGrossHeader.scope = 'col';
+    previewHeaders.append(previewGrossHeader);
+    Object.keys(labels).forEach(id => {
+      const th = el('th');
+      th.scope = 'col';
+      th.dataset.scenario = id;
+      const span = el('span', 'series-label', labels[id]);
+      span.style.setProperty('--series-color', colors[id]);
+      th.append(span);
+      previewHeaders.append(th);
+    });
+    previewHead.append(previewHeaders);
     const previewBody = el('tbody');
-    for (const row of Array.from(body.rows).slice(0, 5)) {
-      const miniRow = row.cloneNode(true);
-      miniRow.querySelectorAll('.after-irpf').forEach(value => value.remove());
-      miniRow.querySelectorAll('.effective-rate').forEach(value => { value.textContent = value.textContent.replace(' IRPF', ''); });
+    for (const row of data.table.slice(0, 5)) {
+      const miniRow = el('tr');
+      const th = el('th', '', money(row.salary));
+      th.scope = 'row';
+      miniRow.append(th);
+      Object.keys(labels).forEach(id => {
+        const td = el('td', '', percent(row[id]));
+        td.dataset.scenario = id;
+        miniRow.append(td);
+      });
       previewBody.append(miniRow);
     }
-    preview.append(head.cloneNode(true), previewBody);
+    preview.append(previewHead, previewBody);
     $('table-preview-content').replaceChildren(preview);
     renderTableVisibility();
   }
@@ -276,8 +306,8 @@
     draw();
   });
   $('export-data').addEventListener('click', () => {
-    const rows = [['Salario bruto anual (€)', ...Object.values(labels).flatMap(label => [`${label} tras IRPF (€)`, `${label} tipo efectivo (%)`])]];
-    data.table.forEach(row => rows.push([String(row.salary), ...Object.keys(labels).flatMap(id => [number(afterIrpf(row.salary, row[id]), 2), number(row[id] * 100, 2)])]));
+    const rows = [['Salario bruto anual (€)', ...Object.values(labels).flatMap(label => [`${label} tipo efectivo (%)`, `${label} tras IRPF (€)`])]];
+    data.table.forEach(row => rows.push([String(row.salary), ...Object.keys(labels).flatMap(id => [number(row[id] * 100, 2), number(afterIrpf(row.salary, row[id]), 2)])]));
     const csv = '\uFEFF' + rows.map(row => row.join(';')).join('\r\n');
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
     const link = el('a');
