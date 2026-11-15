@@ -74,6 +74,9 @@ summary { cursor: pointer; color: var(--ink); }
 .explanation-copy { padding: 14px; }
 .explanation-copy h3 { margin: 0 0 6px; color: var(--ink); font: 700 16px/1.25 var(--title); }
 .explanation-copy p { margin: 0; color: #d1d1d1; font-size: 14px; line-height: 1.5; }
+.table-explanation dl { display: grid; gap: 9px; margin: 12px 0; }
+.table-explanation dt { color: var(--ink); font-weight: 700; }
+.table-explanation dd { margin: 2px 0 0; color: #d1d1d1; font-size: 14px; line-height: 1.5; }
 .table-wrap { min-height: 0; overflow: auto; scrollbar-width: thin; flex: 1; }
 table { width: 100%; min-width: 620px; font-size: clamp(12px,.9vw,16px); font-variant-numeric: tabular-nums; border-spacing: 0; }
 #comparison-table table { min-width: 1350px; }

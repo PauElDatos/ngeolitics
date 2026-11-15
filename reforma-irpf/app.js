@@ -155,6 +155,8 @@
     $('chart-note').textContent = notes[id];
     $('explanation-chart').textContent = shortTitles[id];
     $('explanation-text').textContent = explanations[id];
+    $('chart-explanation').hidden = false;
+    $('table-explanation').hidden = true;
     $('explanation').hidden = false;
     renderThumbnails();
     draw();
@@ -162,7 +164,9 @@
 
   function selectTable() {
     currentView = 'table';
-    $('explanation').hidden = true;
+    $('chart-explanation').hidden = true;
+    $('table-explanation').hidden = false;
+    $('explanation').hidden = false;
     plot.hidden = true;
     $('inspector').hidden = true;
     $('chart-note').hidden = true;
@@ -221,8 +225,7 @@
         const remaining = afterIrpf(row.salary, row[id]);
         const difference = Math.round(remaining) - Math.round(actualAfterIrpf);
         const comparison = id === 'actual' || difference === 0 ? 'same' : difference > 0 ? 'up' : 'down';
-        const indicator = comparison === 'up' ? '↑ ' : comparison === 'down' ? '↓ ' : '';
-        salaryCell.append(el('strong', `after-irpf after-irpf-${comparison}`, indicator + money(remaining)));
+        salaryCell.append(el('strong', `after-irpf after-irpf-${comparison}`, money(remaining)));
         tr.append(rateCell, salaryCell);
       });
       body.append(tr);

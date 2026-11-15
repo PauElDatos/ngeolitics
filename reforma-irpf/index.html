@@ -7,9 +7,9 @@
   <meta name="description" content="Compara el IRPF actual con la reforma de VOX y las alternativas TIPO A, B y C por salario bruto anual.">
   <link rel="icon" href="../assets/faviconNG.png">
   <link rel="stylesheet" href="../assets/section-header.css?v=1">
-  <link rel="stylesheet" href="styles.css?v=7">
+  <link rel="stylesheet" href="styles.css?v=8">
   <script src="data.js?v=1" defer></script>
-  <script src="app.js?v=8" defer></script>
+  <script src="app.js?v=9" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Saltar al contenido principal</a>
@@ -45,8 +45,8 @@
           <div class="table-toolbar-copy">
             <p>Tipo efectivo de IRPF según el salario bruto anual y, a su lado, el salario que queda tras restar ese impuesto. Desliza la tabla horizontalmente para ver todos los modelos.</p>
             <div class="table-legend" aria-label="Comparación con el modelo actual">
-              <span class="table-legend-up">↑ Más que con el tipo actual</span>
-              <span class="table-legend-down">↓ Menos que con el tipo actual</span>
+              <span class="table-legend-up">Verde: queda más que con el tipo actual</span>
+              <span class="table-legend-down">Rojo: queda menos que con el tipo actual</span>
             </div>
           </div>
           <button type="button" id="export-data" aria-label="Descargar tabla en CSV">CSV ↓</button>
@@ -70,8 +70,19 @@
       <section class="explanations" id="explanation" aria-labelledby="explanation-title" hidden>
         <header class="panel-head"><h2 id="explanation-title">Explicación</h2></header>
         <div class="explanation-copy" aria-live="polite" aria-atomic="true">
-          <h3 id="explanation-chart"></h3>
-          <p id="explanation-text"></p>
+          <div id="chart-explanation">
+            <h3 id="explanation-chart"></h3>
+            <p id="explanation-text"></p>
+          </div>
+          <div id="table-explanation" class="table-explanation" hidden>
+            <h3>Cómo leer la tabla</h3>
+            <p>Cada fila compara el mismo salario bruto anual en Actual, VOX y TIPO A, B y C.</p>
+            <dl>
+              <div><dt>Salario tras IRPF</dt><dd>Cantidad anual que queda después de restar el IRPF al bruto. Es el salario restante, no la cantidad que sube o baja.</dd></div>
+              <div><dt>Tipo efectivo</dt><dd>Porcentaje del salario bruto que se paga en IRPF en ese modelo.</dd></div>
+            </dl>
+            <p>El <span class="table-legend-up">verde</span> indica que queda más salario que con el tipo actual; el <span class="table-legend-down">rojo</span>, que queda menos. El importe no descuenta las cotizaciones sociales.</p>
+          </div>
         </div>
       </section>
     </aside>
