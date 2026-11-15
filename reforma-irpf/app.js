@@ -71,8 +71,7 @@
     const sx = x => margin.left + (x - xmin) / (xmax - xmin) * (width - margin.left - margin.right);
     const sy = y => height - margin.bottom - (y - ymin) / (ymax - ymin) * (height - margin.top - margin.bottom);
     metrics = { sx, sy };
-    svg = svgEl('svg', { viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-labelledby': `svg-title-${chart.id} svg-desc-${chart.id}`, class: 'line-chart' });
-    svg.append(svgEl('title', { id: `svg-title-${chart.id}` }, chart.title));
+    svg = svgEl('svg', { viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-label': chart.title, 'aria-describedby': `svg-desc-${chart.id}`, class: 'line-chart' });
     svg.append(svgEl('desc', { id: `svg-desc-${chart.id}` }, 'Comparación de los modelos seleccionados. Eje horizontal: salario bruto anual en miles de euros. Usa el control de salario bajo la gráfica para consultar los valores con el teclado.'));
     const clipId = `clip-${chart.id}`;
     const defs = svgEl('defs');
