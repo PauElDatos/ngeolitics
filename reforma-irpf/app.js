@@ -23,7 +23,7 @@
   };
   const shortTitles = { savings: 'Ahorro anual', net: 'Variación del neto', rate: 'Tipo efectivo', share: 'Ahorro sobre el bruto' };
   const selectedChart = id => data.charts.find(c => c.id === id);
-  let chart = selectedChart('savings');
+  let chart = selectedChart('rate');
   const plot = $('plot'), slider = $('salary'), output = $('salary-value'), values = $('values');
   let svg, cursor, markers, metrics;
   let salary = 30; // Thousands of euros, shared across chart selections.
