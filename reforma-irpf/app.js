@@ -24,6 +24,7 @@
   const shortTitles = { savings: 'Ahorro anual', net: 'Variación del neto', rate: 'Tipo efectivo', share: 'Ahorro sobre el bruto' };
   const selectedChart = id => data.charts.find(c => c.id === id);
   let chart = selectedChart('rate');
+  let currentView = chart.id;
   const plot = $('plot'), slider = $('salary'), output = $('salary-value'), values = $('values');
   let svg, cursor, markers, metrics;
   let salary = 30; // Thousands of euros, shared across chart selections.
@@ -63,6 +64,7 @@
     }
   }
   function draw() {
+    if (currentView === 'table') return;
     const width = Math.max(1, plot.clientWidth);
     const height = Math.max(1, plot.clientHeight);
     const margin = { left: chart.id === 'savings' ? 62 : 48, right: 16, top: 16, bottom: 49 };
@@ -116,7 +118,7 @@
   function renderThumbnails() {
     data.charts.forEach(c => {
       const btn = $('pick-' + c.id);
-      btn.setAttribute('aria-pressed', String(c.id === chart.id));
+      btn.setAttribute('aria-pressed', String(c.id === currentView));
       const mini = svgEl('svg', { viewBox: '0 0 144 52', preserveAspectRatio: 'none', class: 'mini-chart', 'aria-hidden': 'true' });
       const [x0,x1] = c.xDomain, [y0,y1] = c.yDomain;
       const sx = x => 2 + 140 * (x-x0)/(x1-x0);
@@ -128,10 +130,19 @@
       }
       btn.replaceChildren(el('span', '', shortTitles[c.id]), mini);
     });
+    $('pick-table').setAttribute('aria-pressed', String(currentView === 'table'));
+    document.querySelectorAll('.explanation-card').forEach(card => {
+      card.classList.toggle('is-active', card.dataset.chart === currentView);
+    });
   }
 
   function selectChart(id) {
     chart = selectedChart(id);
+    currentView = id;
+    plot.hidden = false;
+    $('inspector').hidden = false;
+    $('chart-note').hidden = false;
+    $('table-view').hidden = true;
     const points = chart.series[0].points;
     slider.min = points[0][0];
     slider.max = points[points.length-1][0];
@@ -140,6 +151,23 @@
     $('chart-note').textContent = notes[id];
     renderThumbnails();
     draw();
+  }
+
+  function selectTable() {
+    currentView = 'table';
+    plot.hidden = true;
+    $('inspector').hidden = true;
+    $('chart-note').hidden = true;
+    $('table-view').hidden = false;
+    $('chart-title').textContent = 'Tipos efectivos por salario';
+    $('chart-count').textContent = '5 modelos';
+    renderThumbnails();
+  }
+
+  function renderTableVisibility() {
+    document.querySelectorAll('#comparison-table [data-scenario]').forEach(cell => {
+      cell.hidden = !visible.has(cell.dataset.scenario);
+    });
   }
 
   function renderTable() {
@@ -153,6 +181,7 @@
     Object.keys(labels).forEach(id => {
       const th = el('th');
       th.scope = 'col';
+      th.dataset.scenario = id;
       const span = el('span', 'series-label', labels[id]);
       span.style.setProperty('--series-color', colors[id]);
       th.append(span);
@@ -174,6 +203,7 @@
     });
     table.append(caption, head, body);
     $('comparison-table').replaceChildren(table);
+    renderTableVisibility();
   }
 
   for (const c of data.charts) {
@@ -183,8 +213,9 @@
     btn.setAttribute('aria-label', c.title);
     btn.setAttribute('aria-controls', 'main');
     btn.addEventListener('click', () => selectChart(c.id));
-    $('chart-options').append(btn);
+    $('chart-options').insertBefore(btn, $('pick-table'));
   }
+  $('pick-table').addEventListener('click', selectTable);
   for (const scenario of data.scenarios) {
     const button = el('button', 'scenario');
     button.type = 'button';
@@ -205,6 +236,7 @@
       button.setAttribute('aria-pressed', String(visible.has(id)));
       $('series-status').textContent = `${visible.size} seleccionados`;
       renderThumbnails();
+      renderTableVisibility();
       draw();
     });
   }
@@ -213,6 +245,7 @@
     document.querySelectorAll('button[data-scenario]').forEach(button => button.setAttribute('aria-pressed', 'true'));
     $('series-status').textContent = '5 seleccionados';
     renderThumbnails();
+    renderTableVisibility();
     draw();
   });
   $('export-data').addEventListener('click', () => {
