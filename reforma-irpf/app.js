@@ -9,6 +9,7 @@
   const number = (n, digits = 0) => new Intl.NumberFormat('es-ES', { minimumFractionDigits: digits, maximumFractionDigits: digits, useGrouping: true }).format(n);
   const money = (n, digits = 0) => `${number(n, digits)} €`;
   const percent = (n, digits = 2) => `${number(n * 100, digits)} %`;
+  const afterIrpf = (salary, rate) => salary * (1 - rate);
   const el = (tag, className, text) => {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -166,7 +167,7 @@
     $('inspector').hidden = true;
     $('chart-note').hidden = true;
     $('table-view').hidden = false;
-    $('chart-title').textContent = 'Tipos efectivos por salario';
+    $('chart-title').textContent = 'Salario anual tras IRPF';
     $('chart-count').textContent = '5 modelos';
     renderThumbnails();
   }
@@ -179,7 +180,7 @@
 
   function renderTable() {
     const table = el('table');
-    const caption = el('caption', 'sr-only', 'Tipo efectivo de IRPF por salario bruto anual. Comparación del modelo actual, VOX y las alternativas TIPO A, B y C.');
+    const caption = el('caption', 'sr-only', 'Salario anual tras IRPF y tipo efectivo por salario bruto anual. Comparación del modelo actual, VOX y las alternativas TIPO A, B y C.');
     const head = el('thead');
     const headers = el('tr');
     const salaryHeader = el('th', '', 'Bruto anual');
@@ -201,9 +202,18 @@
       const th = el('th', '', money(row.salary));
       th.scope = 'row';
       tr.append(th);
+      const actualAfterIrpf = afterIrpf(row.salary, row.actual);
       Object.keys(labels).forEach(id => {
-        const td = el('td', '', percent(row[id]));
+        const td = el('td');
         td.dataset.scenario = id;
+        const remaining = afterIrpf(row.salary, row[id]);
+        const difference = Math.round(remaining) - Math.round(actualAfterIrpf);
+        const comparison = id === 'actual' || difference === 0 ? 'same' : difference > 0 ? 'up' : 'down';
+        const indicator = comparison === 'up' ? '↑ ' : comparison === 'down' ? '↓ ' : '';
+        td.append(
+          el('strong', `after-irpf after-irpf-${comparison}`, indicator + money(remaining)),
+          el('span', 'effective-rate', `${percent(row[id])} IRPF`)
+        );
         tr.append(td);
       });
       body.append(tr);
@@ -213,7 +223,10 @@
     const preview = el('table');
     const previewBody = el('tbody');
     for (const row of Array.from(body.rows).slice(0, 5)) {
-      previewBody.append(row.cloneNode(true));
+      const miniRow = row.cloneNode(true);
+      miniRow.querySelectorAll('.after-irpf').forEach(value => value.remove());
+      miniRow.querySelectorAll('.effective-rate').forEach(value => { value.textContent = value.textContent.replace(' IRPF', ''); });
+      previewBody.append(miniRow);
     }
     preview.append(head.cloneNode(true), previewBody);
     $('table-preview-content').replaceChildren(preview);
@@ -263,13 +276,13 @@
     draw();
   });
   $('export-data').addEventListener('click', () => {
-    const rows = [['Salario bruto anual (€)', ...Object.values(labels).map(label => `${label} (%)`)]];
-    data.table.forEach(row => rows.push([String(row.salary), ...Object.keys(labels).map(id => number(row[id] * 100, 2))]));
+    const rows = [['Salario bruto anual (€)', ...Object.values(labels).flatMap(label => [`${label} tras IRPF (€)`, `${label} tipo efectivo (%)`])]];
+    data.table.forEach(row => rows.push([String(row.salary), ...Object.keys(labels).flatMap(id => [number(afterIrpf(row.salary, row[id]), 2), number(row[id] * 100, 2)])]));
     const csv = '\uFEFF' + rows.map(row => row.join(';')).join('\r\n');
     const url = URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' }));
     const link = el('a');
     link.href = url;
-    link.download = 'reforma-irpf-tipos-efectivos.csv';
+    link.download = 'reforma-irpf-salario-tras-irpf.csv';
     document.body.append(link);
     link.click();
     link.remove();
