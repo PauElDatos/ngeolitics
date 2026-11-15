@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>N.Geolitics — Reforma del IRPF</title>
+  <meta name="description" content="Compara el tipo actual, la reforma de VOX y las alternativas TIPO A, TIPO B y TIPO C mediante las cuatro gráficas y la tabla de la hoja Reforma.">
+  <link rel="icon" href="../assets/faviconNG.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Afacad:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/section-header.css?v=1">
+  <link rel="stylesheet" href="styles.css?v=1">
+  <script src="data.js?v=1" defer></script>
+  <script src="app.js?v=1" defer></script>
+</head>
+<body>
+  <a class="skip" href="#main">Saltar al análisis</a>
+  <header class="ng-section-bar">
+    <div class="ng-section-identity"><a class="ng-section-brand" href="../index.html">N.Geolitics</a><span class="ng-section-divider" aria-hidden="true"></span><h1 class="ng-section-title">Reforma del IRPF</h1></div>
+    <a class="ng-section-return" href="../index.html">← Volver a análisis</a>
+  </header>
+  <nav class="section-tabs" aria-label="Contenido del análisis">
+    <a class="tab on" href="#graficas">Gráficas</a>
+    <a class="tab" href="#tabla">Tabla comparativa</a>
+    <a class="tab" href="#source-details">Fuente y datos</a>
+  </nav>
+  <div class="page">
+    <div class="layout">
+      <aside class="panel sidebar" aria-label="Modelos de IRPF">
+        <div class="sidebar-head"><h2>Escenarios</h2><span>5 modelos</span></div>
+        <p class="sidebar-help">Pulsa un modelo para mostrarlo u ocultarlo en las gráficas.</p>
+        <div id="scenarios" class="scenario-list" role="group" aria-label="Series visibles en las gráficas">
+          <button class="scenario on" type="button" data-scenario="actual" aria-pressed="true" style="--series-color:#e3e3e3"><span class="swatch" aria-hidden="true"></span><span>Tipo actual</span><span class="scenario-check" aria-hidden="true">✓</span></button>
+          <button class="scenario on" type="button" data-scenario="vox" aria-pressed="true" style="--series-color:#FEF702"><span class="swatch" aria-hidden="true"></span><span>Reforma de VOX</span><span class="scenario-check" aria-hidden="true">✓</span></button>
+          <button class="scenario on" type="button" data-scenario="a" aria-pressed="true" style="--series-color:#67b6df"><span class="swatch" aria-hidden="true"></span><span>TIPO A</span><span class="scenario-check" aria-hidden="true">✓</span></button>
+          <button class="scenario on" type="button" data-scenario="b" aria-pressed="true" style="--series-color:#69c7ae"><span class="swatch" aria-hidden="true"></span><span>TIPO B</span><span class="scenario-check" aria-hidden="true">✓</span></button>
+          <button class="scenario on" type="button" data-scenario="c" aria-pressed="true" style="--series-color:#eeb55e"><span class="swatch" aria-hidden="true"></span><span>TIPO C</span><span class="scenario-check" aria-hidden="true">✓</span></button>
+        </div>
+        <div class="sidebar-foot"><button id="reset-scenarios" class="btn" type="button">Mostrar todos</button><p id="series-status" role="status" aria-live="polite">5 modelos seleccionados.</p><a href="#source-details">Consultar la fuente ↗</a></div>
+      </aside>
+      <main id="main" tabindex="-1">
+        <div class="study-heading"><p class="eyebrow">Reforma del IRPF</p><h2>Cinco modelos de IRPF,<br class="desktop-break"> frente a frente</h2><p>El tipo actual, la reforma de VOX y tres alternativas: TIPO A, TIPO B y TIPO C. Explora las cuatro gráficas y compara los tipos efectivos por salario de la hoja «Reforma».</p><p id="profile-note" class="profile-note"></p></div>
+        <section id="scenario-summary" class="summary-grid" aria-label="Resumen de los modelos"></section>
+        <section id="graficas" class="charts-grid" aria-label="Las cuatro gráficas de la hoja Reforma">
+          <article id="chart-savings" class="panel chart-card" aria-labelledby="title-savings"><div class="chart-head"><h2 id="title-savings">Ahorro anual frente al IRPF actual (€)</h2></div><div id="plot-savings" class="chart-plot"></div><p id="note-savings" class="chart-note"></p></article>
+          <article id="chart-net" class="panel chart-card" aria-labelledby="title-net"><div class="chart-head"><h2 id="title-net">Variación del sueldo neto (%)</h2></div><div id="plot-net" class="chart-plot"></div><p id="note-net" class="chart-note"></p></article>
+          <article id="chart-rate" class="panel chart-card" aria-labelledby="title-rate"><div class="chart-head"><h2 id="title-rate">Tipo efectivo de IRPF (% del bruto)</h2></div><div id="plot-rate" class="chart-plot"></div><p id="note-rate" class="chart-note"></p></article>
+          <article id="chart-share" class="panel chart-card" aria-labelledby="title-share"><div class="chart-head"><h2 id="title-share">Ahorro como porcentaje del bruto</h2></div><div id="plot-share" class="chart-plot"></div><p id="note-share" class="chart-note"></p></article>
+        </section>
+        <section id="table-panel" class="panel table-panel" aria-labelledby="tabla"><div class="panel-head"><div><p class="eyebrow">Los datos del modelo</p><h2 id="tabla">Tipos efectivos por salario</h2></div><button id="export-data" class="btn" type="button">Descargar tabla ↓</button></div><div id="table-controls" class="table-controls"></div><div id="comparison-table" class="table-wrap" tabindex="0" aria-label="Tabla comparativa, desplazable horizontalmente"></div><p id="table-note" class="table-note"></p></section>
+        <details id="source-details" class="panel source-details"><summary>Fuente y datos de la hoja «Reforma»</summary><div id="source-content" class="source-content"><p>Datos del archivo Modelo_IRPF_tres_reformas_neutrales.xlsx, hoja «Reforma».</p></div></details>
+        <noscript><p class="panel fallback">Activa JavaScript para visualizar las cuatro gráficas y la tabla comparativa de los cinco modelos.</p></noscript>
+        <footer><span>N.Geolitics</span><span>La información es poder.</span><a href="../index.html">Volver a análisis ↗</a></footer>
+      </main>
+    </div>
+  </div>
+  <div id="tooltip" class="tooltip" role="status" hidden></div>
+</body>
+</html>
