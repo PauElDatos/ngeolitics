@@ -59,15 +59,14 @@ summary { cursor: pointer; color: var(--ink); }
 .chart-option[aria-pressed="true"] { color: var(--accent); border-color: var(--accent); background: #302f24; }
 .chart-option span { font: 600 14px/1.2 Arial, sans-serif; }
 .mini-chart { display: block; width: 100%; height: clamp(36px,6dvh,83px); }
-.table-option { grid-column: 1 / -1; flex-direction: row; align-items: center; min-height: 48px; }
-.table-glyph { font: 28px/1 Arial, sans-serif !important; }
+.table-preview { pointer-events: none; }
+.table-preview table { height: 186px; font-size: 17px; line-height: 1.2; background: var(--surface); color: var(--ink); }
+.table-preview th, .table-preview td { position: static; padding: 2px 6px; }
 .explanations { border-top: 1px solid var(--edge); }
 .explanations .panel-head h2 { font-size: clamp(23px,1.75vw,29px); }
-.explanation-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 9px; padding: 12px; }
-.explanation-card { min-width: 0; padding: 11px; border: 1px solid #464646; border-radius: 9px; background: #252525; }
-.explanation-card.is-active { border-color: var(--accent); background: #302f24; }
-.explanation-card h3 { margin: 0 0 6px; color: var(--accent); font: 700 14px/1.25 var(--title); }
-.explanation-card p { margin: 0; color: #d1d1d1; font-size: 12px; line-height: 1.42; }
+.explanation-copy { padding: 14px; }
+.explanation-copy h3 { margin: 0 0 6px; color: var(--ink); font: 700 16px/1.25 var(--title); }
+.explanation-copy p { margin: 0; color: #d1d1d1; font-size: 14px; line-height: 1.5; }
 .table-wrap { min-height: 0; overflow: auto; scrollbar-width: thin; flex: 1; }
 table { width: 100%; min-width: 620px; font-size: clamp(12px,.9vw,16px); font-variant-numeric: tabular-nums; border-spacing: 0; }
 th, td { padding: 12px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid #393939; }

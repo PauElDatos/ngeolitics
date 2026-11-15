@@ -22,6 +22,12 @@
     return node;
   };
   const shortTitles = { savings: 'Ahorro anual', net: 'Variación del neto', rate: 'Tipo efectivo', share: 'Ahorro sobre el bruto' };
+  const explanations = {
+    savings: 'Muestra cuántos euros de IRPF se ahorran al año respecto al modelo actual. Por encima de cero se paga menos; por debajo, se paga más.',
+    net: 'Compara el sueldo neto de cada reforma con el del modelo actual. Un 5 % significa que se cobra un 5 % más en neto para el mismo salario bruto.',
+    rate: 'Indica qué parte del salario bruto anual se destina al IRPF en cada modelo. Un tipo efectivo del 20 % significa que se pagan 20 € de IRPF por cada 100 € de salario bruto.',
+    share: 'Expresa el ahorro anual en IRPF como porcentaje del salario bruto. Un 2 % equivale a ahorrar 2 € por cada 100 € brutos; un −2 % significa pagar 2 € más.'
+  };
   const selectedChart = id => data.charts.find(c => c.id === id);
   let chart = selectedChart('rate');
   let currentView = chart.id;
@@ -131,9 +137,6 @@
       btn.replaceChildren(el('span', '', shortTitles[c.id]), mini);
     });
     $('pick-table').setAttribute('aria-pressed', String(currentView === 'table'));
-    document.querySelectorAll('.explanation-card').forEach(card => {
-      card.classList.toggle('is-active', card.dataset.chart === currentView);
-    });
   }
 
   function selectChart(id) {
@@ -149,12 +152,16 @@
     $('chart-title').textContent = chart.title;
     $('chart-count').textContent = (data.charts.indexOf(chart)+1) + ' / ' + data.charts.length;
     $('chart-note').textContent = notes[id];
+    $('explanation-chart').textContent = shortTitles[id];
+    $('explanation-text').textContent = explanations[id];
+    $('explanation').hidden = false;
     renderThumbnails();
     draw();
   }
 
   function selectTable() {
     currentView = 'table';
+    $('explanation').hidden = true;
     plot.hidden = true;
     $('inspector').hidden = true;
     $('chart-note').hidden = true;
@@ -165,7 +172,7 @@
   }
 
   function renderTableVisibility() {
-    document.querySelectorAll('#comparison-table [data-scenario]').forEach(cell => {
+    document.querySelectorAll('#comparison-table [data-scenario], #table-preview-content [data-scenario]').forEach(cell => {
       cell.hidden = !visible.has(cell.dataset.scenario);
     });
   }
@@ -203,6 +210,13 @@
     });
     table.append(caption, head, body);
     $('comparison-table').replaceChildren(table);
+    const preview = el('table');
+    const previewBody = el('tbody');
+    for (const row of Array.from(body.rows).slice(0, 5)) {
+      previewBody.append(row.cloneNode(true));
+    }
+    preview.append(head.cloneNode(true), previewBody);
+    $('table-preview-content').replaceChildren(preview);
     renderTableVisibility();
   }
 

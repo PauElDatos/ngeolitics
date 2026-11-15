@@ -7,9 +7,9 @@
   <meta name="description" content="Compara el IRPF actual con la reforma de VOX y las alternativas TIPO A, B y C por salario bruto anual.">
   <link rel="icon" href="../assets/faviconNG.png">
   <link rel="stylesheet" href="../assets/section-header.css?v=1">
-  <link rel="stylesheet" href="styles.css?v=3">
+  <link rel="stylesheet" href="styles.css?v=4">
   <script src="data.js?v=1" defer></script>
-  <script src="app.js?v=5" defer></script>
+  <script src="app.js?v=6" defer></script>
 </head>
 <body>
   <a class="skip" href="#main">Saltar al contenido principal</a>
@@ -46,28 +46,19 @@
       <section id="graficas" class="picker" aria-labelledby="picker-title">
         <header class="panel-head"><h2 id="picker-title">Gráficas y tabla</h2><span>Selecciona una</span></header>
         <div id="chart-options" role="group" aria-label="Seleccionar gráfica o tabla">
-          <button class="chart-option table-option" type="button" id="pick-table" aria-label="Tabla de datos" aria-controls="main" aria-pressed="false"><span>Tabla de datos</span><span class="table-glyph" aria-hidden="true">▦</span></button>
+          <button class="chart-option" type="button" id="pick-table" aria-label="Tabla de datos" aria-controls="main" aria-pressed="false">
+            <span>Tabla de datos</span>
+            <svg class="mini-chart table-preview" viewBox="0 0 620 186" aria-hidden="true" focusable="false">
+              <foreignObject id="table-preview-content" width="620" height="186"></foreignObject>
+            </svg>
+          </button>
         </div>
       </section>
-      <section class="explanations" aria-labelledby="explanation-title">
+      <section class="explanations" id="explanation" aria-labelledby="explanation-title" hidden>
         <header class="panel-head"><h2 id="explanation-title">Explicación</h2></header>
-        <div class="explanation-list">
-          <article class="explanation-card" data-chart="savings">
-            <h3>Ahorro anual</h3>
-            <p>Muestra cuántos euros se pagan de menos o de más que con el IRPF actual. Por encima de cero hay ahorro; por debajo, se paga más.</p>
-          </article>
-          <article class="explanation-card" data-chart="net">
-            <h3>Variación del neto</h3>
-            <p>Expresa el cambio del sueldo neto en porcentaje respecto al modelo actual. Un valor positivo indica más sueldo disponible; uno negativo, menos.</p>
-          </article>
-          <article class="explanation-card" data-chart="rate">
-            <h3>Tipo efectivo</h3>
-            <p>Indica qué porcentaje del salario bruto se destina al IRPF en cada modelo. Una línea más alta significa una mayor carga fiscal.</p>
-          </article>
-          <article class="explanation-card" data-chart="share">
-            <h3>Ahorro sobre el bruto</h3>
-            <p>Convierte el ahorro o coste adicional en un porcentaje del salario bruto. Así se compara el impacto relativo entre salarios diferentes.</p>
-          </article>
+        <div class="explanation-copy" aria-live="polite" aria-atomic="true">
+          <h3 id="explanation-chart"></h3>
+          <p id="explanation-text"></p>
         </div>
       </section>
     </aside>
