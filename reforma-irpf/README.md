@@ -2,7 +2,9 @@
 
 Página estática basada en la maquetación de «Brecha entre ricos y pobres». Muestra los resultados de la hoja **Reforma** del archivo `Modelo_IRPF_tres_reformas_neutrales.xlsx` para Actual, VOX y TIPO A, B y C.
 
-Las cuatro gráficas conservan las series y los límites de los ejes del Excel. Los valores se leen de sus cachés incrustadas en Reforma. La tabla conserva las 16 filas de salario y los tipos efectivos de A86:C102 y E86:G102. La recaudación salarial utiliza F71 y F109:J112. `data.js` conserva el hash del archivo y los rangos de procedencia. El libro original no se publica ni se modifica.
+En escritorio, los escenarios se eligen a la izquierda. El panel derecho contiene cuatro miniaturas seleccionables y la tabla; la gráfica elegida ocupa el centro. En móvil las miniaturas aparecen encima de la gráfica. Al cambiar de vista se conservan los filtros y el salario consultado, ajustado al rango de la nueva gráfica.
+
+Las cuatro gráficas conservan las series y los límites de los ejes del Excel. Los valores se leen de sus cachés incrustadas en Reforma. La tabla conserva las 16 filas de salario y los tipos efectivos de A86:C102 y E86:G102. `data.js` conserva el hash del archivo y los rangos de procedencia. El libro original no se publica ni se modifica.
 
 Para actualizar desde una nueva versión del archivo, desde la raíz del repositorio:
 

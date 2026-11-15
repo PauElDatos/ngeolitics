@@ -21,7 +21,12 @@
     if (text !== undefined) node.textContent = text;
     return node;
   };
-  const chartViews = [];
+  const shortTitles = { savings: 'Ahorro anual', net: 'Variación del neto', rate: 'Tipo efectivo', share: 'Ahorro sobre el bruto' };
+  const selectedChart = id => data.charts.find(c => c.id === id);
+  let chart = selectedChart('savings');
+  const plot = $('plot'), slider = $('salary'), output = $('salary-value'), values = $('values');
+  let svg, cursor, markers, metrics;
+  let salary = 30; // Thousands of euros, shared across chart selections.
   const notes = {
     savings: 'Diferencia respecto al IRPF actual. Un valor negativo significa que se paga más IRPF. Hasta 150.000 € de salario bruto.',
     net: 'Cambio del sueldo neto respecto al modelo actual. Hasta 150.000 € de salario bruto.',
@@ -29,112 +34,112 @@
     share: 'Ahorro anual dividido entre salario bruto anual. Hasta 150.000 € de salario bruto.'
   };
 
-  function makeChart(chart) {
-    const plot = $(`plot-${chart.id}`);
-    $(`title-${chart.id}`).textContent = chart.title;
-    $(`note-${chart.id}`).textContent = notes[chart.id];
-    const control = el('div', 'chart-inspector');
-    const controlLine = el('div', 'inspector-heading');
-    const label = el('label', '', 'Consultar salario bruto');
-    label.htmlFor = `salary-${chart.id}`;
-    const output = el('output', 'salary-value');
-    output.htmlFor = label.htmlFor;
-    controlLine.append(label, output);
-    const slider = el('input', 'salary-slider');
-    slider.type = 'range';
-    slider.id = label.htmlFor;
-    const allX = chart.series[0].points.map(p => p[0]);
-    slider.min = Math.min(...allX);
-    slider.max = Math.max(...allX);
-    slider.step = 1;
-    slider.value = 30;
-    slider.setAttribute('aria-label', `${chart.title}: consultar salario bruto anual`);
-    const values = el('div', 'chart-values');
-    control.append(controlLine, slider, values);
-    plot.after(control);
-    let svg, cursor, markers;
-    let salary = 30;
-    let metrics;
-    const formatValue = value => chart.id === 'savings' ? money(value, 2) : percent(value);
-    function inspect(x) {
-      salary = Math.max(Number(slider.min), Math.min(Number(slider.max), Math.round(x)));
-      slider.value = salary;
-      slider.setAttribute('aria-valuetext', money(salary * 1000));
-      output.textContent = money(salary * 1000);
-      values.replaceChildren();
-      if (!metrics) return;
-      const px = metrics.sx(salary);
-      cursor.setAttribute('x1', px);
-      cursor.setAttribute('x2', px);
-      markers.replaceChildren();
-      chart.series.filter(s => visible.has(s.id)).forEach(series => {
-        // Each chart's embedded cache contains one observed value per 1,000 €.
-        const point = series.points.reduce((best, p) => Math.abs(p[0] - salary) < Math.abs(best[0] - salary) ? p : best);
-        const item = el('div', 'chart-value');
-        item.style.setProperty('--series-color', colors[series.id]);
-        item.append(el('span', 'series-label', labels[series.id]), el('strong', '', formatValue(point[1])));
-        values.append(item);
-        markers.append(svgEl('circle', { cx: metrics.sx(point[0]), cy: metrics.sy(point[1]), r: 3.5, fill: colors[series.id], stroke: '#252525', 'stroke-width': 1.5 }));
-      });
-      if (chart.id !== 'rate') {
-        const reference = el('div', 'chart-reference', 'Actual: referencia de 0');
-        values.append(reference);
-      }
+  const formatValue = value => chart.id === 'savings' ? money(value, 2) : percent(value);
+  function inspect(x) {
+    salary = Math.max(Number(slider.min), Math.min(Number(slider.max), Math.round(x)));
+    slider.value = salary;
+    slider.setAttribute('aria-valuetext', money(salary * 1000));
+    output.textContent = money(salary * 1000);
+    values.replaceChildren();
+    if (!metrics) return;
+    const px = metrics.sx(salary);
+    cursor.setAttribute('x1', px);
+    cursor.setAttribute('x2', px);
+    markers.replaceChildren();
+    chart.series.filter(s => visible.has(s.id)).forEach(series => {
+      // Each chart's embedded cache contains one observed value per 1,000 €.
+      const point = series.points.reduce((best, p) => Math.abs(p[0] - salary) < Math.abs(best[0] - salary) ? p : best);
+      const item = el('div', 'chart-value');
+      item.style.setProperty('--series-color', colors[series.id]);
+      item.append(el('span', 'series-label', labels[series.id]), el('strong', '', formatValue(point[1])));
+      values.append(item);
+      markers.append(svgEl('circle', { cx: metrics.sx(point[0]), cy: metrics.sy(point[1]), r: 3.5, fill: colors[series.id], stroke: '#252525', 'stroke-width': 1.5 }));
+    });
+    if (chart.id !== 'rate' && visible.has('actual')) {
+      const ref = el('div', 'chart-value');
+      ref.style.setProperty('--series-color', colors.actual);
+      ref.append(el('span', 'series-label', 'Actual · referencia'), el('strong', '', formatValue(0)));
+      values.prepend(ref);
     }
-    function draw() {
-      const width = Math.max(260, Math.floor(plot.getBoundingClientRect().width));
-      const height = width < 420 ? 265 : 290;
-      const margin = { left: chart.id === 'savings' ? 62 : 48, right: 16, top: 16, bottom: 49 };
-      const [xmin, xmax] = chart.xDomain;
-      const [ymin, ymax] = chart.yDomain;
-      const sx = x => margin.left + (x - xmin) / (xmax - xmin) * (width - margin.left - margin.right);
-      const sy = y => height - margin.bottom - (y - ymin) / (ymax - ymin) * (height - margin.top - margin.bottom);
-      metrics = { sx, sy };
-      svg = svgEl('svg', { viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-labelledby': `svg-title-${chart.id} svg-desc-${chart.id}`, class: 'line-chart' });
-      svg.append(svgEl('title', { id: `svg-title-${chart.id}` }, chart.title));
-      svg.append(svgEl('desc', { id: `svg-desc-${chart.id}` }, 'Comparación de los modelos seleccionados. Eje horizontal: salario bruto anual en miles de euros. Usa el control de salario bajo la gráfica para consultar los valores con el teclado.'));
-      const clipId = `clip-${chart.id}`;
-      const defs = svgEl('defs');
-      const clip = svgEl('clipPath', { id: clipId });
-      clip.append(svgEl('rect', { x: sx(xmin), y: sy(ymax), width: sx(xmax) - sx(xmin), height: sy(ymin) - sy(ymax) }));
-      defs.append(clip);
-      svg.append(defs);
-      const ySteps = chart.id === 'share' ? 5 : 4;
-      for (let i = 0; i <= ySteps; i++) {
-        const y = ymin + (ymax - ymin) * i / ySteps;
-        svg.append(svgEl('line', { x1: sx(xmin), x2: sx(xmax), y1: sy(y), y2: sy(y), class: Math.abs(y) < 1e-10 ? 'zero-line' : 'grid-line' }));
-        svg.append(svgEl('text', { x: margin.left - 10, y: sy(y) + 4, 'text-anchor': 'end', class: 'axis-label' }, chart.id === 'savings' ? number(y) : percent(y, 0)));
-      }
-      if (chart.id === 'share') svg.append(svgEl('line', { x1: sx(xmin), x2: sx(xmax), y1: sy(0), y2: sy(0), class: 'zero-line' }));
-      const xTicks = width < 420 ? (xmax === 500 ? [0, 100, 250, 400, 500] : [0, 50, 100, 150]) : (xmax === 500 ? [0, 100, 200, 300, 400, 500] : [0, 25, 50, 75, 100, 125, 150]);
-      xTicks.forEach(x => {
-        svg.append(svgEl('line', { x1: sx(x), x2: sx(x), y1: sy(ymin), y2: sy(ymax), class: 'grid-line vertical-grid' }));
-        svg.append(svgEl('text', { x: sx(x), y: height - 29, 'text-anchor': 'middle', class: 'axis-label' }, number(x)));
-      });
-      svg.append(svgEl('text', { x: (sx(xmin) + sx(xmax)) / 2, y: height - 7, 'text-anchor': 'middle', class: 'axis-title' }, 'Salario bruto anual (miles de €)'));
-      const lines = svgEl('g', { 'clip-path': `url(#${clipId})` });
-      chart.series.filter(s => visible.has(s.id)).forEach(series => {
-        const path = series.points.map((p, i) => `${i ? 'L' : 'M'}${sx(p[0]).toFixed(2)},${sy(p[1]).toFixed(2)}`).join(' ');
-        lines.append(svgEl('path', { d: path, fill: 'none', stroke: colors[series.id], 'stroke-width': 2.5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', class: 'chart-series', 'data-scenario': series.id }));
-      });
-      cursor = svgEl('line', { y1: sy(ymax), y2: sy(ymin), class: 'chart-cursor' });
-      markers = svgEl('g');
-      lines.append(cursor, markers);
-      svg.append(lines);
-      const overlay = svgEl('rect', { x: sx(xmin), y: sy(ymax), width: sx(xmax) - sx(xmin), height: sy(ymin) - sy(ymax), fill: 'transparent', class: 'chart-overlay' });
-      overlay.addEventListener('pointermove', event => {
-        if (event.pointerType === 'touch') return;
-        const rect = svg.getBoundingClientRect();
-        const localX = (event.clientX - rect.left) / rect.width * width;
-        inspect(xmin + (localX - margin.left) / (width - margin.left - margin.right) * (xmax - xmin));
-      });
-      svg.append(overlay);
-      plot.replaceChildren(svg);
-      inspect(salary);
+  }
+  function draw() {
+    const width = Math.max(1, plot.clientWidth);
+    const height = Math.max(1, plot.clientHeight);
+    const margin = { left: chart.id === 'savings' ? 62 : 48, right: 16, top: 16, bottom: 49 };
+    const [xmin, xmax] = chart.xDomain;
+    const [ymin, ymax] = chart.yDomain;
+    const sx = x => margin.left + (x - xmin) / (xmax - xmin) * (width - margin.left - margin.right);
+    const sy = y => height - margin.bottom - (y - ymin) / (ymax - ymin) * (height - margin.top - margin.bottom);
+    metrics = { sx, sy };
+    svg = svgEl('svg', { viewBox: `0 0 ${width} ${height}`, role: 'img', 'aria-labelledby': `svg-title-${chart.id} svg-desc-${chart.id}`, class: 'line-chart' });
+    svg.append(svgEl('title', { id: `svg-title-${chart.id}` }, chart.title));
+    svg.append(svgEl('desc', { id: `svg-desc-${chart.id}` }, 'Comparación de los modelos seleccionados. Eje horizontal: salario bruto anual en miles de euros. Usa el control de salario bajo la gráfica para consultar los valores con el teclado.'));
+    const clipId = `clip-${chart.id}`;
+    const defs = svgEl('defs');
+    const clip = svgEl('clipPath', { id: clipId });
+    clip.append(svgEl('rect', { x: sx(xmin), y: sy(ymax), width: sx(xmax) - sx(xmin), height: sy(ymin) - sy(ymax) }));
+    defs.append(clip);
+    svg.append(defs);
+    const ySteps = chart.id === 'share' ? (height > 380 ? 10 : 5) : (height > 380 ? 8 : 4);
+    for (let i = 0; i <= ySteps; i++) {
+      const y = ymin + (ymax - ymin) * i / ySteps;
+      svg.append(svgEl('line', { x1: sx(xmin), x2: sx(xmax), y1: sy(y), y2: sy(y), class: Math.abs(y) < 1e-10 ? 'zero-line' : 'grid-line' }));
+      svg.append(svgEl('text', { x: margin.left - 10, y: sy(y) + 4, 'text-anchor': 'end', class: 'axis-label' }, chart.id === 'savings' ? number(y) : percent(y, 0)));
     }
-    slider.addEventListener('input', () => inspect(Number(slider.value)));
-    new ResizeObserver(draw).observe(plot);
-    chartViews.push({ draw });
+    if (chart.id === 'share' && ySteps % 2) svg.append(svgEl('line', { x1: sx(xmin), x2: sx(xmax), y1: sy(0), y2: sy(0), class: 'zero-line' }));
+    const xTicks = width < 420 ? (xmax === 500 ? [0, 100, 250, 400, 500] : [0, 50, 100, 150]) : (xmax === 500 ? [0, 100, 200, 300, 400, 500] : [0, 25, 50, 75, 100, 125, 150]);
+    xTicks.forEach(x => {
+      svg.append(svgEl('line', { x1: sx(x), x2: sx(x), y1: sy(ymin), y2: sy(ymax), class: 'grid-line vertical-grid' }));
+      svg.append(svgEl('text', { x: sx(x), y: height - 29, 'text-anchor': 'middle', class: 'axis-label' }, number(x)));
+    });
+    svg.append(svgEl('text', { x: (sx(xmin) + sx(xmax)) / 2, y: height - 7, 'text-anchor': 'middle', class: 'axis-title' }, 'Salario bruto anual (miles de €)'));
+    const lines = svgEl('g', { 'clip-path': `url(#${clipId})` });
+    chart.series.filter(s => visible.has(s.id)).forEach(series => {
+      const path = series.points.map((p, i) => `${i ? 'L' : 'M'}${sx(p[0]).toFixed(2)},${sy(p[1]).toFixed(2)}`).join(' ');
+      lines.append(svgEl('path', { d: path, fill: 'none', stroke: colors[series.id], 'stroke-width': 2.5, 'stroke-linejoin': 'round', 'stroke-linecap': 'round', class: 'chart-series', 'data-scenario': series.id }));
+    });
+    cursor = svgEl('line', { y1: sy(ymax), y2: sy(ymin), class: 'chart-cursor' });
+    markers = svgEl('g');
+    lines.append(cursor, markers);
+    svg.append(lines);
+    const overlay = svgEl('rect', { x: sx(xmin), y: sy(ymax), width: sx(xmax) - sx(xmin), height: sy(ymin) - sy(ymax), fill: 'transparent', class: 'chart-overlay' });
+    overlay.addEventListener('pointermove', event => {
+      if (event.pointerType === 'touch') return;
+      const rect = svg.getBoundingClientRect();
+      const localX = (event.clientX - rect.left) / rect.width * width;
+      inspect(xmin + (localX - margin.left) / (width - margin.left - margin.right) * (xmax - xmin));
+    });
+    svg.append(overlay);
+    plot.replaceChildren(svg);
+    inspect(salary);
+  }
+
+  function renderThumbnails() {
+    data.charts.forEach(c => {
+      const btn = $('pick-' + c.id);
+      btn.setAttribute('aria-pressed', String(c.id === chart.id));
+      const mini = svgEl('svg', { viewBox: '0 0 144 52', preserveAspectRatio: 'none', class: 'mini-chart', 'aria-hidden': 'true' });
+      const [x0,x1] = c.xDomain, [y0,y1] = c.yDomain;
+      const sx = x => 2 + 140 * (x-x0)/(x1-x0);
+      const sy = y => 50 - 48 * (y-y0)/(y1-y0);
+      mini.append(svgEl('line', { x1: 2, x2: 142, y1: sy(0), y2: sy(0), stroke: '#666', 'stroke-dasharray': '3 3' }));
+      for (const series of c.series.filter(s => visible.has(s.id))) {
+        const d = series.points.map(([x,y],i) => (i ? 'L' : 'M') + sx(x).toFixed(2) + ',' + sy(y).toFixed(2)).join(' ');
+        mini.append(svgEl('path', { d, fill: 'none', stroke: colors[series.id], 'stroke-width': 1.65, 'vector-effect': 'non-scaling-stroke' }));
+      }
+      btn.replaceChildren(el('span', '', shortTitles[c.id]), mini);
+    });
+  }
+
+  function selectChart(id) {
+    chart = selectedChart(id);
+    const points = chart.series[0].points;
+    slider.min = points[0][0];
+    slider.max = points[points.length-1][0];
+    $('chart-title').textContent = chart.title;
+    $('chart-count').textContent = (data.charts.indexOf(chart)+1) + ' / ' + data.charts.length;
+    $('chart-note').textContent = notes[id];
+    renderThumbnails();
     draw();
   }
 
@@ -143,7 +148,7 @@
     const caption = el('caption', 'sr-only', 'Tipo efectivo de IRPF por salario bruto anual. Comparación del modelo actual, VOX y las alternativas TIPO A, B y C.');
     const head = el('thead');
     const headers = el('tr');
-    const salaryHeader = el('th', '', 'Salario bruto anual');
+    const salaryHeader = el('th', '', 'Bruto anual');
     salaryHeader.scope = 'col';
     headers.append(salaryHeader);
     Object.keys(labels).forEach(id => {
@@ -170,37 +175,26 @@
     });
     table.append(caption, head, body);
     $('comparison-table').replaceChildren(table);
-    $('table-note').textContent = 'Tipo efectivo = IRPF / salario bruto anual. Los porcentajes se muestran con dos decimales. La tabla conserva los cinco modelos aunque ocultes series en las gráficas.';
   }
 
-  function renderSummary() {
-    const descriptions = { a: 'Moderada', b: 'Equilibrada', c: 'Más redistributiva' };
-    const cards = ['a', 'b', 'c'].map(id => {
-      const card = el('article', 'summary-card');
-      card.style.setProperty('--series-color', colors[id]);
-      card.append(el('h3', 'series-label', `${labels[id]} · ${descriptions[id]}`));
-      const result = data.summary.candidates.find(candidate => candidate.id === id);
-      card.append(el('strong', 'summary-value', `${number(result.revenue, 1)} M€`));
-      card.append(el('p', '', `IRPF salarial simulado · +${number(result.additional, 1)} M€ frente al actual`));
-      return card;
-    });
-    $('scenario-summary').replaceChildren(...cards);
+  for (const c of data.charts) {
+    const btn = el('button', 'chart-option');
+    btn.type = 'button';
+    btn.id = 'pick-' + c.id;
+    btn.setAttribute('aria-label', c.title);
+    btn.setAttribute('aria-controls', 'main');
+    btn.addEventListener('click', () => selectChart(c.id));
+    $('chart-options').append(btn);
   }
-
-  function renderSources() {
-    const content = $('source-content');
-    content.replaceChildren();
-    content.append(el('p', '', `Fuente: ${data.source.file}, hoja «${data.source.sheet}». Se muestran los resultados guardados en el archivo para este perfil:`));
-    content.append(el('p', '', data.profile.A4));
-    content.append(el('p', '', data.profile.A5));
-    content.append(el('p', '', 'Las cuatro gráficas proceden de las series guardadas en esta hoja. La tabla corresponde a A86:C102 y E86:G102. La recaudación salarial actual de referencia es de ' + number(data.summary.actual, 1) + ' M€; los resultados de A, B y C proceden de F109:J112.'));
-    content.append(el('p', '', data.profile.A114));
-    content.append(el('p', '', 'Los límites de los ejes coinciden con el Excel. Las curvas de ahorro y variación neta llegan a 150.000 €; la de tipo efectivo llega a 500.000 €. La tabla incluye los 16 salarios de la hoja, hasta 1.000.000 €.'));
-    content.append(el('p', 'source-note', '«Actual» y «VOX» son los modelos del archivo aportado. Los resultados corresponden a sus supuestos y al perfil indicado.'));
-  }
-
-  document.querySelectorAll('[data-scenario]').forEach(button => {
-    if (button.tagName !== 'BUTTON') return;
+  for (const scenario of data.scenarios) {
+    const button = el('button', 'scenario');
+    button.type = 'button';
+    button.dataset.scenario = scenario.id;
+    button.setAttribute('aria-pressed', 'true');
+    const swatch = el('span', 'swatch');
+    swatch.setAttribute('aria-hidden','true');
+    button.append(swatch, el('span','',scenario.label));
+    $('scenarios').append(button);
     const id = button.dataset.scenario;
     button.style.setProperty('--series-color', colors[id]);
     button.addEventListener('click', () => {
@@ -210,15 +204,17 @@
       }
       visible.has(id) ? visible.delete(id) : visible.add(id);
       button.setAttribute('aria-pressed', String(visible.has(id)));
-      $('series-status').textContent = `${visible.size} modelos seleccionados.`;
-      chartViews.forEach(view => view.draw());
+      $('series-status').textContent = `${visible.size} seleccionados`;
+      renderThumbnails();
+      draw();
     });
-  });
+  }
   $('reset-scenarios').addEventListener('click', () => {
     Object.keys(labels).forEach(id => visible.add(id));
     document.querySelectorAll('button[data-scenario]').forEach(button => button.setAttribute('aria-pressed', 'true'));
-    $('series-status').textContent = '5 modelos seleccionados.';
-    chartViews.forEach(view => view.draw());
+    $('series-status').textContent = '5 seleccionados';
+    renderThumbnails();
+    draw();
   });
   $('export-data').addEventListener('click', () => {
     const rows = [['Salario bruto anual (€)', ...Object.values(labels).map(label => `${label} (%)`)]];
@@ -234,19 +230,7 @@
     setTimeout(() => URL.revokeObjectURL(url), 1000);
   });
   renderTable();
-  renderSummary();
-  renderSources();
-  $('profile-note').textContent = data.profile.A4 + ' Resultados guardados en el Excel.';
-  const updateTabs = () => {
-    const target = location.hash || '#graficas';
-    document.querySelectorAll('.section-tabs a').forEach(link => {
-      const active = link.getAttribute('href') === target;
-      link.classList.toggle('on', active);
-      if (active) link.setAttribute('aria-current', 'location');
-      else link.removeAttribute('aria-current');
-    });
-  };
-  window.addEventListener('hashchange', updateTabs);
-  updateTabs();
-  data.charts.forEach(makeChart);
+  slider.addEventListener('input', () => inspect(Number(slider.value)));
+  selectChart(chart.id);
+  new ResizeObserver(draw).observe(plot);
 })();
